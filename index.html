@@ -1,288 +1,336 @@
 <!doctype html>
 <html lang="ko">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cg fill='%239B2F57'%3E%3Ccircle cx='20' cy='7.5' r='6'/%3E%3Ccircle cx='31.9' cy='16.1' r='6'/%3E%3Ccircle cx='27.3' cy='30.1' r='6'/%3E%3Ccircle cx='12.7' cy='30.1' r='6'/%3E%3Ccircle cx='8.1' cy='16.1' r='6'/%3E%3Ccircle cx='20' cy='20' r='5'/%3E%3C/g%3E%3C/svg%3E">
-<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
-<title>maehwachem</title>
-<meta name="description" content="고등학교 과학 교사의 수업 도구와 학습 자료 모음">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-/* 레이아웃: 위에 이름표(매화 모양 분자 마크 + maehwachem), 첫 화면은 소개와 '지금 쓸 수 있는 도구' 바로 가기,
-   그 아래 분류 칩으로 거르는 작업 목록, 이력, 연락. 도구가 늘면 WORKS 배열에 한 줄만 더함 */
-:root{
-  --bg:#F3F5F4; --paper:#FFFFFF; --ink:#1B1D22; --ink2:#535A61; --line:#D9DEDC; --grid:#E4E8E6;
-  --plum:#9B2F57; --plum-soft:#F6E4EA; --live:#2E7350; --live-soft:#E0F0E6; --fill:#FBEFC4; --fill-line:#C9A227;
-  --display:'Do Hyeon', 'IBM Plex Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
-  --body:'IBM Plex Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif;
-  --mono:'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
-}
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-  --bg:#15171A; --paper:#1D2024; --ink:#E7EAEC; --ink2:#A6AEB5; --line:#30353B; --grid:#22262A;
-  --plum:#E58AAB; --plum-soft:#3A2230; --live:#7FD0A3; --live-soft:#1E3529; --fill:#43391A; --fill-line:#B8942A; color-scheme:dark; } }
-:root[data-theme="dark"]{
-  --bg:#15171A; --paper:#1D2024; --ink:#E7EAEC; --ink2:#A6AEB5; --line:#30353B; --grid:#22262A;
-  --plum:#E58AAB; --plum-soft:#3A2230; --live:#7FD0A3; --live-soft:#1E3529; --fill:#43391A; --fill-line:#B8942A; color-scheme:dark; }
-*{ box-sizing:border-box; }
-html{ scroll-behavior:smooth; }
-@media (prefers-reduced-motion: reduce){ html{ scroll-behavior:auto; } }
-body{ background:var(--bg); color:var(--ink); font-family:var(--body); font-size:16px; line-height:1.7; word-break:keep-all; overflow-wrap:break-word; }
-a{ color:inherit; }
-a:focus-visible, button:focus-visible{ outline:2px solid var(--plum); outline-offset:2px; border-radius:6px; }
-.wrap{ max-width:1080px; margin:0 auto; padding-inline:20px; }
-.fill{ background:var(--fill); border-bottom:1.5px dashed var(--fill-line); padding:0 4px; border-radius:3px; color:var(--ink); }
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>KJE의 작업실 · 과학교육과 탐구</title>
+  <meta name="description" content="과학교육을 바탕으로 수업과 탐구, 디지털 제작을 연결합니다. KJE의 가상실험, 학습 게임, 교육 도구와 수업·탐구 자료.">
+  <link rel="canonical" href="https://maehwachem.github.io/">
+  <link rel="icon" type="image/png" href="assets/student-character.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;family=Noto+Serif+KR:wght@400;500;600&amp;display=swap">
+  <style>
+    #kje-portfolio{--kje-student-image:url('assets/student-character.png')}
+    #kje-portfolio .kje-student-image{display:block;background-image:var(--kje-student-image);background-size:contain;background-position:center;background-repeat:no-repeat;background-origin:content-box}
+    #kje-portfolio .kje-brand-drawing{width:48px;height:52px;flex:0 0 auto;background-color:#f6f3e9;border-radius:14px;padding:5px}
+    @media(max-width:650px){#kje-portfolio .kje-brand-drawing{width:38px;height:42px;border-radius:10px;padding:4px}}
+    
+    #kje-portfolio{--kje-paper:light-dark(#faf9f5,#192522);--kje-ink:light-dark(#233a38,#f2eee2);--kje-muted:light-dark(#68736c,#b5c0b9);--kje-line:light-dark(#dcded4,#3c4b46);--kje-green:light-dark(#315b4b,#b1ccad);--kje-wash:light-dark(#e9eddf,#263b32);--kje-white:light-dark(#fffefa,#21312c);--kje-button:light-dark(#294d40,#b1ccad);--kje-button-text:light-dark(#fffefa,#203629);color:var(--kje-ink);background:var(--kje-paper);font-family:'Noto Sans KR',sans-serif;font-size:14px;line-height:1.6;position:relative;isolation:isolate;text-align:left;overflow:hidden}
+    #kje-portfolio *{box-sizing:border-box}
+    #kje-portfolio button,#kje-portfolio a{-webkit-tap-highlight-color:transparent;font:inherit;color:inherit}
+    #kje-portfolio button{background:none;border:0;padding:0;text-align:inherit}
+    #kje-portfolio button:focus-visible,#kje-portfolio a:focus-visible{outline:2px solid var(--kje-green);outline-offset:5px}
+    #kje-portfolio a{text-decoration:none}
+    #kje-portfolio p,#kje-portfolio h1,#kje-portfolio h2,#kje-portfolio h3{margin:0}
+    #kje-portfolio .kje-wrap{width:86%;max-width:1180px;margin:0 auto}
+    #kje-portfolio .kje-nav{height:88px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--kje-line);gap:25px}
+    #kje-portfolio .kje-brand{display:flex;align-items:center;gap:11px;white-space:nowrap}
+    #kje-portfolio .kje-mark{font:500 27px/1 Georgia,serif;letter-spacing:-2px;border:1px solid var(--kje-ink);width:49px;height:49px;display:grid;place-items:center;border-radius:50%;padding-right:3px}
+    #kje-portfolio .kje-brand-name{font-size:17px;font-weight:600;letter-spacing:-.5px}
+    #kje-portfolio .kje-menu{display:flex;gap:25px;align-items:center;font-size:12px;font-weight:500;white-space:nowrap}
+    #kje-portfolio .kje-menu button,#kje-portfolio .kje-menu a{padding:11px 0}
+    #kje-portfolio .kje-menu button:hover,#kje-portfolio .kje-menu a:hover{color:var(--kje-green);text-decoration:underline;text-underline-offset:7px}
+    #kje-portfolio .kje-hero{display:grid;grid-template-columns:1.35fr 1fr;gap:35px;align-items:center;padding:62px 0 65px}
+    #kje-portfolio .kje-eyebrow{font-size:10px;letter-spacing:2.2px;font-weight:500;color:var(--kje-green);text-transform:uppercase}
+    #kje-portfolio h1{font-family:'Noto Serif KR',serif;font-size:clamp(31px,4.5vw,54px);font-weight:500;letter-spacing:-2.7px;line-height:1.48;margin-top:23px;word-break:keep-all}
+    #kje-portfolio .kje-hero-copy{font-size:13px;color:var(--kje-muted);line-height:1.95;margin-top:22px;word-break:keep-all}
+    #kje-portfolio .kje-hero-actions{display:flex;gap:23px;align-items:center;margin-top:30px}
+    #kje-portfolio .kje-action{display:inline-flex;align-items:center;justify-content:center;gap:19px;font-size:12px;padding:12px 19px;background:var(--kje-button);color:var(--kje-button-text);border:1px solid var(--kje-button);transition:transform .18s}
+    #kje-portfolio .kje-action:hover{transform:translateY(-2px)}
+    #kje-portfolio .kje-text-link{display:inline-flex;align-items:center;gap:12px;font-size:12px;border-bottom:1px solid var(--kje-ink);padding:4px 0}
+    #kje-portfolio .kje-hero-art{position:relative;aspect-ratio:1.03;min-height:270px;background:light-dark(#e2e6d6,#35473e);overflow:hidden}
+    #kje-portfolio .kje-art-grid{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:1px;background:light-dark(#e2e6d6,#35473e)}
+    #kje-portfolio .kje-art-cell{position:relative;overflow:hidden}
+    #kje-portfolio .kje-art-cell:nth-child(1){background:light-dark(#dae2d3,#4f6758)}
+    #kje-portfolio .kje-art-cell:nth-child(2){background:light-dark(#f3eedf,#d7d1bd)}
+    #kje-portfolio .kje-art-cell:nth-child(3){background:light-dark(#efe8d9,#b8baa7)}
+    #kje-portfolio .kje-art-cell:nth-child(4){background:light-dark(#466554,#355746)}
+    #kje-portfolio .kje-orbit{width:77%;height:77%;border:1px solid light-dark(#566c59,#d8e3cc);border-radius:50%;position:absolute;top:12%;left:12%;transform:rotate(-35deg)}
+    #kje-portfolio .kje-orbit:before{content:'';position:absolute;inset:17%;border:1px solid light-dark(#566c59,#d8e3cc);border-radius:50%}
+    #kje-portfolio .kje-orbit:after{content:'';position:absolute;width:20%;height:20%;background:light-dark(#3b5946,#d9e3c9);border-radius:50%;top:1%;left:12%}
+    #kje-portfolio .kje-arches{position:absolute;inset:18% 24% 0;border:1px solid #938a6d;border-bottom:0;border-radius:100px 100px 0 0}
+    #kje-portfolio .kje-arches:before,#kje-portfolio .kje-arches:after{content:'';position:absolute;inset:11% 18% 0;border:1px solid #938a6d;border-bottom:0;border-radius:100px 100px 0 0}
+    #kje-portfolio .kje-arches:after{inset:22% 36% 0}
+    #kje-portfolio .kje-type-art{position:absolute;bottom:2%;left:8%;font:italic 140px/.9 Georgia,serif;color:#607456;transform:rotate(-8deg)}
+    #kje-portfolio .kje-cut-circle{position:absolute;width:125%;height:125%;border:30px solid #bdd0ac;border-radius:50%;left:-40%;top:19%}
+    #kje-portfolio .kje-art-caption{position:absolute;bottom:13px;right:13px;font-size:9px;letter-spacing:1.5px;color:#f5f3e7;writing-mode:vertical-rl}
+    #kje-portfolio .kje-art-label{position:absolute;top:13px;left:14px;font-size:9px;letter-spacing:1.6px;color:#345140}
+    #kje-portfolio .kje-divider{border-top:1px solid var(--kje-line);display:flex;justify-content:space-between;gap:12px;padding:17px 0;font-size:11px;color:var(--kje-muted)}
+    #kje-portfolio .kje-divider span:first-child{color:var(--kje-ink);letter-spacing:1px}
+    #kje-portfolio .kje-section{padding:49px 0 57px;scroll-margin-top:20px}
+    #kje-portfolio .kje-section-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:25px}
+    #kje-portfolio h2{font-size:25px;line-height:1.5;letter-spacing:-1px;font-weight:500}
+    #kje-portfolio .kje-subtitle{font-size:12px;color:var(--kje-muted);margin-top:5px}
+    #kje-portfolio .kje-projects{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
+    #kje-portfolio .kje-project{display:block;width:100%}
+    #kje-portfolio .kje-project:hover .kje-poster{transform:translateY(-4px)}
+    #kje-portfolio .kje-poster{height:194px;position:relative;overflow:hidden;transition:transform .2s}
+    #kje-portfolio .kje-poster-island{background:light-dark(#dce6db,#b6cbb6);color:#2a4b3a}
+    #kje-portfolio .kje-poster-lab{background:light-dark(#eadfcc,#d1c2a6);color:#5c4a2d}
+    #kje-portfolio .kje-poster-note{background:light-dark(#dfe5e9,#c2d1d9);color:#344f60}
+    #kje-portfolio .kje-poster-cap{position:absolute;left:17px;top:13px;font-size:9px;letter-spacing:1.4px}
+    #kje-portfolio .kje-poster-word{position:absolute;left:16px;bottom:13px;font-family:'Noto Serif KR',serif;font-size:23px;letter-spacing:-1px;line-height:1.45;z-index:2}
+    #kje-portfolio .kje-contour{position:absolute;border:1px solid #8ca28a;width:185px;height:128px;border-radius:43% 56% 40% 49%;transform:rotate(-27deg);right:-25px;top:17px}
+    #kje-portfolio .kje-contour:before,#kje-portfolio .kje-contour:after{content:'';position:absolute;inset:13px;border:1px solid #8ca28a;border-radius:inherit}
+    #kje-portfolio .kje-contour:after{inset:26px;background:#c0d0b5}
+    #kje-portfolio .kje-lab-ring{position:absolute;right:24px;top:31px;width:102px;height:102px;border:1px solid #9c8964;border-radius:50%;background:#d5c4a0;box-shadow:inset 0 0 0 12px #eadfc8,inset 0 0 0 13px #a6936e}
+    #kje-portfolio .kje-lab-ring:after{content:'e⁻';font:italic 41px Georgia,serif;position:absolute;inset:15px;display:grid;place-items:center}
+    #kje-portfolio .kje-notepaper{position:absolute;width:115px;height:135px;right:25px;top:34px;transform:rotate(9deg);background:#f7f5ef;padding:16px;box-shadow:7px 8px 0 #b6c7cb}
+    #kje-portfolio .kje-notepaper b{font:32px Georgia,serif;font-weight:400;display:block}
+    #kje-portfolio .kje-notepaper span{display:block;height:1px;background:#c1ccd0;margin-top:13px}
+    #kje-portfolio .kje-project-tag{font-size:10px;color:var(--kje-green);margin-top:16px;letter-spacing:.3px}
+    #kje-portfolio .kje-project-title{font-size:16px;font-weight:500;letter-spacing:-.5px;margin-top:5px;display:flex;justify-content:space-between;gap:5px}
+    #kje-portfolio .kje-project-desc{font-size:11px;color:var(--kje-muted);line-height:1.8;margin-top:7px;word-break:keep-all}
+    #kje-portfolio .kje-mosaic{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid var(--kje-line);border-bottom:1px solid var(--kje-line)}
+    #kje-portfolio .kje-path{display:block;padding:24px 24px 25px 0;position:relative}
+    #kje-portfolio .kje-path+.kje-path{padding-left:24px;border-left:1px solid var(--kje-line)}
+    #kje-portfolio .kje-path-no{font:italic 22px Georgia,serif;color:var(--kje-green)}
+    #kje-portfolio .kje-path-title{font-size:16px;font-weight:500;display:block;margin-top:21px}
+    #kje-portfolio .kje-path-desc{font-size:11px;color:var(--kje-muted);display:block;margin-top:7px;word-break:keep-all}
+    #kje-portfolio .kje-path-arrow{position:absolute;right:24px;top:27px;font-size:17px}
+    #kje-portfolio .kje-path:hover .kje-path-title{text-decoration:underline;text-underline-offset:4px}
+    #kje-portfolio .kje-about-band{background:var(--kje-wash);margin-top:59px;padding:43px 0;scroll-margin-top:20px}
+    #kje-portfolio .kje-about-inner{display:grid;grid-template-columns:.8fr 1.5fr;gap:35px;align-items:center}
+    #kje-portfolio .kje-about-title{font-family:'Noto Serif KR',serif;font-size:25px;font-weight:500;letter-spacing:-1px;line-height:1.65;margin-top:10px}
+    #kje-portfolio .kje-about-copy{font-size:12px;color:var(--kje-muted);line-height:2;word-break:keep-all}
+    #kje-portfolio .kje-interests{display:flex;gap:14px;font-size:10px;color:var(--kje-green);flex-wrap:wrap;margin-top:15px}
+    #kje-portfolio .kje-footer{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px 20px;padding:27px 0;font-size:10px;color:var(--kje-muted)}
+    #kje-portfolio .kje-contact-email{font-size:12px;color:var(--kje-green);overflow-wrap:anywhere;text-decoration:underline;text-underline-offset:4px;padding:8px 0}
+    #kje-portfolio .kje-footer strong{color:var(--kje-ink);font-weight:500;font-size:12px}
+    #kje-portfolio .kje-overlay{position:absolute;inset:0;z-index:10;background:light-dark(#faf9f5,#192522);padding:35px 7%;overflow:auto}
+    #kje-portfolio .kje-overlay[hidden]{display:none}
+    #kje-portfolio .kje-detail-top{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--kje-line);padding-bottom:20px;margin-bottom:38px}
+    #kje-portfolio .kje-close{display:inline-flex;align-items:center;gap:9px;font-size:12px;padding:7px 0}
+    #kje-portfolio .kje-detail-label{font-size:11px;letter-spacing:1px;color:var(--kje-muted)}
+    #kje-portfolio .kje-detail-title{font-family:'Noto Serif KR',serif;font-weight:500;font-size:36px;letter-spacing:-1.5px;margin:14px 0 19px}
+    #kje-portfolio .kje-detail-summary{font-size:14px;line-height:1.9;max-width:580px;color:var(--kje-muted);word-break:keep-all}
+    #kje-portfolio .kje-detail-panels{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:34px}
+    #kje-portfolio .kje-detail-panel{background:var(--kje-wash);padding:25px}
+    #kje-portfolio .kje-detail-panel h3{font-size:15px;font-weight:500;margin-bottom:12px}
+    #kje-portfolio .kje-detail-panel p{font-size:12px;color:var(--kje-muted);line-height:1.9;word-break:keep-all}
+    #kje-portfolio .kje-detail-foot{margin-top:28px;border-top:1px solid var(--kje-line);padding-top:19px;color:var(--kje-muted);font-size:11px}
+    @media(max-width:650px){#kje-portfolio .kje-wrap{width:88%}#kje-portfolio .kje-nav{height:auto;min-height:75px;flex-wrap:wrap;padding:16px 0;gap:12px}#kje-portfolio .kje-brand-name{font-size:15px}#kje-portfolio .kje-mark{height:38px;width:38px;font-size:22px}#kje-portfolio .kje-menu{gap:17px;font-size:11px;flex-wrap:wrap}#kje-portfolio .kje-hero{grid-template-columns:1fr;padding:37px 0 29px;gap:28px}#kje-portfolio h1{font-size:36px;letter-spacing:-1.8px;margin-top:14px}#kje-portfolio .kje-hero-copy{font-size:12px;margin-top:16px}#kje-portfolio .kje-hero-art{min-height:0;aspect-ratio:1.6;max-height:250px}#kje-portfolio .kje-art-grid{grid-template-columns:repeat(4,1fr);grid-template-rows:1fr}#kje-portfolio .kje-type-art{font-size:125px}#kje-portfolio .kje-art-label{font-size:8px;letter-spacing:1px}#kje-portfolio .kje-cut-circle{border-width:25px;width:190%;height:120%;top:28%;left:-72%}#kje-portfolio .kje-divider{font-size:10px}#kje-portfolio .kje-divider span:last-child{display:none}#kje-portfolio .kje-section{padding:32px 0 37px}#kje-portfolio h2{font-size:23px}#kje-portfolio .kje-projects{grid-template-columns:1fr;gap:29px}#kje-portfolio .kje-poster{height:195px}#kje-portfolio .kje-project-title{font-size:18px}#kje-portfolio .kje-project-desc{font-size:12px}#kje-portfolio .kje-project-tag{font-size:11px}#kje-portfolio .kje-poster-word{font-size:29px;left:23px;bottom:19px}#kje-portfolio .kje-contour{right:25px;width:215px;height:150px}#kje-portfolio .kje-lab-ring{right:50px;width:125px;height:125px;top:28px}#kje-portfolio .kje-notepaper{right:48px}#kje-portfolio .kje-mosaic{grid-template-columns:1fr}#kje-portfolio .kje-path,#kje-portfolio .kje-path+.kje-path{padding:19px 0;border-left:0}#kje-portfolio .kje-path+.kje-path{border-top:1px solid var(--kje-line)}#kje-portfolio .kje-path-title{margin-top:5px}#kje-portfolio .kje-path-no{font-size:17px}#kje-portfolio .kje-path-arrow{right:2px}#kje-portfolio .kje-about-band{margin-top:38px;padding:32px 0}#kje-portfolio .kje-about-inner{grid-template-columns:1fr;gap:20px}#kje-portfolio .kje-about-title{font-size:23px}#kje-portfolio .kje-footer{font-size:9px;align-items:flex-start}#kje-portfolio .kje-detail-panels{grid-template-columns:1fr}#kje-portfolio .kje-detail-title{font-size:29px}}
+    #kje-portfolio .kje-profile{padding:52px 0 44px;display:grid;grid-template-columns:1.5fr 1fr;gap:48px;align-items:start;scroll-margin-top:20px}
+    #kje-portfolio .kje-profile h1{font-family:Georgia,serif;font-size:64px;letter-spacing:-2px;line-height:1.1;margin-top:17px}
+    #kje-portfolio .kje-profile-lead{font-family:'Noto Serif KR',serif;font-size:22px;line-height:1.8;letter-spacing:-.7px;margin-top:21px;word-break:keep-all}
+    #kje-portfolio .kje-profile-text{font-size:13px;color:var(--kje-muted);line-height:1.95;margin-top:17px;word-break:keep-all}
+    #kje-portfolio .kje-background{background:var(--kje-wash);padding:26px 25px;margin-top:6px}
+    #kje-portfolio .kje-background h2{font-size:14px;font-weight:500;letter-spacing:0;margin-bottom:18px}
+    #kje-portfolio .kje-background dl{margin:0}
+    #kje-portfolio .kje-background dl div{border-top:1px solid var(--kje-line);padding:15px 0 0;margin-top:15px}
+    #kje-portfolio .kje-background dt{font-size:11px;color:var(--kje-muted);margin-bottom:5px}
+    #kje-portfolio .kje-background dd{font-size:13px;margin:0;line-height:1.8;word-break:keep-all}
+    #kje-portfolio .kje-profile-nav{display:flex;gap:25px;margin-top:24px;flex-wrap:wrap}
+    #kje-portfolio .kje-capabilities{border-top:1px solid var(--kje-line);padding:37px 0 13px;scroll-margin-top:20px}
+    #kje-portfolio .kje-section-heading .kje-subtitle{font-size:12px;margin-top:7px}
+    #kje-portfolio .kje-cap-row{display:grid;grid-template-columns:38px 1fr 1.5fr;gap:19px;padding:22px 0;border-top:1px solid var(--kje-line);align-items:start}
+    #kje-portfolio .kje-cap-number{font:italic 21px/1.5 Georgia,serif;color:var(--kje-green)}
+    #kje-portfolio .kje-cap-row h3{font-size:16px;font-weight:500;line-height:1.6;letter-spacing:-.3px}
+    #kje-portfolio .kje-cap-row p{font-size:12px;color:var(--kje-muted);line-height:1.95;word-break:keep-all}
+    #kje-portfolio .kje-cap-link{font-size:11px!important;color:var(--kje-green)!important;display:inline-flex;gap:10px;align-items:center;padding:5px 0!important;margin-top:8px;border-bottom:1px solid var(--kje-line)!important}
+    #kje-portfolio .kje-experience-list{margin-top:28px;border-top:1px solid var(--kje-line)}
+    #kje-portfolio .kje-experience-row{display:grid;grid-template-columns:150px 1fr;gap:20px;padding:14px 0;border-bottom:1px solid var(--kje-line);font-size:12px;line-height:1.9}
+    #kje-portfolio .kje-experience-row span{color:var(--kje-muted);word-break:keep-all}
+    #kje-portfolio .kje-experience-row strong{font-weight:500}
+    #kje-portfolio .kje-menu [data-scroll="about"]{text-decoration:underline;text-underline-offset:8px;color:var(--kje-green)}
+    #kje-portfolio .kje-about-band{margin-top:0}
+    #kje-portfolio .kje-personal-heading{font-size:23px;font-weight:500;letter-spacing:-.7px;line-height:1.6}
+    @media(max-width:650px){#kje-portfolio .kje-profile{grid-template-columns:1fr;gap:26px;padding:32px 0}#kje-portfolio .kje-profile h1{font-size:50px}#kje-portfolio .kje-profile-lead{font-size:21px}#kje-portfolio .kje-background{padding:21px;margin:0}#kje-portfolio .kje-background dl{display:grid;grid-template-columns:1fr 1fr;gap:16px}#kje-portfolio .kje-background dl div{margin:0}#kje-portfolio .kje-background dl div:last-child{grid-column:1/-1}#kje-portfolio .kje-capabilities{padding-top:30px}#kje-portfolio .kje-cap-row{grid-template-columns:28px 1fr;gap:8px 13px}#kje-portfolio .kje-cap-row>div:last-child{grid-column:2}#kje-portfolio .kje-experience-row{grid-template-columns:1fr;gap:4px}#kje-portfolio .kje-section-heading{align-items:flex-start}#kje-portfolio .kje-section-heading>.kje-eyebrow{display:none}#kje-portfolio .kje-personal-heading{font-size:22px}#kje-portfolio .kje-about-band{margin-top:0}}
+    #kje-portfolio .kje-profile-lead{margin-top:20px}
+    #kje-portfolio .kje-background{margin-top:3px}
+    #kje-portfolio .kje-profile{padding:46px 0 42px}
+    #kje-portfolio .kje-project-section{border-top:1px solid var(--kje-line)}
+    #kje-portfolio .kje-category-picker{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:27px 0 29px}
+    #kje-portfolio .kje-category{padding:16px 14px;border:1px solid var(--kje-line);background:var(--kje-white);min-width:0;transition:background .15s}
+    #kje-portfolio .kje-category[aria-pressed="true"]{background:var(--kje-button);color:var(--kje-button-text);border-color:var(--kje-button)}
+    #kje-portfolio .kje-category-name{font-size:14px;font-weight:500;display:block;line-height:1.6;word-break:keep-all}
+    #kje-portfolio .kje-category-hint{display:block;font-size:11px;margin-top:5px;line-height:1.7;opacity:.85;word-break:keep-all}
+    #kje-portfolio .kje-category-intro{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 18px;margin-bottom:19px;color:var(--kje-muted);font-size:12px;line-height:1.8}
+    #kje-portfolio .kje-projects{grid-template-columns:repeat(2,minmax(0,1fr));gap:27px 23px}
+    #kje-portfolio .kje-project[hidden]{display:none}
+    #kje-portfolio .kje-poster{height:195px}
+    #kje-portfolio .kje-project-desc{font-size:12px;line-height:1.8}
+    #kje-portfolio .kje-poster-battery{background:light-dark(#dce3da,#bdcabc);color:#314c3d}
+    #kje-portfolio .kje-battery-art{position:absolute;right:37px;top:37px;width:69px;height:104px;border:2px solid currentColor;border-radius:12px;transform:rotate(12deg);opacity:.7}
+    #kje-portfolio .kje-battery-art:before{content:'';position:absolute;top:-9px;left:22px;width:20px;height:7px;background:currentColor;border-radius:3px 3px 0 0}
+    #kje-portfolio .kje-battery-art:after{content:'';position:absolute;inset:35px 8px 8px;background:currentColor;opacity:.25;border-radius:4px}
+    #kje-portfolio .kje-poster-power{background:light-dark(#e9dfc5,#d5c6a0);color:#62512c}
+    #kje-portfolio .kje-power-art{position:absolute;right:22px;top:26px;font:86px/1.2 Georgia,serif;opacity:.3}
+    #kje-portfolio .kje-poster-earth{background:light-dark(#d9e5e7,#bad0d4);color:#305463}
+    #kje-portfolio .kje-earth-art{position:absolute;width:122px;height:122px;border-radius:50%;border:1px solid currentColor;right:25px;top:26px;overflow:hidden;opacity:.5;background:repeating-linear-gradient(0deg,transparent 0 20px,currentColor 21px,transparent 22px 24px)}
+    #kje-portfolio .kje-earth-art:after{content:'';position:absolute;inset:0 28px;border:1px solid currentColor;border-radius:50%}
+    #kje-portfolio .kje-poster-acid{background:light-dark(#e8dfe2,#d5bfc8);color:#634b58}
+    #kje-portfolio .kje-acid-art{position:absolute;right:26px;top:42px;font:27px/1.3 Georgia,serif;transform:rotate(-8deg);opacity:.7}
+    @media(max-width:650px){#kje-portfolio .kje-category-picker{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:20px}#kje-portfolio .kje-category{padding:13px 12px;min-height:77px}#kje-portfolio .kje-projects{grid-template-columns:1fr}#kje-portfolio .kje-profile{padding:30px 0}#kje-portfolio .kje-background{margin-top:0}}
+    #kje-portfolio .kje-nav{height:auto;min-height:88px;flex-wrap:wrap;padding:17px 0}
+    @media(prefers-reduced-motion:reduce){#kje-portfolio *{transition:none!important;scroll-behavior:auto!important}}
+  
 
-/* 이름표 */
-header.bar{ padding-block:18px; border-bottom:1px solid var(--line); background:var(--bg); }
-header.bar .wrap{ display:flex; align-items:center; justify-content:space-between; gap:12px 24px; flex-wrap:wrap; }
-.brand{ display:flex; align-items:center; gap:10px; text-decoration:none; }
-.brand svg{ width:34px; height:34px; flex:none; }
-.brand span{ font-family:var(--mono); font-weight:600; font-size:18px; letter-spacing:.01em; }
-nav.top{ display:flex; gap:4px 18px; flex-wrap:wrap; font-size:15px; }
-nav.top a{ text-decoration:none; color:var(--ink2); padding:4px 0; }
-nav.top a:hover{ color:var(--plum); }
-
-/* 첫 화면 */
-.hero{ background-image:linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size:28px 28px; border-bottom:1px solid var(--line); }
-.hero .wrap{ display:grid; grid-template-columns:minmax(0, 1.35fr) minmax(0, 1fr); gap:40px; padding-block:56px 52px; align-items:start; }
-.eyebrow{ margin:0 0 14px; font-size:14px; font-weight:600; color:var(--plum); letter-spacing:.02em; }
-h1{ margin:0; font-family:var(--display); font-weight:400; font-size:clamp(36px, 5.6vw, 58px); line-height:1.12; text-wrap:balance; }
-.hero p.sub{ margin:18px 0 0; max-width:56ch; color:var(--ink2); font-size:17px; }
-.hero .who{ margin:22px 0 0; font-size:15px; color:var(--ink2); }
-.quick{ background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:20px 22px; display:grid; gap:12px; }
-.quick h2{ margin:0; font-size:13px; font-weight:700; letter-spacing:.05em; color:var(--ink2); }
-.quick a{ display:grid; gap:2px; text-decoration:none; padding:12px 14px; border-radius:10px; border:1px solid var(--line); background:var(--bg); }
-.quick a:hover{ border-color:var(--plum); }
-.quick a b{ font-size:17px; font-weight:700; }
-.quick a span{ font-size:14px; color:var(--ink2); line-height:1.5; }
-.quick p{ margin:2px 0 0; font-size:13.5px; color:var(--ink2); line-height:1.55; }
-
-/* 공통 구획 */
-section.blk{ padding-block:56px 8px; scroll-margin-top:12px; }
-.blk-head{ display:flex; align-items:baseline; justify-content:space-between; gap:8px 20px; flex-wrap:wrap; margin-bottom:18px; }
-h2.sec{ margin:0; font-family:var(--display); font-weight:400; font-size:34px; line-height:1.15; }
-.blk-head p{ margin:0; color:var(--ink2); font-size:15px; }
-
-/* 작업 목록 */
-.chips{ display:flex; flex-wrap:wrap; gap:8px; margin:0 0 18px; }
-.chips button{ font:inherit; font-size:14.5px; font-weight:500; min-height:40px; padding:0 14px; border-radius:999px; border:1px solid var(--line); background:var(--paper); color:var(--ink); cursor:pointer; }
-.chips button[aria-pressed="true"]{ background:var(--ink); color:var(--bg); border-color:var(--ink); }
-.chips button .n{ font-family:var(--mono); font-size:12.5px; margin-left:6px; opacity:.7; }
-.works{ display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:14px; }
-.work{ background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:18px 20px; display:grid; grid-template-rows:auto auto 1fr auto; gap:8px; min-width:0; }
-.work .cat{ font-size:12.5px; font-weight:600; color:var(--plum); letter-spacing:.02em; }
-.work h3{ margin:0; font-size:19px; font-weight:700; line-height:1.35; }
-.work p{ margin:0; font-size:14.5px; color:var(--ink2); line-height:1.6; }
-.work .foot{ display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; padding-top:6px; }
-.tags{ display:flex; flex-wrap:wrap; gap:6px; }
-.tag{ font-size:12px; color:var(--ink2); border:1px solid var(--line); border-radius:999px; padding:1px 9px; }
-.go{ font-size:14px; font-weight:600; text-decoration:none; border-radius:8px; padding:6px 12px; white-space:nowrap; }
-.go.live{ background:var(--live-soft); color:var(--live); }
-.go.live:hover{ outline:1.5px solid var(--live); }
-.go.repo{ background:var(--plum-soft); color:var(--plum); }
-.go.repo:hover{ outline:1.5px solid var(--plum); }
-.go.soon{ color:var(--ink2); border:1px dashed var(--line); }
-
-/* 이력 */
-.career{ display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:14px; }
-.card{ background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:20px 22px; min-width:0; }
-.card h3{ margin:0 0 10px; font-size:13px; font-weight:700; letter-spacing:.05em; color:var(--ink2); }
-.card ul{ margin:0; padding:0; list-style:none; display:grid; gap:12px; }
-.card li b{ display:block; font-weight:600; font-size:16px; line-height:1.45; }
-.card li span{ display:block; font-size:14px; color:var(--ink2); line-height:1.55; }
-.card li span.fill{ display:inline; color:var(--ink); }
-
-/* 연락 */
-.contact{ display:flex; flex-wrap:wrap; gap:12px; align-items:stretch; }
-.contact .card{ display:grid; gap:6px; flex:1 1 280px; }
-.contact .addr{ font-family:var(--mono); font-size:17px; user-select:all; overflow-wrap:anywhere; }
-.contact .row{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
-.btn{ font:inherit; font-size:14px; font-weight:600; min-height:38px; padding:0 14px; border-radius:8px; border:1px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; }
-.btn:hover{ border-color:var(--plum); }
-.copied{ font-size:13.5px; color:var(--live); }
-
-footer{ margin-top:64px; border-top:1px solid var(--line); padding-block:22px 40px; font-size:14px; color:var(--ink2); }
-footer .wrap{ display:flex; flex-wrap:wrap; gap:6px 22px; }
-footer a{ color:var(--ink2); text-underline-offset:3px; }
-
-@media (max-width:1060px){ .works{ grid-template-columns:repeat(3, minmax(0, 1fr)); } }
-@media (max-width:900px){
-  .hero .wrap{ grid-template-columns:minmax(0, 1fr); gap:28px; padding-block:40px 36px; }
-  .works{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
-  .career{ grid-template-columns:minmax(0, 1fr); }
-}
-@media (max-width:560px){
-  .wrap{ padding-inline:16px; }
-  .works{ grid-template-columns:minmax(0, 1fr); }
-  h2.sec{ font-size:30px; }
-  nav.top{ font-size:14.5px; }
-}
+html{color-scheme:light dark;scroll-behavior:smooth}body{margin:0;background:light-dark(#faf9f5,#192522)}
+[hidden]{display:none!important}button,a{touch-action:manipulation}button{cursor:pointer}
+#kje-portfolio{min-height:100vh;overflow:clip;font-family:'Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif}
+#kje-portfolio .kje-brand{padding:0}#kje-portfolio .kje-menu{flex-wrap:wrap}
+#kje-portfolio .kje-menu a[aria-current]{text-decoration:underline;text-underline-offset:8px}
+#kje-portfolio .kje-profile{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}
+#kje-portfolio .kje-project{display:flex;flex-direction:column;min-width:0}
+#kje-portfolio .kje-project-title{font-size:17px;margin-top:6px;line-height:1.7;word-break:keep-all;overflow-wrap:anywhere}
+#kje-portfolio .kje-project-tag{font-size:11px;margin-top:16px}#kje-portfolio .kje-poster-cap{font-size:11px;letter-spacing:.5px}
+#kje-portfolio .kje-project-desc{margin-top:8px}#kje-portfolio .kje-project:hover .kje-poster{transform:none}
+#kje-portfolio .kje-project-links{display:flex;flex-wrap:wrap;gap:10px 19px;align-items:center;margin-top:auto;padding-top:14px;min-height:49px}
+#kje-portfolio .kje-project-go{display:inline-flex;gap:12px;align-items:center;color:var(--kje-green);font-size:12px;line-height:1.8;min-height:40px;padding:5px 0;text-decoration:underline;text-underline-offset:5px}
+#kje-portfolio .kje-project-status{font-size:11px;color:var(--kje-muted);line-height:1.8}
+#kje-portfolio .kje-eyebrow{font-size:11px}#kje-portfolio .kje-explore{border-top:1px solid var(--kje-line)}
+#kje-portfolio .kje-explore-list{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:24px}
+#kje-portfolio .kje-explore-list h3{font-size:16px;font-weight:500;margin-bottom:9px;line-height:1.7}
+#kje-portfolio .kje-explore-list p{font-size:13px;line-height:1.9;color:var(--kje-muted);word-break:keep-all}
+#kje-portfolio .kje-about-copy{font-size:13px}#kje-portfolio .kje-footer{font-size:11px}
+#kje-portfolio .kje-footer-links{display:flex;flex-wrap:wrap;gap:12px 22px;align-items:center}
+#kje-portfolio .kje-footer-links a{padding:8px 0}#kje-portfolio .kje-skip{position:absolute;left:7%;top:-80px;z-index:20;background:var(--kje-button);color:var(--kje-button-text);padding:12px 18px}
+#kje-portfolio .kje-skip:focus{top:8px}#kje-portfolio section{scroll-margin-top:20px}
+#kje-portfolio .kje-projects{align-items:stretch}
+@media(min-width:1400px){#kje-portfolio .kje-projects{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:650px){#kje-portfolio .kje-profile{grid-template-columns:1fr}#kje-portfolio .kje-explore-list{grid-template-columns:1fr;gap:26px}#kje-portfolio .kje-menu{gap:7px 19px}#kje-portfolio .kje-poster-word{font-size:27px}#kje-portfolio .kje-project-title{font-size:18px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 </style>
 </head>
 <body>
-<header class="bar">
-  <div class="wrap">
-    <a class="brand" href="#top" aria-label="maehwachem 처음으로">
-      <svg viewBox="0 0 40 40" aria-hidden="true">
-        <g stroke="var(--plum)" stroke-width="1.6" stroke-linecap="round">
-          <line x1="20" y1="20" x2="20" y2="7.5"/><line x1="20" y1="20" x2="31.9" y2="16.1"/><line x1="20" y1="20" x2="27.3" y2="30.1"/><line x1="20" y1="20" x2="12.7" y2="30.1"/><line x1="20" y1="20" x2="8.1" y2="16.1"/>
-        </g>
-        <g fill="var(--plum)" fill-opacity=".22" stroke="var(--plum)" stroke-width="1.6">
-          <circle cx="20" cy="7.5" r="5.5"/><circle cx="31.9" cy="16.1" r="5.5"/><circle cx="27.3" cy="30.1" r="5.5"/><circle cx="12.7" cy="30.1" r="5.5"/><circle cx="8.1" cy="16.1" r="5.5"/>
-        </g>
-        <circle cx="20" cy="20" r="3.4" fill="var(--plum)"/>
-      </svg>
-      <span>maehwachem</span>
-    </a>
-    <nav class="top" aria-label="이 페이지 안">
-      <a href="#works">작업</a><a href="#career">이력</a><a href="#contact">연락</a>
-    </nav>
+<div id="kje-portfolio">
+  <a class="kje-skip" href="#projects">프로젝트로 바로 가기</a>
+  <div class="kje-wrap">
+    <header class="kje-nav" id="top">
+      <a class="kje-brand" href="#top" aria-label="KJE의 작업실 홈"><span class="kje-student-image kje-brand-drawing" aria-hidden="true"></span><span class="kje-brand-name">KJE의 작업실</span></a>
+      <nav class="kje-menu" aria-label="주 메뉴"><a href="#about">소개</a><a href="#projects">프로젝트</a><a href="#explore">탐구</a><a href="#journal">글·사진</a><a href="mailto:kjechem@naver.com">연락하기</a></nav>
+    </header>
   </div>
-</header>
-
-<main id="top">
-  <section class="hero">
-    <div class="wrap">
-      <div>
-        <p class="eyebrow">고등학교 과학 교사 · 통합과학 · 화학</p>
-        <h1>학생이 직접 재고, 기록하고, 근거로 판단하는 과학 수업을 만듭니다</h1>
-        <p class="sub">예산과 안전, 시간 때문에 하기 어려운 실험은 가상 실험실로 연습하게 하고, 실제 실험에서는 기록끼리 맞춰 보며 판단하게 합니다. 수업에 필요한 도구는 AI와 함께 코드를 짜며 직접 만들어 씁니다.</p>
-        <p class="who"><span class="fill">[이름]</span> · <span class="fill">[학교명]</span></p>
+  <main>
+    <div class="kje-wrap">
+      <section class="kje-profile" id="about" aria-label="소개">
+      <div><p class="kje-eyebrow">About · 소개</p><h1>KJE</h1><p class="kje-profile-lead">과학교육을 바탕으로<br>수업과 탐구, 디지털 제작을 연결합니다.</p><p class="kje-profile-text">과학 수업과 평가 문항을 설계하고, 실험·탐구 활동을 구성해 왔습니다. AI를 활용한 학습 게임과 가상실험실, 교육용 웹 도구로 활동을 넓혀 가고 있습니다.</p><div class="kje-profile-nav"><a class="kje-text-link" href="#projects">프로젝트 둘러보기 <span aria-hidden="true">↓</span></a></div></div>
+      <aside class="kje-background" aria-label="전공과 활동 배경"><h2>전공과 활동 배경</h2><dl><div><dt>전공</dt><dd>화학교육 석사</dd></div><div><dt>활동</dt><dd>고등학교 과학 교사<br>화학 · 통합과학 · 과학탐구실험</dd></div><div><dt>확장하고 있는 관심</dt><dd>AI 융합교육 · 센서 기반 탐구<br>디지털 학습 콘텐츠</dd></div></dl></aside>
+    </section>
+      <section class="kje-section kje-project-section" id="projects" aria-labelledby="projects-title">
+        <div class="kje-section-heading"><div><h2 id="projects-title">프로젝트</h2><p class="kje-subtitle">실험하고, 플레이하고, 활용하는 과학 콘텐츠.</p></div><span class="kje-eyebrow">Project collection</span></div>
+        <div class="kje-category-picker" role="group" aria-label="프로젝트 분류">
+        <button type="button" class="kje-category cursor-interaction" data-category="lab" aria-pressed="true" aria-controls="kje-project-list"><span class="kje-category-name">가상실험</span><span class="kje-category-hint">조건을 바꾸며 관찰하기</span></button>
+        <button type="button" class="kje-category cursor-interaction" data-category="game" aria-pressed="false" aria-controls="kje-project-list"><span class="kje-category-name">학습 게임</span><span class="kje-category-hint">미션을 풀며 탐험하기</span></button>
+        <button type="button" class="kje-category cursor-interaction" data-category="tool" aria-pressed="false" aria-controls="kje-project-list"><span class="kje-category-name">교육 도구</span><span class="kje-category-hint">기록하고 연습하기</span></button>
+        <button type="button" class="kje-category cursor-interaction" data-category="lesson" aria-pressed="false" aria-controls="kje-project-list"><span class="kje-category-name">수업·탐구 자료</span><span class="kje-category-hint">개념과 탐구를 연결하기</span></button>
       </div>
-      <aside class="quick" aria-labelledby="quick-h">
-        <h2 id="quick-h">지금 수업에서 쓸 수 있는 도구</h2>
-        <a href="https://maehwachem.github.io/science-tools/battery/"><b>배터리 시험팀</b><span>실제 실험 기록 · 전극판 식별과 화학 전지</span></a>
-        <a href="https://maehwachem.github.io/science-tools/battery/virtual.html"><b>배터리 가상 시험동</b><span>화면 속 실험대로 측정 절차 연습</span></a>
-        <a href="https://maehwachem.github.io/science-tools/#sensor"><b>마이크로비트 센서 기록기</b><span>전압·온도를 센서로 받아 그래프와 기록으로</span></a>
-        <p>설치 없이 브라우저에서 열고, 학생 기록은 그 기기에만 저장돼요.</p>
-      </aside>
+        <div class="kje-category-intro"><p id="kje-category-description">현상과 변화를 화면에서 살펴보는 실험 콘텐츠.</p><span id="kje-category-status" role="status" aria-live="polite">가상실험 · 4개</span></div>
+        <div class="kje-projects" id="kje-project-list"><article class="kje-project" data-kind="lab">
+      <div class="kje-poster kje-poster-lab" aria-hidden="true"><span class="kje-poster-cap">가상실험</span><div class="kje-lab-ring"></div><span class="kje-poster-word">산화·환원<br>실험실</span></div>
+      <p class="kje-project-tag">화학 · 산화·환원</p><h3 class="kje-project-title">산화·환원 실험실</h3><p class="kje-project-desc">실험에서 관찰하는 변화와 산화·환원 개념을 연결하는 가상실험.</p><div class="kje-project-links"><span class="kje-project-status">공개 준비 중</span></div>
+    </article><article class="kje-project" data-kind="lab">
+      <div class="kje-poster kje-poster-battery" aria-hidden="true"><span class="kje-poster-cap">가상실험</span><div class="kje-battery-art"></div><span class="kje-poster-word">배터리<br>가상 시험동</span></div>
+      <p class="kje-project-tag">전기화학 · 배터리</p><h3 class="kje-project-title">배터리 가상 시험동</h3><p class="kje-project-desc">화면 속 실험대에서 거름종이, 전극판, 집게와 다이얼을 조작하며 측정 절차를 익힙니다.</p><div class="kje-project-links"><a class="kje-project-go" href="https://maehwachem.github.io/science-tools/battery/virtual.html">실험 열기 <span aria-hidden="true">↗</span></a></div>
+    </article><article class="kje-project" data-kind="game" hidden>
+      <div class="kje-poster kje-poster-island" aria-hidden="true"><span class="kje-poster-cap">학습 게임</span><div class="kje-contour"></div><span class="kje-poster-word">화학자의<br>섬</span></div>
+      <p class="kje-project-tag">화학 · 탐험</p><h3 class="kje-project-title">화학자의 섬</h3><p class="kje-project-desc">섬을 탐험하고 문제를 해결하며 기초부터 심화까지 화학을 만나는 학습 게임.</p><div class="kje-project-links"><span class="kje-project-status">공개 준비 중</span></div>
+    </article><article class="kje-project" data-kind="game" hidden>
+      <div class="kje-poster kje-poster-power" aria-hidden="true"><span class="kje-poster-cap">학습 게임</span><div class="kje-power-art">kWh</div><span class="kje-poster-word">전기요금<br>챌린지</span></div>
+      <p class="kje-project-tag">에너지 · 생활 속 과학</p><h3 class="kje-project-title">전기요금 챌린지</h3><p class="kje-project-desc">가전제품을 선택하고 배치하며 전기 사용과 비용을 생각하는 게임.</p><div class="kje-project-links"><span class="kje-project-status">공개 준비 중</span></div>
+    </article><article class="kje-project" data-kind="tool" hidden>
+      <div class="kje-poster kje-poster-note" aria-hidden="true"><span class="kje-poster-cap">교육 도구</span><div class="kje-notepaper"><b>Q.</b><span></span><span></span><span></span></div><span class="kje-poster-word">나의 면접<br>연습노트</span></div>
+      <p class="kje-project-tag">진로 · 면접</p><h3 class="kje-project-title">나의 면접 연습노트</h3><p class="kje-project-desc">자신의 경험을 정리하고 답변을 연습하는 웹 도구.</p><div class="kje-project-links"><a class="kje-project-go" href="https://maehwachem.github.io/interview-note/">도구 열기 <span aria-hidden="true">↗</span></a></div>
+    </article><article class="kje-project" data-kind="lesson" hidden>
+      <div class="kje-poster kje-poster-earth" aria-hidden="true"><span class="kje-poster-cap">수업·탐구 자료</span><div class="kje-earth-art"></div><span class="kje-poster-word">엘니뇨와<br>라니냐</span></div>
+      <p class="kje-project-tag">통합과학 · 지구과학</p><h3 class="kje-project-title">엘니뇨와 라니냐</h3><p class="kje-project-desc">무역풍과 표층 해수, 강수 지역의 변화를 연결해 살펴보는 인터랙티브 자료.</p><div class="kje-project-links"><span class="kje-project-status">공개 준비 중</span></div>
+    </article><article class="kje-project" data-kind="lesson" hidden>
+      <div class="kje-poster kje-poster-acid" aria-hidden="true"><span class="kje-poster-cap">수업·탐구 자료</span><div class="kje-acid-art">H⁺ + OH⁻</div><span class="kje-poster-word">산과 염기,<br>중화반응</span></div>
+      <p class="kje-project-tag">화학 · 산과 염기</p><h3 class="kje-project-title">산·염기 중화반응 자료</h3><p class="kje-project-desc">산과 염기를 섞을 때의 변화를 이온과 연결해 설명하는 수업 자료.</p><div class="kje-project-links"><span class="kje-project-status">공개 준비 중</span></div>
+    </article><article class="kje-project" data-kind="tool" hidden>
+      <div class="kje-poster kje-poster-battery" aria-hidden="true"><span class="kje-poster-cap">교육 도구</span><div class="kje-battery-art"></div><span class="kje-poster-word">배터리<br>시험팀</span></div>
+      <p class="kje-project-tag">실제 실험 · 통합과학 · 화학</p><h3 class="kje-project-title">배터리 시험팀</h3><p class="kje-project-desc">라벨이 섞인 전극판을 전압으로 식별하고, 실험 기록을 근거로 판정해 성적서를 쓰는 조별 실험 도구.</p><div class="kje-project-links"><a class="kje-project-go" href="https://maehwachem.github.io/science-tools/battery/">도구 열기 <span aria-hidden="true">↗</span></a></div>
+    </article><article class="kje-project" data-kind="tool" hidden>
+      <div class="kje-poster kje-poster-battery" aria-hidden="true"><span class="kje-poster-cap">교육 도구</span><div class="kje-battery-art"></div><span class="kje-poster-word">마이크로비트<br>센서 기록기</span></div>
+      <p class="kje-project-tag">센서 · 웹 블루투스</p><h3 class="kje-project-title">마이크로비트 센서 기록기</h3><p class="kje-project-desc">전압과 온도 값을 받아 그래프로 살펴보고, 실험 조건별 기록을 CSV로 저장하는 도구.</p><div class="kje-project-links"><a class="kje-project-go" href="https://maehwachem.github.io/science-tools/sensor/">전압 기록기 <span aria-hidden="true">↗</span></a><a class="kje-project-go" href="https://maehwachem.github.io/science-tools/sensor/temp.html">온도 기록기 <span aria-hidden="true">↗</span></a></div>
+    </article><article class="kje-project" data-kind="tool" hidden>
+      <div class="kje-poster kje-poster-earth" aria-hidden="true"><span class="kje-poster-cap">교육 도구</span><div class="kje-earth-art"></div><span class="kje-poster-word">Microbit<br>Data Visualizer</span></div>
+      <p class="kje-project-tag">마이크로비트 · 데이터</p><h3 class="kje-project-title">Microbit Data Visualizer</h3><p class="kje-project-desc">웹 블루투스로 온도 값을 받아 그래프로 그리고 CSV로 저장하는 프로젝트.</p><div class="kje-project-links"><a class="kje-project-go" href="https://github.com/maehwachem/microbit-web-visualizer" target="_blank" rel="noopener noreferrer">GitHub 저장소 <span aria-hidden="true">↗</span></a></div>
+    </article><article class="kje-project" data-kind="lesson" hidden>
+      <div class="kje-poster kje-poster-acid" aria-hidden="true"><span class="kje-poster-cap">수업·탐구 자료</span><div class="kje-acid-art">H⁺ + OH⁻</div><span class="kje-poster-word">AR<br>심장</span></div>
+      <p class="kje-project-tag">생명과학 · AR</p><h3 class="kje-project-title">AR 심장</h3><p class="kje-project-desc">3D 심장 모델을 돌려 보고 증강현실로 교실에 띄워 보는 자료.</p><div class="kje-project-links"><a class="kje-project-go" href="https://github.com/maehwachem/heart-ar" target="_blank" rel="noopener noreferrer">GitHub 저장소 <span aria-hidden="true">↗</span></a></div>
+    </article><article class="kje-project" data-kind="lab">
+      <div class="kje-poster kje-poster-acid" aria-hidden="true"><span class="kje-poster-cap">가상실험</span><div class="kje-acid-art">H⁺ + OH⁻</div><span class="kje-poster-word">산·염기<br>가상 실험실</span></div>
+      <p class="kje-project-tag">가상실험 · 산과 염기</p><h3 class="kje-project-title">산·염기 가상 실험실</h3><p class="kje-project-desc">중화반응을 살펴보며 시약을 넣는 순서와 양, 다시 시도한 과정을 기록하는 가상실험.</p><div class="kje-project-links"><span class="kje-project-status">공개 준비 중</span></div>
+    </article><article class="kje-project" data-kind="lab">
+      <div class="kje-poster kje-poster-lab" aria-hidden="true"><span class="kje-poster-cap">가상실험</span><div class="kje-lab-ring"></div><span class="kje-poster-word">용액<br>조제실</span></div>
+      <p class="kje-project-tag">화학 · 용액과 농도</p><h3 class="kje-project-title">용액 조제실</h3><p class="kje-project-desc">용액과 농도를 한 차시에 다루는 가상실험실.</p><div class="kje-project-links"><span class="kje-project-status">공개 준비 중</span></div>
+    </article><article class="kje-project" data-kind="game" hidden>
+      <div class="kje-poster kje-poster-island" aria-hidden="true"><span class="kje-poster-cap">학습 게임</span><div class="kje-contour"></div><span class="kje-poster-word">화학자의<br>항해</span></div>
+      <p class="kje-project-tag">화학 · 이야기 · 모둠</p><h3 class="kje-project-title">화학자의 항해</h3><p class="kje-project-desc">화학자의 섬 뒷이야기를 잇는 이야기 게임. 조별로 함께하는 모둠판도 있습니다.</p><div class="kje-project-links"><span class="kje-project-status">공개 준비 중</span></div>
+    </article><article class="kje-project" data-kind="tool" hidden>
+      <div class="kje-poster kje-poster-earth" aria-hidden="true"><span class="kje-poster-cap">교육 도구</span><div class="kje-earth-art"></div><span class="kje-poster-word">환경<br>대응팀</span></div>
+      <p class="kje-project-tag">실제 실험 · 산과 염기</p><h3 class="kje-project-title">환경 대응팀</h3><p class="kje-project-desc">하천 오염에 대응하는 역할극 속에서 시료의 액성을 판별하고 중화반응을 다루는 조별 실험 도구.</p><div class="kje-project-links"><span class="kje-project-status">공개 준비 중</span></div>
+    </article><article class="kje-project" data-kind="tool" hidden>
+      <div class="kje-poster kje-poster-note" aria-hidden="true"><span class="kje-poster-cap">교육 도구</span><div class="kje-notepaper"><b>Q.</b><span></span><span></span><span></span></div><span class="kje-poster-word">영상 운동<br>분석기</span></div>
+      <p class="kje-project-tag">물리 · 태블릿</p><h3 class="kje-project-title">영상 운동 분석기</h3><p class="kje-project-desc">영상 속 물체의 위치를 짚어 운동을 분석하고, 실제 길이로 보정한 데이터를 CSV로 저장하는 도구.</p><div class="kje-project-links"><span class="kje-project-status">공개 준비 중</span></div>
+    </article><article class="kje-project" data-kind="lesson" hidden>
+      <div class="kje-poster kje-poster-earth" aria-hidden="true"><span class="kje-poster-cap">수업·탐구 자료</span><div class="kje-earth-art"></div><span class="kje-poster-word">적도의 정렬<br>별자리판</span></div>
+      <p class="kje-project-tag">천문 · 인쇄 자료</p><h3 class="kje-project-title">적도의 정렬 매트와 별자리판</h3><p class="kje-project-desc">망원경 정렬을 위한 바닥 매트와 항성시 계산판, 밝은 별 18개를 담은 회전 별자리판.</p><div class="kje-project-links"><span class="kje-project-status">공개 준비 중</span></div>
+    </article><article class="kje-project" data-kind="lesson" hidden>
+      <div class="kje-poster kje-poster-earth" aria-hidden="true"><span class="kje-poster-cap">수업·탐구 자료</span><div class="kje-earth-art"></div><span class="kje-poster-word">대기<br>대순환</span></div>
+      <p class="kje-project-tag">통합과학 · 지구과학</p><h3 class="kje-project-title">대기 대순환</h3><p class="kje-project-desc">위도에 따라 달라지는 대기의 순환을 살펴보는 인터랙티브 자료.</p><div class="kje-project-links"><span class="kje-project-status">공개 준비 중</span></div>
+    </article><article class="kje-project" data-kind="lesson" hidden>
+      <div class="kje-poster kje-poster-lab" aria-hidden="true"><span class="kje-poster-cap">수업·탐구 자료</span><div class="kje-lab-ring"></div><span class="kje-poster-word">몰 농도<br>학습지</span></div>
+      <p class="kje-project-tag">화학 · 농도</p><h3 class="kje-project-title">몰 농도 학습지</h3><p class="kje-project-desc">몰 농도 개념을 단계별로 익히는 학습지.</p><div class="kje-project-links"><span class="kje-project-status">공개 준비 중</span></div>
+    </article><article class="kje-project" data-kind="lesson" hidden>
+      <div class="kje-poster kje-poster-note" aria-hidden="true"><span class="kje-poster-cap">수업·탐구 자료</span><div class="kje-notepaper"><b>Q.</b><span></span><span></span><span></span></div><span class="kje-poster-word">마이크로비트<br>처음 시작하기</span></div>
+      <p class="kje-project-tag">마이크로비트 · 입문</p><h3 class="kje-project-title">마이크로비트 처음 시작하기</h3><p class="kje-project-desc">마이크로비트를 처음 쓰는 학생과 교사를 위한 안내와 새 기기의 첫 연결 점검 자료.</p><div class="kje-project-links"><span class="kje-project-status">공개 준비 중</span></div>
+    </article></div>
+        <noscript><style>#kje-portfolio .kje-category-picker,#kje-portfolio .kje-category-intro{display:none}#kje-portfolio .kje-project[hidden]{display:flex!important}</style><p>아래에 모든 프로젝트를 표시합니다.</p></noscript>
+      </section>
+      <section class="kje-section kje-explore" id="explore" aria-labelledby="explore-title">
+        <div class="kje-section-heading"><div><h2 id="explore-title">탐구</h2><p class="kje-subtitle">실험과 제작에서 이어지는 관심.</p></div><span class="kje-eyebrow">Exploration</span></div>
+        <div class="kje-explore-list">
+          <article><h3>센서로 기록하는 변화</h3><p>마이크로비트로 전압과 온도를 측정하고, 기록을 그래프로 살펴봅니다. 측정 도구를 활용해 실험에서 확인할 질문을 구체화합니다.</p><a class="kje-project-go" href="https://maehwachem.github.io/science-tools/sensor/">센서 기록기 열기 <span aria-hidden="true">↗</span></a></article>
+          <article><h3>실제 실험과 가상실험</h3><p>화면에서 실험 절차를 익히고, 실제 실험의 관찰과 기록으로 연결합니다. 배터리와 산·염기 등 과학 주제를 실험과 디지털 콘텐츠로 다룹니다.</p><a class="kje-project-go" href="#projects-lab" data-select-category="lab">가상실험 살펴보기 <span aria-hidden="true">↑</span></a></article>
+        </div>
+      </section>
     </div>
-  </section>
-
-  <section class="blk" id="works">
-    <div class="wrap">
-      <div class="blk-head">
-        <h2 class="sec">작업</h2>
-        <p id="works-count"></p>
-      </div>
-      <div class="chips" role="group" aria-label="분류" id="chips"></div>
-      <div class="works" id="works-list"></div>
-    </div>
-  </section>
-
-  <section class="blk" id="career">
-    <div class="wrap">
-      <div class="blk-head"><h2 class="sec">이력</h2></div>
-      <div class="career">
-        <div class="card">
-          <h3>가르치는 과목</h3>
-          <ul>
-            <li><b>통합과학</b><span>고1 공통 과목</span></li>
-            <li><b>화학</b><span>예전에는 화학Ⅱ도 가르쳤어요</span></li>
-          </ul>
-        </div>
-        <div class="card">
-          <h3>경력</h3>
-          <ul>
-            <li><b>고등학교 과학 교사</b><span><span class="fill">[학교명 · 20XX–현재]</span></span></li>
-            <li><b>중학교 과학 교사</b><span><span class="fill">[학교명 · 기간]</span></span></li>
-            <li><b>국가 수준 평가 문항 개발 참여</b><span>평가 문항과 채점 기준 설계</span></li>
-          </ul>
-        </div>
-        <div class="card">
-          <h3>관심 분야</h3>
-          <ul>
-            <li><b>가상 실험과 실제 실험 잇기</b><span>이론적 접근과 실험적 접근을 나눠 각자의 역할을 맡기는 수업</span></li>
-            <li><b>과정 중심 평가</b><span>결과보다 측정, 재확인, 판단의 근거가 남는 수행평가</span></li>
-            <li><b>센서를 활용한 탐구</b><span>마이크로비트와 AI 비전 센서로 하는 측정</span></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="blk" id="contact">
-    <div class="wrap">
-      <div class="blk-head"><h2 class="sec">연락</h2><p>수업 도구 사용, 공동 연구, 연수 문의는 이메일로 보내 주세요.</p></div>
-      <div class="contact">
-        <div class="card">
-          <h3>이메일</h3>
-          <span class="addr" id="mail"><span class="fill">[이메일 주소]</span></span>
-          <div class="row"><button type="button" class="btn" id="copy-mail">주소 복사</button><span class="copied" id="copied" role="status"></span></div>
-        </div>
-        <div class="card">
-          <h3>깃허브</h3>
-          <span class="addr">github.com/maehwachem</span>
-          <div class="row"><a class="btn" href="https://github.com/maehwachem" target="_blank" rel="noopener">깃허브 열기</a></div>
-        </div>
-      </div>
-    </div>
-  </section>
-</main>
-
-<footer>
-  <div class="wrap">
-    <a href="https://maehwachem.github.io/science-tools/battery/privacy.html">수업 도구 개인정보 처리방침</a>
-    <span>이 페이지는 방문 분석 도구를 쓰지 않아요.</span>
-  </div>
-</footer>
-
+    <section class="kje-about-band" id="journal" aria-labelledby="journal-title"><div class="kje-wrap kje-about-inner"><div><p class="kje-eyebrow">Beyond work</p><h2 class="kje-personal-heading" id="journal-title">일상에서 이어지는 관심</h2></div><div><p class="kje-about-copy">사진을 찍고, 텃밭을 가꾸고, 별을 봅니다.<br>술을 빚으며 관찰한 변화와 일상에서 떠오른 생각도 기록합니다.</p><div class="kje-interests"><span>사진</span><span>텃밭</span><span>별보기</span><span>술 빚기</span></div></div></div></section>
+  </main>
+  <footer class="kje-wrap kje-footer" id="contact"><strong>KJE의 작업실</strong><div class="kje-footer-links"><a class="kje-contact-email" href="mailto:kjechem@naver.com">kjechem@naver.com</a><a href="https://github.com/maehwachem" target="_blank" rel="noopener noreferrer">GitHub</a><a href="https://maehwachem.github.io/science-tools/battery/privacy.html">수업 도구 개인정보 처리방침</a><a href="#top">맨 위로 ↑</a></div><span>© KJE</span></footer>
+</div>
 <script>
-(() => {
+(()=>{
   'use strict';
-  /* 새 작업은 여기에 한 줄 추가: status는 live(바로 열기), repo(깃허브 저장소), soon(공개 준비 중) */
-  const CATS = { tool:'수업 도구·가상 실험실', game:'학습 게임', inter:'인터랙티브 학습 자료', maker:'마이크로비트·깃허브' };
-  const T = 'https://maehwachem.github.io/science-tools/', G = 'https://github.com/maehwachem/';
-  const WORKS = [
-    { cat:'tool', title:'배터리 시험팀', desc:'라벨이 섞인 전극판을 전압으로 식별하고, 기록을 근거로 판정해 성적서를 쓰는 조별 실험 도구예요. 2차는 통합과학이나 화학 과정으로 이어져요.', tags:['실제 실험', '통합과학', '화학'], status:'live', url:T + 'battery/' },
-    { cat:'tool', title:'배터리 가상 시험동', desc:'화면 속 실험대에서 거름종이, 전극판, 집게, 다이얼을 직접 조작하며 측정 절차를 익혀요. 조작 실수도 기록으로 남아요.', tags:['가상 실험', '조별·개별'], status:'live', url:T + 'battery/virtual.html' },
-    { cat:'tool', title:'환경 대응팀', desc:'하천 오염 폐수에 대응하는 역할극 속에서 시료의 액성을 판별하고 중화 반응을 다루는 조별 수행평가 도구예요.', tags:['실제 실험', '산·염기'], status:'soon' },
-    { cat:'tool', title:'산·염기 가상 실험실', desc:'중화 반응 가상 실험이에요. 무엇을 어떤 순서로 얼마나 넣었는지, 어디서 다시 했는지가 교사에게 기록으로 돌아가요.', tags:['가상 실험', '중·고'], status:'soon' },
-    { cat:'tool', title:'용액 조제실', desc:'용액과 농도를 한 차시에 다루는 가상 실험실이에요.', tags:['가상 실험', '화학'], status:'soon' },
-    { cat:'tool', title:'영상 운동 분석기', desc:'태블릿으로 찍은 영상에서 프레임마다 물체 위치를 짚어 운동을 분석하고, 실제 길이로 보정해 CSV로 저장해요.', tags:['물리', '태블릿'], status:'soon' },
-    { cat:'tool', title:'적도의 정렬 매트와 별자리판', desc:'관측 행사에서 적도의식 망원경을 맞추는 2 m 바닥 매트와 항성시 계산판, 밝은 별 18개를 담은 회전 별자리판이에요.', tags:['천문', 'A3 인쇄'], status:'soon' },
-    { cat:'game', title:'화학자의 섬', desc:'섬을 탐험하며 기초부터 심화까지 화학을 배우는 학습 게임이에요.', tags:['화학'], status:'soon' },
-    { cat:'game', title:'화학자의 항해', desc:'화학자의 섬 뒷이야기를 잇는 이야기 게임이에요. 조별로 함께 하는 모둠판도 있어요.', tags:['화학', '모둠판'], status:'soon' },
-    { cat:'inter', title:'엘니뇨와 라니냐', desc:'엘니뇨와 라니냐가 생기는 과정을 직접 조작하며 살펴보는 자료예요.', tags:['통합과학', '지구'], status:'soon' },
-    { cat:'inter', title:'대기 대순환', desc:'위도에 따라 달라지는 대기의 순환을 살펴보는 인터랙티브 자료예요.', tags:['통합과학', '지구'], status:'soon' },
-    { cat:'inter', title:'몰 농도 학습지', desc:'몰 농도 개념을 단계별로 익히는 학습지예요.', tags:['화학'], status:'soon' },
-    { cat:'maker', title:'마이크로비트 처음 시작하기', desc:'마이크로비트를 처음 쓰는 학생과 교사를 위한 안내와 새 기기 첫 연결 점검 자료예요.', tags:['마이크로비트'], status:'soon' },
-    { cat:'maker', title:'마이크로비트 센서 기록기', desc:'마이크로비트로 셀 전압이나 방수 온도 센서 값을 블루투스로 받아 그래프로 그리고, 실험 조건별로 기록해 CSV로 내요.', tags:['마이크로비트', '웹 블루투스'], status:'live', links:[['전압', T + 'sensor/'], ['온도', T + 'sensor/temp.html']] },
-    { cat:'maker', title:'Microbit Data Visualizer', desc:'웹 블루투스로 마이크로비트의 온도 값을 받아 그래프로 그리고 CSV로 저장해요.', tags:['마이크로비트', '웹 블루투스'], status:'repo', url:G + 'microbit-web-visualizer' },
-    { cat:'maker', title:'AR 심장', desc:'3D 심장 모델을 돌려 보고 증강현실로 교실에 띄워 보는 자료예요.', tags:['생명과학', 'AR'], status:'repo', url:G + 'heart-ar' }
-  ];
-  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
-  const GO = { live:['live', '열기'], repo:['repo', '깃허브'], soon:['soon', '공개 준비 중'] };
-  let cur = 'all';
-  try{ const s = localStorage.getItem('maehwachem-hub-cat'); if(s && (s === 'all' || CATS[s])) cur = s; }catch(e){}
-  const chips = document.getElementById('chips'), list = document.getElementById('works-list'), count = document.getElementById('works-count');
-  function draw(){
-    const keys = ['all', ...Object.keys(CATS)];
-    chips.innerHTML = keys.map(k => `<button type="button" data-cat="${k}" aria-pressed="${cur === k}">${k === 'all' ? '전체' : esc(CATS[k])}<span class="n">${k === 'all' ? WORKS.length : WORKS.filter(w => w.cat === k).length}</span></button>`).join('');
-    const shown = WORKS.filter(w => cur === 'all' || w.cat === cur);
-    list.innerHTML = shown.map(w => {
-      const [cls, label] = GO[w.status];
-      const link = w.status === 'soon' ? `<span class="go soon">${label}</span>` : w.links ? `<span class="tags">${w.links.map(([t, u]) => `<a class="go ${cls}" href="${esc(u)}">${esc(t)}</a>`).join('')}</span>` : `<a class="go ${cls}" href="${esc(w.url)}"${w.status === 'repo' ? ' target="_blank" rel="noopener"' : ''}>${label}</a>`;
-      return `<article class="work"><span class="cat">${esc(CATS[w.cat])}</span><h3>${esc(w.title)}</h3><p>${esc(w.desc)}</p>
-        <div class="foot"><span class="tags">${w.tags.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</span>${link}</div></article>`;
-    }).join('');
-    const live = WORKS.filter(w => w.status !== 'soon').length;
-    count.textContent = `${WORKS.length}개 가운데 ${live}개 공개`;
+  const root=document.getElementById('kje-portfolio');
+  const categories={lab:['가상실험','현상과 변화를 화면에서 살펴보는 실험 콘텐츠.'],game:['학습 게임','탐험과 미션, 선택을 통해 과학을 만나는 게임.'],tool:['교육 도구','학습과 지도, 실험 기록에 활용하는 도구.'],lesson:['수업·탐구 자료','과학 개념을 이해하고 탐구로 이어가는 자료.']};
+  const buttons=[...root.querySelectorAll('[data-category]')];
+  const cards=[...root.querySelectorAll('[data-kind]')];
+  function selectCategory(key,writeHash){
+    if(!categories[key])return;
+    buttons.forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.category===key)));
+    let count=0;
+    cards.forEach(card=>{card.hidden=card.dataset.kind!==key;if(!card.hidden)count++;});
+    root.querySelector('#kje-category-description').textContent=categories[key][1];
+    root.querySelector('#kje-category-status').textContent=categories[key][0]+' · '+count+'개';
+    if(writeHash)history.replaceState(null,'','#projects-'+key);
   }
-  chips.addEventListener('click', e => {
-    const b = e.target.closest('button[data-cat]'); if(!b) return;
-    cur = b.dataset.cat; try{ localStorage.setItem('maehwachem-hub-cat', cur); }catch(e){}
-    draw();
-  });
-  document.getElementById('copy-mail').addEventListener('click', () => {
-    const el = document.getElementById('mail'), out = document.getElementById('copied'), txt = el.textContent.trim();
-    const sel = () => { const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); out.textContent = '선택했어요. 복사해 쓰세요.'; };
-    try{ navigator.clipboard.writeText(txt).then(() => { out.textContent = '복사했어요.'; }, sel); }catch(e){ sel(); }
-  });
-  draw();
+  function applyHash(){
+    const hash=location.hash.slice(1);
+    if(hash.startsWith('projects-')){
+      selectCategory(hash.slice(9),false);
+      document.getElementById('projects').scrollIntoView({block:'start'});
+    }
+    const oldAnchors={works:'projects',career:'about'};
+    if(oldAnchors[hash])document.getElementById(oldAnchors[hash]).scrollIntoView({block:'start'});
+  }
+  buttons.forEach(button=>button.addEventListener('click',()=>selectCategory(button.dataset.category,true)));
+  root.querySelectorAll('[data-select-category]').forEach(link=>link.addEventListener('click',()=>selectCategory(link.dataset.selectCategory,false)));
+  window.addEventListener('hashchange',applyHash);
+  selectCategory('lab',false);applyHash();
+  const navLinks=[...root.querySelectorAll('.kje-menu a[href^="#"]')];
+  if('IntersectionObserver' in window){
+    const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{
+      if(!entry.isIntersecting)return;
+      navLinks.forEach(link=>{if(link.hash==='#'+entry.target.id)link.setAttribute('aria-current','location');else link.removeAttribute('aria-current');});
+    }),{rootMargin:'-5% 0px -65% 0px',threshold:0});
+    ['about','projects','explore','journal'].forEach(id=>observer.observe(document.getElementById(id)));
+  }
 })();
 </script>
 </body>
