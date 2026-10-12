@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cg fill='%239B2F57'%3E%3Ccircle cx='20' cy='7.5' r='6'/%3E%3Ccircle cx='31.9' cy='16.1' r='6'/%3E%3Ccircle cx='27.3' cy='30.1' r='6'/%3E%3Ccircle cx='12.7' cy='30.1' r='6'/%3E%3Ccircle cx='8.1' cy='16.1' r='6'/%3E%3Ccircle cx='20' cy='20' r='5'/%3E%3C/g%3E%3C/svg%3E">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>maehwachem</title>
+<meta name="description" content="고등학교 과학 교사의 수업 도구와 학습 자료 모음">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* 레이아웃: 위에 이름표(매화 모양 분자 마크 + maehwachem), 첫 화면은 소개와 '지금 쓸 수 있는 도구' 바로 가기,
+   그 아래 분류 칩으로 거르는 작업 목록, 이력, 연락. 도구가 늘면 WORKS 배열에 한 줄만 더함 */
+:root{
+  --bg:#F3F5F4; --paper:#FFFFFF; --ink:#1B1D22; --ink2:#535A61; --line:#D9DEDC; --grid:#E4E8E6;
+  --plum:#9B2F57; --plum-soft:#F6E4EA; --live:#2E7350; --live-soft:#E0F0E6; --fill:#FBEFC4; --fill-line:#C9A227;
+  --display:'Do Hyeon', 'IBM Plex Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --body:'IBM Plex Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif;
+  --mono:'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#15171A; --paper:#1D2024; --ink:#E7EAEC; --ink2:#A6AEB5; --line:#30353B; --grid:#22262A;
+  --plum:#E58AAB; --plum-soft:#3A2230; --live:#7FD0A3; --live-soft:#1E3529; --fill:#43391A; --fill-line:#B8942A; color-scheme:dark; } }
+:root[data-theme="dark"]{
+  --bg:#15171A; --paper:#1D2024; --ink:#E7EAEC; --ink2:#A6AEB5; --line:#30353B; --grid:#22262A;
+  --plum:#E58AAB; --plum-soft:#3A2230; --live:#7FD0A3; --live-soft:#1E3529; --fill:#43391A; --fill-line:#B8942A; color-scheme:dark; }
+*{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+@media (prefers-reduced-motion: reduce){ html{ scroll-behavior:auto; } }
+body{ background:var(--bg); color:var(--ink); font-family:var(--body); font-size:16px; line-height:1.7; word-break:keep-all; overflow-wrap:break-word; }
+a{ color:inherit; }
+a:focus-visible, button:focus-visible{ outline:2px solid var(--plum); outline-offset:2px; border-radius:6px; }
+.wrap{ max-width:1080px; margin:0 auto; padding-inline:20px; }
+.fill{ background:var(--fill); border-bottom:1.5px dashed var(--fill-line); padding:0 4px; border-radius:3px; color:var(--ink); }
+
+/* 이름표 */
+header.bar{ padding-block:18px; border-bottom:1px solid var(--line); background:var(--bg); }
+header.bar .wrap{ display:flex; align-items:center; justify-content:space-between; gap:12px 24px; flex-wrap:wrap; }
+.brand{ display:flex; align-items:center; gap:10px; text-decoration:none; }
+.brand svg{ width:34px; height:34px; flex:none; }
+.brand span{ font-family:var(--mono); font-weight:600; font-size:18px; letter-spacing:.01em; }
+nav.top{ display:flex; gap:4px 18px; flex-wrap:wrap; font-size:15px; }
+nav.top a{ text-decoration:none; color:var(--ink2); padding:4px 0; }
+nav.top a:hover{ color:var(--plum); }
+
+/* 첫 화면 */
+.hero{ background-image:linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size:28px 28px; border-bottom:1px solid var(--line); }
+.hero .wrap{ display:grid; grid-template-columns:minmax(0, 1.35fr) minmax(0, 1fr); gap:40px; padding-block:56px 52px; align-items:start; }
+.eyebrow{ margin:0 0 14px; font-size:14px; font-weight:600; color:var(--plum); letter-spacing:.02em; }
+h1{ margin:0; font-family:var(--display); font-weight:400; font-size:clamp(36px, 5.6vw, 58px); line-height:1.12; text-wrap:balance; }
+.hero p.sub{ margin:18px 0 0; max-width:56ch; color:var(--ink2); font-size:17px; }
+.hero .who{ margin:22px 0 0; font-size:15px; color:var(--ink2); }
+.quick{ background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:20px 22px; display:grid; gap:12px; }
+.quick h2{ margin:0; font-size:13px; font-weight:700; letter-spacing:.05em; color:var(--ink2); }
+.quick a{ display:grid; gap:2px; text-decoration:none; padding:12px 14px; border-radius:10px; border:1px solid var(--line); background:var(--bg); }
+.quick a:hover{ border-color:var(--plum); }
+.quick a b{ font-size:17px; font-weight:700; }
+.quick a span{ font-size:14px; color:var(--ink2); line-height:1.5; }
+.quick p{ margin:2px 0 0; font-size:13.5px; color:var(--ink2); line-height:1.55; }
+
+/* 공통 구획 */
+section.blk{ padding-block:56px 8px; scroll-margin-top:12px; }
+.blk-head{ display:flex; align-items:baseline; justify-content:space-between; gap:8px 20px; flex-wrap:wrap; margin-bottom:18px; }
+h2.sec{ margin:0; font-family:var(--display); font-weight:400; font-size:34px; line-height:1.15; }
+.blk-head p{ margin:0; color:var(--ink2); font-size:15px; }
+
+/* 작업 목록 */
+.chips{ display:flex; flex-wrap:wrap; gap:8px; margin:0 0 18px; }
+.chips button{ font:inherit; font-size:14.5px; font-weight:500; min-height:40px; padding:0 14px; border-radius:999px; border:1px solid var(--line); background:var(--paper); color:var(--ink); cursor:pointer; }
+.chips button[aria-pressed="true"]{ background:var(--ink); color:var(--bg); border-color:var(--ink); }
+.chips button .n{ font-family:var(--mono); font-size:12.5px; margin-left:6px; opacity:.7; }
+.works{ display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:14px; }
+.work{ background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:18px 20px; display:grid; grid-template-rows:auto auto 1fr auto; gap:8px; min-width:0; }
+.work .cat{ font-size:12.5px; font-weight:600; color:var(--plum); letter-spacing:.02em; }
+.work h3{ margin:0; font-size:19px; font-weight:700; line-height:1.35; }
+.work p{ margin:0; font-size:14.5px; color:var(--ink2); line-height:1.6; }
+.work .foot{ display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; padding-top:6px; }
+.tags{ display:flex; flex-wrap:wrap; gap:6px; }
+.tag{ font-size:12px; color:var(--ink2); border:1px solid var(--line); border-radius:999px; padding:1px 9px; }
+.go{ font-size:14px; font-weight:600; text-decoration:none; border-radius:8px; padding:6px 12px; white-space:nowrap; }
+.go.live{ background:var(--live-soft); color:var(--live); }
+.go.live:hover{ outline:1.5px solid var(--live); }
+.go.repo{ background:var(--plum-soft); color:var(--plum); }
+.go.repo:hover{ outline:1.5px solid var(--plum); }
+.go.soon{ color:var(--ink2); border:1px dashed var(--line); }
+
+/* 이력 */
+.career{ display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:14px; }
+.card{ background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:20px 22px; min-width:0; }
+.card h3{ margin:0 0 10px; font-size:13px; font-weight:700; letter-spacing:.05em; color:var(--ink2); }
+.card ul{ margin:0; padding:0; list-style:none; display:grid; gap:12px; }
+.card li b{ display:block; font-weight:600; font-size:16px; line-height:1.45; }
+.card li span{ display:block; font-size:14px; color:var(--ink2); line-height:1.55; }
+.card li span.fill{ display:inline; color:var(--ink); }
+
+/* 연락 */
+.contact{ display:flex; flex-wrap:wrap; gap:12px; align-items:stretch; }
+.contact .card{ display:grid; gap:6px; flex:1 1 280px; }
+.contact .addr{ font-family:var(--mono); font-size:17px; user-select:all; overflow-wrap:anywhere; }
+.contact .row{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.btn{ font:inherit; font-size:14px; font-weight:600; min-height:38px; padding:0 14px; border-radius:8px; border:1px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; }
+.btn:hover{ border-color:var(--plum); }
+.copied{ font-size:13.5px; color:var(--live); }
+
+footer{ margin-top:64px; border-top:1px solid var(--line); padding-block:22px 40px; font-size:14px; color:var(--ink2); }
+footer .wrap{ display:flex; flex-wrap:wrap; gap:6px 22px; }
+footer a{ color:var(--ink2); text-underline-offset:3px; }
+
+@media (max-width:1060px){ .works{ grid-template-columns:repeat(3, minmax(0, 1fr)); } }
+@media (max-width:900px){
+  .hero .wrap{ grid-template-columns:minmax(0, 1fr); gap:28px; padding-block:40px 36px; }
+  .works{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+  .career{ grid-template-columns:minmax(0, 1fr); }
+}
+@media (max-width:560px){
+  .wrap{ padding-inline:16px; }
+  .works{ grid-template-columns:minmax(0, 1fr); }
+  h2.sec{ font-size:30px; }
+  nav.top{ font-size:14.5px; }
+}
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="maehwachem 처음으로">
+      <svg viewBox="0 0 40 40" aria-hidden="true">
+        <g stroke="var(--plum)" stroke-width="1.6" stroke-linecap="round">
+          <line x1="20" y1="20" x2="20" y2="7.5"/><line x1="20" y1="20" x2="31.9" y2="16.1"/><line x1="20" y1="20" x2="27.3" y2="30.1"/><line x1="20" y1="20" x2="12.7" y2="30.1"/><line x1="20" y1="20" x2="8.1" y2="16.1"/>
+        </g>
+        <g fill="var(--plum)" fill-opacity=".22" stroke="var(--plum)" stroke-width="1.6">
+          <circle cx="20" cy="7.5" r="5.5"/><circle cx="31.9" cy="16.1" r="5.5"/><circle cx="27.3" cy="30.1" r="5.5"/><circle cx="12.7" cy="30.1" r="5.5"/><circle cx="8.1" cy="16.1" r="5.5"/>
+        </g>
+        <circle cx="20" cy="20" r="3.4" fill="var(--plum)"/>
+      </svg>
+      <span>maehwachem</span>
+    </a>
+    <nav class="top" aria-label="이 페이지 안">
+      <a href="#works">작업</a><a href="#career">이력</a><a href="#contact">연락</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <p class="eyebrow">고등학교 과학 교사 · 통합과학 · 화학</p>
+        <h1>학생이 직접 재고, 기록하고, 근거로 판단하는 과학 수업을 만듭니다</h1>
+        <p class="sub">예산과 안전, 시간 때문에 하기 어려운 실험은 가상 실험실로 연습하게 하고, 실제 실험에서는 기록끼리 맞춰 보며 판단하게 합니다. 수업에 필요한 도구는 AI와 함께 코드를 짜며 직접 만들어 씁니다.</p>
+        <p class="who"><span class="fill">[이름]</span> · <span class="fill">[학교명]</span></p>
+      </div>
+      <aside class="quick" aria-labelledby="quick-h">
+        <h2 id="quick-h">지금 수업에서 쓸 수 있는 도구</h2>
+        <a href="https://maehwachem.github.io/science-tools/battery/"><b>배터리 시험팀</b><span>실제 실험 기록 · 전극판 식별과 화학 전지</span></a>
+        <a href="https://maehwachem.github.io/science-tools/battery/virtual.html"><b>배터리 가상 시험동</b><span>화면 속 실험대로 측정 절차 연습</span></a>
+        <a href="https://maehwachem.github.io/science-tools/#sensor"><b>마이크로비트 센서 기록기</b><span>전압·온도를 센서로 받아 그래프와 기록으로</span></a>
+        <p>설치 없이 브라우저에서 열고, 학생 기록은 그 기기에만 저장돼요.</p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="blk" id="works">
+    <div class="wrap">
+      <div class="blk-head">
+        <h2 class="sec">작업</h2>
+        <p id="works-count"></p>
+      </div>
+      <div class="chips" role="group" aria-label="분류" id="chips"></div>
+      <div class="works" id="works-list"></div>
+    </div>
+  </section>
+
+  <section class="blk" id="career">
+    <div class="wrap">
+      <div class="blk-head"><h2 class="sec">이력</h2></div>
+      <div class="career">
+        <div class="card">
+          <h3>가르치는 과목</h3>
+          <ul>
+            <li><b>통합과학</b><span>고1 공통 과목</span></li>
+            <li><b>화학</b><span>예전에는 화학Ⅱ도 가르쳤어요</span></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>경력</h3>
+          <ul>
+            <li><b>고등학교 과학 교사</b><span><span class="fill">[학교명 · 20XX–현재]</span></span></li>
+            <li><b>중학교 과학 교사</b><span><span class="fill">[학교명 · 기간]</span></span></li>
+            <li><b>국가 수준 평가 문항 개발 참여</b><span>평가 문항과 채점 기준 설계</span></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>관심 분야</h3>
+          <ul>
+            <li><b>가상 실험과 실제 실험 잇기</b><span>이론적 접근과 실험적 접근을 나눠 각자의 역할을 맡기는 수업</span></li>
+            <li><b>과정 중심 평가</b><span>결과보다 측정, 재확인, 판단의 근거가 남는 수행평가</span></li>
+            <li><b>센서를 활용한 탐구</b><span>마이크로비트와 AI 비전 센서로 하는 측정</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="blk" id="contact">
+    <div class="wrap">
+      <div class="blk-head"><h2 class="sec">연락</h2><p>수업 도구 사용, 공동 연구, 연수 문의는 이메일로 보내 주세요.</p></div>
+      <div class="contact">
+        <div class="card">
+          <h3>이메일</h3>
+          <span class="addr" id="mail"><span class="fill">[이메일 주소]</span></span>
+          <div class="row"><button type="button" class="btn" id="copy-mail">주소 복사</button><span class="copied" id="copied" role="status"></span></div>
+        </div>
+        <div class="card">
+          <h3>깃허브</h3>
+          <span class="addr">github.com/maehwachem</span>
+          <div class="row"><a class="btn" href="https://github.com/maehwachem" target="_blank" rel="noopener">깃허브 열기</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <a href="https://maehwachem.github.io/science-tools/battery/privacy.html">수업 도구 개인정보 처리방침</a>
+    <span>이 페이지는 방문 분석 도구를 쓰지 않아요.</span>
+  </div>
+</footer>
+
+<script>
+(() => {
+  'use strict';
+  /* 새 작업은 여기에 한 줄 추가: status는 live(바로 열기), repo(깃허브 저장소), soon(공개 준비 중) */
+  const CATS = { tool:'수업 도구·가상 실험실', game:'학습 게임', inter:'인터랙티브 학습 자료', maker:'마이크로비트·깃허브' };
+  const T = 'https://maehwachem.github.io/science-tools/', G = 'https://github.com/maehwachem/';
+  const WORKS = [
+    { cat:'tool', title:'배터리 시험팀', desc:'라벨이 섞인 전극판을 전압으로 식별하고, 기록을 근거로 판정해 성적서를 쓰는 조별 실험 도구예요. 2차는 통합과학이나 화학 과정으로 이어져요.', tags:['실제 실험', '통합과학', '화학'], status:'live', url:T + 'battery/' },
+    { cat:'tool', title:'배터리 가상 시험동', desc:'화면 속 실험대에서 거름종이, 전극판, 집게, 다이얼을 직접 조작하며 측정 절차를 익혀요. 조작 실수도 기록으로 남아요.', tags:['가상 실험', '조별·개별'], status:'live', url:T + 'battery/virtual.html' },
+    { cat:'tool', title:'환경 대응팀', desc:'하천 오염 폐수에 대응하는 역할극 속에서 시료의 액성을 판별하고 중화 반응을 다루는 조별 수행평가 도구예요.', tags:['실제 실험', '산·염기'], status:'soon' },
+    { cat:'tool', title:'산·염기 가상 실험실', desc:'중화 반응 가상 실험이에요. 무엇을 어떤 순서로 얼마나 넣었는지, 어디서 다시 했는지가 교사에게 기록으로 돌아가요.', tags:['가상 실험', '중·고'], status:'soon' },
+    { cat:'tool', title:'용액 조제실', desc:'용액과 농도를 한 차시에 다루는 가상 실험실이에요.', tags:['가상 실험', '화학'], status:'soon' },
+    { cat:'tool', title:'영상 운동 분석기', desc:'태블릿으로 찍은 영상에서 프레임마다 물체 위치를 짚어 운동을 분석하고, 실제 길이로 보정해 CSV로 저장해요.', tags:['물리', '태블릿'], status:'soon' },
+    { cat:'tool', title:'적도의 정렬 매트와 별자리판', desc:'관측 행사에서 적도의식 망원경을 맞추는 2 m 바닥 매트와 항성시 계산판, 밝은 별 18개를 담은 회전 별자리판이에요.', tags:['천문', 'A3 인쇄'], status:'soon' },
+    { cat:'game', title:'화학자의 섬', desc:'섬을 탐험하며 기초부터 심화까지 화학을 배우는 학습 게임이에요.', tags:['화학'], status:'soon' },
+    { cat:'game', title:'화학자의 항해', desc:'화학자의 섬 뒷이야기를 잇는 이야기 게임이에요. 조별로 함께 하는 모둠판도 있어요.', tags:['화학', '모둠판'], status:'soon' },
+    { cat:'inter', title:'엘니뇨와 라니냐', desc:'엘니뇨와 라니냐가 생기는 과정을 직접 조작하며 살펴보는 자료예요.', tags:['통합과학', '지구'], status:'soon' },
+    { cat:'inter', title:'대기 대순환', desc:'위도에 따라 달라지는 대기의 순환을 살펴보는 인터랙티브 자료예요.', tags:['통합과학', '지구'], status:'soon' },
+    { cat:'inter', title:'몰 농도 학습지', desc:'몰 농도 개념을 단계별로 익히는 학습지예요.', tags:['화학'], status:'soon' },
+    { cat:'maker', title:'마이크로비트 처음 시작하기', desc:'마이크로비트를 처음 쓰는 학생과 교사를 위한 안내와 새 기기 첫 연결 점검 자료예요.', tags:['마이크로비트'], status:'soon' },
+    { cat:'maker', title:'마이크로비트 센서 기록기', desc:'마이크로비트로 셀 전압이나 방수 온도 센서 값을 블루투스로 받아 그래프로 그리고, 실험 조건별로 기록해 CSV로 내요.', tags:['마이크로비트', '웹 블루투스'], status:'live', links:[['전압', T + 'sensor/'], ['온도', T + 'sensor/temp.html']] },
+    { cat:'maker', title:'Microbit Data Visualizer', desc:'웹 블루투스로 마이크로비트의 온도 값을 받아 그래프로 그리고 CSV로 저장해요.', tags:['마이크로비트', '웹 블루투스'], status:'repo', url:G + 'microbit-web-visualizer' },
+    { cat:'maker', title:'AR 심장', desc:'3D 심장 모델을 돌려 보고 증강현실로 교실에 띄워 보는 자료예요.', tags:['생명과학', 'AR'], status:'repo', url:G + 'heart-ar' }
+  ];
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+  const GO = { live:['live', '열기'], repo:['repo', '깃허브'], soon:['soon', '공개 준비 중'] };
+  let cur = 'all';
+  try{ const s = localStorage.getItem('maehwachem-hub-cat'); if(s && (s === 'all' || CATS[s])) cur = s; }catch(e){}
+  const chips = document.getElementById('chips'), list = document.getElementById('works-list'), count = document.getElementById('works-count');
+  function draw(){
+    const keys = ['all', ...Object.keys(CATS)];
+    chips.innerHTML = keys.map(k => `<button type="button" data-cat="${k}" aria-pressed="${cur === k}">${k === 'all' ? '전체' : esc(CATS[k])}<span class="n">${k === 'all' ? WORKS.length : WORKS.filter(w => w.cat === k).length}</span></button>`).join('');
+    const shown = WORKS.filter(w => cur === 'all' || w.cat === cur);
+    list.innerHTML = shown.map(w => {
+      const [cls, label] = GO[w.status];
+      const link = w.status === 'soon' ? `<span class="go soon">${label}</span>` : w.links ? `<span class="tags">${w.links.map(([t, u]) => `<a class="go ${cls}" href="${esc(u)}">${esc(t)}</a>`).join('')}</span>` : `<a class="go ${cls}" href="${esc(w.url)}"${w.status === 'repo' ? ' target="_blank" rel="noopener"' : ''}>${label}</a>`;
+      return `<article class="work"><span class="cat">${esc(CATS[w.cat])}</span><h3>${esc(w.title)}</h3><p>${esc(w.desc)}</p>
+        <div class="foot"><span class="tags">${w.tags.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</span>${link}</div></article>`;
+    }).join('');
+    const live = WORKS.filter(w => w.status !== 'soon').length;
+    count.textContent = `${WORKS.length}개 가운데 ${live}개 공개`;
+  }
+  chips.addEventListener('click', e => {
+    const b = e.target.closest('button[data-cat]'); if(!b) return;
+    cur = b.dataset.cat; try{ localStorage.setItem('maehwachem-hub-cat', cur); }catch(e){}
+    draw();
+  });
+  document.getElementById('copy-mail').addEventListener('click', () => {
+    const el = document.getElementById('mail'), out = document.getElementById('copied'), txt = el.textContent.trim();
+    const sel = () => { const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); out.textContent = '선택했어요. 복사해 쓰세요.'; };
+    try{ navigator.clipboard.writeText(txt).then(() => { out.textContent = '복사했어요.'; }, sel); }catch(e){ sel(); }
+  });
+  draw();
+})();
+</script>
+</body>
+</html>
