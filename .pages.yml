@@ -1,0 +1,242 @@
+# Pages CMS: edit with the repository owner account; do not invite collaborators.
+media:
+  input: assets/uploads
+  output: /assets/uploads
+  rename: random
+  extensions:
+  - jpg
+  - jpeg
+  - png
+  - webp
+  - gif
+content:
+- name: site
+  label: 소개·홈페이지 설정
+  type: file
+  path: content/site.json
+  format: json
+  fields:
+  - name: title
+    label: 홈페이지 이름
+    type: string
+    required: true
+  - name: name
+    label: 표시 이름
+    type: string
+    required: true
+  - name: character
+    label: 상단 캐릭터
+    type: image
+  - name: lead
+    label: 첫 소개 문구
+    type: text
+    required: true
+  - name: bio
+    label: 소개 내용
+    type: text
+  - name: email
+    label: 연락받을 이메일
+    type: string
+    required: true
+    pattern:
+      regex: ^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$
+      message: 이메일 주소를 확인해 주세요.
+  - name: background
+    label: 전공과 활동 배경
+    type: object
+    list:
+      collapsible:
+        collapsed: true
+        summary: '{label}'
+    fields:
+    - name: label
+      label: 항목 이름
+      type: string
+      required: true
+    - name: text
+      label: 내용
+      type: text
+      required: true
+  - name: explorations
+    label: 탐구 소개
+    type: object
+    list:
+      collapsible:
+        collapsed: true
+        summary: '{title}'
+    fields:
+    - name: title
+      label: 제목
+      type: string
+      required: true
+    - name: text
+      label: 내용
+      type: text
+    - name: link_label
+      label: 링크 버튼 이름
+      type: string
+    - name: link
+      label: 연결 주소
+      type: string
+      pattern: &id001
+        regex: ^(https?://|/|#|mailto:).+
+        message: https:// 로 시작하는 주소 또는 / 로 시작하는 페이지 경로를 입력해 주세요.
+  - name: interests_title
+    label: 일상 관심 제목
+    type: string
+  - name: interests_text
+    label: 일상 관심 소개
+    type: text
+  - name: interests
+    label: 관심 주제
+    type: string
+    list: true
+- name: projects
+  label: 프로젝트 관리
+  type: file
+  path: content/projects.json
+  format: json
+  fields:
+  - name: projects
+    label: 프로젝트
+    type: object
+    list:
+      collapsible:
+        collapsed: true
+        summary: '{title}'
+    fields:
+    - name: title
+      label: 프로젝트 이름
+      type: string
+      required: true
+    - name: kind
+      label: 카테고리
+      type: select
+      required: true
+      options:
+        values:
+        - name: lab
+          label: 가상실험
+        - name: game
+          label: 학습 게임
+        - name: tool
+          label: 교육 도구
+        - name: lesson
+          label: 수업·탐구 자료
+    - name: desc
+      label: 설명
+      type: text
+      required: true
+    - name: tag
+      label: 과목·주제 태그
+      type: string
+      description: '예: 화학 · 산과 염기'
+    - name: cover
+      label: 대표 이미지
+      type: image
+      description: 선택 사항입니다. 비워 두면 아래 표지 스타일을 사용합니다.
+    - name: poster
+      label: 기본 표지 스타일
+      type: select
+      default: note
+      options:
+        values:
+        - name: lab
+          label: 실험
+        - name: battery
+          label: 배터리
+        - name: island
+          label: 섬
+        - name: power
+          label: 전기
+        - name: note
+          label: 노트
+        - name: earth
+          label: 지구
+        - name: acid
+          label: 산과 염기
+    - name: words
+      label: 기본 표지에 들어갈 글자
+      type: text
+      description: 줄바꿈을 넣을 수 있습니다. 비워 두면 프로젝트 이름이 표시됩니다.
+    - name: links
+      label: 연결할 링크
+      type: object
+      list:
+        collapsible:
+          collapsed: true
+          summary: '{label}'
+      fields:
+      - name: label
+        label: 버튼 이름
+        type: string
+        required: true
+      - name: url
+        label: 연결 주소
+        type: string
+        required: true
+        pattern: *id001
+      description: 링크가 없으면 홈페이지에 공개 준비 중으로 표시됩니다.
+    description: 항목을 추가하거나 순서를 바꾼 뒤 저장해 주세요.
+- name: posts
+  label: 글·사진 쓰기
+  type: file
+  path: content/posts.json
+  format: json
+  fields:
+  - name: posts
+    label: 글과 사진
+    type: object
+    list:
+      collapsible:
+        collapsed: true
+        summary: '{title}'
+    fields:
+    - name: id
+      label: 글 고유번호
+      type: uuid
+      hidden: true
+      options:
+        editable: false
+        generate: false
+    - name: title
+      label: 글 제목
+      type: string
+      required: true
+    - name: date
+      label: 작성일
+      type: date
+      required: true
+      options:
+        format: yyyy-MM-dd
+    - name: category
+      label: 분류
+      type: select
+      default: 생각과 기록
+      required: true
+      options:
+        values:
+        - 수업·탐구
+        - 디지털 제작
+        - 생각과 기록
+        - 사진
+        - 텃밭
+        - 별보기
+        - 술 빚기
+    - name: summary
+      label: 목록에 보일 짧은 소개
+      type: text
+    - name: cover
+      label: 대표 사진
+      type: image
+    - name: cover_alt
+      label: 대표 사진 설명
+      type: string
+    - name: body
+      label: 본문
+      type: rich-text
+      required: true
+      options:
+        format: html
+        switcher: false
+    description: 항목 추가로 새 글을 씁니다. 저장한 글과 사진은 공개됩니다. 최신 작성일 순으로 표시됩니다.

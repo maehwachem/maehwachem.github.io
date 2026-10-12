@@ -194,6 +194,7 @@ html{color-scheme:light dark;scroll-behavior:smooth}body{margin:0;background:lig
 @media(max-width:650px){#kje-portfolio .kje-profile{grid-template-columns:1fr}#kje-portfolio .kje-explore-list{grid-template-columns:1fr;gap:26px}#kje-portfolio .kje-menu{gap:7px 19px}#kje-portfolio .kje-poster-word{font-size:27px}#kje-portfolio .kje-project-title{font-size:18px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 </style>
+  <link rel="stylesheet" href="assets/content.css">
 </head>
 <body>
 <div id="kje-portfolio">
@@ -291,47 +292,20 @@ html{color-scheme:light dark;scroll-behavior:smooth}body{margin:0;background:lig
       </section>
     </div>
     <section class="kje-about-band" id="journal" aria-labelledby="journal-title"><div class="kje-wrap kje-about-inner"><div><p class="kje-eyebrow">Beyond work</p><h2 class="kje-personal-heading" id="journal-title">일상에서 이어지는 관심</h2></div><div><p class="kje-about-copy">사진을 찍고, 텃밭을 가꾸고, 별을 봅니다.<br>술을 빚으며 관찰한 변화와 일상에서 떠오른 생각도 기록합니다.</p><div class="kje-interests"><span>사진</span><span>텃밭</span><span>별보기</span><span>술 빚기</span></div></div></div></section>
+
+    <section class="kje-wrap kje-post-section" aria-labelledby="posts-title">
+      <div id="kje-post-listing">
+        <div class="kje-section-heading"><div><h2 id="posts-title">글·사진</h2><p class="kje-subtitle">탐구와 제작, 일상에서 남긴 기록.</p></div><span class="kje-eyebrow">Journal</span></div>
+        <div id="kje-post-filters" class="kje-post-filters" role="group" aria-label="글 분류" hidden></div>
+        <div id="kje-post-list" class="kje-post-grid"></div>
+        <p id="kje-post-empty" class="kje-post-empty" role="status">글을 불러오는 중입니다.</p>
+        <noscript><p>글 목록을 보려면 브라우저에서 자바스크립트를 켜 주세요.</p></noscript>
+      </div>
+      <article id="kje-post-reader" class="kje-reader" aria-label="글 본문" hidden></article>
+    </section>
   </main>
-  <footer class="kje-wrap kje-footer" id="contact"><strong>KJE의 작업실</strong><div class="kje-footer-links"><a class="kje-contact-email" href="mailto:kjechem@naver.com">kjechem@naver.com</a><a href="https://github.com/maehwachem" target="_blank" rel="noopener noreferrer">GitHub</a><a href="https://maehwachem.github.io/science-tools/battery/privacy.html">수업 도구 개인정보 처리방침</a><a href="#top">맨 위로 ↑</a></div><span>© KJE</span></footer>
+  <footer class="kje-wrap kje-footer" id="contact"><strong>KJE의 작업실</strong><div class="kje-footer-links"><a class="kje-contact-email" href="mailto:kjechem@naver.com">kjechem@naver.com</a><a href="https://github.com/maehwachem" target="_blank" rel="noopener noreferrer">GitHub</a><a href="https://maehwachem.github.io/science-tools/battery/privacy.html">수업 도구 개인정보 처리방침</a><a href="admin/">관리</a><a href="#top">맨 위로 ↑</a></div><span>© KJE</span></footer>
 </div>
-<script>
-(()=>{
-  'use strict';
-  const root=document.getElementById('kje-portfolio');
-  const categories={lab:['가상실험','현상과 변화를 화면에서 살펴보는 실험 콘텐츠.'],game:['학습 게임','탐험과 미션, 선택을 통해 과학을 만나는 게임.'],tool:['교육 도구','학습과 지도, 실험 기록에 활용하는 도구.'],lesson:['수업·탐구 자료','과학 개념을 이해하고 탐구로 이어가는 자료.']};
-  const buttons=[...root.querySelectorAll('[data-category]')];
-  const cards=[...root.querySelectorAll('[data-kind]')];
-  function selectCategory(key,writeHash){
-    if(!categories[key])return;
-    buttons.forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.category===key)));
-    let count=0;
-    cards.forEach(card=>{card.hidden=card.dataset.kind!==key;if(!card.hidden)count++;});
-    root.querySelector('#kje-category-description').textContent=categories[key][1];
-    root.querySelector('#kje-category-status').textContent=categories[key][0]+' · '+count+'개';
-    if(writeHash)history.replaceState(null,'','#projects-'+key);
-  }
-  function applyHash(){
-    const hash=location.hash.slice(1);
-    if(hash.startsWith('projects-')){
-      selectCategory(hash.slice(9),false);
-      document.getElementById('projects').scrollIntoView({block:'start'});
-    }
-    const oldAnchors={works:'projects',career:'about'};
-    if(oldAnchors[hash])document.getElementById(oldAnchors[hash]).scrollIntoView({block:'start'});
-  }
-  buttons.forEach(button=>button.addEventListener('click',()=>selectCategory(button.dataset.category,true)));
-  root.querySelectorAll('[data-select-category]').forEach(link=>link.addEventListener('click',()=>selectCategory(link.dataset.selectCategory,false)));
-  window.addEventListener('hashchange',applyHash);
-  selectCategory('lab',false);applyHash();
-  const navLinks=[...root.querySelectorAll('.kje-menu a[href^="#"]')];
-  if('IntersectionObserver' in window){
-    const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{
-      if(!entry.isIntersecting)return;
-      navLinks.forEach(link=>{if(link.hash==='#'+entry.target.id)link.setAttribute('aria-current','location');else link.removeAttribute('aria-current');});
-    }),{rootMargin:'-5% 0px -65% 0px',threshold:0});
-    ['about','projects','explore','journal'].forEach(id=>observer.observe(document.getElementById(id)));
-  }
-})();
-</script>
+<script src="assets/content.js" defer></script>
 </body>
 </html>

@@ -1,0 +1,238 @@
+{
+  "projects": [
+    {
+      "kind": "lab",
+      "title": "산화·환원 실험실",
+      "poster": "lab",
+      "words": "산화·환원\n실험실",
+      "tag": "화학 · 산화·환원",
+      "desc": "실험에서 관찰하는 변화와 산화·환원 개념을 연결하는 가상실험.",
+      "cover": "",
+      "links": []
+    },
+    {
+      "kind": "lab",
+      "title": "배터리 가상 시험동",
+      "poster": "battery",
+      "words": "배터리\n가상 시험동",
+      "tag": "전기화학 · 배터리",
+      "desc": "화면 속 실험대에서 거름종이, 전극판, 집게와 다이얼을 조작하며 측정 절차를 익힙니다.",
+      "links": [
+        {
+          "label": "실험 열기",
+          "url": "https://maehwachem.github.io/science-tools/battery/virtual.html"
+        }
+      ],
+      "cover": ""
+    },
+    {
+      "kind": "game",
+      "title": "화학자의 섬",
+      "poster": "island",
+      "words": "화학자의\n섬",
+      "tag": "화학 · 탐험",
+      "desc": "섬을 탐험하고 문제를 해결하며 기초부터 심화까지 화학을 만나는 학습 게임.",
+      "cover": "",
+      "links": []
+    },
+    {
+      "kind": "game",
+      "title": "전기요금 챌린지",
+      "poster": "power",
+      "words": "전기요금\n챌린지",
+      "tag": "에너지 · 생활 속 과학",
+      "desc": "가전제품을 선택하고 배치하며 전기 사용과 비용을 생각하는 게임.",
+      "cover": "",
+      "links": []
+    },
+    {
+      "kind": "tool",
+      "title": "나의 면접 연습노트",
+      "poster": "note",
+      "words": "나의 면접\n연습노트",
+      "tag": "진로 · 면접",
+      "desc": "자신의 경험을 정리하고 답변을 연습하는 웹 도구.",
+      "links": [
+        {
+          "label": "도구 열기",
+          "url": "https://maehwachem.github.io/interview-note/"
+        }
+      ],
+      "cover": ""
+    },
+    {
+      "kind": "lesson",
+      "title": "엘니뇨와 라니냐",
+      "poster": "earth",
+      "words": "엘니뇨와\n라니냐",
+      "tag": "통합과학 · 지구과학",
+      "desc": "무역풍과 표층 해수, 강수 지역의 변화를 연결해 살펴보는 인터랙티브 자료.",
+      "cover": "",
+      "links": []
+    },
+    {
+      "kind": "lesson",
+      "title": "산·염기 중화반응 자료",
+      "poster": "acid",
+      "words": "산과 염기,\n중화반응",
+      "tag": "화학 · 산과 염기",
+      "desc": "산과 염기를 섞을 때의 변화를 이온과 연결해 설명하는 수업 자료.",
+      "cover": "",
+      "links": []
+    },
+    {
+      "kind": "tool",
+      "title": "배터리 시험팀",
+      "poster": "battery",
+      "words": "배터리\n시험팀",
+      "tag": "실제 실험 · 통합과학 · 화학",
+      "desc": "라벨이 섞인 전극판을 전압으로 식별하고, 실험 기록을 근거로 판정해 성적서를 쓰는 조별 실험 도구.",
+      "links": [
+        {
+          "label": "도구 열기",
+          "url": "https://maehwachem.github.io/science-tools/battery/"
+        }
+      ],
+      "cover": ""
+    },
+    {
+      "kind": "tool",
+      "title": "마이크로비트 센서 기록기",
+      "poster": "battery",
+      "words": "마이크로비트\n센서 기록기",
+      "tag": "센서 · 웹 블루투스",
+      "desc": "전압과 온도 값을 받아 그래프로 살펴보고, 실험 조건별 기록을 CSV로 저장하는 도구.",
+      "links": [
+        {
+          "label": "전압 기록기",
+          "url": "https://maehwachem.github.io/science-tools/sensor/"
+        },
+        {
+          "label": "온도 기록기",
+          "url": "https://maehwachem.github.io/science-tools/sensor/temp.html"
+        }
+      ],
+      "cover": ""
+    },
+    {
+      "kind": "tool",
+      "title": "Microbit Data Visualizer",
+      "poster": "earth",
+      "words": "Microbit\nData Visualizer",
+      "tag": "마이크로비트 · 데이터",
+      "desc": "웹 블루투스로 온도 값을 받아 그래프로 그리고 CSV로 저장하는 프로젝트.",
+      "links": [
+        {
+          "label": "GitHub 저장소",
+          "url": "https://github.com/maehwachem/microbit-web-visualizer"
+        }
+      ],
+      "cover": ""
+    },
+    {
+      "kind": "lesson",
+      "title": "AR 심장",
+      "poster": "acid",
+      "words": "AR\n심장",
+      "tag": "생명과학 · AR",
+      "desc": "3D 심장 모델을 돌려 보고 증강현실로 교실에 띄워 보는 자료.",
+      "links": [
+        {
+          "label": "GitHub 저장소",
+          "url": "https://github.com/maehwachem/heart-ar"
+        }
+      ],
+      "cover": ""
+    },
+    {
+      "kind": "lab",
+      "title": "산·염기 가상 실험실",
+      "poster": "acid",
+      "words": "산·염기\n가상 실험실",
+      "tag": "가상실험 · 산과 염기",
+      "desc": "중화반응을 살펴보며 시약을 넣는 순서와 양, 다시 시도한 과정을 기록하는 가상실험.",
+      "cover": "",
+      "links": []
+    },
+    {
+      "kind": "lab",
+      "title": "용액 조제실",
+      "poster": "lab",
+      "words": "용액\n조제실",
+      "tag": "화학 · 용액과 농도",
+      "desc": "용액과 농도를 한 차시에 다루는 가상실험실.",
+      "cover": "",
+      "links": []
+    },
+    {
+      "kind": "game",
+      "title": "화학자의 항해",
+      "poster": "island",
+      "words": "화학자의\n항해",
+      "tag": "화학 · 이야기 · 모둠",
+      "desc": "화학자의 섬 뒷이야기를 잇는 이야기 게임. 조별로 함께하는 모둠판도 있습니다.",
+      "cover": "",
+      "links": []
+    },
+    {
+      "kind": "tool",
+      "title": "환경 대응팀",
+      "poster": "earth",
+      "words": "환경\n대응팀",
+      "tag": "실제 실험 · 산과 염기",
+      "desc": "하천 오염에 대응하는 역할극 속에서 시료의 액성을 판별하고 중화반응을 다루는 조별 실험 도구.",
+      "cover": "",
+      "links": []
+    },
+    {
+      "kind": "tool",
+      "title": "영상 운동 분석기",
+      "poster": "note",
+      "words": "영상 운동\n분석기",
+      "tag": "물리 · 태블릿",
+      "desc": "영상 속 물체의 위치를 짚어 운동을 분석하고, 실제 길이로 보정한 데이터를 CSV로 저장하는 도구.",
+      "cover": "",
+      "links": []
+    },
+    {
+      "kind": "lesson",
+      "title": "적도의 정렬 매트와 별자리판",
+      "poster": "earth",
+      "words": "적도의 정렬\n별자리판",
+      "tag": "천문 · 인쇄 자료",
+      "desc": "망원경 정렬을 위한 바닥 매트와 항성시 계산판, 밝은 별 18개를 담은 회전 별자리판.",
+      "cover": "",
+      "links": []
+    },
+    {
+      "kind": "lesson",
+      "title": "대기 대순환",
+      "poster": "earth",
+      "words": "대기\n대순환",
+      "tag": "통합과학 · 지구과학",
+      "desc": "위도에 따라 달라지는 대기의 순환을 살펴보는 인터랙티브 자료.",
+      "cover": "",
+      "links": []
+    },
+    {
+      "kind": "lesson",
+      "title": "몰 농도 학습지",
+      "poster": "lab",
+      "words": "몰 농도\n학습지",
+      "tag": "화학 · 농도",
+      "desc": "몰 농도 개념을 단계별로 익히는 학습지.",
+      "cover": "",
+      "links": []
+    },
+    {
+      "kind": "lesson",
+      "title": "마이크로비트 처음 시작하기",
+      "poster": "note",
+      "words": "마이크로비트\n처음 시작하기",
+      "tag": "마이크로비트 · 입문",
+      "desc": "마이크로비트를 처음 쓰는 학생과 교사를 위한 안내와 새 기기의 첫 연결 점검 자료.",
+      "cover": "",
+      "links": []
+    }
+  ]
+}
