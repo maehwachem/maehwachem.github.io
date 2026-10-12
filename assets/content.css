@@ -31,3 +31,5 @@
 #kje-portfolio .kje-post-filter[aria-pressed=true]{background:var(--kje-button);color:var(--kje-button-text);border-color:var(--kje-button)}
 @media(max-width:850px){#kje-portfolio .kje-post-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){#kje-portfolio .kje-post-grid{grid-template-columns:1fr;gap:28px}#kje-portfolio .kje-post-section{padding:30px 0 40px}#kje-portfolio .kje-rich-content{font-size:15px}}
+
+#kje-portfolio .kje-project .kje-post-meta{margin-top:12px;margin-bottom:0}

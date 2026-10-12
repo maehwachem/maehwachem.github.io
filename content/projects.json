@@ -1,4 +1,6 @@
 {
+  "display_order": "manual",
+  "show_dates": true,
   "projects": [
     {
       "kind": "lab",

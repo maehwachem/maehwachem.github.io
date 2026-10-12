@@ -37,6 +37,10 @@
     if(!site || typeof site!=='object')return;
     setText('.kje-brand-name',site.title);setText('.kje-footer strong',site.title);
     setText('#about h1',site.name);setText('.kje-profile-lead',site.lead);setText('.kje-profile-text',site.bio);
+    if(text(site.background_title).trim()){
+      setText('.kje-background h2',site.background_title);
+      root.querySelector('.kje-background').setAttribute('aria-label',site.background_title);
+    }
     if(text(site.title))document.title=site.title+' · 과학교육과 탐구';
     if(text(site.lead))document.querySelector('meta[name="description"]').content=site.lead.replace(/\n/g,' ');
     const brand=root.querySelector('.kje-brand');if(text(site.title))brand.setAttribute('aria-label',site.title+' 홈');
@@ -68,7 +72,7 @@
   function renderProjects(data) {
     if(!data || !Array.isArray(data.projects))throw new Error('Invalid project data');
     const list=root.querySelector('#kje-project-list');const fragment=document.createDocumentFragment();
-    for(const item of data.projects) {
+    for(const item of orderedItems(data.projects,data.display_order)) {
       if(!item || !text(item.title) || !own(categories,item.kind))continue;
       const card=node('article','kje-project');card.dataset.kind=item.kind;
       const posterName=own(art,item.poster)?item.poster:'note';const poster=node('div','kje-poster kje-poster-'+posterName);poster.setAttribute('aria-hidden','true');
@@ -76,6 +80,7 @@
       if(cover){const img=node('img','kje-project-cover');img.src=cover;img.alt='';img.loading='lazy';poster.append(img);}
       else{poster.innerHTML=art[posterName];poster.prepend(node('span','kje-poster-cap',categories[item.kind][0]));poster.append(node('span','kje-poster-word',item.words||item.title));}
       card.append(poster,node('p','kje-project-tag',item.tag),node('h3','kje-project-title',item.title),node('p','kje-project-desc',item.desc));
+      if(data.show_dates!==false && dateKey(item.date))card.append(postMeta(item,false));
       const links=node('div','kje-project-links');
       (Array.isArray(item.links)?item.links:[]).forEach(link=>{if(link)addLink(links,link.label,link.url);});
       if(!links.children.length)links.append(node('span','kje-project-status','공개 준비 중'));
@@ -103,13 +108,35 @@
     }
     const result=document.createDocumentFragment();for(const child of source.body.childNodes)result.append(copy(child));return result;
   }
-  let posts=[];let postCategory='전체';let postsReady=false;
+  let posts=[];let postCategory='전체';let postsReady=false;let showPostDates=true;
+  function orderedItems(items,order){
+    const result=items.slice();
+    return order==='newest'?result.sort((a,b)=>dateKey(b?.date).localeCompare(dateKey(a?.date))):result;
+  }
   function sortedPosts(data) {
     if(!data||!Array.isArray(data.posts))throw new Error('Invalid post data');
     const ids=new Set();
-    return data.posts.filter(item=>{if(!item||!text(item.title)||!text(item.id)||ids.has(item.id))return false;ids.add(item.id);return true;}).sort((a,b)=>text(b.date).localeCompare(text(a.date)));
+    const valid=data.posts.filter(item=>{if(!item||!text(item.title)||!text(item.id)||ids.has(item.id))return false;ids.add(item.id);return true;});
+    return orderedItems(valid,data.display_order);
   }
-  function formatDate(value){const date=text(value).slice(0,10);return /^\d{4}-\d{2}-\d{2}$/.test(date)?date.replaceAll('-','.'):'';}
+  function dateKey(value){
+    const date=text(value).slice(0,10);
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(date))return '';
+    const parsed=new Date(date+'T00:00:00Z');
+    return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0,10)===date?date:'';
+  }
+  function postMeta(item,withCategory=true){
+    const meta=node('p','kje-post-meta');const date=dateKey(item.date);
+    if(date && (!withCategory || showPostDates)){
+      const time=node('time','','게시일 '+date.replaceAll('-','.'));
+      time.setAttribute('datetime',date);meta.append(time);
+    }
+    if(withCategory && text(item.category)){
+      if(meta.childNodes.length)meta.append(document.createTextNode(' · '));
+      meta.append(document.createTextNode(item.category));
+    }
+    meta.hidden=!meta.childNodes.length;return meta;
+  }
   function postURL(id) {const url=new URL(location.href);url.searchParams.set('post',id);url.hash='journal';return url;}
   function postLink(post){const link=node('a');link.href=postURL(post.id);link.addEventListener('click',event=>{if(event.button!==0||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;event.preventDefault();history.pushState(null,'',link.href);showPost(true);});return link;}
   function renderPostList() {
@@ -118,7 +145,7 @@
     for(const post of visible){
       const card=node('article','kje-post-card');const link=postLink(post);const cover=safeURL(post.cover,true);
       if(cover){const img=node('img','kje-post-cover');img.src=cover;img.alt=text(post.cover_alt);img.loading='lazy';link.append(img);}
-      link.append(node('p','kje-post-meta',[formatDate(post.date),text(post.category)].filter(Boolean).join(' · ')),node('h3','kje-post-title',post.title));
+      link.append(postMeta(post),node('h3','kje-post-title',post.title));
       if(text(post.summary))link.append(node('p','kje-post-summary',post.summary));card.append(link);list.append(card);
     }
     const empty=root.querySelector('#kje-post-empty');empty.hidden=visible.length>0;empty.textContent=posts.length?'이 분류에는 아직 글이 없습니다.':'아직 등록된 글이 없습니다.';
@@ -138,7 +165,7 @@
     back.addEventListener('click',event=>{if(event.button!==0||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;event.preventDefault();history.pushState(null,'',back.href);showPost();});reader.append(back);
     if(!post){reader.append(node('h2','','글을 찾을 수 없습니다.'),node('p','','글이 삭제되었거나 주소가 변경되었습니다.'));}
     else{
-      reader.append(node('p','kje-post-meta',[formatDate(post.date),text(post.category)].filter(Boolean).join(' · ')),node('h2','',post.title));
+      reader.append(postMeta(post),node('h2','',post.title));
       const cover=safeURL(post.cover,true);if(cover){const img=node('img','kje-post-cover');img.src=cover;img.alt=text(post.cover_alt);reader.append(img);}
       const body=node('div','kje-rich-content');body.append(safeRichText(post.body));reader.append(body);
     }
@@ -157,6 +184,6 @@
   Promise.allSettled([
     read('content/site.json').then(applySite),
     read('content/projects.json').then(renderProjects),
-    read('content/posts.json').then(data=>{posts=sortedPosts(data);postsReady=true;renderPostFilters();renderPostList();showPost(Boolean(new URL(location.href).searchParams.get('post')));}).catch(()=>{setText('#kje-post-empty','글을 불러오지 못했습니다. 잠시 후 새로고침해 주세요.');})
+    read('content/posts.json').then(data=>{posts=sortedPosts(data);showPostDates=data.show_dates!==false;postsReady=true;renderPostFilters();renderPostList();showPost(Boolean(new URL(location.href).searchParams.get('post')));}).catch(()=>{setText('#kje-post-empty','글을 불러오지 못했습니다. 잠시 후 새로고침해 주세요.');})
   ]);
 })();
