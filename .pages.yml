@@ -147,20 +147,26 @@ content:
         values:
         - name: lab
           label: 가상실험
+        - name: real
+          label: 실제 실험 수업
         - name: game
           label: 학습 게임
         - name: tool
           label: 교육 도구
         - name: lesson
-          label: 수업·탐구 자료
+          label: 수업 자료
     - name: desc
       label: 설명
       type: text
       required: true
     - name: tag
-      label: 과목·주제 태그
+      label: 주제 태그
       type: string
-      description: '예: 화학 · 산과 염기'
+      description: '예: 산과 염기 · 중화 적정'
+    - name: level
+      label: 대상 학교급·과목
+      type: string
+      description: '예: 고등학교 통합과학, 화학 / 중학교 과학, 고등학교 화학. 비워 두면 표시하지 않습니다.'
     - name: cover
       label: 대표 이미지
       type: image
@@ -189,6 +195,12 @@ content:
           label: 실험도구
         - name: solution
           label: 용액과 농도
+        - name: sensor
+          label: 센서
+        - name: heart
+          label: 심장
+        - name: star
+          label: 별자리
     - name: words
       label: 기본 표지에 들어갈 글자
       type: text
