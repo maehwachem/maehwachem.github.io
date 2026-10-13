@@ -69,22 +69,6 @@
     },
     {
       "kind": "lab",
-      "title": "용액 조제실",
-      "poster": "solution",
-      "words": "용액\n조제실",
-      "tag": "용액과 농도 · 어는점 내림",
-      "level": "고등학교 화학, 물질과 에너지",
-      "desc": "저울, 부피 플라스크, 피펫으로 정해진 농도의 용액을 만들고 냉각 곡선에서 어는점을 읽는 한 차시 가상실험실.",
-      "cover": "",
-      "links": [
-        {
-          "label": "실험 열기",
-          "url": "https://maehwachem.github.io/science-tools/solution-lab/"
-        }
-      ]
-    },
-    {
-      "kind": "lab",
       "title": "기체 가상 실험실",
       "poster": "gas",
       "words": "기체\n가상 실험실",
