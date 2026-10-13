@@ -175,7 +175,7 @@
     {
       "kind": "lab",
       "title": "용액 조제실",
-      "poster": "lab",
+      "poster": "solution",
       "words": "용액\n조제실",
       "tag": "화학 · 용액과 농도",
       "desc": "용액과 농도를 한 차시에 다루는 가상실험실.",
