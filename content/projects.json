@@ -199,7 +199,16 @@
       "level": "",
       "desc": "마이크로비트를 처음 쓰는 학생과 교사를 위한 안내와 새 기기의 첫 연결 점검 자료.",
       "cover": "",
-      "links": []
+      "links": [
+        {
+          "label": "시작 안내",
+          "url": "https://maehwachem.github.io/science-tools/sensor/start.html"
+        },
+        {
+          "label": "첫 연결 점검",
+          "url": "https://maehwachem.github.io/science-tools/sensor/check.html"
+        }
+      ]
     },
     {
       "kind": "tool",
@@ -266,9 +275,14 @@
       "words": "엘니뇨와\n라니냐",
       "tag": "지구과학 · 기후",
       "level": "고등학교 통합과학",
-      "desc": "무역풍과 표층 해수, 강수 지역의 변화를 연결해 살펴보는 인터랙티브 자료.",
+      "desc": "무역풍과 표층 해수, 용승, 워커 순환을 적도 태평양 단면에서 연결해 엘니뇨와 라니냐를 비교하는 인터랙티브 자료. 무역풍 세기를 바꿔 보는 실험과 확인 문제가 있습니다.",
       "cover": "",
-      "links": []
+      "links": [
+        {
+          "label": "자료 열기",
+          "url": "https://maehwachem.github.io/science-tools/earth/el-nino.html"
+        }
+      ]
     },
     {
       "kind": "lesson",
@@ -277,9 +291,14 @@
       "words": "대기\n대순환",
       "tag": "지구과학 · 기후",
       "level": "고등학교 통합과학",
-      "desc": "위도에 따라 달라지는 대기의 순환을 살펴보는 인터랙티브 자료.",
+      "desc": "위도별 에너지 불균형, 전향력, 세 순환과 바람·기압대, 사막과 열대 우림의 분포를 장면을 넘기며 살펴보는 인터랙티브 자료.",
       "cover": "",
-      "links": []
+      "links": [
+        {
+          "label": "자료 열기",
+          "url": "https://maehwachem.github.io/science-tools/earth/general-circulation.html"
+        }
+      ]
     },
     {
       "kind": "lesson",
@@ -299,9 +318,14 @@
       "words": "몰 농도\n학습지",
       "tag": "용액과 농도",
       "level": "고등학교 화학",
-      "desc": "몰 농도 개념을 단계별로 익히는 학습지.",
+      "desc": "몰 농도의 정의부터 질량에서 몰 농도 구하기, 용액 만들기와 묽히기까지 단계별로 익히는 학습지. 인쇄해서 쓸 수 있습니다.",
       "cover": "",
-      "links": []
+      "links": [
+        {
+          "label": "학습지 열기",
+          "url": "https://maehwachem.github.io/science-tools/worksheets/molarity.html"
+        }
+      ]
     }
   ]
 }
