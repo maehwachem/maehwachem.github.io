@@ -179,6 +179,14 @@ content:
         values:
         - name: lab
           label: 실험
+        - name: gas
+          label: 기체
+        - name: heat
+          label: 열화학
+        - name: rate
+          label: 반응 속도
+        - name: equil
+          label: 화학 평형
         - name: battery
           label: 배터리
         - name: island

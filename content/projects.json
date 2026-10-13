@@ -84,6 +84,70 @@
       ]
     },
     {
+      "kind": "lab",
+      "title": "기체 가상 실험실",
+      "poster": "gas",
+      "words": "기체\n가상 실험실",
+      "tag": "기체 · 기체 법칙",
+      "level": "",
+      "desc": "보일 법칙과 샤를 법칙을 주사기·압력 센서·물중탕으로 재고, 수상 치환으로 모은 뷰테인과 수소로 분자량과 몰 부피를 구합니다. 연습·평가 모드와 교사 화면이 있습니다.",
+      "cover": "",
+      "links": [
+        {
+          "label": "실험 열기",
+          "url": "https://maehwachem.github.io/science-tools/gas/"
+        }
+      ]
+    },
+    {
+      "kind": "lab",
+      "title": "열화학 가상 실험실",
+      "poster": "heat",
+      "words": "열화학\n가상 실험실",
+      "tag": "열화학 · 반응 엔탈피",
+      "level": "",
+      "desc": "스타이로폼 컵 열량계로 용해 엔탈피와 중화 엔탈피를 재고, 세 반응의 ΔH로 헤스 법칙을 확인합니다. 연습·평가 모드와 교사 화면이 있습니다.",
+      "cover": "",
+      "links": [
+        {
+          "label": "실험 열기",
+          "url": "https://maehwachem.github.io/science-tools/thermochem/"
+        }
+      ]
+    },
+    {
+      "kind": "lab",
+      "title": "반응 속도 가상 실험실",
+      "poster": "rate",
+      "words": "반응 속도\n가상 실험실",
+      "tag": "반응 속도 · 촉매",
+      "level": "",
+      "desc": "기체 발생, 질량 감소, 앙금 생성 실험으로 농도·온도·촉매·표면적이 반응 속도에 주는 영향을 비교합니다. 연습·평가 모드와 교사 화면이 있습니다.",
+      "cover": "",
+      "links": [
+        {
+          "label": "실험 열기",
+          "url": "https://maehwachem.github.io/science-tools/kinetics/"
+        }
+      ]
+    },
+    {
+      "kind": "lab",
+      "title": "화학 평형 가상 실험실",
+      "poster": "equil",
+      "words": "화학 평형\n가상 실험실",
+      "tag": "화학 평형 · 평형 이동",
+      "level": "",
+      "desc": "흡광도 검량선으로 평형 상수를 구하고, 코발트 착이온과 NO₂ 주사기로 온도와 압력에 따른 평형 이동을 잽니다. 연습·평가 모드와 교사 화면이 있습니다.",
+      "cover": "",
+      "links": [
+        {
+          "label": "실험 열기",
+          "url": "https://maehwachem.github.io/science-tools/equilibrium/"
+        }
+      ]
+    },
+    {
       "kind": "real",
       "title": "배터리 시험팀",
       "poster": "battery",
@@ -302,25 +366,34 @@
     },
     {
       "kind": "lesson",
-      "title": "산·염기 중화반응 자료",
+      "title": "산·염기 중화 반응",
       "poster": "acid",
-      "words": "산과 염기,\n중화반응",
-      "tag": "화학 · 산과 염기",
+      "words": "산·염기\n중화 반응",
+      "tag": "산과 염기 · 수업 슬라이드",
       "level": "고등학교 통합과학, 화학",
-      "desc": "산과 염기를 섞을 때의 변화를 이온과 연결해 설명하는 수업 자료.",
+      "desc": "같은 부피로 섞으면 중성일까? 염산과 수산화 나트륨 수용액 속 이온을 모형으로 보고, 넣는 양을 바꿔 가며 이온 수와 액성의 변화를 따라가는 18장 수업 슬라이드. 중화열, 지시약, 산의 종류까지 다룹니다.",
       "cover": "",
-      "links": []
+      "links": [
+        {
+          "label": "슬라이드 열기",
+          "url": "https://maehwachem.github.io/science-tools/lectures/neutralization.html"
+        }
+      ]
     },
     {
       "kind": "lesson",
-      "title": "몰 농도 학습지",
+      "title": "몰 농도",
       "poster": "solution",
-      "words": "몰 농도\n학습지",
-      "tag": "용액과 농도",
+      "words": "몰 농도\n슬라이드·학습지",
+      "tag": "용액과 농도 · 수업 슬라이드와 학습지",
       "level": "고등학교 화학",
-      "desc": "몰 농도의 정의부터 질량에서 몰 농도 구하기, 용액 만들기와 묽히기까지 단계별로 익히는 학습지. 인쇄해서 쓸 수 있습니다.",
+      "desc": "질량이 같아도 입자 수가 다른 까닭에서 시작해 몰 농도의 정의, 질량에서 몰 농도 구하기, 용액 만들기와 묽히기까지 다루는 19장 수업 슬라이드와 짝 학습지. 학습지의 빈칸 번호는 슬라이드와 같고, 인쇄해서 쓸 수 있습니다.",
       "cover": "",
       "links": [
+        {
+          "label": "슬라이드 열기",
+          "url": "https://maehwachem.github.io/science-tools/lectures/molarity.html"
+        },
         {
           "label": "학습지 열기",
           "url": "https://maehwachem.github.io/science-tools/worksheets/molarity.html"
