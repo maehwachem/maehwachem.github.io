@@ -214,6 +214,37 @@
     },
     {
       "kind": "tool",
+      "title": "AR 심장",
+      "poster": "heart",
+      "words": "AR\n심장",
+      "tag": "생명과학 · AR",
+      "level": "",
+      "desc": "3D 심장 모델을 돌려 보고 증강현실로 교실에 띄워 보는 자료.",
+      "links": [
+        {
+          "label": "AR 열기",
+          "url": "https://maehwachem.github.io/heart-ar/"
+        },
+        {
+          "label": "GitHub 저장소",
+          "url": "https://github.com/maehwachem/heart-ar"
+        }
+      ],
+      "cover": ""
+    },
+    {
+      "kind": "tool",
+      "title": "적도의 정렬 매트와 별자리판",
+      "poster": "star",
+      "words": "적도의 정렬\n별자리판",
+      "tag": "천문 · 인쇄 자료",
+      "level": "",
+      "desc": "망원경 정렬을 위한 바닥 매트와 항성시 계산판, 밝은 별 18개를 담은 회전 별자리판.",
+      "cover": "",
+      "links": []
+    },
+    {
+      "kind": "tool",
       "title": "나의 면접 연습노트",
       "poster": "note",
       "words": "나의 면접\n연습노트",
@@ -269,37 +300,6 @@
       "tag": "용액과 농도",
       "level": "고등학교 화학",
       "desc": "몰 농도 개념을 단계별로 익히는 학습지.",
-      "cover": "",
-      "links": []
-    },
-    {
-      "kind": "lesson",
-      "title": "AR 심장",
-      "poster": "heart",
-      "words": "AR\n심장",
-      "tag": "생명과학 · AR",
-      "level": "",
-      "desc": "3D 심장 모델을 돌려 보고 증강현실로 교실에 띄워 보는 자료.",
-      "links": [
-        {
-          "label": "AR 열기",
-          "url": "https://maehwachem.github.io/heart-ar/"
-        },
-        {
-          "label": "GitHub 저장소",
-          "url": "https://github.com/maehwachem/heart-ar"
-        }
-      ],
-      "cover": ""
-    },
-    {
-      "kind": "lesson",
-      "title": "적도의 정렬 매트와 별자리판",
-      "poster": "star",
-      "words": "적도의 정렬\n별자리판",
-      "tag": "천문 · 인쇄 자료",
-      "level": "",
-      "desc": "망원경 정렬을 위한 바닥 매트와 항성시 계산판, 밝은 별 18개를 담은 회전 별자리판.",
       "cover": "",
       "links": []
     }
