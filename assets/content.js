@@ -8,7 +8,7 @@
     tool: ['교육 도구', '학습과 지도, 실험 기록에 활용하는 도구.'],
     lesson: ['수업·탐구 자료', '과학 개념을 이해하고 탐구로 이어가는 자료.']
   };
-  const art = {lab:'<div class="kje-lab-ring"></div>',battery:'<div class="kje-battery-art"></div>',island:'<div class="kje-contour"></div>',power:'<div class="kje-power-art">kWh</div>',note:'<div class="kje-notepaper"><b>Q.</b><span></span><span></span><span></span></div>',earth:'<div class="kje-earth-art"></div>',acid:'<div class="kje-acid-art">H⁺ + OH⁻</div>'};
+  const art = {lab:'<div class="kje-lab-ring"></div>',battery:'<div class="kje-battery-art"></div>',island:'<div class="kje-contour"></div>',power:'<div class="kje-power-art">kWh</div>',glass:'<svg class="kje-glass-art" viewBox="0 0 150 130" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M10 90H49V120Q49 124 45 124H14Q10 124 10 120Z M70 95H100L107 117Q109 123 102 123H68Q61 123 63 117Z M122 60H136V115H122Z" fill="currentColor" fill-opacity=".22" stroke="none"/><path d="M6 45H50L55 50L50 53V120Q50 125 45 125H14Q9 125 9 120V50Z"/><path d="M15 70H24M15 82H21M15 94H24"/><path d="M77 18H93M79 18V58L61 117Q59 125 67 125H103Q111 125 109 117L91 58V18"/><path d="M121 8H137V117H121Z M113 117H145V125H113Z M137 25H132M137 40H132M137 55H129M137 70H132M137 85H132M137 100H129"/></svg>',note:'<div class="kje-notepaper"><b>Q.</b><span></span><span></span><span></span></div>',earth:'<div class="kje-earth-art"></div>',acid:'<div class="kje-acid-art">H⁺ + OH⁻</div>'};
   const own = (object,key) => Object.prototype.hasOwnProperty.call(object,key);
   const text = value => typeof value === 'string' ? value : '';
   function node(tag, className, value) {

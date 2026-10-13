@@ -185,6 +185,8 @@ content:
           label: 지구
         - name: acid
           label: 산과 염기
+        - name: glass
+          label: 실험도구
     - name: words
       label: 기본 표지에 들어갈 글자
       type: text
