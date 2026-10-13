@@ -206,7 +206,7 @@ content:
         - name: sensor
           label: 센서
         - name: heart
-          label: 심장
+          label: 하트
         - name: star
           label: 별자리
     - name: words

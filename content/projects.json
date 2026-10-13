@@ -287,20 +287,16 @@
     },
     {
       "kind": "tool",
-      "title": "AR 심장",
+      "title": "AR 포토",
       "poster": "heart",
-      "words": "AR\n심장",
-      "tag": "생명과학 · AR",
+      "words": "AR\n포토",
+      "tag": "AR · 사진",
       "level": "",
-      "desc": "3D 심장 모델을 돌려 보고 증강현실로 교실에 띄워 보는 자료.",
+      "desc": "직접 만든 3D 하트나 내가 고른 사진(액자, 배경을 지운 투명 PNG)을 AR로 현실 공간에 놓아 보고, 카메라 화면에 띄워 같이 사진을 찍어 저장하는 도구. 고른 사진은 휴대폰 밖으로 보내지 않습니다.",
       "links": [
         {
           "label": "AR 열기",
-          "url": "https://maehwachem.github.io/heart-ar/"
-        },
-        {
-          "label": "GitHub 저장소",
-          "url": "https://github.com/maehwachem/heart-ar"
+          "url": "https://maehwachem.github.io/science-tools/ar-photo/"
         }
       ],
       "cover": ""
