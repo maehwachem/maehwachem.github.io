@@ -4,6 +4,22 @@
   "projects": [
     {
       "kind": "lab",
+      "title": "첫 실험 교실",
+      "date": "2026-10-13",
+      "poster": "lab",
+      "words": "첫 실험\n교실",
+      "tag": "실험 기초 · 실험도구",
+      "desc": "실험도구 31가지의 이름과 쓰임, 사용 순서를 그림과 동작 모션으로 익히고, 저울·피펫 조작과 실험 준비 과정을 화면에서 연습합니다.",
+      "cover": "",
+      "links": [
+        {
+          "label": "실험 열기",
+          "url": "https://maehwachem.github.io/science-tools/lab-tools/"
+        }
+      ]
+    },
+    {
+      "kind": "lab",
       "title": "산화·환원 실험실",
       "poster": "lab",
       "words": "산화·환원\n실험실",
