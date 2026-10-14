@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>짧은 주소 · KJE</title>
+<style>
+:root{color-scheme:light dark;--ink:light-dark(#1d2433,#e8eaf0);--muted:light-dark(#5b6475,#a9b0bf);--paper:light-dark(#f7f6f2,#16181d);--line:light-dark(#d9d6cc,#343844);--accent:light-dark(#24569a,#8db4ec)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.7 "Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif}
+main{max-width:720px;margin:0 auto;padding:48px 20px 64px}
+h1{font-size:26px;margin:0 0 6px}
+p{margin:0 0 16px;color:var(--muted);font-size:15px}
+a{color:var(--accent)}
+table{width:100%;border-collapse:collapse;font-size:15px}
+td{padding:10px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+td:first-child{padding-left:0}
+code{font:14px ui-monospace,Menlo,Consolas,monospace;color:var(--ink);overflow-wrap:anywhere}
+.lb{color:var(--muted)}
+button{font:inherit;font-size:13px;padding:6px 12px;min-height:36px;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--ink);cursor:pointer;white-space:nowrap}
+@media(max-width:560px){tr{display:grid;grid-template-columns:1fr auto;padding:8px 0;border-bottom:1px solid var(--line)}td{border:0;padding:2px 0}td.lb{grid-column:1;grid-row:2;font-size:14px}td:last-child{grid-column:2;grid-row:1/3;align-self:center}}
+</style>
+</head>
+<body>
+<main>
+<h1>짧은 주소</h1>
+<p>수업 도구를 짧은 주소로 열 수 있어요. 칠판에 적거나 말로 불러 주기 좋아요. AR 전시관은 <code id="exEx"></code>처럼 뒤에 전시 이름을 붙여요. <a href="/">홈으로</a></p>
+<table><tbody id="rows"></tbody></table>
+</main>
+<script>
+(function(){
+  var host=location.host;document.getElementById('exEx').textContent=host+'/ar/전시이름';
+  fetch('/content/shortlinks.json',{cache:'no-cache'}).then(function(r){return r.json()}).then(function(d){
+    var tb=document.getElementById('rows');
+    (d.links||[]).forEach(function(l){
+      var url=location.origin+'/'+l.key,tr=document.createElement('tr');
+      tr.innerHTML='<td><a><code></code></a></td><td class="lb"></td><td><button type="button">복사</button></td>';
+      var a=tr.querySelector('a');a.href='/'+l.key;a.querySelector('code').textContent=host+'/'+l.key;tr.querySelector('.lb').textContent=l.label;
+      var b=tr.querySelector('button');b.setAttribute('aria-label',l.label+' 주소 복사');
+      b.onclick=function(){var done=function(){b.textContent='복사했어요';setTimeout(function(){b.textContent='복사'},1800)};
+        if(navigator.clipboard)navigator.clipboard.writeText(url).then(done,function(){prompt('이 주소를 복사하세요',url)});else prompt('이 주소를 복사하세요',url)};
+      tb.appendChild(tr);
+    });
+  });
+})();
+</script>
+</body>
+</html>

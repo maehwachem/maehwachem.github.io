@@ -1,0 +1,140 @@
+{
+  "links": [
+    {
+      "key": "ar",
+      "label": "AR 전시관",
+      "path": "/science-tools/ar-photo/exhibit.html",
+      "param": "ex"
+    },
+    {
+      "key": "ar-guide",
+      "label": "AR 전시관 사용법",
+      "path": "/science-tools/ar-photo/exhibit-guide.html"
+    },
+    {
+      "key": "ar-photo",
+      "label": "AR 포토",
+      "path": "/science-tools/ar-photo/"
+    },
+    {
+      "key": "ar-card",
+      "label": "카드로 하는 AR",
+      "path": "/science-tools/ar-photo/marker.html"
+    },
+    {
+      "key": "tools",
+      "label": "수업 도구 모음",
+      "path": "/science-tools/"
+    },
+    {
+      "key": "lab",
+      "label": "첫 실험 교실",
+      "path": "/science-tools/lab-tools/"
+    },
+    {
+      "key": "acid",
+      "label": "산·염기 가상 실험실",
+      "path": "/science-tools/acid-base/virtual.html"
+    },
+    {
+      "key": "redox",
+      "label": "산화·환원 가상 실험실",
+      "path": "/science-tools/redox/"
+    },
+    {
+      "key": "gas",
+      "label": "기체 가상 실험실",
+      "path": "/science-tools/gas/"
+    },
+    {
+      "key": "heat",
+      "label": "열화학 가상 실험실",
+      "path": "/science-tools/thermochem/"
+    },
+    {
+      "key": "rate",
+      "label": "반응 속도 가상 실험실",
+      "path": "/science-tools/kinetics/"
+    },
+    {
+      "key": "eq",
+      "label": "화학 평형 가상 실험실",
+      "path": "/science-tools/equilibrium/"
+    },
+    {
+      "key": "battery",
+      "label": "배터리 가상 시험동",
+      "path": "/science-tools/battery/virtual.html"
+    },
+    {
+      "key": "battery-team",
+      "label": "배터리 시험팀",
+      "path": "/science-tools/battery/"
+    },
+    {
+      "key": "env",
+      "label": "환경 대응팀",
+      "path": "/science-tools/acid-base/"
+    },
+    {
+      "key": "island",
+      "label": "화학자의 섬",
+      "path": "/science-tools/chemists-island/"
+    },
+    {
+      "key": "voyage",
+      "label": "화학자의 항해",
+      "path": "/science-tools/chem-voyage/"
+    },
+    {
+      "key": "voyage-team",
+      "label": "화학자의 항해 모둠판",
+      "path": "/science-tools/chem-voyage/team.html"
+    },
+    {
+      "key": "sensor",
+      "label": "마이크로비트 전압 기록기",
+      "path": "/science-tools/sensor/"
+    },
+    {
+      "key": "temp",
+      "label": "마이크로비트 온도 기록기",
+      "path": "/science-tools/sensor/temp.html"
+    },
+    {
+      "key": "microbit",
+      "label": "마이크로비트 처음 시작하기",
+      "path": "/science-tools/sensor/start.html"
+    },
+    {
+      "key": "interview",
+      "label": "나의 면접 연습노트",
+      "path": "/interview-note/"
+    },
+    {
+      "key": "molarity",
+      "label": "몰 농도 슬라이드",
+      "path": "/science-tools/lectures/molarity.html"
+    },
+    {
+      "key": "molarity-sheet",
+      "label": "몰 농도 학습지",
+      "path": "/science-tools/worksheets/molarity.html"
+    },
+    {
+      "key": "neutral",
+      "label": "산·염기 중화 반응 슬라이드",
+      "path": "/science-tools/lectures/neutralization.html"
+    },
+    {
+      "key": "elnino",
+      "label": "엘니뇨와 라니냐",
+      "path": "/science-tools/earth/el-nino.html"
+    },
+    {
+      "key": "circulation",
+      "label": "대기 대순환",
+      "path": "/science-tools/earth/general-circulation.html"
+    }
+  ]
+}
