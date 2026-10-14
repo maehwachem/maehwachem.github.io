@@ -209,6 +209,8 @@ content:
           label: 하트
         - name: star
           label: 별자리
+        - name: exhibit
+          label: 전시대
     - name: words
       label: 기본 표지에 들어갈 글자
       type: text

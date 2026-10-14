@@ -287,6 +287,30 @@
     },
     {
       "kind": "tool",
+      "title": "AR 전시관",
+      "poster": "exhibit",
+      "words": "AR\n전시관",
+      "tag": "AR · 공간 전시",
+      "level": "",
+      "desc": "사진과 이름, 설명으로 전시물을 만들면 실제 공간에 전시대가 세워지고, 걸어 다니며 보는 도구. 아무것도 붙이거나 세우지 않아 훼손하면 안 되는 곳에서도 전시할 수 있고, 학생들이 만든 전시 파일을 합쳐 하나의 전시로 엮습니다.",
+      "cover": "",
+      "links": [
+        {
+          "label": "전시관 열기",
+          "url": "https://maehwachem.github.io/science-tools/ar-photo/exhibit.html"
+        },
+        {
+          "label": "예시 전시",
+          "url": "https://maehwachem.github.io/science-tools/ar-photo/exhibit.html?ex=sample"
+        },
+        {
+          "label": "사용법",
+          "url": "https://maehwachem.github.io/science-tools/ar-photo/exhibit-guide.html"
+        }
+      ]
+    },
+    {
+      "kind": "tool",
       "title": "적도의 정렬 매트와 별자리판",
       "poster": "star",
       "words": "적도의 정렬\n별자리판",
