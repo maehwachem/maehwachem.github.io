@@ -1,5 +1,16 @@
 {
   "display_order": "manual",
   "show_dates": true,
-  "posts": []
+  "posts": [
+    {
+      "id": "837e90b7-d0ab-408b-b3fe-4d738995fbba",
+      "title": "kjelab.kr 도메인을 등록했다",
+      "date": "2026-10-14",
+      "category": "디지털 제작",
+      "summary": "포트폴리오와 수업 도구를 짧은 주소로 열기 위해 가비아에서 kjelab.kr을 3년 동안 쓰기로 했다.",
+      "cover": "",
+      "cover_alt": "",
+      "body": "<p>2026년 10월 14일, 가비아에서 <strong>kjelab.kr</strong> 도메인을 등록했다. 3년을 한 번에 결제했으니 2029년 10월까지 쓸 수 있다.</p><p>지금까지 포트폴리오와 수업 도구는 maehwachem.github.io라는 긴 주소로 열었다. 수업 시간에 학생들에게 주소를 불러 주거나 칠판에 적기에는 길었다. 이제 이 사이트를 kjelab.kr로 옮기고, 가상 실험실이나 AR 전시관도 kjelab.kr/gas, kjelab.kr/ar처럼 짧은 주소로 열 수 있게 연결하는 중이다.</p><p>만료 한 달 전인 2029년 9월에 기간을 연장할 것.</p>"
+    }
+  ]
 }
