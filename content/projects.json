@@ -180,7 +180,8 @@
             "url": "https://maehwachem.github.io/science-tools/acid-base/"
           }
         ],
-        "subject": "chemistry"
+        "subject": "chemistry",
+        "move_to": "chemistry"
       },
       {
         "kind": "game",
