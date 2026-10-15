@@ -17,7 +17,8 @@
           "label": "실험 열기",
           "url": "https://maehwachem.github.io/science-tools/lab-tools/"
         }
-      ]
+      ],
+      "subject": "tools"
     },
     {
       "kind": "lab",
@@ -33,7 +34,8 @@
           "label": "실험 열기",
           "url": "https://maehwachem.github.io/science-tools/redox/"
         }
-      ]
+      ],
+      "subject": "chemistry"
     },
     {
       "kind": "lab",
@@ -49,7 +51,8 @@
           "url": "https://maehwachem.github.io/science-tools/battery/virtual.html"
         }
       ],
-      "cover": ""
+      "cover": "",
+      "subject": "chemistry"
     },
     {
       "kind": "lab",
@@ -65,7 +68,8 @@
           "label": "실험 열기",
           "url": "https://maehwachem.github.io/science-tools/acid-base/virtual.html"
         }
-      ]
+      ],
+      "subject": "chemistry"
     },
     {
       "kind": "lab",
@@ -81,7 +85,8 @@
           "label": "실험 열기",
           "url": "https://maehwachem.github.io/science-tools/gas/"
         }
-      ]
+      ],
+      "subject": "chemistry"
     },
     {
       "kind": "lab",
@@ -97,7 +102,8 @@
           "label": "실험 열기",
           "url": "https://maehwachem.github.io/science-tools/thermochem/"
         }
-      ]
+      ],
+      "subject": "chemistry"
     },
     {
       "kind": "lab",
@@ -113,7 +119,8 @@
           "label": "실험 열기",
           "url": "https://maehwachem.github.io/science-tools/kinetics/"
         }
-      ]
+      ],
+      "subject": "chemistry"
     },
     {
       "kind": "lab",
@@ -129,7 +136,8 @@
           "label": "실험 열기",
           "url": "https://maehwachem.github.io/science-tools/equilibrium/"
         }
-      ]
+      ],
+      "subject": "chemistry"
     },
     {
       "kind": "real",
@@ -145,7 +153,8 @@
           "url": "https://maehwachem.github.io/science-tools/battery/"
         }
       ],
-      "cover": ""
+      "cover": "",
+      "subject": "chemistry"
     },
     {
       "kind": "real",
@@ -161,7 +170,8 @@
           "label": "수업 열기",
           "url": "https://maehwachem.github.io/science-tools/acid-base/"
         }
-      ]
+      ],
+      "subject": "environment"
     },
     {
       "kind": "game",
@@ -181,7 +191,8 @@
           "label": "교사용 매뉴얼",
           "url": "https://maehwachem.github.io/science-tools/chemists-island/manual.html"
         }
-      ]
+      ],
+      "subject": "chemistry"
     },
     {
       "kind": "game",
@@ -201,7 +212,8 @@
           "label": "모둠판",
           "url": "https://maehwachem.github.io/science-tools/chem-voyage/team.html"
         }
-      ]
+      ],
+      "subject": "chemistry"
     },
     {
       "kind": "game",
@@ -212,7 +224,8 @@
       "level": "중학교 과학",
       "desc": "가전제품을 선택하고 배치하며 전기 사용과 비용을 생각하는 게임.",
       "cover": "",
-      "links": []
+      "links": [],
+      "subject": "physics"
     },
     {
       "kind": "tool",
@@ -236,7 +249,8 @@
           "url": "https://github.com/maehwachem/microbit-web-visualizer"
         }
       ],
-      "cover": ""
+      "cover": "",
+      "subject": "tools"
     },
     {
       "kind": "tool",
@@ -256,7 +270,8 @@
           "label": "첫 연결 점검",
           "url": "https://maehwachem.github.io/science-tools/sensor/check.html"
         }
-      ]
+      ],
+      "subject": "tools"
     },
     {
       "kind": "tool",
@@ -267,7 +282,8 @@
       "level": "",
       "desc": "영상 속 물체의 위치를 짚어 운동을 분석하고, 실제 길이로 보정한 데이터를 CSV로 저장하는 도구.",
       "cover": "",
-      "links": []
+      "links": [],
+      "subject": "physics"
     },
     {
       "kind": "tool",
@@ -283,7 +299,8 @@
           "url": "https://maehwachem.github.io/science-tools/ar-photo/"
         }
       ],
-      "cover": ""
+      "cover": "",
+      "subject": "tools"
     },
     {
       "kind": "tool",
@@ -307,7 +324,8 @@
           "label": "사용법",
           "url": "https://maehwachem.github.io/science-tools/ar-photo/exhibit-guide.html"
         }
-      ]
+      ],
+      "subject": "tools"
     },
     {
       "kind": "tool",
@@ -318,7 +336,8 @@
       "level": "",
       "desc": "망원경 정렬을 위한 바닥 매트와 항성시 계산판, 밝은 별 18개를 담은 회전 별자리판.",
       "cover": "",
-      "links": []
+      "links": [],
+      "subject": "earth"
     },
     {
       "kind": "tool",
@@ -334,7 +353,8 @@
           "url": "https://maehwachem.github.io/interview-note/"
         }
       ],
-      "cover": ""
+      "cover": "",
+      "subject": "tools"
     },
     {
       "kind": "lesson",
@@ -350,7 +370,8 @@
           "label": "자료 열기",
           "url": "https://maehwachem.github.io/science-tools/earth/el-nino.html"
         }
-      ]
+      ],
+      "subject": "earth"
     },
     {
       "kind": "lesson",
@@ -366,7 +387,8 @@
           "label": "자료 열기",
           "url": "https://maehwachem.github.io/science-tools/earth/general-circulation.html"
         }
-      ]
+      ],
+      "subject": "earth"
     },
     {
       "kind": "lesson",
@@ -382,7 +404,8 @@
           "label": "슬라이드 열기",
           "url": "https://maehwachem.github.io/science-tools/lectures/neutralization.html"
         }
-      ]
+      ],
+      "subject": "chemistry"
     },
     {
       "kind": "lesson",
@@ -402,7 +425,8 @@
           "label": "학습지 열기",
           "url": "https://maehwachem.github.io/science-tools/worksheets/molarity.html"
         }
-      ]
+      ],
+      "subject": "chemistry"
     }
   ]
 }
