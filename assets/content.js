@@ -61,29 +61,31 @@
     setText('#journal-title',site.interests_title);setText('.kje-about-copy',site.interests_text);
     if(Array.isArray(site.interests)){const list=root.querySelector('.kje-interests');list.replaceChildren(...site.interests.map(value=>node('span','',value)));}
   }
-  let selectedCategory='all';
+  let selectedCategory='lab';
   function selectCategory(key,writeHash=false) {
-    if(!own(categories,key)&&!own(formats,key))return;
+    if(!own(formats,key))return;
     selectedCategory=key;
-    root.querySelectorAll('[data-category]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.category===(own(categories,key)?key:'all'))));
+    root.querySelectorAll('[data-category]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.category===key)));
     let count=0;
-    root.querySelectorAll('.kje-project[data-kind]').forEach(card=>{card.hidden=key==='all'?false:own(formats,key)?card.dataset.kind!==key:card.dataset.subject!==key;if(!card.hidden)count++;});
-    const meta=categories[key]||formats[key];setText('#kje-category-description',meta[1]);setText('#kje-category-status',meta[0]+' · '+count+'개');const empty=root.querySelector('#kje-project-empty');if(empty){empty.hidden=count>0;empty.textContent=meta[0]+' 콘텐츠는 아직 등록되지 않았습니다.';}
+    root.querySelectorAll('.kje-project[data-kind]').forEach(card=>{card.hidden=card.dataset.kind!==key;if(!card.hidden)count++;});
+    const meta=formats[key];setText('#kje-category-description',meta[1]);setText('#kje-category-status',meta[0]+' · '+count+'개');
+    const empty=root.querySelector('#kje-project-empty');if(empty){empty.hidden=count>0;empty.textContent=meta[0]+' 콘텐츠는 아직 등록되지 않았습니다.';}
     if(writeHash)history.replaceState(null,'','#projects-'+key);
   }
   function projectItems(data) {
     if(data && data.groups && typeof data.groups==='object' && !Array.isArray(data.groups)) {
-      const items=[];const keys=Object.keys(categories).filter(key=>key!=='all');
+      const keys=Object.keys(formats);
       const resident=Object.fromEntries(keys.map(key=>[key,[]]));const moved=Object.fromEntries(keys.map(key=>[key,[]]));
-      for(const subject of Object.keys(categories).filter(key=>key!=='all')) {
-        const group=data.groups[subject];if(!Array.isArray(group))continue;
+      for(const source of Object.keys(data.groups)) {
+        const group=data.groups[source];if(!Array.isArray(group))continue;
         for(const item of group){if(!item || typeof item!=='object')continue;
-          const target=own(categories,item.move_to)&&item.move_to!=='all'?item.move_to:subject;
-          (target===subject?resident:moved)[target].push({...item,subject:target});
+          const kind=own(formats,source)?source:item.kind;
+          const target=own(formats,item.move_to)?item.move_to:kind;
+          if(!own(formats,target))continue;
+          (target===kind?resident:moved)[target].push({...item,kind:target});
         }
       }
-      for(const subject of keys)items.push(...resident[subject],...moved[subject]);
-      return items;
+      return keys.flatMap(key=>[...resident[key],...moved[key]]);
     }
     if(data && Array.isArray(data.projects))return data.projects;
     throw new Error('Invalid project data');
@@ -193,13 +195,13 @@
   }
   function applyHash() {
     const hash=location.hash.slice(1);
-    if(hash.startsWith('projects-')&&(own(categories,hash.slice(9))||own(formats,hash.slice(9)))){selectCategory(hash.slice(9));document.getElementById('projects').scrollIntoView({block:'start'});}
+    if(hash.startsWith('projects-')&&own(formats,hash.slice(9))){selectCategory(hash.slice(9));document.getElementById('projects').scrollIntoView({block:'start'});}
     const old={works:'projects',career:'about'};if(own(old,hash))document.getElementById(old[hash]).scrollIntoView({block:'start'});
   }
   root.querySelectorAll('[data-category]').forEach(button=>button.addEventListener('click',()=>selectCategory(button.dataset.category,true)));
   root.addEventListener('click',event=>{const link=event.target.closest('a[data-select-category]');if(link)selectCategory(link.dataset.selectCategory);});
   window.addEventListener('hashchange',applyHash);window.addEventListener('popstate',()=>{applyHash();showPost();});
-  selectCategory('all');applyHash();
+  selectCategory('lab');applyHash();
   async function read(path){const response=await fetch(path,{cache:'no-cache',credentials:'omit'});if(!response.ok)throw new Error('Content load failed');return response.json();}
   Promise.allSettled([
     read('content/site.json').then(applySite),
@@ -207,4 +209,5 @@
     read('content/posts.json').then(data=>{posts=sortedPosts(data);showPostDates=data.show_dates!==false;postsReady=true;renderPostFilters();renderPostList();showPost(Boolean(new URL(location.href).searchParams.get('post')));}).catch(()=>{setText('#kje-post-empty','글을 불러오지 못했습니다. 잠시 후 새로고침해 주세요.');})
   ]);
 })();
+
 

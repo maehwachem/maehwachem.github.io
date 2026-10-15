@@ -2,33 +2,25 @@
   "display_order": "manual",
   "show_dates": true,
   "groups": {
-    "physics": [
+    "lab": [
       {
-        "kind": "game",
-        "title": "전기요금 챌린지",
-        "poster": "power",
-        "words": "전기요금\n챌린지",
-        "tag": "에너지 · 생활 속 과학",
-        "level": "중학교 과학",
-        "desc": "가전제품을 선택하고 배치하며 전기 사용과 비용을 생각하는 게임.",
+        "kind": "lab",
+        "title": "첫 실험 교실",
+        "date": "2026-10-13",
+        "poster": "glass",
+        "words": "첫 실험\n교실",
+        "tag": "실험 기초 · 실험도구",
+        "level": "중학교 과학, 고등학교 과학탐구실험",
+        "desc": "실험도구 31가지의 이름과 쓰임, 사용 순서를 그림과 동작 모션으로 익히고, 저울·피펫 조작과 실험 준비 과정을 화면에서 연습합니다.",
         "cover": "",
-        "links": [],
-        "subject": "physics"
+        "links": [
+          {
+            "label": "실험 열기",
+            "url": "https://maehwachem.github.io/science-tools/lab-tools/"
+          }
+        ],
+        "subject": "tools"
       },
-      {
-        "kind": "tool",
-        "title": "영상 운동 분석기",
-        "poster": "note",
-        "words": "영상 운동\n분석기",
-        "tag": "물리 · 태블릿",
-        "level": "",
-        "desc": "영상 속 물체의 위치를 짚어 운동을 분석하고, 실제 길이로 보정한 데이터를 CSV로 저장하는 도구.",
-        "cover": "",
-        "links": [],
-        "subject": "physics"
-      }
-    ],
-    "chemistry": [
       {
         "kind": "lab",
         "title": "산화·환원 가상 실험실",
@@ -147,7 +139,9 @@
           }
         ],
         "subject": "chemistry"
-      },
+      }
+    ],
+    "real": [
       {
         "kind": "real",
         "title": "배터리 시험팀",
@@ -181,7 +175,9 @@
           }
         ],
         "subject": "chemistry"
-      },
+      }
+    ],
+    "game": [
       {
         "kind": "game",
         "title": "화학자의 섬",
@@ -225,113 +221,19 @@
         "subject": "chemistry"
       },
       {
-        "kind": "lesson",
-        "title": "산·염기 중화 반응",
-        "poster": "acid",
-        "words": "산·염기\n중화 반응",
-        "tag": "산과 염기 · 수업 슬라이드",
-        "level": "고등학교 통합과학, 화학",
-        "desc": "같은 부피로 섞으면 중성일까? 염산과 수산화 나트륨 수용액 속 이온을 모형으로 보고, 넣는 양을 바꿔 가며 이온 수와 액성의 변화를 따라가는 18장 수업 슬라이드. 중화열, 지시약, 산의 종류까지 다룹니다.",
-        "cover": "",
-        "links": [
-          {
-            "label": "슬라이드 열기",
-            "url": "https://maehwachem.github.io/science-tools/lectures/neutralization.html"
-          }
-        ],
-        "subject": "chemistry"
-      },
-      {
-        "kind": "lesson",
-        "title": "몰 농도",
-        "poster": "solution",
-        "words": "몰 농도\n슬라이드·학습지",
-        "tag": "용액과 농도 · 수업 슬라이드와 학습지",
-        "level": "고등학교 화학",
-        "desc": "질량이 같아도 입자 수가 다른 까닭에서 시작해 몰 농도의 정의, 질량에서 몰 농도 구하기, 용액 만들기와 묽히기까지 다루는 19장 수업 슬라이드와 짝 학습지. 학습지의 빈칸 번호는 슬라이드와 같고, 인쇄해서 쓸 수 있습니다.",
-        "cover": "",
-        "links": [
-          {
-            "label": "슬라이드 열기",
-            "url": "https://maehwachem.github.io/science-tools/lectures/molarity.html"
-          },
-          {
-            "label": "학습지 열기",
-            "url": "https://maehwachem.github.io/science-tools/worksheets/molarity.html"
-          }
-        ],
-        "subject": "chemistry"
-      }
-    ],
-    "biology": [],
-    "earth": [
-      {
-        "kind": "tool",
-        "title": "적도의 정렬 매트와 별자리판",
-        "poster": "star",
-        "words": "적도의 정렬\n별자리판",
-        "tag": "천문 · 인쇄 자료",
-        "level": "",
-        "desc": "망원경 정렬을 위한 바닥 매트와 항성시 계산판, 밝은 별 18개를 담은 회전 별자리판.",
+        "kind": "game",
+        "title": "전기요금 챌린지",
+        "poster": "power",
+        "words": "전기요금\n챌린지",
+        "tag": "에너지 · 생활 속 과학",
+        "level": "중학교 과학",
+        "desc": "가전제품을 선택하고 배치하며 전기 사용과 비용을 생각하는 게임.",
         "cover": "",
         "links": [],
-        "subject": "earth"
-      },
-      {
-        "kind": "lesson",
-        "title": "엘니뇨와 라니냐",
-        "poster": "earth",
-        "words": "엘니뇨와\n라니냐",
-        "tag": "지구과학 · 기후",
-        "level": "고등학교 통합과학, 지구과학",
-        "desc": "무역풍과 표층 해수, 용승, 워커 순환을 적도 태평양 단면에서 연결해 엘니뇨와 라니냐를 비교하는 인터랙티브 자료. 무역풍 세기를 바꿔 보는 실험과 확인 문제가 있습니다.",
-        "cover": "",
-        "links": [
-          {
-            "label": "자료 열기",
-            "url": "https://maehwachem.github.io/science-tools/earth/el-nino.html"
-          }
-        ],
-        "subject": "earth"
-      },
-      {
-        "kind": "lesson",
-        "title": "대기 대순환",
-        "poster": "earth",
-        "words": "대기\n대순환",
-        "tag": "지구과학 · 기후",
-        "level": "고등학교 통합과학, 지구과학",
-        "desc": "위도별 에너지 불균형, 전향력, 세 순환과 바람·기압대, 사막과 열대 우림의 분포를 장면을 넘기며 살펴보는 인터랙티브 자료.",
-        "cover": "",
-        "links": [
-          {
-            "label": "자료 열기",
-            "url": "https://maehwachem.github.io/science-tools/earth/general-circulation.html"
-          }
-        ],
-        "subject": "earth"
+        "subject": "physics"
       }
     ],
-    "environment": [],
-    "tools": [
-      {
-        "kind": "lab",
-        "title": "첫 실험 교실",
-        "date": "2026-10-13",
-        "poster": "glass",
-        "words": "첫 실험\n교실",
-        "tag": "실험 기초 · 실험도구",
-        "level": "중학교 과학, 고등학교 과학탐구실험",
-        "desc": "실험도구 31가지의 이름과 쓰임, 사용 순서를 그림과 동작 모션으로 익히고, 저울·피펫 조작과 실험 준비 과정을 화면에서 연습합니다.",
-        "cover": "",
-        "links": [
-          {
-            "label": "실험 열기",
-            "url": "https://maehwachem.github.io/science-tools/lab-tools/"
-          }
-        ],
-        "subject": "tools"
-      },
+    "tool": [
       {
         "kind": "tool",
         "title": "마이크로비트 센서 기록기",
@@ -380,6 +282,18 @@
       },
       {
         "kind": "tool",
+        "title": "영상 운동 분석기",
+        "poster": "note",
+        "words": "영상 운동\n분석기",
+        "tag": "물리 · 태블릿",
+        "level": "",
+        "desc": "영상 속 물체의 위치를 짚어 운동을 분석하고, 실제 길이로 보정한 데이터를 CSV로 저장하는 도구.",
+        "cover": "",
+        "links": [],
+        "subject": "physics"
+      },
+      {
+        "kind": "tool",
         "title": "AR 포토",
         "poster": "heart",
         "words": "AR\n포토",
@@ -422,6 +336,18 @@
       },
       {
         "kind": "tool",
+        "title": "적도의 정렬 매트와 별자리판",
+        "poster": "star",
+        "words": "적도의 정렬\n별자리판",
+        "tag": "천문 · 인쇄 자료",
+        "level": "",
+        "desc": "망원경 정렬을 위한 바닥 매트와 항성시 계산판, 밝은 별 18개를 담은 회전 별자리판.",
+        "cover": "",
+        "links": [],
+        "subject": "earth"
+      },
+      {
+        "kind": "tool",
         "title": "나의 면접 연습노트",
         "poster": "note",
         "words": "나의 면접\n연습노트",
@@ -436,6 +362,80 @@
         ],
         "cover": "",
         "subject": "tools"
+      }
+    ],
+    "lesson": [
+      {
+        "kind": "lesson",
+        "title": "엘니뇨와 라니냐",
+        "poster": "earth",
+        "words": "엘니뇨와\n라니냐",
+        "tag": "지구과학 · 기후",
+        "level": "고등학교 통합과학, 지구과학",
+        "desc": "무역풍과 표층 해수, 용승, 워커 순환을 적도 태평양 단면에서 연결해 엘니뇨와 라니냐를 비교하는 인터랙티브 자료. 무역풍 세기를 바꿔 보는 실험과 확인 문제가 있습니다.",
+        "cover": "",
+        "links": [
+          {
+            "label": "자료 열기",
+            "url": "https://maehwachem.github.io/science-tools/earth/el-nino.html"
+          }
+        ],
+        "subject": "earth"
+      },
+      {
+        "kind": "lesson",
+        "title": "대기 대순환",
+        "poster": "earth",
+        "words": "대기\n대순환",
+        "tag": "지구과학 · 기후",
+        "level": "고등학교 통합과학, 지구과학",
+        "desc": "위도별 에너지 불균형, 전향력, 세 순환과 바람·기압대, 사막과 열대 우림의 분포를 장면을 넘기며 살펴보는 인터랙티브 자료.",
+        "cover": "",
+        "links": [
+          {
+            "label": "자료 열기",
+            "url": "https://maehwachem.github.io/science-tools/earth/general-circulation.html"
+          }
+        ],
+        "subject": "earth"
+      },
+      {
+        "kind": "lesson",
+        "title": "산·염기 중화 반응",
+        "poster": "acid",
+        "words": "산·염기\n중화 반응",
+        "tag": "산과 염기 · 수업 슬라이드",
+        "level": "고등학교 통합과학, 화학",
+        "desc": "같은 부피로 섞으면 중성일까? 염산과 수산화 나트륨 수용액 속 이온을 모형으로 보고, 넣는 양을 바꿔 가며 이온 수와 액성의 변화를 따라가는 18장 수업 슬라이드. 중화열, 지시약, 산의 종류까지 다룹니다.",
+        "cover": "",
+        "links": [
+          {
+            "label": "슬라이드 열기",
+            "url": "https://maehwachem.github.io/science-tools/lectures/neutralization.html"
+          }
+        ],
+        "subject": "chemistry"
+      },
+      {
+        "kind": "lesson",
+        "title": "몰 농도",
+        "poster": "solution",
+        "words": "몰 농도\n슬라이드·학습지",
+        "tag": "용액과 농도 · 수업 슬라이드와 학습지",
+        "level": "고등학교 화학",
+        "desc": "질량이 같아도 입자 수가 다른 까닭에서 시작해 몰 농도의 정의, 질량에서 몰 농도 구하기, 용액 만들기와 묽히기까지 다루는 19장 수업 슬라이드와 짝 학습지. 학습지의 빈칸 번호는 슬라이드와 같고, 인쇄해서 쓸 수 있습니다.",
+        "cover": "",
+        "links": [
+          {
+            "label": "슬라이드 열기",
+            "url": "https://maehwachem.github.io/science-tools/lectures/molarity.html"
+          },
+          {
+            "label": "학습지 열기",
+            "url": "https://maehwachem.github.io/science-tools/worksheets/molarity.html"
+          }
+        ],
+        "subject": "chemistry"
       }
     ]
   }

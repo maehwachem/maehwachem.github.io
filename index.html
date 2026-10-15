@@ -214,9 +214,6 @@ html{color-scheme:light dark;scroll-behavior:smooth}body{margin:0;background:lig
 
     #kje-portfolio .kje-project[data-subject] .kje-poster{background:var(--kje-category-bg);color:var(--kje-category-ink)}
     #kje-portfolio .kje-project[data-subject] .kje-project-tag{color:var(--kje-category-ink)}
-    #kje-portfolio .kje-category[data-category]{border-top:3px solid var(--kje-category-ink);color:var(--kje-category-ink)}
-    #kje-portfolio .kje-category[data-category][aria-pressed="true"]{background:var(--kje-category-ink);border-color:var(--kje-category-ink);color:#fff}
-    #kje-portfolio .kje-category[data-category]:hover:not([aria-pressed="true"]){background:var(--kje-category-bg)}
     #kje-portfolio .kje-project .kje-lab-ring{border-color:currentColor;background:color-mix(in srgb,currentColor 12%,var(--kje-category-bg));box-shadow:inset 0 0 0 12px var(--kje-category-bg),inset 0 0 0 13px currentColor}
     #kje-portfolio .kje-project .kje-contour,#kje-portfolio .kje-project .kje-contour:before,#kje-portfolio .kje-project .kje-contour:after{border-color:currentColor}
     #kje-portfolio .kje-project .kje-contour:after{background:color-mix(in srgb,currentColor 16%,var(--kje-category-bg))}
@@ -224,17 +221,13 @@ html{color-scheme:light dark;scroll-behavior:smooth}body{margin:0;background:lig
     #kje-portfolio .kje-project .kje-notepaper span{background:color-mix(in srgb,var(--kje-category-ink) 35%,#fff)}
   
     /* Subject owns color; format owns content label; illustration owns shape. */
-    #kje-portfolio .kje-project[data-subject="all"],#kje-portfolio .kje-category[data-category="all"]{--kje-category-bg:#ecece8;--kje-category-ink:#444b48}
-    #kje-portfolio .kje-project[data-subject="physics"],#kje-portfolio .kje-category[data-category="physics"]{--kje-category-bg:#e3edf6;--kje-category-ink:#284e70}
-    #kje-portfolio .kje-project[data-subject="chemistry"],#kje-portfolio .kje-category[data-category="chemistry"]{--kje-category-bg:#f3e9d5;--kje-category-ink:#6b4d20}
-    #kje-portfolio .kje-project[data-subject="biology"],#kje-portfolio .kje-category[data-category="biology"]{--kje-category-bg:#e1eee8;--kje-category-ink:#285747}
-    #kje-portfolio .kje-project[data-subject="earth"],#kje-portfolio .kje-category[data-category="earth"]{--kje-category-bg:#ebe6f3;--kje-category-ink:#51416e}
-    #kje-portfolio .kje-project[data-subject="environment"],#kje-portfolio .kje-category[data-category="environment"]{--kje-category-bg:#e4edda;--kje-category-ink:#43572b}
-    #kje-portfolio .kje-project[data-subject="tools"],#kje-portfolio .kje-category[data-category="tools"]{--kje-category-bg:#e7eaed;--kje-category-ink:#3f4e5a}
-    #kje-portfolio .kje-category-picker{grid-template-columns:repeat(7,minmax(0,1fr))}
-    #kje-portfolio .kje-category{text-align:center;padding:13px 8px;min-height:52px}
-    @media(max-width:900px){#kje-portfolio .kje-category-picker{grid-template-columns:repeat(4,minmax(0,1fr))}}
-    @media(max-width:650px){#kje-portfolio .kje-category-picker{grid-template-columns:repeat(3,minmax(0,1fr))}#kje-portfolio .kje-category:last-child{grid-column:auto}}
+    #kje-portfolio .kje-project[data-subject="all"]{--kje-category-bg:#ecece8;--kje-category-ink:#444b48}
+    #kje-portfolio .kje-project[data-subject="physics"]{--kje-category-bg:#e3edf6;--kje-category-ink:#284e70}
+    #kje-portfolio .kje-project[data-subject="chemistry"]{--kje-category-bg:#f3e9d5;--kje-category-ink:#6b4d20}
+    #kje-portfolio .kje-project[data-subject="biology"]{--kje-category-bg:#e1eee8;--kje-category-ink:#285747}
+    #kje-portfolio .kje-project[data-subject="earth"]{--kje-category-bg:#ebe6f3;--kje-category-ink:#51416e}
+    #kje-portfolio .kje-project[data-subject="environment"]{--kje-category-bg:#e4edda;--kje-category-ink:#43572b}
+    #kje-portfolio .kje-project[data-subject="tools"]{--kje-category-bg:#e7eaed;--kje-category-ink:#3f4e5a}
   </style>
   <link rel="stylesheet" href="assets/content.css?v=20261012-order">
 </head>
@@ -255,16 +248,14 @@ html{color-scheme:light dark;scroll-behavior:smooth}body{margin:0;background:lig
     </section>
       <section class="kje-section kje-project-section" id="projects" aria-labelledby="projects-title">
         <div class="kje-section-heading"><div><h2 id="projects-title">프로젝트</h2><p class="kje-subtitle">실험하고, 플레이하고, 활용하는 과학 콘텐츠.</p></div><span class="kje-eyebrow">Project collection</span></div>
-        <div class="kje-category-picker" role="group" aria-label="프로젝트 주제 분류">
-        <button type="button" class="kje-category cursor-interaction" data-category="all" aria-pressed="true" aria-controls="kje-project-list"><span class="kje-category-name">전체</span></button>
-        <button type="button" class="kje-category cursor-interaction" data-category="physics" aria-pressed="false" aria-controls="kje-project-list"><span class="kje-category-name">물리</span></button>
-        <button type="button" class="kje-category cursor-interaction" data-category="chemistry" aria-pressed="false" aria-controls="kje-project-list"><span class="kje-category-name">화학</span></button>
-        <button type="button" class="kje-category cursor-interaction" data-category="biology" aria-pressed="false" aria-controls="kje-project-list"><span class="kje-category-name">생명과학</span></button>
-        <button type="button" class="kje-category cursor-interaction" data-category="earth" aria-pressed="false" aria-controls="kje-project-list"><span class="kje-category-name">지구과학</span></button>
-        <button type="button" class="kje-category cursor-interaction" data-category="environment" aria-pressed="false" aria-controls="kje-project-list"><span class="kje-category-name">환경</span></button>
-        <button type="button" class="kje-category cursor-interaction" data-category="tools" aria-pressed="false" aria-controls="kje-project-list"><span class="kje-category-name">도구</span></button>
+        <div class="kje-category-picker" role="group" aria-label="프로젝트 분류">
+        <button type="button" class="kje-category cursor-interaction" data-category="lab" aria-pressed="true" aria-controls="kje-project-list"><span class="kje-category-name">가상실험</span><span class="kje-category-hint">조건을 바꾸며 관찰하기</span></button>
+        <button type="button" class="kje-category cursor-interaction" data-category="real" aria-pressed="false" aria-controls="kje-project-list"><span class="kje-category-name">실제 실험 수업</span><span class="kje-category-hint">실험하고 기록하기</span></button>
+        <button type="button" class="kje-category cursor-interaction" data-category="game" aria-pressed="false" aria-controls="kje-project-list"><span class="kje-category-name">학습 게임</span><span class="kje-category-hint">미션을 풀며 탐험하기</span></button>
+        <button type="button" class="kje-category cursor-interaction" data-category="tool" aria-pressed="false" aria-controls="kje-project-list"><span class="kje-category-name">교육 도구</span><span class="kje-category-hint">기록하고 연습하기</span></button>
+        <button type="button" class="kje-category cursor-interaction" data-category="lesson" aria-pressed="false" aria-controls="kje-project-list"><span class="kje-category-name">수업 자료</span><span class="kje-category-hint">개념과 탐구를 연결하기</span></button>
       </div>
-        <div class="kje-category-intro"><p id="kje-category-description">주제별로 제작한 콘텐츠를 한눈에 살펴봅니다.</p><span id="kje-category-status" role="status" aria-live="polite">전체 · 24개</span></div>
+        <div class="kje-category-intro"><p id="kje-category-description">현상과 변화를 화면에서 살펴보는 실험 콘텐츠.</p><span id="kje-category-status" role="status" aria-live="polite">가상실험 · 8개</span></div>
         <div class="kje-projects" id="kje-project-list"><article class="kje-project" data-kind="lab" data-subject="tools">
       <div class="kje-poster kje-poster-glass" aria-hidden="true"><span class="kje-poster-cap">도구 · 가상실험</span><svg class="kje-glass-art" viewBox="0 0 150 130" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M10 90H49V120Q49 124 45 124H14Q10 124 10 120Z M70 95H100L107 117Q109 123 102 123H68Q61 123 63 117Z M122 60H136V115H122Z" fill="currentColor" fill-opacity=".22" stroke="none"/><path d="M6 45H50L55 50L50 53V120Q50 125 45 125H14Q9 125 9 120V50Z"/><path d="M15 70H24M15 82H21M15 94H24"/><path d="M77 18H93M79 18V58L61 117Q59 125 67 125H103Q111 125 109 117L91 58V18"/><path d="M121 8H137V117H121Z M113 117H145V125H113Z M137 25H132M137 40H132M137 55H129M137 70H132M137 85H132M137 100H129"/></svg><span class="kje-poster-word">첫 실험<br>교실</span></div>
       <p class="kje-project-tag">실험 기초 · 실험도구</p><h3 class="kje-project-title">첫 실험 교실</h3><p class="kje-project-desc">실험도구 31가지의 이름과 쓰임, 사용 순서를 그림과 동작 모션으로 익히고, 저울·피펫 조작과 실험 준비 과정을 화면에서 연습합니다.</p><p class="kje-project-level"><span class="kje-project-level-label">대상</span>중학교 과학, 고등학교 과학탐구실험</p><div class="kje-project-links"><a class="kje-project-go" href="https://maehwachem.github.io/science-tools/lab-tools/">실험 열기 <span aria-hidden="true">↗</span></a></div>
@@ -364,6 +355,7 @@ html{color-scheme:light dark;scroll-behavior:smooth}body{margin:0;background:lig
   </main>
   <footer class="kje-wrap kje-footer" id="contact"><strong>KJE의 작업실</strong><div class="kje-footer-links"><a class="kje-contact-email" href="mailto:kjechem@naver.com">kjechem@naver.com</a><a href="https://github.com/maehwachem" target="_blank" rel="noopener noreferrer">GitHub</a><a href="https://maehwachem.github.io/science-tools/battery/privacy.html">수업 도구 개인정보 처리방침</a><a href="admin/">관리</a><a href="#top">맨 위로 ↑</a></div><span>© KJE</span></footer>
 </div>
-<script src="assets/content.js?v=20261015-grouped-editor" defer></script>
+<script src="assets/content.js?v=20261015-format-categories" defer></script>
 </body>
 </html>
+
