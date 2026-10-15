@@ -71,10 +71,27 @@
     const meta=categories[key]||formats[key];setText('#kje-category-description',meta[1]);setText('#kje-category-status',meta[0]+' · '+count+'개');const empty=root.querySelector('#kje-project-empty');if(empty){empty.hidden=count>0;empty.textContent=meta[0]+' 콘텐츠는 아직 등록되지 않았습니다.';}
     if(writeHash)history.replaceState(null,'','#projects-'+key);
   }
+  function projectItems(data) {
+    if(data && data.groups && typeof data.groups==='object' && !Array.isArray(data.groups)) {
+      const items=[];const keys=Object.keys(categories).filter(key=>key!=='all');
+      const resident=Object.fromEntries(keys.map(key=>[key,[]]));const moved=Object.fromEntries(keys.map(key=>[key,[]]));
+      for(const subject of Object.keys(categories).filter(key=>key!=='all')) {
+        const group=data.groups[subject];if(!Array.isArray(group))continue;
+        for(const item of group){if(!item || typeof item!=='object')continue;
+          const target=own(categories,item.move_to)&&item.move_to!=='all'?item.move_to:subject;
+          (target===subject?resident:moved)[target].push({...item,subject:target});
+        }
+      }
+      for(const subject of keys)items.push(...resident[subject],...moved[subject]);
+      return items;
+    }
+    if(data && Array.isArray(data.projects))return data.projects;
+    throw new Error('Invalid project data');
+  }
   function renderProjects(data) {
-    if(!data || !Array.isArray(data.projects))throw new Error('Invalid project data');
+    const projects=projectItems(data);
     const list=root.querySelector('#kje-project-list');const fragment=document.createDocumentFragment();
-    for(const item of orderedItems(data.projects,data.display_order)) {
+    for(const item of orderedItems(projects,data.display_order)) {
       if(!item || !text(item.title) || !own(formats,item.kind))continue;
       const card=node('article','kje-project');card.dataset.kind=item.kind;card.dataset.subject=own(categories,item.subject)&&item.subject!=='all'?item.subject:'tools';
       const posterName=own(art,item.poster)?item.poster:'note';const poster=node('div','kje-poster kje-poster-'+posterName);poster.setAttribute('aria-hidden','true');
@@ -190,3 +207,4 @@
     read('content/posts.json').then(data=>{posts=sortedPosts(data);showPostDates=data.show_dates!==false;postsReady=true;renderPostFilters();renderPostList();showPost(Boolean(new URL(location.href).searchParams.get('post')));}).catch(()=>{setText('#kje-post-empty','글을 불러오지 못했습니다. 잠시 후 새로고침해 주세요.');})
   ]);
 })();
+

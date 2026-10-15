@@ -1,0 +1,43 @@
+name: Organize project categories
+on:
+  push:
+    branches: [main]
+    paths:
+      - content/projects.json
+      - scripts/organize_projects.py
+      - scripts/test_organize_projects.py
+      - .github/workflows/organize-projects.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+  pages: write
+concurrency:
+  group: organize-projects
+  cancel-in-progress: false
+jobs:
+  organize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Check category and ordering behavior
+        run: python3 -m unittest discover -s scripts -p 'test_organize_projects.py'
+      - name: Apply category moves
+        id: organize
+        run: |
+          python3 scripts/organize_projects.py
+          if ! git diff --quiet -- content/projects.json; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add content/projects.json
+            git commit -m 'Apply project category moves'
+            git push origin HEAD:main
+            echo 'changed=true' >> "$GITHUB_OUTPUT"
+          fi
+      - name: Rebuild Pages after category moves
+        if: steps.organize.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: gh api --method POST "repos/$GH_REPO/pages/builds" > /dev/null
