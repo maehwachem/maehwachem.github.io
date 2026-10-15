@@ -211,7 +211,24 @@ html{color-scheme:light dark;scroll-behavior:smooth}body{margin:0;background:lig
 @media(min-width:1400px){#kje-portfolio .kje-projects{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:650px){#kje-portfolio .kje-profile{grid-template-columns:1fr}#kje-portfolio .kje-explore-list{grid-template-columns:1fr;gap:26px}#kje-portfolio .kje-menu{gap:7px 19px}#kje-portfolio .kje-poster-word{font-size:27px}#kje-portfolio .kje-project-title{font-size:18px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
-</style>
+
+    /* Category controls palette; poster classes control illustration only. */
+    #kje-portfolio .kje-project[data-kind="lab"],#kje-portfolio .kje-category[data-category="lab"]{--kje-category-bg:#e3edf6;--kje-category-ink:#284e70}
+    #kje-portfolio .kje-project[data-kind="real"],#kje-portfolio .kje-category[data-category="real"]{--kje-category-bg:#e1eee8;--kje-category-ink:#285747}
+    #kje-portfolio .kje-project[data-kind="game"],#kje-portfolio .kje-category[data-category="game"]{--kje-category-bg:#f3e9d5;--kje-category-ink:#6b4d20}
+    #kje-portfolio .kje-project[data-kind="tool"],#kje-portfolio .kje-category[data-category="tool"]{--kje-category-bg:#ebe6f3;--kje-category-ink:#51416e}
+    #kje-portfolio .kje-project[data-kind="lesson"],#kje-portfolio .kje-category[data-category="lesson"]{--kje-category-bg:#f3e5e3;--kje-category-ink:#773f40}
+    #kje-portfolio .kje-project[data-kind] .kje-poster{background:var(--kje-category-bg);color:var(--kje-category-ink)}
+    #kje-portfolio .kje-project[data-kind] .kje-project-tag{color:var(--kje-category-ink)}
+    #kje-portfolio .kje-category[data-category]{border-top:3px solid var(--kje-category-ink);color:var(--kje-category-ink)}
+    #kje-portfolio .kje-category[data-category][aria-pressed="true"]{background:var(--kje-category-ink);border-color:var(--kje-category-ink);color:#fff}
+    #kje-portfolio .kje-category[data-category]:hover:not([aria-pressed="true"]){background:var(--kje-category-bg)}
+    #kje-portfolio .kje-project .kje-lab-ring{border-color:currentColor;background:color-mix(in srgb,currentColor 12%,var(--kje-category-bg));box-shadow:inset 0 0 0 12px var(--kje-category-bg),inset 0 0 0 13px currentColor}
+    #kje-portfolio .kje-project .kje-contour,#kje-portfolio .kje-project .kje-contour:before,#kje-portfolio .kje-project .kje-contour:after{border-color:currentColor}
+    #kje-portfolio .kje-project .kje-contour:after{background:color-mix(in srgb,currentColor 16%,var(--kje-category-bg))}
+    #kje-portfolio .kje-project .kje-notepaper{color:var(--kje-category-ink);box-shadow:7px 8px 0 color-mix(in srgb,var(--kje-category-ink) 22%,var(--kje-category-bg))}
+    #kje-portfolio .kje-project .kje-notepaper span{background:color-mix(in srgb,var(--kje-category-ink) 35%,#fff)}
+  </style>
   <link rel="stylesheet" href="assets/content.css?v=20261012-order">
 </head>
 <body>
