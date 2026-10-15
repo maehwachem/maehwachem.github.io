@@ -140,21 +140,19 @@ content:
       - name: move_to
         label: 다른 카테고리로 이동
         type: select
-        default: ''
+        default: physics
         options:
           values:
-          - name: ''
-            label: 현재 카테고리 유지
           - name: physics
-            label: 물리로 이동
+            label: 현재 카테고리 유지 (물리)
           - name: chemistry
-            label: 화학로 이동
+            label: 화학으로 이동
           - name: biology
-            label: 생명과학로 이동
+            label: 생명과학으로 이동
           - name: earth
-            label: 지구과학로 이동
+            label: 지구과학으로 이동
           - name: environment
-            label: 환경로 이동
+            label: 환경으로 이동
           - name: tools
             label: 도구로 이동
         description: 목적지를 선택하고 Save를 누르면 해당 목록의 마지막으로 이동합니다. 자동 정리가 끝난 뒤 편집기를 새로고침하세요. 제목·내용·날짜는 유지됩니다.
@@ -277,21 +275,19 @@ content:
       - name: move_to
         label: 다른 카테고리로 이동
         type: select
-        default: ''
+        default: chemistry
         options:
           values:
-          - name: ''
-            label: 현재 카테고리 유지
           - name: physics
             label: 물리로 이동
           - name: chemistry
-            label: 화학로 이동
+            label: 현재 카테고리 유지 (화학)
           - name: biology
-            label: 생명과학로 이동
+            label: 생명과학으로 이동
           - name: earth
-            label: 지구과학로 이동
+            label: 지구과학으로 이동
           - name: environment
-            label: 환경로 이동
+            label: 환경으로 이동
           - name: tools
             label: 도구로 이동
         description: 목적지를 선택하고 Save를 누르면 해당 목록의 마지막으로 이동합니다. 자동 정리가 끝난 뒤 편집기를 새로고침하세요. 제목·내용·날짜는 유지됩니다.
@@ -414,21 +410,19 @@ content:
       - name: move_to
         label: 다른 카테고리로 이동
         type: select
-        default: ''
+        default: biology
         options:
           values:
-          - name: ''
-            label: 현재 카테고리 유지
           - name: physics
             label: 물리로 이동
           - name: chemistry
-            label: 화학로 이동
+            label: 화학으로 이동
           - name: biology
-            label: 생명과학로 이동
+            label: 현재 카테고리 유지 (생명과학)
           - name: earth
-            label: 지구과학로 이동
+            label: 지구과학으로 이동
           - name: environment
-            label: 환경로 이동
+            label: 환경으로 이동
           - name: tools
             label: 도구로 이동
         description: 목적지를 선택하고 Save를 누르면 해당 목록의 마지막으로 이동합니다. 자동 정리가 끝난 뒤 편집기를 새로고침하세요. 제목·내용·날짜는 유지됩니다.
@@ -551,21 +545,19 @@ content:
       - name: move_to
         label: 다른 카테고리로 이동
         type: select
-        default: ''
+        default: earth
         options:
           values:
-          - name: ''
-            label: 현재 카테고리 유지
           - name: physics
             label: 물리로 이동
           - name: chemistry
-            label: 화학로 이동
+            label: 화학으로 이동
           - name: biology
-            label: 생명과학로 이동
+            label: 생명과학으로 이동
           - name: earth
-            label: 지구과학로 이동
+            label: 현재 카테고리 유지 (지구과학)
           - name: environment
-            label: 환경로 이동
+            label: 환경으로 이동
           - name: tools
             label: 도구로 이동
         description: 목적지를 선택하고 Save를 누르면 해당 목록의 마지막으로 이동합니다. 자동 정리가 끝난 뒤 편집기를 새로고침하세요. 제목·내용·날짜는 유지됩니다.
@@ -688,21 +680,19 @@ content:
       - name: move_to
         label: 다른 카테고리로 이동
         type: select
-        default: ''
+        default: environment
         options:
           values:
-          - name: ''
-            label: 현재 카테고리 유지
           - name: physics
             label: 물리로 이동
           - name: chemistry
-            label: 화학로 이동
+            label: 화학으로 이동
           - name: biology
-            label: 생명과학로 이동
+            label: 생명과학으로 이동
           - name: earth
-            label: 지구과학로 이동
+            label: 지구과학으로 이동
           - name: environment
-            label: 환경로 이동
+            label: 현재 카테고리 유지 (환경)
           - name: tools
             label: 도구로 이동
         description: 목적지를 선택하고 Save를 누르면 해당 목록의 마지막으로 이동합니다. 자동 정리가 끝난 뒤 편집기를 새로고침하세요. 제목·내용·날짜는 유지됩니다.
@@ -825,23 +815,21 @@ content:
       - name: move_to
         label: 다른 카테고리로 이동
         type: select
-        default: ''
+        default: tools
         options:
           values:
-          - name: ''
-            label: 현재 카테고리 유지
           - name: physics
             label: 물리로 이동
           - name: chemistry
-            label: 화학로 이동
+            label: 화학으로 이동
           - name: biology
-            label: 생명과학로 이동
+            label: 생명과학으로 이동
           - name: earth
-            label: 지구과학로 이동
+            label: 지구과학으로 이동
           - name: environment
-            label: 환경로 이동
+            label: 환경으로 이동
           - name: tools
-            label: 도구로 이동
+            label: 현재 카테고리 유지 (도구)
         description: 목적지를 선택하고 Save를 누르면 해당 목록의 마지막으로 이동합니다. 자동 정리가 끝난 뒤 편집기를 새로고침하세요. 제목·내용·날짜는 유지됩니다.
       - name: date
         label: 게시일 (업로드 날짜)
