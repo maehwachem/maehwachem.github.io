@@ -33,3 +33,11 @@
 @media(max-width:650px){#kje-portfolio .kje-post-grid{grid-template-columns:1fr;gap:28px}#kje-portfolio .kje-post-section{padding:30px 0 40px}#kje-portfolio .kje-rich-content{font-size:15px}}
 
 #kje-portfolio .kje-project .kje-post-meta{margin-top:12px;margin-bottom:0}
+
+/* Illustrated adventure-game covers */
+#kje-portfolio .kje-game-cover{position:relative;isolation:isolate}
+#kje-portfolio .kje-game-cover:after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(5,19,29,.28),transparent 40%,rgba(5,19,29,.18) 58%,rgba(5,19,29,.85));z-index:1}
+#kje-portfolio .kje-game-cover .kje-project-cover{object-position:center 43%;transition:transform .35s ease}
+#kje-portfolio .kje-game-cover .kje-poster-cap{color:#fff8df;z-index:2;text-shadow:0 1px 4px #152b33}
+#kje-portfolio .kje-game-cover .kje-poster-word{color:#fff8df;z-index:2;font-weight:600;font-size:27px;text-shadow:0 2px 8px rgba(0,0,0,.65);letter-spacing:-1px}
+@media(prefers-reduced-motion:no-preference){#kje-portfolio .kje-project:hover .kje-game-cover .kje-project-cover{transform:scale(1.045)}}
