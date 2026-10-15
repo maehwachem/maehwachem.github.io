@@ -1,16 +1,16 @@
 # KJE의 작업실
 
-- 홈페이지: https://maehwachem.github.io/
-- 관리 시작: https://maehwachem.github.io/admin/
+- 홈페이지: https://kjelab.kr/
+- 글쓰기·관리: https://kjelab.kr/admin/
 - 연락처: kjechem@naver.com
 
 ## 직접 편집하기
 
-1. 관리 페이지에서 Pages CMS를 열고 GitHub의 `maehwachem` 계정으로 로그인합니다.
+1. 홈페이지 상단 또는 ‘글·사진’ 제목 옆의 **글쓰기**를 누르고, **글쓰기 편집기 열기**에서 GitHub의 `maehwachem` 계정으로 로그인합니다.
 2. 최초 한 번 Pages CMS GitHub App을 `maehwachem.github.io` 저장소에만 설치합니다.
 3. 이 저장소의 `main` 브랜치를 엽니다.
-4. 소개·홈페이지 설정, 프로젝트 관리, 글·사진 쓰기 중 하나를 선택합니다.
-5. 내용을 수정하고 Save를 누릅니다. GitHub Pages 배포 완료 후 홈페이지에 반영됩니다.
+4. **글·사진 쓰기 → 글과 사진 → 항목 추가(Add item)**에서 새 글을 씁니다. 기존 글을 수정하려면 해당 제목을 엽니다. 소개와 프로젝트는 관리 페이지의 각 메뉴에서 편집합니다.
+5. 제목·게시일·분류·본문을 입력하고 Save를 누릅니다. GitHub Pages 배포 완료 후 `kjelab.kr`에 반영됩니다.
 
 프로젝트 목록은 편집기에서 항목을 추가·삭제하거나 순서를 바꿀 수 있습니다. 대표 이미지를 생략하면 기존의 기본 표지를 사용합니다. 링크가 없으면 공개 준비 중으로 표시됩니다.
 

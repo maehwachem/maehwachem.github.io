@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="light dark">
   <title>KJE의 작업실 · 과학교육과 탐구</title>
   <meta name="description" content="과학교육을 바탕으로 수업과 탐구, 디지털 제작을 연결합니다. KJE의 가상실험, 실제 실험 수업, 학습 게임, 교육 도구와 수업 자료.">
-  <link rel="canonical" href="https://maehwachem.github.io/">
+  <link rel="canonical" href="https://kjelab.kr/">
   <link rel="icon" type="image/png" href="assets/student-character.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -188,6 +188,9 @@ html{color-scheme:light dark;scroll-behavior:smooth}body{margin:0;background:lig
 #kje-portfolio{min-height:100vh;overflow:clip;font-family:'Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif}
 #kje-portfolio .kje-brand{padding:0}#kje-portfolio .kje-menu{flex-wrap:wrap}
 #kje-portfolio .kje-menu a[aria-current]{text-decoration:underline;text-underline-offset:8px}
+#kje-portfolio .kje-write-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;flex-shrink:0;min-height:42px;padding:10px 17px;border:1px solid var(--kje-button);border-radius:4px;background:var(--kje-button);color:var(--kje-button-text);font-size:12px;font-weight:500;white-space:nowrap}
+#kje-portfolio .kje-menu .kje-write-link{padding:10px 17px}
+#kje-portfolio .kje-write-link:hover,#kje-portfolio .kje-menu .kje-write-link:hover{background:var(--kje-green);color:var(--kje-button-text);text-decoration:none}
 #kje-portfolio .kje-profile{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}
 #kje-portfolio .kje-project{display:flex;flex-direction:column;min-width:0}
 #kje-portfolio .kje-project-title{font-size:17px;margin-top:6px;line-height:1.7;word-break:keep-all;overflow-wrap:anywhere}
@@ -217,7 +220,7 @@ html{color-scheme:light dark;scroll-behavior:smooth}body{margin:0;background:lig
   <div class="kje-wrap">
     <header class="kje-nav" id="top">
       <a class="kje-brand" href="#top" aria-label="KJE의 작업실 홈"><span class="kje-student-image kje-brand-drawing" aria-hidden="true"></span><span class="kje-brand-name">KJE의 작업실</span></a>
-      <nav class="kje-menu" aria-label="주 메뉴"><a href="#about">소개</a><a href="#projects">프로젝트</a><a href="#explore">탐구</a><a href="#journal">글·사진</a><a href="mailto:kjechem@naver.com">연락하기</a></nav>
+      <nav class="kje-menu" aria-label="주 메뉴"><a href="#about">소개</a><a href="#projects">프로젝트</a><a href="#explore">탐구</a><a href="#journal">글·사진</a><a href="mailto:kjechem@naver.com">연락하기</a><a class="kje-write-link" href="/admin/" aria-label="글쓰기 · 작성자 로그인">글쓰기 <span aria-hidden="true">↗</span></a></nav>
     </header>
   </div>
   <main>
@@ -323,7 +326,7 @@ html{color-scheme:light dark;scroll-behavior:smooth}body{margin:0;background:lig
 
     <section class="kje-wrap kje-post-section" aria-labelledby="posts-title">
       <div id="kje-post-listing">
-        <div class="kje-section-heading"><div><h2 id="posts-title">글·사진</h2><p class="kje-subtitle">탐구와 제작, 일상에서 남긴 기록.</p></div><span class="kje-eyebrow">Journal</span></div>
+        <div class="kje-section-heading"><div><h2 id="posts-title">글·사진</h2><p class="kje-subtitle">탐구와 제작, 일상에서 남긴 기록.</p></div><a class="kje-write-link" href="/admin/" aria-label="글쓰기 · 작성자 로그인">글쓰기 <span aria-hidden="true">↗</span></a></div>
         <div id="kje-post-filters" class="kje-post-filters" role="group" aria-label="글 분류" hidden></div>
         <div id="kje-post-list" class="kje-post-grid"></div>
         <p id="kje-post-empty" class="kje-post-empty" role="status">글을 불러오는 중입니다.</p>

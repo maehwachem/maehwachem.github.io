@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
   <meta name="color-scheme" content="light dark">
-  <title>관리 · KJE의 작업실</title>
+  <title>글쓰기·관리 · KJE의 작업실</title>
   <link rel="icon" href="../assets/student-character.png">
   <style>
     :root{color-scheme:light dark;--paper:light-dark(#faf9f5,#192522);--ink:light-dark(#233a38,#f2eee2);--muted:light-dark(#68736c,#b5c0b9);--line:light-dark(#dcded4,#3c4b46);--wash:light-dark(#e9eddf,#263b32);--button:light-dark(#294d40,#b1ccad);--button-text:light-dark(#fffefa,#203629)}
@@ -15,11 +15,21 @@
 <body>
   <header class="wrap"><a class="brand" href="../"><img src="../assets/student-character.png" alt=""><span>KJE의 작업실</span></a><a class="home" href="../">홈페이지 보기 ↗</a></header>
   <main class="wrap">
-    <p class="eyebrow">WORKSPACE · 관리</p>
-    <h1>소개를 다듬고,<br>새로운 기록을 남기는 곳.</h1>
-    <p class="intro">소개와 프로젝트를 수정하고, 글과 사진을 올립니다.<br>편집과 저장은 GitHub 계정으로 로그인한 뒤 사용할 수 있습니다.</p>
-    <a class="login" href="https://app.pagescms.org/maehwachem/maehwachem.github.io/main" target="_blank" rel="noopener noreferrer">로그인하고 편집하기 <span aria-hidden="true">↗</span></a>
-    <p class="account">Pages CMS에서 <strong>maehwachem</strong> 계정으로 로그인합니다.</p>
+    <p class="eyebrow">WORKSPACE · 글쓰기·관리</p>
+    <h1>글과 사진으로<br>새로운 기록을 남겨요.</h1>
+    <p class="intro">아래 버튼에서 글 편집기를 열어 새 글을 쓰거나 기존 글을 수정합니다.<br>GitHub 계정으로 로그인하고 저장하면 kjelab.kr에 반영됩니다.</p>
+    <a class="login" href="https://app.pagescms.org/maehwachem/maehwachem.github.io/main/file/posts" target="_blank" rel="noopener noreferrer">글쓰기 편집기 열기 <span aria-hidden="true">↗</span></a>
+    <p class="account">새 창의 Pages CMS에서 <strong>maehwachem</strong> 계정으로 로그인합니다. 이미 로그인했다면 글 편집 화면으로 이동합니다.</p>
+    <section class="setup" style="margin-top:28px" aria-labelledby="writing-guide">
+      <h2 id="writing-guide">새 글 올리는 순서</h2>
+      <ol>
+        <li><strong>글쓰기 편집기 열기</strong>를 누릅니다. 로그인 후 저장소 목록이 나오면 <strong>maehwachem.github.io → main → 글·사진 쓰기</strong>를 선택합니다.</li>
+        <li><strong>글과 사진</strong> 목록에서 <strong>항목 추가(Add item)</strong>를 누릅니다. 기존 글을 고치려면 해당 제목을 엽니다.</li>
+        <li><strong>글 제목·게시일·분류·본문</strong>을 입력합니다. 사진은 <strong>대표 사진</strong>이나 본문에서 추가합니다.</li>
+        <li><strong>Save</strong>를 눌러 저장합니다. 배포가 끝나면 <a href="../#journal">홈페이지의 글·사진</a>에서 확인합니다.</li>
+      </ol>
+      <p class="note">저장 후 홈페이지 반영까지 잠시 걸릴 수 있습니다. 처음 연결하는 경우 아래 안내를 따라 주세요.</p>
+    </section>
     <div class="cards">
       <section><span class="number">01</span><h2><a href="https://app.pagescms.org/maehwachem/maehwachem.github.io/main/file/site" target="_blank" rel="noopener noreferrer">소개·홈페이지 설정 ↗</a></h2><p>소개 상자 제목과 내용, 탐구 소개, 관심 주제와 연락처를 바꿉니다.</p></section>
       <section><span class="number">02</span><h2><a href="https://app.pagescms.org/maehwachem/maehwachem.github.io/main/file/projects" target="_blank" rel="noopener noreferrer">프로젝트 관리 ↗</a></h2><p>프로젝트를 추가하거나 수정합니다. 분류와 순서, 게시일, 대표 이미지와 연결 주소를 정합니다.</p></section>
@@ -41,13 +51,13 @@
         <li>위 버튼을 누르고 <strong>Sign in with GitHub</strong>를 선택합니다.</li>
         <li>Pages CMS 앱 설치 화면에서 <strong>Only select repositories</strong>를 선택합니다.</li>
         <li><strong>maehwachem.github.io</strong>만 선택하고 요청 권한을 확인한 뒤 승인합니다.</li>
-        <li>이 저장소의 <strong>main</strong>을 열면 준비된 세 가지 편집 메뉴가 나타납니다.</li>
+        <li>이 저장소의 <strong>main</strong>을 열고 <strong>글·사진 쓰기</strong>를 선택합니다.</li>
       </ol>
       <p class="note">본인만 사용하려면 GitHub 저장소나 Pages CMS에 다른 편집자·Collaborators를 초대하지 마세요. 이 안내 페이지의 주소를 아는 것만으로 편집 권한을 얻을 수는 없습니다.</p>
     </section>
     <p class="guide">수정 후 <strong>Save</strong>를 누르면 저장되고, GitHub Pages 배포가 끝난 뒤 홈페이지에 반영됩니다. 잠시 기다린 후 ‘홈페이지 보기’에서 확인해 주세요.</p>
     <p class="guide">이 홈페이지는 공개 저장소를 사용합니다. 저장한 글·사진은 공개되므로 비공개 메모나 학생 개인정보를 저장하는 용도로 사용하지 마세요.</p>
   </main>
-  <footer class="wrap">KJE의 작업실 · 관리</footer>
+  <footer class="wrap">KJE의 작업실 · 글쓰기·관리</footer>
 </body>
 </html>
