@@ -186,7 +186,7 @@
         "tag": "이야기 게임 · 탐험",
         "level": "고등학교 통합과학, 화학",
         "desc": "무인도에서 재료를 모으고 장치를 만들며 다섯 장을 풀어 가는 화학 이야기 게임. 증류와 전기분해, 금속 제련, 산성비와 중화, 연소열, 화학 평형을 다룹니다.",
-        "cover": "assets/uploads/chemists-island-cover.webp",
+        "cover": "assets/uploads/chemists-island-gameplay.webp",
         "links": [
           {
             "label": "게임 열기",
@@ -207,7 +207,7 @@
         "tag": "이야기 게임 · 모둠",
         "level": "고등학교 화학, 물질과 에너지",
         "desc": "화학자의 섬 뒷이야기. 몰 농도와 희석, 어는점 내림, 삼투압으로 선원과 연구 기지를 구하는 세 장의 이야기 게임. 같은 조 최대 5명이 함께하는 모둠판도 있습니다.",
-        "cover": "assets/uploads/chemists-voyage-cover.webp",
+        "cover": "assets/uploads/chemists-voyage-gameplay.webp",
         "links": [
           {
             "label": "게임 열기",
