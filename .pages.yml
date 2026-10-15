@@ -114,35 +114,23 @@ content:
         label: 직접 배치 — 아래 목록 순서대로
       - name: newest
         label: 최신순 — 게시일이 최근인 순서대로
-    description: 직접 배치에서는 카테고리별 목록 안에서 끌어 놓은 순서대로 보입니다. 최신순에서는 게시일이 없는 항목이 뒤에 표시됩니다.
+    description: 직접 배치에서는 아래 목록을 끌어 순서를 정합니다. 분류 안에서도 같은 순서가 유지됩니다. 최신순에서는 게시일이 없는 항목이 뒤에 표시됩니다.
   - name: show_dates
     label: 홈페이지에 게시일 표시
     type: boolean
     default: true
     description: 끄면 날짜를 숨깁니다. 표시 순서에는 영향을 주지 않습니다.
-  - name: lab
-    label: '가상실험'
+  - name: projects
+    label: 프로젝트
     type: object
     list:
       collapsible:
         collapsed: true
-        summary: '{title}'
+        summary: '{index}. {title}'
     fields:
     - name: title
       label: 프로젝트 이름
       type: string
-      required: true
-    - name: level
-      label: 대상 (학교급·과목)
-      type: string
-      description: '예: 고등학교 통합과학, 화학 / 중학교 과학, 고등학교 화학. 비워 두면 표시하지 않습니다.'
-    - name: tag
-      label: 주제 태그
-      type: string
-      description: '예: 산과 염기 · 중화 적정'
-    - name: desc
-      label: 설명
-      type: text
       required: true
     - name: date
       label: 게시일 (업로드 날짜)
@@ -151,24 +139,34 @@ content:
       options:
         format: yyyy-MM-dd
       description: 처음 게시한 날짜를 선택하세요. 날짜를 모르는 기존 프로젝트는 비워 두면 표시되지 않습니다.
-    - name: links
-      label: 연결할 링크
-      type: object
-      list:
-        collapsible:
-          collapsed: true
-          summary: '{label}'
-      fields:
-      - name: label
-        label: 버튼 이름
-        type: string
-        required: true
-      - name: url
-        label: 연결 주소
-        type: string
-        required: true
-        pattern: *id001
-      description: 링크가 없으면 홈페이지에 공개 준비 중으로 표시됩니다.
+    - name: kind
+      label: 카테고리
+      type: select
+      required: true
+      options:
+        values:
+        - name: lab
+          label: 가상실험
+        - name: real
+          label: 실제 실험 수업
+        - name: game
+          label: 학습 게임
+        - name: tool
+          label: 교육 도구
+        - name: lesson
+          label: 수업 자료
+    - name: desc
+      label: 설명
+      type: text
+      required: true
+    - name: tag
+      label: 주제 태그
+      type: string
+      description: '예: 산과 염기 · 중화 적정'
+    - name: level
+      label: 대상 학교급·과목
+      type: string
+      description: '예: 고등학교 통합과학, 화학 / 중학교 과학, 고등학교 화학. 비워 두면 표시하지 않습니다.'
     - name: cover
       label: 대표 이미지
       type: image
@@ -217,38 +215,6 @@ content:
       label: 기본 표지에 들어갈 글자
       type: text
       description: 줄바꿈을 넣을 수 있습니다. 비워 두면 프로젝트 이름이 표시됩니다.
-    description: '가상실험 카테고리의 프로젝트예요. 왼쪽 점 모양 손잡이를 끌어 순서를 바꾼 뒤 Save를 누르세요. 다른 카테고리로 옮기려면 그 카테고리에 새로 추가하고 여기서 지워요.'
-  - name: real
-    label: '실제 실험 수업'
-    type: object
-    list:
-      collapsible:
-        collapsed: true
-        summary: '{title}'
-    fields:
-    - name: title
-      label: 프로젝트 이름
-      type: string
-      required: true
-    - name: level
-      label: 대상 (학교급·과목)
-      type: string
-      description: '예: 고등학교 통합과학, 화학 / 중학교 과학, 고등학교 화학. 비워 두면 표시하지 않습니다.'
-    - name: tag
-      label: 주제 태그
-      type: string
-      description: '예: 산과 염기 · 중화 적정'
-    - name: desc
-      label: 설명
-      type: text
-      required: true
-    - name: date
-      label: 게시일 (업로드 날짜)
-      type: date
-      default: ''
-      options:
-        format: yyyy-MM-dd
-      description: 처음 게시한 날짜를 선택하세요. 날짜를 모르는 기존 프로젝트는 비워 두면 표시되지 않습니다.
     - name: links
       label: 연결할 링크
       type: object
@@ -267,349 +233,7 @@ content:
         required: true
         pattern: *id001
       description: 링크가 없으면 홈페이지에 공개 준비 중으로 표시됩니다.
-    - name: cover
-      label: 대표 이미지
-      type: image
-      description: 선택 사항입니다. 비워 두면 아래 표지 스타일을 사용합니다.
-    - name: poster
-      label: 기본 표지 스타일
-      type: select
-      default: note
-      options:
-        values:
-        - name: lab
-          label: 실험
-        - name: gas
-          label: 기체
-        - name: heat
-          label: 열화학
-        - name: rate
-          label: 반응 속도
-        - name: equil
-          label: 화학 평형
-        - name: battery
-          label: 배터리
-        - name: island
-          label: 섬
-        - name: power
-          label: 전기
-        - name: note
-          label: 노트
-        - name: earth
-          label: 지구
-        - name: acid
-          label: 산과 염기
-        - name: glass
-          label: 실험도구
-        - name: solution
-          label: 용액과 농도
-        - name: sensor
-          label: 센서
-        - name: heart
-          label: 하트
-        - name: star
-          label: 별자리
-        - name: exhibit
-          label: 전시대
-    - name: words
-      label: 기본 표지에 들어갈 글자
-      type: text
-      description: 줄바꿈을 넣을 수 있습니다. 비워 두면 프로젝트 이름이 표시됩니다.
-    description: '실제 실험 수업 카테고리의 프로젝트예요. 왼쪽 점 모양 손잡이를 끌어 순서를 바꾼 뒤 Save를 누르세요. 다른 카테고리로 옮기려면 그 카테고리에 새로 추가하고 여기서 지워요.'
-  - name: game
-    label: '학습 게임'
-    type: object
-    list:
-      collapsible:
-        collapsed: true
-        summary: '{title}'
-    fields:
-    - name: title
-      label: 프로젝트 이름
-      type: string
-      required: true
-    - name: level
-      label: 대상 (학교급·과목)
-      type: string
-      description: '예: 고등학교 통합과학, 화학 / 중학교 과학, 고등학교 화학. 비워 두면 표시하지 않습니다.'
-    - name: tag
-      label: 주제 태그
-      type: string
-      description: '예: 산과 염기 · 중화 적정'
-    - name: desc
-      label: 설명
-      type: text
-      required: true
-    - name: date
-      label: 게시일 (업로드 날짜)
-      type: date
-      default: ''
-      options:
-        format: yyyy-MM-dd
-      description: 처음 게시한 날짜를 선택하세요. 날짜를 모르는 기존 프로젝트는 비워 두면 표시되지 않습니다.
-    - name: links
-      label: 연결할 링크
-      type: object
-      list:
-        collapsible:
-          collapsed: true
-          summary: '{label}'
-      fields:
-      - name: label
-        label: 버튼 이름
-        type: string
-        required: true
-      - name: url
-        label: 연결 주소
-        type: string
-        required: true
-        pattern: *id001
-      description: 링크가 없으면 홈페이지에 공개 준비 중으로 표시됩니다.
-    - name: cover
-      label: 대표 이미지
-      type: image
-      description: 선택 사항입니다. 비워 두면 아래 표지 스타일을 사용합니다.
-    - name: poster
-      label: 기본 표지 스타일
-      type: select
-      default: note
-      options:
-        values:
-        - name: lab
-          label: 실험
-        - name: gas
-          label: 기체
-        - name: heat
-          label: 열화학
-        - name: rate
-          label: 반응 속도
-        - name: equil
-          label: 화학 평형
-        - name: battery
-          label: 배터리
-        - name: island
-          label: 섬
-        - name: power
-          label: 전기
-        - name: note
-          label: 노트
-        - name: earth
-          label: 지구
-        - name: acid
-          label: 산과 염기
-        - name: glass
-          label: 실험도구
-        - name: solution
-          label: 용액과 농도
-        - name: sensor
-          label: 센서
-        - name: heart
-          label: 하트
-        - name: star
-          label: 별자리
-        - name: exhibit
-          label: 전시대
-    - name: words
-      label: 기본 표지에 들어갈 글자
-      type: text
-      description: 줄바꿈을 넣을 수 있습니다. 비워 두면 프로젝트 이름이 표시됩니다.
-    description: '학습 게임 카테고리의 프로젝트예요. 왼쪽 점 모양 손잡이를 끌어 순서를 바꾼 뒤 Save를 누르세요. 다른 카테고리로 옮기려면 그 카테고리에 새로 추가하고 여기서 지워요.'
-  - name: tool
-    label: '교육 도구'
-    type: object
-    list:
-      collapsible:
-        collapsed: true
-        summary: '{title}'
-    fields:
-    - name: title
-      label: 프로젝트 이름
-      type: string
-      required: true
-    - name: level
-      label: 대상 (학교급·과목)
-      type: string
-      description: '예: 고등학교 통합과학, 화학 / 중학교 과학, 고등학교 화학. 비워 두면 표시하지 않습니다.'
-    - name: tag
-      label: 주제 태그
-      type: string
-      description: '예: 산과 염기 · 중화 적정'
-    - name: desc
-      label: 설명
-      type: text
-      required: true
-    - name: date
-      label: 게시일 (업로드 날짜)
-      type: date
-      default: ''
-      options:
-        format: yyyy-MM-dd
-      description: 처음 게시한 날짜를 선택하세요. 날짜를 모르는 기존 프로젝트는 비워 두면 표시되지 않습니다.
-    - name: links
-      label: 연결할 링크
-      type: object
-      list:
-        collapsible:
-          collapsed: true
-          summary: '{label}'
-      fields:
-      - name: label
-        label: 버튼 이름
-        type: string
-        required: true
-      - name: url
-        label: 연결 주소
-        type: string
-        required: true
-        pattern: *id001
-      description: 링크가 없으면 홈페이지에 공개 준비 중으로 표시됩니다.
-    - name: cover
-      label: 대표 이미지
-      type: image
-      description: 선택 사항입니다. 비워 두면 아래 표지 스타일을 사용합니다.
-    - name: poster
-      label: 기본 표지 스타일
-      type: select
-      default: note
-      options:
-        values:
-        - name: lab
-          label: 실험
-        - name: gas
-          label: 기체
-        - name: heat
-          label: 열화학
-        - name: rate
-          label: 반응 속도
-        - name: equil
-          label: 화학 평형
-        - name: battery
-          label: 배터리
-        - name: island
-          label: 섬
-        - name: power
-          label: 전기
-        - name: note
-          label: 노트
-        - name: earth
-          label: 지구
-        - name: acid
-          label: 산과 염기
-        - name: glass
-          label: 실험도구
-        - name: solution
-          label: 용액과 농도
-        - name: sensor
-          label: 센서
-        - name: heart
-          label: 하트
-        - name: star
-          label: 별자리
-        - name: exhibit
-          label: 전시대
-    - name: words
-      label: 기본 표지에 들어갈 글자
-      type: text
-      description: 줄바꿈을 넣을 수 있습니다. 비워 두면 프로젝트 이름이 표시됩니다.
-    description: '교육 도구 카테고리의 프로젝트예요. 왼쪽 점 모양 손잡이를 끌어 순서를 바꾼 뒤 Save를 누르세요. 다른 카테고리로 옮기려면 그 카테고리에 새로 추가하고 여기서 지워요.'
-  - name: lesson
-    label: '수업 자료'
-    type: object
-    list:
-      collapsible:
-        collapsed: true
-        summary: '{title}'
-    fields:
-    - name: title
-      label: 프로젝트 이름
-      type: string
-      required: true
-    - name: level
-      label: 대상 (학교급·과목)
-      type: string
-      description: '예: 고등학교 통합과학, 화학 / 중학교 과학, 고등학교 화학. 비워 두면 표시하지 않습니다.'
-    - name: tag
-      label: 주제 태그
-      type: string
-      description: '예: 산과 염기 · 중화 적정'
-    - name: desc
-      label: 설명
-      type: text
-      required: true
-    - name: date
-      label: 게시일 (업로드 날짜)
-      type: date
-      default: ''
-      options:
-        format: yyyy-MM-dd
-      description: 처음 게시한 날짜를 선택하세요. 날짜를 모르는 기존 프로젝트는 비워 두면 표시되지 않습니다.
-    - name: links
-      label: 연결할 링크
-      type: object
-      list:
-        collapsible:
-          collapsed: true
-          summary: '{label}'
-      fields:
-      - name: label
-        label: 버튼 이름
-        type: string
-        required: true
-      - name: url
-        label: 연결 주소
-        type: string
-        required: true
-        pattern: *id001
-      description: 링크가 없으면 홈페이지에 공개 준비 중으로 표시됩니다.
-    - name: cover
-      label: 대표 이미지
-      type: image
-      description: 선택 사항입니다. 비워 두면 아래 표지 스타일을 사용합니다.
-    - name: poster
-      label: 기본 표지 스타일
-      type: select
-      default: note
-      options:
-        values:
-        - name: lab
-          label: 실험
-        - name: gas
-          label: 기체
-        - name: heat
-          label: 열화학
-        - name: rate
-          label: 반응 속도
-        - name: equil
-          label: 화학 평형
-        - name: battery
-          label: 배터리
-        - name: island
-          label: 섬
-        - name: power
-          label: 전기
-        - name: note
-          label: 노트
-        - name: earth
-          label: 지구
-        - name: acid
-          label: 산과 염기
-        - name: glass
-          label: 실험도구
-        - name: solution
-          label: 용액과 농도
-        - name: sensor
-          label: 센서
-        - name: heart
-          label: 하트
-        - name: star
-          label: 별자리
-        - name: exhibit
-          label: 전시대
-    - name: words
-      label: 기본 표지에 들어갈 글자
-      type: text
-      description: 줄바꿈을 넣을 수 있습니다. 비워 두면 프로젝트 이름이 표시됩니다.
-    description: '수업 자료 카테고리의 프로젝트예요. 왼쪽 점 모양 손잡이를 끌어 순서를 바꾼 뒤 Save를 누르세요. 다른 카테고리로 옮기려면 그 카테고리에 새로 추가하고 여기서 지워요.'
+    description: 왼쪽 점 모양 손잡이를 위아래로 끌어 프로젝트의 순서를 바꾼 뒤 Save를 누르세요. 직접 배치를 선택해야 홈페이지에 이 순서가 반영됩니다.
 - name: shortlinks
   label: 짧은 주소
   type: file
@@ -666,7 +290,7 @@ content:
         label: 직접 배치 — 아래 목록 순서대로
       - name: newest
         label: 최신순 — 게시일이 최근인 순서대로
-    description: 직접 배치에서는 카테고리별 목록 안에서 끌어 놓은 순서대로 보입니다. 최신순에서는 게시일이 없는 항목이 뒤에 표시됩니다.
+    description: 직접 배치에서는 아래 목록을 끌어 순서를 정합니다. 분류 안에서도 같은 순서가 유지됩니다. 최신순에서는 게시일이 없는 항목이 뒤에 표시됩니다.
   - name: show_dates
     label: 홈페이지에 게시일 표시
     type: boolean

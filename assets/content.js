@@ -71,12 +71,9 @@
     if(writeHash)history.replaceState(null,'','#projects-'+key);
   }
   function renderProjects(data) {
-    /* 관리 화면에서 카테고리별 목록(lab, real, game, tool, lesson)으로 나눠 저장한다. 예전 형식(projects 한 목록)도 읽는다. */
-    const grouped=data&&Object.keys(categories).some(k=>Array.isArray(data[k]));
-    if(!data || (!grouped && !Array.isArray(data.projects)))throw new Error('Invalid project data');
-    const items=grouped?Object.keys(categories).flatMap(k=>orderedItems((data[k]||[]).filter(x=>x&&typeof x==='object').map(x=>({...x,kind:k})),data.display_order)):orderedItems(data.projects,data.display_order);
+    if(!data || !Array.isArray(data.projects))throw new Error('Invalid project data');
     const list=root.querySelector('#kje-project-list');const fragment=document.createDocumentFragment();
-    for(const item of items) {
+    for(const item of orderedItems(data.projects,data.display_order)) {
       if(!item || !text(item.title) || !own(categories,item.kind))continue;
       const card=node('article','kje-project');card.dataset.kind=item.kind;
       const posterName=own(art,item.poster)?item.poster:'note';const poster=node('div','kje-poster kje-poster-'+posterName);poster.setAttribute('aria-hidden','true');
