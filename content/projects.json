@@ -367,6 +367,24 @@
         ],
         "cover": "",
         "subject": "tools"
+      },
+      {
+        "kind": "tool",
+        "title": "수학책 편집 노트",
+        "date": "2026-10-16",
+        "poster": "note",
+        "words": "수학책\n편집 노트",
+        "tag": "수학 · 문제 편집",
+        "level": "교사 · 수학 학습자료 제작",
+        "desc": "수학 문제 사진을 바탕으로 수식과 문장을 편집하고, 필요한 도형을 골라 문제지로 구성해 인쇄·PDF 저장하는 웹 도구.",
+        "cover": "",
+        "links": [
+          {
+            "label": "도구 열기 (접근 제한)",
+            "url": "https://math-book-notebook.kjeung.chatgpt.site/"
+          }
+        ],
+        "subject": "tools"
       }
     ],
     "lesson": [
