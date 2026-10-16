@@ -29,7 +29,7 @@
         "tag": "산화와 환원 · 전기화학",
         "level": "고등학교 통합과학, 화학",
         "desc": "금속의 반응성, 산화 환원 적정, 화학 전지, 전기분해, 연료 전지를 화면 속 회로판 하나로 실험합니다. 연습·평가 모드와 교사 화면이 있습니다.",
-        "cover": "assets/uploads/cover-art-redox.webp",
+        "cover": "assets/uploads/cover-watercolor-lab-redox.webp",
         "links": [
           {
             "label": "실험 열기",
@@ -52,7 +52,7 @@
             "url": "https://maehwachem.github.io/science-tools/battery/virtual.html"
           }
         ],
-        "cover": "assets/uploads/cover-art-paper-battery.webp",
+        "cover": "assets/uploads/cover-watercolor-lab-battery.webp",
         "subject": "chemistry"
       },
       {
@@ -63,7 +63,7 @@
         "tag": "산과 염기 · 중화 적정",
         "level": "중학교 과학, 고등학교 화학",
         "desc": "중학교는 지시약으로 시료의 액성을 가리고 중화 반응의 변화를 재며, 고등학교는 뷰렛으로 중화 적정해 산의 몰 농도를 구합니다. 학생 화면은 다섯 가지 언어로 볼 수 있습니다. 연습·평가 모드와 교사 화면이 있습니다.",
-        "cover": "assets/uploads/cover-art-titration.webp",
+        "cover": "assets/uploads/cover-watercolor-lab-acid-base.webp",
         "links": [
           {
             "label": "실험 열기",
@@ -97,7 +97,7 @@
         "tag": "열화학 · 반응 엔탈피",
         "level": "고등학교 물질과 에너지",
         "desc": "스타이로폼 컵 열량계로 용해 엔탈피와 중화 엔탈피를 재고, 세 반응의 ΔH로 헤스 법칙을 확인합니다. 연습·평가 모드와 교사 화면이 있습니다.",
-        "cover": "assets/uploads/cover-art-calorimetry.webp",
+        "cover": "assets/uploads/cover-watercolor-lab-thermochem.webp",
         "links": [
           {
             "label": "실험 열기",
@@ -114,7 +114,7 @@
         "tag": "반응 속도 · 촉매",
         "level": "고등학교 화학 반응의 세계",
         "desc": "기체 발생, 질량 감소, 앙금 생성 실험으로 농도·온도·촉매·표면적이 반응 속도에 주는 영향을 비교합니다. 연습·평가 모드와 교사 화면이 있습니다.",
-        "cover": "assets/uploads/cover-art-kinetics.webp",
+        "cover": "assets/uploads/cover-watercolor-lab-kinetics.webp",
         "links": [
           {
             "label": "실험 열기",
@@ -156,7 +156,7 @@
             "url": "https://maehwachem.github.io/science-tools/battery/"
           }
         ],
-        "cover": "assets/uploads/cover-art-paper-battery.webp",
+        "cover": "assets/uploads/cover-watercolor-battery-team.webp",
         "subject": "chemistry"
       },
       {
@@ -261,7 +261,7 @@
             "url": "https://github.com/maehwachem/microbit-web-visualizer"
           }
         ],
-        "cover": "assets/uploads/cover-art-microbit.webp",
+        "cover": "assets/uploads/cover-watercolor-sensor-recorder.webp",
         "subject": "tools"
       },
       {
@@ -272,7 +272,7 @@
         "tag": "마이크로비트 · 입문",
         "level": "",
         "desc": "마이크로비트를 처음 쓰는 학생과 교사를 위한 안내와 새 기기의 첫 연결 점검 자료.",
-        "cover": "assets/uploads/cover-art-microbit.webp",
+        "cover": "assets/uploads/cover-watercolor-microbit-start.webp",
         "links": [
           {
             "label": "시작 안내",
@@ -396,7 +396,7 @@
         "tag": "지구과학 · 기후",
         "level": "고등학교 통합과학, 지구과학",
         "desc": "무역풍과 표층 해수, 용승, 워커 순환을 적도 태평양 단면에서 연결해 엘니뇨와 라니냐를 비교하는 인터랙티브 자료. 무역풍 세기를 바꿔 보는 실험과 확인 문제가 있습니다.",
-        "cover": "assets/uploads/cover-art-el-nino.webp",
+        "cover": "assets/uploads/cover-watercolor-el-nino.webp",
         "links": [
           {
             "label": "자료 열기",
@@ -413,7 +413,7 @@
         "tag": "지구과학 · 기후",
         "level": "고등학교 통합과학, 지구과학",
         "desc": "위도별 에너지 불균형, 전향력, 세 순환과 바람·기압대, 사막과 열대 우림의 분포를 장면을 넘기며 살펴보는 인터랙티브 자료.",
-        "cover": "assets/uploads/cover-art-circulation.webp",
+        "cover": "assets/uploads/cover-watercolor-circulation.webp",
         "links": [
           {
             "label": "자료 열기",
@@ -431,7 +431,7 @@
         "tag": "지구과학 · 기후",
         "level": "고등학교 통합과학, 지구과학",
         "desc": "태양 복사 100의 행방을 따라 지표·대기·지구 전체의 열수지를 확인하고, 복사 평형과 비교하며 온실 효과와 지구 온난화를 살펴보는 인터랙티브 자료. 이산화 탄소·기온·북극 해빙 자료, 온실 기체와 반사율을 바꿔 보는 실험, 확인 문제가 있습니다.",
-        "cover": "assets/uploads/cover-art-heat-budget.webp",
+        "cover": "assets/uploads/cover-watercolor-heat-budget.webp",
         "links": [
           {
             "label": "자료 열기",
@@ -448,7 +448,7 @@
         "tag": "산과 염기 · 수업 슬라이드",
         "level": "고등학교 통합과학, 화학",
         "desc": "같은 부피로 섞으면 중성일까? 염산과 수산화 나트륨 수용액 속 이온을 모형으로 보고, 넣는 양을 바꿔 가며 이온 수와 액성의 변화를 따라가는 18장 수업 슬라이드. 중화열, 지시약, 산의 종류까지 다룹니다.",
-        "cover": "assets/uploads/cover-art-titration.webp",
+        "cover": "assets/uploads/cover-watercolor-neutralization.webp",
         "links": [
           {
             "label": "슬라이드 열기",
