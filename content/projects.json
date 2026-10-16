@@ -228,7 +228,7 @@
         "tag": "에너지 · 생활 속 과학",
         "level": "중학교 과학",
         "desc": "가전제품을 선택하고 배치하며 전기 사용과 비용을 생각하는 게임.",
-        "cover": "",
+        "cover": "assets/uploads/electricity-room-gameplay.webp",
         "links": [
           {
             "label": "게임 열기",

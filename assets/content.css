@@ -41,3 +41,6 @@
 #kje-portfolio .kje-game-cover .kje-poster-cap{color:#fff8df;z-index:2;text-shadow:0 1px 4px #152b33}
 #kje-portfolio .kje-game-cover .kje-poster-word{color:#fff8df;z-index:2;font-weight:600;font-size:27px;text-shadow:0 2px 8px rgba(0,0,0,.65);letter-spacing:-1px}
 @media(prefers-reduced-motion:no-preference){#kje-portfolio .kje-project:hover .kje-game-cover .kje-project-cover{transform:scale(1.045)}}
+
+/* Keep the complete floor plan visible on the electricity game cover. */
+#kje-portfolio .kje-poster-power.kje-game-cover .kje-project-cover{object-fit:contain;object-position:center;background:#63874e}
