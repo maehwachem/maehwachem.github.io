@@ -156,7 +156,7 @@
             "url": "https://maehwachem.github.io/science-tools/battery/"
           }
         ],
-        "cover": "",
+        "cover": "assets/uploads/battery-team-illustrated.webp",
         "subject": "chemistry"
       },
       {
@@ -167,7 +167,7 @@
         "tag": "산과 염기 · 조별 실험",
         "level": "고등학교 통합과학, 화학",
         "desc": "하천 오염 사고에 출동한 대응팀이 되어 시료 여섯 가지의 액성을 가리고, 산성·염기성 폐수를 섞어 중화 반응을 분석하는 조별 실험 수업.",
-        "cover": "",
+        "cover": "assets/uploads/environment-team-illustrated.webp",
         "links": [
           {
             "label": "수업 열기",
@@ -261,7 +261,7 @@
             "url": "https://github.com/maehwachem/microbit-web-visualizer"
           }
         ],
-        "cover": "",
+        "cover": "assets/uploads/sensor-recorder-illustrated.webp",
         "subject": "tools"
       },
       {
@@ -272,7 +272,7 @@
         "tag": "마이크로비트 · 입문",
         "level": "",
         "desc": "마이크로비트를 처음 쓰는 학생과 교사를 위한 안내와 새 기기의 첫 연결 점검 자료.",
-        "cover": "",
+        "cover": "assets/uploads/microbit-start-illustrated.webp",
         "links": [
           {
             "label": "시작 안내",
@@ -293,7 +293,7 @@
         "tag": "물리 · 태블릿",
         "level": "",
         "desc": "영상 속 물체의 위치를 짚어 운동을 분석하고, 실제 길이로 보정한 데이터를 CSV로 저장하는 도구.",
-        "cover": "",
+        "cover": "assets/uploads/motion-analysis-illustrated.webp",
         "links": [],
         "subject": "physics"
       },
@@ -311,7 +311,7 @@
             "url": "https://maehwachem.github.io/science-tools/ar-photo/"
           }
         ],
-        "cover": "",
+        "cover": "assets/uploads/ar-photo-illustrated.webp",
         "subject": "tools"
       },
       {
@@ -322,7 +322,7 @@
         "tag": "AR · 공간 전시",
         "level": "",
         "desc": "사진과 이름, 설명으로 전시물을 만들면 실제 공간에 전시대가 세워지고, 걸어 다니며 보는 도구. 아무것도 붙이거나 세우지 않아 훼손하면 안 되는 곳에서도 전시할 수 있고, 학생들이 만든 전시 파일을 합쳐 하나의 전시로 엮습니다.",
-        "cover": "",
+        "cover": "assets/uploads/ar-gallery-illustrated.webp",
         "links": [
           {
             "label": "전시관 열기",
@@ -347,7 +347,7 @@
         "tag": "천문 · 인쇄 자료",
         "level": "",
         "desc": "망원경 정렬을 위한 바닥 매트와 항성시 계산판, 밝은 별 18개를 담은 회전 별자리판.",
-        "cover": "",
+        "cover": "assets/uploads/star-chart-illustrated.webp",
         "links": [],
         "subject": "earth"
       },
@@ -365,7 +365,7 @@
             "url": "https://maehwachem.github.io/interview-note/"
           }
         ],
-        "cover": "",
+        "cover": "assets/uploads/interview-note-illustrated.webp",
         "subject": "tools"
       },
       {
@@ -377,7 +377,7 @@
         "tag": "수학 · 문제 편집",
         "level": "교사 · 수학 학습자료 제작",
         "desc": "수학 문제 사진을 바탕으로 수식과 문장을 편집하고, 필요한 도형을 골라 문제지로 구성해 인쇄·PDF 저장하는 웹 도구.",
-        "cover": "",
+        "cover": "assets/uploads/math-editor-illustrated.webp",
         "links": [
           {
             "label": "도구 열기 (접근 제한)",
@@ -396,7 +396,7 @@
         "tag": "지구과학 · 기후",
         "level": "고등학교 통합과학, 지구과학",
         "desc": "무역풍과 표층 해수, 용승, 워커 순환을 적도 태평양 단면에서 연결해 엘니뇨와 라니냐를 비교하는 인터랙티브 자료. 무역풍 세기를 바꿔 보는 실험과 확인 문제가 있습니다.",
-        "cover": "",
+        "cover": "assets/uploads/el-nino-illustrated.webp",
         "links": [
           {
             "label": "자료 열기",
@@ -413,7 +413,7 @@
         "tag": "지구과학 · 기후",
         "level": "고등학교 통합과학, 지구과학",
         "desc": "위도별 에너지 불균형, 전향력, 세 순환과 바람·기압대, 사막과 열대 우림의 분포를 장면을 넘기며 살펴보는 인터랙티브 자료.",
-        "cover": "",
+        "cover": "assets/uploads/circulation-illustrated.webp",
         "links": [
           {
             "label": "자료 열기",
@@ -430,7 +430,7 @@
         "tag": "산과 염기 · 수업 슬라이드",
         "level": "고등학교 통합과학, 화학",
         "desc": "같은 부피로 섞으면 중성일까? 염산과 수산화 나트륨 수용액 속 이온을 모형으로 보고, 넣는 양을 바꿔 가며 이온 수와 액성의 변화를 따라가는 18장 수업 슬라이드. 중화열, 지시약, 산의 종류까지 다룹니다.",
-        "cover": "",
+        "cover": "assets/uploads/neutralization-illustrated.webp",
         "links": [
           {
             "label": "슬라이드 열기",
@@ -447,7 +447,7 @@
         "tag": "용액과 농도 · 수업 슬라이드와 학습지",
         "level": "고등학교 화학",
         "desc": "질량이 같아도 입자 수가 다른 까닭에서 시작해 몰 농도의 정의, 질량에서 몰 농도 구하기, 용액 만들기와 묽히기까지 다루는 19장 수업 슬라이드와 짝 학습지. 학습지의 빈칸 번호는 슬라이드와 같고, 인쇄해서 쓸 수 있습니다.",
-        "cover": "",
+        "cover": "assets/uploads/molarity-illustrated.webp",
         "links": [
           {
             "label": "슬라이드 열기",

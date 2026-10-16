@@ -48,3 +48,7 @@
 /* Show the complete illustrated lab cover, including its title, at every width. */
 #kje-portfolio .kje-project .kje-poster.kje-lab-illustrated{height:auto;aspect-ratio:484/330;background:#f5eddb}
 #kje-portfolio .kje-lab-illustrated .kje-project-cover{width:100%;height:100%;object-fit:contain;object-position:center}
+
+/* Keep the complete editorial cover and its title visible, including on phones. */
+#kje-portfolio .kje-project .kje-poster.kje-editorial-illustrated{height:auto;aspect-ratio:3/2;background:#f5eddb}
+#kje-portfolio .kje-editorial-illustrated .kje-project-cover{width:100%;height:100%;object-fit:contain;object-position:center}
