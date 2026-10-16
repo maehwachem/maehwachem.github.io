@@ -48,6 +48,10 @@
         "desc": "화면 속 실험대에서 거름종이, 전극판, 집게와 다이얼을 조작하며 측정 절차를 익힙니다. 연습·평가 모드와 교사 화면이 있습니다.",
         "links": [
           {
+            "label": "수업방 열기",
+            "url": "https://battery-classroom.kjeung.chatgpt.site"
+          },
+          {
             "label": "실험 열기",
             "url": "https://maehwachem.github.io/science-tools/battery/virtual.html"
           }
