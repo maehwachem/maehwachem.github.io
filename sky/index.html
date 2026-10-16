@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f6f5ef">
+  <meta name="description" content="날짜와 관측지를 골라 낮의 태양과 달, 밤의 행성과 별자리, 해·달 출몰 시각과 월별 천문현상을 확인하는 KJE의 하늘 관측실.">
+  <meta property="og:title" content="하늘 관측실 · KJE의 작업실">
+  <meta property="og:description" content="오늘 볼 천체와 관측 시간을 한눈에. 낮 관측·밤 관측·천문력.">
+  <meta property="og:image" content="https://kjelab.kr/assets/uploads/cover-sky-observatory.webp">
+  <title>하늘 관측실 · KJE의 작업실</title>
+  <link rel="stylesheet" href="style.css?v=20261017">
+  <script src="vendor/astronomy.browser.min.js" defer></script>
+  <script src="stars.js" defer></script>
+  <script src="core.js" defer></script>
+  <script src="app.js?v=20261017" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">관측 정보로 이동</a>
+  <header class="site-header"><div class="header-inner"><a class="brand" href="/">KJE LAB <span>교육 도구 · 지구과학</span></a><a class="back-link" href="/#projects-tool">작업실로 <span aria-hidden="true">↗</span></a></div></header>
+  <main id="main" class="page">
+    <section class="intro" aria-labelledby="page-title">
+      <div><p class="eyebrow">오늘의 하늘, 낮부터 밤까지</p><h1 id="page-title">하늘 관측실</h1><p class="subtitle">오늘 볼 천체와 관측 시간을 한눈에</p></div>
+      <span class="timezone">한국 표준시 <strong>KST</strong></span>
+    </section>
+    <form id="observation-form" class="controls" aria-label="관측 날짜와 장소 설정">
+      <div class="control date-control"><label for="date">관측 날짜</label><div class="input-group"><button type="button" id="previous-day" class="icon-button" aria-label="전날">‹</button><input id="date" type="date" min="2000-01-01" max="2100-12-31" required><button type="button" id="next-day" class="icon-button" aria-label="다음 날">›</button></div></div>
+      <div class="control"><label for="location">관측지</label><select id="location"><option value="ansan">안산</option><option value="siheung">시흥</option><option value="seoul">서울</option><option value="incheon">인천</option><option value="suwon">수원</option><option value="chuncheon">춘천</option><option value="gangneung">강릉</option><option value="daejeon">대전</option><option value="sejong">세종</option><option value="cheongju">청주</option><option value="jeonju">전주</option><option value="gwangju">광주</option><option value="daegu">대구</option><option value="busan">부산</option><option value="ulsan">울산</option><option value="changwon">창원</option><option value="jeju">제주</option><option value="custom">좌표 직접 입력</option></select></div>
+      <div class="control"><label for="time">관측 시각</label><input id="time" type="time" step="60" required></div>
+      <div class="control action-control"><span class="control-label">빠르게 선택</span><div class="input-group"><button type="button" id="now">지금</button><button type="button" id="geolocate">내 위치</button></div></div>
+      <fieldset id="custom-location" class="custom-location" hidden><legend>관측지 좌표</legend><label>위도(°)<input id="latitude" type="number" min="-90" max="90" step="0.00001" value="37.3219" inputmode="decimal"></label><label>경도(°)<input id="longitude" type="number" min="-180" max="180" step="0.00001" value="126.8309" inputmode="decimal"></label><label>해발 높이(m)<input id="height" type="number" min="0" max="9000" step="1" value="0" inputmode="numeric"></label><button type="button" id="apply-location">좌표 적용</button></fieldset>
+    </form>
+    <div class="context-line"><span id="context">관측 정보를 준비하고 있어요.</span><span id="loading" role="status" aria-live="polite">계산 중</span></div>
+    <p class="error-message" id="error" role="alert" hidden></p>
+    <noscript><p class="error-message">천문 정보를 계산하려면 브라우저의 JavaScript를 켜 주세요.</p></noscript>
+    <nav class="tabs" role="tablist" aria-label="관측 정보">
+      <button type="button" id="tab-day" role="tab" aria-controls="panel-day" aria-selected="true">낮 관측</button>
+      <button type="button" id="tab-night" role="tab" aria-controls="panel-night" aria-selected="false" tabindex="-1">밤 관측</button>
+      <button type="button" id="tab-calendar" role="tab" aria-controls="panel-calendar" aria-selected="false" tabindex="-1">천문력</button>
+    </nav>
+    <section id="panel-day" role="tabpanel" aria-labelledby="tab-day" aria-busy="true">
+      <div class="hero-grid">
+        <article class="sky-panel daylight"><div class="panel-top"><span id="sun-at">선택한 시각의 태양</span><span class="small">위치 안내</span></div><div class="sun-figure" id="sun-figure" aria-hidden="true"><div class="sun-disc"></div></div><div class="hero-caption"><div><h2 id="sun-heading">태양의 위치를 확인해요</h2><p id="sun-direction">방향과 높이를 계산하고 있어요.</p></div><div class="hero-number"><small>지평선에서의 고도</small><span id="sun-altitude">—</span></div></div></article>
+        <div class="guide"><p class="section-label">낮의 관측 안내</p><h2>낮에도 관측할 수 있어요</h2><div class="guide-item"><h3>태양의 표면</h3><p>안전한 관측 장비로 흑점의 모양과 위치 변화를 살펴보세요.</p><a class="text-link" href="https://sdo.gsfc.nasa.gov/data/" target="_blank" rel="noopener noreferrer">최신 태양 영상 보기 · NASA ↗</a></div><div class="guide-item"><h3>낮에 보이는 달 <span class="mini-phase" id="day-moon-phase" aria-hidden="true"></span></h3><p id="day-moon-position">달의 위치를 계산하고 있어요.</p><div id="day-moon-window" class="observation-window"></div><p class="small">달 고도 10° 이상·태양과 30° 이상 떨어진 낮 시간. 구름과 하늘 밝기에 따라 찾기 어려울 수 있어요.</p></div></div>
+      </div>
+      <div id="day-times" class="time-grid" aria-label="해와 달의 주요 시각"></div>
+      <aside class="safety"><strong>태양 관측 전 확인</strong><p>태양을 맨눈으로 직접 보지 마세요. 망원경·쌍안경에는 기기에 맞는 <b>태양 관측용 필터를 렌즈 앞쪽에</b> 장착해야 해요. 맨눈용 일식 안경을 쓴 채 망원경이나 쌍안경을 들여다보면 안 돼요. <a href="https://science.nasa.gov/eclipses/safety/" target="_blank" rel="noopener noreferrer">NASA 안전 안내 ↗</a></p></aside>
+      <section class="eclipse-section"><div class="section-heading"><h2>다음 일식은 언제일까?</h2><span class="small">선택한 날짜 이후 · 관측지 기준</span></div><div id="solar-eclipse" class="eclipse-content"><p class="small">관측지에서 보이는 다음 일식을 찾고 있어요.</p></div></section>
+    </section>
+    <section id="panel-night" role="tabpanel" aria-labelledby="tab-night" hidden aria-busy="true">
+      <div class="hero-grid">
+        <article class="sky-panel moonlight"><div class="panel-top"><span id="moon-at">선택한 시각의 달</span><span class="small">위상도</span></div><div class="moon-figure" id="moon-figure"></div><div class="hero-caption"><div><h2 id="moon-heading">오늘의 달</h2><p id="next-phase">다음 주요 위상을 계산하고 있어요.</p></div><div class="hero-number"><small>월령</small><span id="moon-age">—</span></div></div><p class="moon-caption" id="moon-fraction"></p></article>
+        <div class="guide"><p class="section-label">밤의 관측 안내</p><h2 id="night-heading">달과 별의 위치를 살펴봐요</h2><p class="guide-copy" id="night-copy"></p><div class="guide-item"><h3>선택한 시각의 달</h3><p id="night-moon-position">달의 위치를 계산하고 있어요.</p></div><div class="guide-item"><h3>오늘의 관측 포인트</h3><p id="moon-tip"></p></div><p class="small">위상도는 북반구에서의 기본 모양이며, 실제 하늘에서 보이는 기울기는 다를 수 있어요.</p></div>
+      </div>
+      <div id="night-times" class="time-grid" aria-label="밤 관측의 주요 시각"></div>
+      <section class="planets-section"><div class="section-heading"><h2>행성은 어느 방향에 있을까?</h2><span class="small" id="planet-time"></span></div><p class="small">지평선 위에 있어도 날씨·광공해·주변 지형에 따라 보이지 않을 수 있어요.</p><table class="planet-table"><caption class="sr-only">선택한 시각의 행성 방향, 고도, 하늘 상태</caption><thead><tr><th scope="col">천체</th><th scope="col">방향</th><th scope="col">고도</th><th scope="col">위치·하늘 상태</th></tr></thead><tbody id="planets"></tbody></table><details class="outer-planets"><summary>망원경으로 찾는 행성</summary><table class="planet-table"><caption class="sr-only">천왕성과 해왕성의 위치</caption><thead><tr><th scope="col">천체</th><th scope="col">방향</th><th scope="col">고도</th><th scope="col">위치·하늘 상태</th></tr></thead><tbody id="outer-planets"></tbody></table></details></section>
+      <section class="stars-section"><div class="section-heading"><h2>밝은 별로 별자리 찾기</h2><span class="small">밝은 별 13개 중 고도 10° 이상</span></div><p id="star-note" class="small"></p><div id="stars" class="star-grid"></div></section>
+      <section class="eclipse-section"><div class="section-heading"><h2>다음 월식</h2><span class="small">선택한 날짜 이후 · 관측지 기준</span></div><div id="lunar-eclipse" class="eclipse-content"><p class="small">달이 떠 있는 시간과 겹치는 월식을 찾고 있어요.</p></div></section>
+    </section>
+    <section id="panel-calendar" role="tabpanel" aria-labelledby="tab-calendar" hidden>
+      <div class="calendar-layout"><div><div class="calendar-heading"><button id="previous-month" type="button" class="icon-button" aria-label="이전 달">‹</button><h2 id="month-heading">천문력</h2><button id="next-month" type="button" class="icon-button" aria-label="다음 달">›</button></div><div id="calendar" class="calendar-grid" aria-label="월별 천문력"></div><p class="small calendar-legend">테두리: 오늘 · 점: 주요 천문현상 · 달 모양: 해당 날짜 21시</p></div><article class="calendar-detail" id="calendar-detail" aria-live="polite"><p class="section-label" id="selected-date"></p><h3 id="selected-phase"></h3><p class="small" id="selected-moon-info"></p><div class="selected-times" id="selected-times"></div><div id="selected-events"></div><button type="button" id="open-selected-date">이 날짜 관측 보기</button></article></div>
+      <section class="month-events"><div class="section-heading"><h2>이달의 주요 천문현상</h2><a class="text-link" href="https://astro.kasi.re.kr/life/ephemeris" target="_blank" rel="noopener noreferrer">한국천문연구원 자료 ↗</a></div><div id="month-events"></div><p class="small">달 위상·근원지점·춘분·하지·추분·동지와 관측지에서 보이는 일월식을 계산합니다. 유성우는 출처를 확인한 날짜만 추가하며, 모든 천문현상을 나열한 목록은 아닙니다.</p></section>
+    </section>
+    <section id="upcoming-section" class="upcoming"><div class="section-heading"><h2>다가오는 천문현상</h2><button type="button" class="text-button" id="show-calendar">천문력 보기 →</button></div><div id="upcoming" class="event-grid"></div></section>
+    <details class="method"><summary>자료와 계산 기준</summary><div><p>시각은 모두 한국 표준시(KST)입니다. 도시 선택은 대표 좌표·해발 0m를 사용합니다. 좌표와 높이를 직접 넣어 관측지를 바꿀 수 있습니다. 선택한 관측지는 이 브라우저에만 저장됩니다.</p><p>해·달의 출몰은 표준 대기굴절을 적용한 천체 윗부분과 지평선을 기준으로 계산합니다. 산·건물·실제 대기 상태는 반영하지 않습니다. 천문박명은 태양 중심의 고도가 −18°인 때입니다. 고도 0°는 지평선, 90°는 머리 위이며, 방위각은 북 0°·동 90°·남 180°·서 270°입니다.</p><p>월령은 직전 삭부터 지난 시간입니다. 관측 화면은 선택한 시각, 달력은 해당 날짜 21시를 기준으로 합니다. 달 그림은 위상만 나타내며 달 표면·기울기·겉보기 크기를 재현한 영상이 아닙니다.</p><p>일월식은 선택한 장소의 지평선 위 관측 구간을 함께 안내합니다. 최대식 시각이 지평선 아래이면 최대 가림비율을 관측값처럼 안내하지 않습니다. 날씨는 계산에 포함하지 않습니다.</p><p>계산: <a href="https://github.com/cosinekitty/astronomy" target="_blank" rel="noopener noreferrer">Astronomy Engine 2.1.19</a> · <a href="vendor/astronomy-engine-LICENSE.txt">MIT 라이선스</a>. 공식 역서와 계산 방법 차이가 있어 시각이 다를 수 있으며, 특히 달의 근원지점 시각은 근삿값입니다.</p><p>별의 좌표·기준 V등급: <a href="https://iauarchive.eso.org/public/themes/naming_stars/" target="_blank" rel="noopener noreferrer">IAU 별 이름 목록</a>. J2000 좌표를 사용한 위치 안내이며 별의 고유운동과 실시간 변광은 반영하지 않습니다. 천문현상 대조: <a href="https://astro.kasi.re.kr/life/ephemeris" target="_blank" rel="noopener noreferrer">한국천문연구원</a>. 태양 관측 안전: <a href="https://science.nasa.gov/eclipses/safety/" target="_blank" rel="noopener noreferrer">NASA</a>.</p></div></details>
+    <footer class="page-footer"><a href="/">KJE의 작업실</a><span>만든이 KJE</span></footer>
+  </main>
+</body>
+</html>

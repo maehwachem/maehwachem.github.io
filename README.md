@@ -53,3 +53,13 @@
 - 동작 방식: 없는 경로로 들어오면 GitHub Pages가 `404.html`을 보여 주고, 이 페이지가 목록에서 첫 경로(key)를 찾아 사이트 안 주소(path)로 옮깁니다. 사이트 밖 주소로는 보내지 않습니다.
 - `param`이 있는 항목은 두 번째 경로를 값으로 붙입니다. 예: `/ar/chojigo-nature` → `/science-tools/ar-photo/exhibit.html?ex=chojigo-nature`
 - key에는 실제 폴더 이름(`admin`, `assets`, `content`, `links`)이나 다른 저장소 이름(`science-tools`, `interview-note`)을 쓰지 않습니다. 실제 경로가 먼저 열려 짧은 주소가 동작하지 않습니다.
+
+## 하늘 관측실
+
+- 주소: https://kjelab.kr/sky/
+- 파일: `sky/index.html`, `sky/style.css`, `sky/app.js`, `sky/core.js`, `sky/worker.js`
+- 낮의 태양·달, 밤의 달·행성·밝은 별, 월별 천문력을 제공합니다. 날짜·관측지·시각을 바꿀 수 있으며 모든 시각은 KST입니다.
+- Astronomy Engine 2.1.19를 `sky/vendor/`에 포함해 브라우저에서 계산합니다. API 키, 별도 서버, 빌드 과정이 필요하지 않습니다. 별의 좌표와 기준 등급은 IAU 목록을 사용합니다.
+- 출몰·위상 시각은 한국천문연구원 자료와 대조했습니다. 일월식은 선택한 장소에서 지평선 위에 있는 구간을 안내하며 날씨나 실제 시야는 반영하지 않습니다. 달의 근·원지점 시각은 근삿값입니다.
+- 유성우는 출처를 확인한 날짜만 수록합니다. 현재 2026년 10월 오리온자리 유성우를 포함하며 해마다 자동 반복하지 않습니다.
+- 검증: `node --test sky/tests/core.test.cjs`
