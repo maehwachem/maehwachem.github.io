@@ -63,7 +63,7 @@
         "tag": "산과 염기 · 중화 적정",
         "level": "중학교 과학, 고등학교 화학",
         "desc": "중학교는 지시약으로 시료의 액성을 가리고 중화 반응의 변화를 재며, 고등학교는 뷰렛으로 중화 적정해 산의 몰 농도를 구합니다. 학생 화면은 다섯 가지 언어로 볼 수 있습니다. 연습·평가 모드와 교사 화면이 있습니다.",
-        "cover": "assets/uploads/cover-watercolor-lab-acid-base.webp",
+        "cover": "assets/uploads/cover-watercolor-lab-acid-base-v2.webp",
         "links": [
           {
             "label": "실험 열기",
@@ -261,7 +261,7 @@
             "url": "https://github.com/maehwachem/microbit-web-visualizer"
           }
         ],
-        "cover": "assets/uploads/cover-watercolor-sensor-recorder.webp",
+        "cover": "assets/uploads/cover-watercolor-sensor-recorder-v2.webp",
         "subject": "tools"
       },
       {

@@ -57,3 +57,7 @@ Generation used the built-in image tool with the existing interview-note cover a
 ## Exact visual reference correction
 
 The user identified the unchanged 화학 평형 가상 실험실 cover as the visual reference: irregular chunky navy hand lettering and simple watercolor pigment areas. Earlier CSS serif headings and finely hatched illustrations did not match. Twelve covers now use full watercolor illustrations with integrated hand lettering, assets/uploads/cover-watercolor-*.webp. The original equilibrium cover was the direct style reference for each built-in generation call. Typography is no longer overlaid in HTML. No extra small explanatory captions, formulas or numerical data appear. The original equilibrium artwork, all other project data and browser translation protection remain unchanged.
+
+## Two narrowly scoped cover repairs
+
+Restored the waterproof external DS18B20 probe in the sensor-recorder cover: metal tip in water, sealed cable entry above water, dry sensor module linked to the board, wireless recording display. The actual sensor/temp.html preparation instructions were checked: 3V power, GND ground, data on P1, with a 4.7 kΩ pull-up (usually included on an adapter); the cover depicts a module rather than a pin-level wiring guide. Changed only the acid/base burette contents and falling drop to colorless; the receiving indicator flask remains pale pink. Both covers retain approved watercolor texture and lettering. All other covers and project fields are unchanged.
