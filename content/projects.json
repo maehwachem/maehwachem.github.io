@@ -12,7 +12,7 @@
         "tag": "실험 기초 · 실험도구",
         "level": "중학교 과학, 고등학교 과학탐구실험",
         "desc": "실험도구 31가지의 이름과 쓰임, 사용 순서를 그림과 동작 모션으로 익히고, 저울·피펫 조작과 실험 준비 과정을 화면에서 연습합니다.",
-        "cover": "assets/uploads/lab-intro-illustrated.webp",
+        "cover": "assets/uploads/cover-series-1-v3.webp",
         "links": [
           {
             "label": "실험 열기",
@@ -29,7 +29,7 @@
         "tag": "산화와 환원 · 전기화학",
         "level": "고등학교 통합과학, 화학",
         "desc": "금속의 반응성, 산화 환원 적정, 화학 전지, 전기분해, 연료 전지를 화면 속 회로판 하나로 실험합니다. 연습·평가 모드와 교사 화면이 있습니다.",
-        "cover": "assets/uploads/cover-watercolor-lab-redox.webp",
+        "cover": "assets/uploads/cover-series-2-v3.webp",
         "links": [
           {
             "label": "실험 열기",
@@ -52,7 +52,7 @@
             "url": "https://maehwachem.github.io/science-tools/battery/virtual.html"
           }
         ],
-        "cover": "assets/uploads/cover-watercolor-lab-battery.webp",
+        "cover": "assets/uploads/cover-series-3-v3.webp",
         "subject": "chemistry"
       },
       {
@@ -63,7 +63,7 @@
         "tag": "산과 염기 · 중화 적정",
         "level": "중학교 과학, 고등학교 화학",
         "desc": "중학교는 지시약으로 시료의 액성을 가리고 중화 반응의 변화를 재며, 고등학교는 뷰렛으로 중화 적정해 산의 몰 농도를 구합니다. 학생 화면은 다섯 가지 언어로 볼 수 있습니다. 연습·평가 모드와 교사 화면이 있습니다.",
-        "cover": "assets/uploads/cover-watercolor-lab-acid-base-v2.webp",
+        "cover": "assets/uploads/cover-series-4-v3.webp",
         "links": [
           {
             "label": "실험 열기",
@@ -80,7 +80,7 @@
         "tag": "기체 · 기체 법칙",
         "level": "고등학교 물질과 에너지",
         "desc": "보일 법칙과 샤를 법칙을 주사기·압력 센서·물중탕으로 재고, 수상 치환으로 모은 뷰테인과 수소로 분자량과 몰 부피를 구합니다. 연습·평가 모드와 교사 화면이 있습니다.",
-        "cover": "assets/uploads/lab-gas-illustrated.webp",
+        "cover": "assets/uploads/cover-series-5-v3.webp",
         "links": [
           {
             "label": "실험 열기",
@@ -97,7 +97,7 @@
         "tag": "열화학 · 반응 엔탈피",
         "level": "고등학교 물질과 에너지",
         "desc": "스타이로폼 컵 열량계로 용해 엔탈피와 중화 엔탈피를 재고, 세 반응의 ΔH로 헤스 법칙을 확인합니다. 연습·평가 모드와 교사 화면이 있습니다.",
-        "cover": "assets/uploads/cover-watercolor-lab-thermochem.webp",
+        "cover": "assets/uploads/cover-series-6-v3.webp",
         "links": [
           {
             "label": "실험 열기",
@@ -114,7 +114,7 @@
         "tag": "반응 속도 · 촉매",
         "level": "고등학교 화학 반응의 세계",
         "desc": "기체 발생, 질량 감소, 앙금 생성 실험으로 농도·온도·촉매·표면적이 반응 속도에 주는 영향을 비교합니다. 연습·평가 모드와 교사 화면이 있습니다.",
-        "cover": "assets/uploads/cover-watercolor-lab-kinetics.webp",
+        "cover": "assets/uploads/cover-series-7-v3.webp",
         "links": [
           {
             "label": "실험 열기",
@@ -156,7 +156,7 @@
             "url": "https://maehwachem.github.io/science-tools/battery/"
           }
         ],
-        "cover": "assets/uploads/cover-watercolor-battery-team.webp",
+        "cover": "assets/uploads/cover-series-8-v3.webp",
         "subject": "chemistry"
       },
       {
@@ -167,7 +167,7 @@
         "tag": "산과 염기 · 조별 실험",
         "level": "고등학교 통합과학, 화학",
         "desc": "하천 오염 사고에 출동한 대응팀이 되어 시료 여섯 가지의 액성을 가리고, 산성·염기성 폐수를 섞어 중화 반응을 분석하는 조별 실험 수업.",
-        "cover": "assets/uploads/environment-team-illustrated.webp",
+        "cover": "assets/uploads/cover-series-9-v3.webp",
         "links": [
           {
             "label": "수업 열기",
@@ -293,7 +293,7 @@
         "tag": "물리 · 태블릿",
         "level": "",
         "desc": "영상 속 물체의 위치를 짚어 운동을 분석하고, 실제 길이로 보정한 데이터를 CSV로 저장하는 도구.",
-        "cover": "assets/uploads/motion-analysis-illustrated-v2.webp",
+        "cover": "assets/uploads/cover-series-10-v3.webp",
         "links": [],
         "subject": "physics"
       },
@@ -311,7 +311,7 @@
             "url": "https://maehwachem.github.io/science-tools/ar-photo/"
           }
         ],
-        "cover": "assets/uploads/ar-photo-illustrated.webp",
+        "cover": "assets/uploads/cover-series-11-v3.webp",
         "subject": "tools"
       },
       {
@@ -322,7 +322,7 @@
         "tag": "AR · 공간 전시",
         "level": "",
         "desc": "사진과 이름, 설명으로 전시물을 만들면 실제 공간에 전시대가 세워지고, 걸어 다니며 보는 도구. 아무것도 붙이거나 세우지 않아 훼손하면 안 되는 곳에서도 전시할 수 있고, 학생들이 만든 전시 파일을 합쳐 하나의 전시로 엮습니다.",
-        "cover": "assets/uploads/ar-gallery-illustrated.webp",
+        "cover": "assets/uploads/cover-series-12-v3.webp",
         "links": [
           {
             "label": "전시관 열기",
@@ -347,7 +347,7 @@
         "tag": "천문 · 인쇄 자료",
         "level": "",
         "desc": "망원경 정렬을 위한 바닥 매트와 항성시 계산판, 밝은 별 18개를 담은 회전 별자리판.",
-        "cover": "assets/uploads/star-chart-illustrated.webp",
+        "cover": "assets/uploads/cover-series-13-v3.webp",
         "links": [],
         "subject": "earth"
       },
@@ -365,7 +365,7 @@
             "url": "https://maehwachem.github.io/interview-note/"
           }
         ],
-        "cover": "assets/uploads/interview-note-illustrated.webp",
+        "cover": "assets/uploads/cover-series-14-v3.webp",
         "subject": "tools"
       },
       {
@@ -377,7 +377,7 @@
         "tag": "수학 · 문제 편집",
         "level": "교사 · 수학 학습자료 제작",
         "desc": "수학 문제 사진을 바탕으로 수식과 문장을 편집하고, 필요한 도형을 골라 문제지로 구성해 인쇄·PDF 저장하는 웹 도구.",
-        "cover": "assets/uploads/math-editor-illustrated.webp",
+        "cover": "assets/uploads/cover-series-15-v3.webp",
         "links": [
           {
             "label": "도구 열기 (접근 제한)",
@@ -396,7 +396,7 @@
         "tag": "지구과학 · 기후",
         "level": "고등학교 통합과학, 지구과학",
         "desc": "무역풍과 표층 해수, 용승, 워커 순환을 적도 태평양 단면에서 연결해 엘니뇨와 라니냐를 비교하는 인터랙티브 자료. 무역풍 세기를 바꿔 보는 실험과 확인 문제가 있습니다.",
-        "cover": "assets/uploads/cover-watercolor-el-nino.webp",
+        "cover": "assets/uploads/cover-series-16-v3.webp",
         "links": [
           {
             "label": "자료 열기",
@@ -413,7 +413,7 @@
         "tag": "지구과학 · 기후",
         "level": "고등학교 통합과학, 지구과학",
         "desc": "위도별 에너지 불균형, 전향력, 세 순환과 바람·기압대, 사막과 열대 우림의 분포를 장면을 넘기며 살펴보는 인터랙티브 자료.",
-        "cover": "assets/uploads/cover-watercolor-circulation.webp",
+        "cover": "assets/uploads/cover-series-17-v3.webp",
         "links": [
           {
             "label": "자료 열기",
@@ -431,7 +431,7 @@
         "tag": "지구과학 · 기후",
         "level": "고등학교 통합과학, 지구과학",
         "desc": "태양 복사 100의 행방을 따라 지표·대기·지구 전체의 열수지를 확인하고, 복사 평형과 비교하며 온실 효과와 지구 온난화를 살펴보는 인터랙티브 자료. 이산화 탄소·기온·북극 해빙 자료, 온실 기체와 반사율을 바꿔 보는 실험, 확인 문제가 있습니다.",
-        "cover": "assets/uploads/cover-watercolor-heat-budget.webp",
+        "cover": "assets/uploads/cover-series-18-v3.webp",
         "links": [
           {
             "label": "자료 열기",
@@ -448,7 +448,7 @@
         "tag": "산과 염기 · 수업 슬라이드",
         "level": "고등학교 통합과학, 화학",
         "desc": "같은 부피로 섞으면 중성일까? 염산과 수산화 나트륨 수용액 속 이온을 모형으로 보고, 넣는 양을 바꿔 가며 이온 수와 액성의 변화를 따라가는 18장 수업 슬라이드. 중화열, 지시약, 산의 종류까지 다룹니다.",
-        "cover": "assets/uploads/cover-watercolor-neutralization.webp",
+        "cover": "assets/uploads/cover-series-19-v3.webp",
         "links": [
           {
             "label": "슬라이드 열기",
@@ -465,7 +465,7 @@
         "tag": "용액과 농도 · 수업 슬라이드와 학습지",
         "level": "고등학교 화학",
         "desc": "질량이 같아도 입자 수가 다른 까닭에서 시작해 몰 농도의 정의, 질량에서 몰 농도 구하기, 용액 만들기와 묽히기까지 다루는 19장 수업 슬라이드와 짝 학습지. 학습지의 빈칸 번호는 슬라이드와 같고, 인쇄해서 쓸 수 있습니다.",
-        "cover": "assets/uploads/molarity-illustrated.webp",
+        "cover": "assets/uploads/cover-series-20-v3.webp",
         "links": [
           {
             "label": "슬라이드 열기",
