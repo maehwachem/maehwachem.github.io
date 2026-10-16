@@ -424,6 +424,24 @@
       },
       {
         "kind": "lesson",
+        "title": "지구의 열수지",
+        "date": "2026-10-16",
+        "poster": "earth",
+        "words": "지구의\n열수지",
+        "tag": "지구과학 · 기후",
+        "level": "고등학교 통합과학, 지구과학",
+        "desc": "태양 복사 100의 행방을 따라 지표·대기·지구 전체의 열수지를 확인하고, 복사 평형과 비교하며 온실 효과와 지구 온난화를 살펴보는 인터랙티브 자료. 이산화 탄소·기온·북극 해빙 자료, 온실 기체와 반사율을 바꿔 보는 실험, 확인 문제가 있습니다.",
+        "cover": "assets/uploads/heat-budget-scene.webp",
+        "links": [
+          {
+            "label": "자료 열기",
+            "url": "https://maehwachem.github.io/science-tools/earth/heat-budget.html"
+          }
+        ],
+        "subject": "earth"
+      },
+      {
+        "kind": "lesson",
         "title": "산·염기 중화 반응",
         "poster": "acid",
         "words": "산·염기\n중화 반응",
