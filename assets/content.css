@@ -52,3 +52,8 @@
 /* Keep the complete editorial cover and its title visible, including on phones. */
 #kje-portfolio .kje-project .kje-poster.kje-editorial-illustrated{height:auto;aspect-ratio:3/2;background:#f5eddb}
 #kje-portfolio .kje-editorial-illustrated .kje-project-cover{width:100%;height:100%;object-fit:contain;object-position:center}
+
+/* Illustration-led covers: only the title, with no explanatory labels. */
+#kje-portfolio .kje-project .kje-poster.kje-art-cover{height:auto;aspect-ratio:3/2;container-type:inline-size;background:#f6efdd}
+#kje-portfolio .kje-art-cover .kje-project-cover{width:100%;height:100%;object-fit:contain;object-position:center}
+#kje-portfolio .kje-art-cover-title{position:absolute;z-index:2;left:7%;right:7%;top:7%;font-family:'Noto Serif KR',serif;font-weight:700;color:#17394c;font-size:clamp(17px,6cqw,29px);line-height:1.32;letter-spacing:-.6px}
