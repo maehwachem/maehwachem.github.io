@@ -24,6 +24,12 @@
       <div><p class="eyebrow">오늘의 하늘, 낮부터 밤까지</p><h1 id="page-title">하늘 관측실</h1><p class="subtitle">오늘 볼 천체와 관측 시간을 한눈에</p></div>
       <span class="timezone">한국 표준시 <strong>KST</strong></span>
     </section>
+    <nav class="tabs" role="tablist" aria-label="관측 정보">
+      <button type="button" id="tab-day" role="tab" aria-controls="panel-day" aria-selected="true">낮 관측</button>
+      <button type="button" id="tab-night" role="tab" aria-controls="panel-night" aria-selected="false" tabindex="-1">밤 관측</button>
+      <button type="button" id="tab-calendar" role="tab" aria-controls="panel-calendar" aria-selected="false" tabindex="-1">천문력</button>
+      <button type="button" id="tab-telescope" role="tab" aria-controls="panel-telescope" aria-selected="false" tabindex="-1">망원경 사용법</button>
+    </nav>
     <form id="observation-form" class="controls" aria-label="관측 날짜와 장소 설정">
       <div class="control date-control"><label for="date">관측 날짜</label><div class="input-group"><button type="button" id="previous-day" class="icon-button" aria-label="전날">‹</button><input id="date" type="date" min="2000-01-01" max="2100-12-31" required><button type="button" id="next-day" class="icon-button" aria-label="다음 날">›</button></div></div>
       <div class="control"><label for="location">관측지</label><select id="location"><option value="ansan">안산</option><option value="siheung">시흥</option><option value="seoul">서울</option><option value="incheon">인천</option><option value="suwon">수원</option><option value="chuncheon">춘천</option><option value="gangneung">강릉</option><option value="daejeon">대전</option><option value="sejong">세종</option><option value="cheongju">청주</option><option value="jeonju">전주</option><option value="gwangju">광주</option><option value="daegu">대구</option><option value="busan">부산</option><option value="ulsan">울산</option><option value="changwon">창원</option><option value="jeju">제주</option><option value="custom">좌표 직접 입력</option></select></div>
@@ -34,12 +40,6 @@
     <div class="context-line" id="observation-context"><span id="context">관측 정보를 준비하고 있어요.</span><span id="loading" role="status" aria-live="polite">계산 중</span></div>
     <p class="error-message" id="error" role="alert" hidden></p>
     <noscript><p class="error-message">천문 정보를 계산하려면 브라우저의 JavaScript를 켜 주세요.</p></noscript>
-    <nav class="tabs" role="tablist" aria-label="관측 정보">
-      <button type="button" id="tab-day" role="tab" aria-controls="panel-day" aria-selected="true">낮 관측</button>
-      <button type="button" id="tab-night" role="tab" aria-controls="panel-night" aria-selected="false" tabindex="-1">밤 관측</button>
-      <button type="button" id="tab-calendar" role="tab" aria-controls="panel-calendar" aria-selected="false" tabindex="-1">천문력</button>
-      <button type="button" id="tab-telescope" role="tab" aria-controls="panel-telescope" aria-selected="false" tabindex="-1">망원경 사용법</button>
-    </nav>
     <section id="panel-day" role="tabpanel" aria-labelledby="tab-day" aria-busy="true">
       <div class="hero-grid">
         <article class="sky-panel daylight"><div class="panel-top"><span id="sun-at">선택한 시각의 태양</span><span class="small">위치 안내</span></div><div class="sun-figure" id="sun-figure" aria-hidden="true"><div class="sun-disc"></div></div><div class="hero-caption"><div><h2 id="sun-heading">태양의 위치를 확인해요</h2><p id="sun-direction">방향과 높이를 계산하고 있어요.</p></div><div class="hero-number"><small>지평선에서의 고도</small><span id="sun-altitude">—</span></div></div></article>
