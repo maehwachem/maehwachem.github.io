@@ -49,7 +49,7 @@
         "links": [
           {
             "label": "수업방 열기",
-            "url": "https://battery-classroom.kjeung.chatgpt.site"
+            "url": "https://battery-classroom.kjeung.chatgpt.site/virtual"
           },
           {
             "label": "실험 열기",
@@ -156,7 +156,11 @@
         "desc": "라벨이 섞인 전극판을 전압으로 식별하고, 실험 기록을 근거로 판정해 성적서를 쓰는 조별 실험 수업. 결석생은 개별로 할 수 있고, 교사는 서술 답안에 클릭으로 피드백을 보냅니다.",
         "links": [
           {
-            "label": "수업 열기",
+            "label": "수업방 열기",
+            "url": "https://battery-classroom.kjeung.chatgpt.site/real"
+          },
+          {
+            "label": "실험 열기",
             "url": "https://maehwachem.github.io/science-tools/battery/"
           }
         ],
