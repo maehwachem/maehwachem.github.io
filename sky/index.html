@@ -9,11 +9,12 @@
   <meta property="og:description" content="오늘 볼 천체와 관측 시간을 한눈에. 낮 관측·밤 관측·천문력.">
   <meta property="og:image" content="https://kjelab.kr/assets/uploads/cover-sky-observatory.webp">
   <title>하늘 관측실 · KJE의 작업실</title>
-  <link rel="stylesheet" href="style.css?v=20261017">
+  <link rel="stylesheet" href="style.css?v=20261017-telescope">
   <script src="vendor/astronomy.browser.min.js" defer></script>
   <script src="stars.js" defer></script>
   <script src="core.js" defer></script>
-  <script src="app.js?v=20261017" defer></script>
+  <script src="app.js?v=20261017-telescope" defer></script>
+  <script src="telescope.js?v=20261017" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">관측 정보로 이동</a>
@@ -30,13 +31,14 @@
       <div class="control action-control"><span class="control-label">빠르게 선택</span><div class="input-group"><button type="button" id="now">지금</button><button type="button" id="geolocate">내 위치</button></div></div>
       <fieldset id="custom-location" class="custom-location" hidden><legend>관측지 좌표</legend><label>위도(°)<input id="latitude" type="number" min="-90" max="90" step="0.00001" value="37.3219" inputmode="decimal"></label><label>경도(°)<input id="longitude" type="number" min="-180" max="180" step="0.00001" value="126.8309" inputmode="decimal"></label><label>해발 높이(m)<input id="height" type="number" min="0" max="9000" step="1" value="0" inputmode="numeric"></label><button type="button" id="apply-location">좌표 적용</button></fieldset>
     </form>
-    <div class="context-line"><span id="context">관측 정보를 준비하고 있어요.</span><span id="loading" role="status" aria-live="polite">계산 중</span></div>
+    <div class="context-line" id="observation-context"><span id="context">관측 정보를 준비하고 있어요.</span><span id="loading" role="status" aria-live="polite">계산 중</span></div>
     <p class="error-message" id="error" role="alert" hidden></p>
     <noscript><p class="error-message">천문 정보를 계산하려면 브라우저의 JavaScript를 켜 주세요.</p></noscript>
     <nav class="tabs" role="tablist" aria-label="관측 정보">
       <button type="button" id="tab-day" role="tab" aria-controls="panel-day" aria-selected="true">낮 관측</button>
       <button type="button" id="tab-night" role="tab" aria-controls="panel-night" aria-selected="false" tabindex="-1">밤 관측</button>
       <button type="button" id="tab-calendar" role="tab" aria-controls="panel-calendar" aria-selected="false" tabindex="-1">천문력</button>
+      <button type="button" id="tab-telescope" role="tab" aria-controls="panel-telescope" aria-selected="false" tabindex="-1">망원경 사용법</button>
     </nav>
     <section id="panel-day" role="tabpanel" aria-labelledby="tab-day" aria-busy="true">
       <div class="hero-grid">
@@ -53,6 +55,7 @@
         <div class="guide"><p class="section-label">밤의 관측 안내</p><h2 id="night-heading">달과 별의 위치를 살펴봐요</h2><p class="guide-copy" id="night-copy"></p><div class="guide-item"><h3>선택한 시각의 달</h3><p id="night-moon-position">달의 위치를 계산하고 있어요.</p></div><div class="guide-item"><h3>오늘의 관측 포인트</h3><p id="moon-tip"></p></div><p class="small">위상도는 북반구에서의 기본 모양이며, 실제 하늘에서 보이는 기울기는 다를 수 있어요.</p></div>
       </div>
       <div id="night-times" class="time-grid" aria-label="밤 관측의 주요 시각"></div>
+      <p class="scope-entry"><button type="button" class="text-button" data-view="telescope">망원경이 처음이라면 · 사용법 보기 →</button></p>
       <section class="planets-section"><div class="section-heading"><h2>행성은 어느 방향에 있을까?</h2><span class="small" id="planet-time"></span></div><p class="small">지평선 위에 있어도 날씨·광공해·주변 지형에 따라 보이지 않을 수 있어요.</p><table class="planet-table"><caption class="sr-only">선택한 시각의 행성 방향, 고도, 하늘 상태</caption><thead><tr><th scope="col">천체</th><th scope="col">방향</th><th scope="col">고도</th><th scope="col">위치·하늘 상태</th></tr></thead><tbody id="planets"></tbody></table><details class="outer-planets"><summary>망원경으로 찾는 행성</summary><table class="planet-table"><caption class="sr-only">천왕성과 해왕성의 위치</caption><thead><tr><th scope="col">천체</th><th scope="col">방향</th><th scope="col">고도</th><th scope="col">위치·하늘 상태</th></tr></thead><tbody id="outer-planets"></tbody></table></details></section>
       <section class="stars-section"><div class="section-heading"><h2>밝은 별로 별자리 찾기</h2><span class="small">밝은 별 13개 중 고도 10° 이상</span></div><p id="star-note" class="small"></p><div id="stars" class="star-grid"></div></section>
       <section class="eclipse-section"><div class="section-heading"><h2>다음 월식</h2><span class="small">선택한 날짜 이후 · 관측지 기준</span></div><div id="lunar-eclipse" class="eclipse-content"><p class="small">달이 떠 있는 시간과 겹치는 월식을 찾고 있어요.</p></div></section>
@@ -61,8 +64,87 @@
       <div class="calendar-layout"><div><div class="calendar-heading"><button id="previous-month" type="button" class="icon-button" aria-label="이전 달">‹</button><h2 id="month-heading">천문력</h2><button id="next-month" type="button" class="icon-button" aria-label="다음 달">›</button></div><div id="calendar" class="calendar-grid" aria-label="월별 천문력"></div><p class="small calendar-legend">테두리: 오늘 · 점: 주요 천문현상 · 달 모양: 해당 날짜 21시</p></div><article class="calendar-detail" id="calendar-detail" aria-live="polite"><p class="section-label" id="selected-date"></p><h3 id="selected-phase"></h3><p class="small" id="selected-moon-info"></p><div class="selected-times" id="selected-times"></div><div id="selected-events"></div><button type="button" id="open-selected-date">이 날짜 관측 보기</button></article></div>
       <section class="month-events"><div class="section-heading"><h2>이달의 주요 천문현상</h2><a class="text-link" href="https://astro.kasi.re.kr/life/ephemeris" target="_blank" rel="noopener noreferrer">한국천문연구원 자료 ↗</a></div><div id="month-events"></div><p class="small">달 위상·근원지점·춘분·하지·추분·동지와 관측지에서 보이는 일월식을 계산합니다. 유성우는 출처를 확인한 날짜만 추가하며, 모든 천문현상을 나열한 목록은 아닙니다.</p></section>
     </section>
+    <section id="panel-telescope" class="scope-guide" role="tabpanel" aria-labelledby="tab-telescope" hidden>
+      <div class="scope-intro"><p class="section-label">망원경을 처음 꺼냈다면</p><h2>낮에 준비하고, 달부터 찾아보세요</h2><p>부품 이름을 익힌 뒤 낮은 배율로 찾고 초점을 맞춰 보세요. 잠금장치와 조립 순서는 기종마다 다르므로 가지고 있는 망원경의 설명서를 함께 확인하세요.</p></div>
+      <aside class="safety scope-first-safety"><strong>낮에 연습할 때도 태양을 향하지 않아요</strong><p>태양은 맨눈이나 일반 망원경으로 직접 보면 위험해요. 파인더 정렬은 태양과 떨어진 방향의 지상 표적으로 연습하세요. <a href="#scope-solar">태양 관측 안전 확인 ↓</a></p></aside>
+      <nav class="scope-jumps" aria-label="사용법 바로가기"><a href="#scope-start">첫 관측 순서</a><a href="#scope-eyepieces">배율 계산</a><a href="#scope-mounts">가대별 조작</a><a href="#scope-trouble">잘 안 보일 때</a></nav>
+
+      <section class="scope-section" aria-labelledby="scope-parts-title">
+        <div class="section-heading"><h3 id="scope-parts-title">먼저, 이 다섯 곳을 찾아보세요</h3><span class="small">굴절망원경과 경위대 예시</span></div>
+        <div class="scope-parts">
+          <figure class="scope-figure">
+            <svg viewBox="0 0 560 300" role="img" aria-labelledby="scope-diagram-title scope-diagram-desc">
+              <title id="scope-diagram-title">망원경의 주요 부분</title><desc id="scope-diagram-desc">왼쪽 앞 렌즈와 경통이 1번, 경통 위 작은 파인더가 2번, 오른쪽 위 접안렌즈가 3번, 접안부 아래 초점 조절 손잡이가 4번, 아래의 가대와 삼각대가 5번입니다.</desc>
+              <g class="scope-diagram-frame" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+                <path d="M274 149V185M274 185V218M274 218L195 282M274 218L356 282M274 218V286" fill="none"/>
+                <path d="M223 260H327" fill="none"/><rect x="250" y="177" width="48" height="37" rx="8" class="scope-diagram-metal"/>
+                <rect x="110" y="96" width="260" height="55" rx="14" class="scope-diagram-body"/><path d="M241 96V151M264 96V151" fill="none"/>
+                <rect x="93" y="88" width="44" height="71" rx="6" class="scope-diagram-body"/><ellipse cx="95" cy="124" rx="10" ry="32" class="scope-diagram-glass"/>
+                <path d="M273 96V73M313 96V73" fill="none"/><rect x="249" y="57" width="88" height="24" rx="5" class="scope-diagram-metal"/><ellipse cx="249" cy="69" rx="5" ry="12" class="scope-diagram-glass"/>
+                <path d="M371 115H415V88H433V137H371Z" class="scope-diagram-metal"/><rect x="409" y="61" width="31" height="32" rx="4" class="scope-diagram-body"/>
+                <circle cx="371" cy="149" r="12" class="scope-diagram-metal"/><path d="M374 149H391" fill="none"/>
+              </g>
+              <g class="scope-diagram-callout" fill="none" stroke-width="2"><path d="M74 66L100 90M317 32L305 57M473 43L439 65M461 177L383 149M378 237L301 199"/></g>
+              <g class="scope-diagram-number"><circle cx="64" cy="48" r="20"/><circle cx="327" cy="23" r="20"/><circle cx="484" cy="31" r="20"/><circle cx="480" cy="183" r="20"/><circle cx="399" cy="245" r="20"/>
+                <text x="64" y="55">1</text><text x="327" y="30">2</text><text x="484" y="38">3</text><text x="480" y="190">4</text><text x="399" y="252">5</text>
+              </g>
+            </svg>
+            <figcaption>반사망원경은 접안부가 경통 옆에 있을 수 있어요. 실제 부품의 위치는 기종에 따라 달라요.</figcaption>
+          </figure>
+          <dl class="scope-part-list"><div><dt><span>1</span>경통과 렌즈·거울</dt><dd>빛을 모으는 본체예요. 앞쪽 구경은 빛을 받는 부분의 지름이에요.</dd></div><div><dt><span>2</span>파인더</dt><dd>목표를 먼저 찾는 작은 망원경 또는 점 조준기예요.</dd></div><div><dt><span>3</span>접안렌즈</dt><dd>눈을 대고 보는 렌즈예요. 바꾸면 배율이 달라져요.</dd></div><div><dt><span>4</span>초점 조절 손잡이</dt><dd>상이 가장 또렷해지는 위치를 찾을 때 돌려요.</dd></div><div><dt><span>5</span>가대와 삼각대</dt><dd>망원경을 받치고, 방향과 높이를 움직이게 해 줘요.</dd></div></dl>
+        </div>
+      </section>
+
+      <section id="scope-start" class="scope-section" aria-labelledby="scope-start-title">
+        <div class="section-heading"><h3 id="scope-start-title">첫 관측, 이 순서로 해 보세요</h3><span class="small">설치 → 파인더 정렬 → 달 찾기 → 초점 → 배율</span></div>
+        <ol class="scope-steps">
+          <li><h4>흔들리지 않게 설치하기</h4><p>단단하고 평평한 바닥에서 다리를 충분히 벌리고 잠가요. 기종 설명서 순서대로 조립하고, 경통을 손으로 받친 채 고정 상태를 확인하세요. 창문 너머보다 실외에서 관측하는 편이 좋아요.</p><p class="small">적도의는 균형과 극축 정렬이 필요해요. <a href="#scope-mounts">내 가대의 준비 방법 ↓</a></p></li>
+          <li><h4>긴 초점거리의 접안렌즈 끼우기</h4><p>25 mm와 10 mm가 있다면 <b>25 mm부터</b> 사용해요. 배율이 낮아 처음 목표를 찾기 수월해요. 접안렌즈를 고정하고, 첫 연습에서는 바로우렌즈를 빼 두세요.</p></li>
+          <li><h4>낮에 파인더와 본망원경 맞추기</h4><p>태양과 떨어진 방향에서 멀리 있는 안테나 끝처럼 작은 고정 표적을 골라요.</p><div class="scope-finder-order"><p><b>먼저 본망원경</b>으로 표적을 찾아 초점을 맞추고 시야 한가운데 놓아요.</p><p><b>경통을 움직이지 않고</b> 파인더의 조절 나사로 십자선이나 붉은 점을 같은 표적에 맞춰요.</p><p><b>다른 먼 표적</b>으로도 확인해요. 이동 후에는 정렬이 틀어지지 않았는지 다시 살펴보세요.</p></div></li>
+          <li><h4>밤에는 파인더로 달 찾기</h4><p>‘밤 관측’에서 달이 떠 있는 방향과 고도를 확인해요. 파인더 중앙에 달을 넣은 뒤 본망원경을 보고, 천천히 움직여 시야 가운데에 놓아요. 파인더의 점이나 십자선이 달 전체를 가리면 가장자리를 기준으로 찾아도 좋아요.</p><button type="button" class="text-button" data-view="night">달의 위치 확인하기 →</button></li>
+          <li><h4>가장 또렷한 초점 찾기</h4><p>접안렌즈에서 눈의 거리를 조금씩 바꿔 원형 시야를 확보해요. 초점 손잡이를 천천히 돌려 달 가장자리나 분화구가 가장 선명한 지점을 찾아요. 지나치면 반대로 조금 되돌리세요. 손잡이가 끝에 닿으면 억지로 돌리지 않아요.</p></li>
+          <li><h4>중앙에 놓은 뒤, 필요하면 확대하기</h4><p>상이 선명하면 더 짧은 초점거리의 접안렌즈로 바꾸고 초점을 다시 맞춰요. 흐려지거나 흔들림만 커지면 낮은 배율로 돌아가세요. 천체가 시야 밖으로 움직이면 가대의 조절부로 조금씩 따라가요.</p></li>
+        </ol>
+      </section>
+
+      <section id="scope-eyepieces" class="scope-section" aria-labelledby="scope-eyepieces-title">
+        <div class="section-heading"><h3 id="scope-eyepieces-title">내 접안렌즈는 몇 배일까?</h3></div>
+        <div class="scope-calculator"><div><p class="scope-formula">배율 = 망원경 초점거리 ÷ 접안렌즈 초점거리</p><p class="small">경통에 적힌 F 또는 focal length를 확인하세요. 렌즈의 지름인 구경(D)과는 달라요. 아래 숫자는 계산 예시예요.</p>
+          <form id="scope-power-form" class="scope-power-inputs"><label for="scope-focal">망원경 초점거리(mm)<input id="scope-focal" type="number" min="0.1" step="any" value="900" inputmode="decimal" required></label><label for="scope-eyepiece">접안렌즈 초점거리(mm)<input id="scope-eyepiece" type="number" min="0.1" step="any" value="25" inputmode="decimal" required></label><label for="scope-barlow">바로우렌즈<select id="scope-barlow"><option value="1">사용 안 함</option><option value="2">2× 바로우</option><option value="3">3× 바로우</option></select></label></form>
+          <div class="scope-presets"><span>접안렌즈 바꿔 보기</span><button type="button" data-eyepiece="25">25 mm</button><button type="button" data-eyepiece="10">10 mm</button><button type="button" data-eyepiece="5">5 mm</button></div>
+        </div><div class="scope-power-result" aria-live="polite" aria-atomic="true"><span>계산 배율</span><output id="scope-power" for="scope-focal scope-eyepiece scope-barlow">36배</output><p id="scope-power-detail">900 ÷ 25 = 36</p></div></div>
+        <p class="small">같은 망원경에서는 접안렌즈의 숫자(mm)가 작을수록 배율이 커져요. 바로우 배율은 표시값을 사용한 근사 계산입니다. 계산된 배율이 실제로 선명하게 보이는 배율을 보장하지는 않아요. 구경·대기 상태·장비 상태에 따라 달라집니다.</p>
+      </section>
+
+      <section id="scope-mounts" class="scope-section" aria-labelledby="scope-mounts-title">
+        <div class="section-heading"><h3 id="scope-mounts-title">가대에 따라 움직이는 방법이 달라요</h3></div>
+        <div class="scope-mount-grid">
+          <article class="scope-mount"><p class="section-label">경위대 · AZ</p><h4>위아래, 좌우로 움직여요</h4><p>고도는 위아래, 방위각은 좌우 움직임이에요. 잠금·마찰 조절 장치를 설명서에 맞게 조절하고, 경통을 받치며 움직이세요. 미동 손잡이가 있으면 마지막 위치를 조금씩 맞춰요.</p><p>시간이 지나 천체가 움직이면 <b>두 방향을 조금씩 조절</b>해 따라가요.</p></article>
+          <article class="scope-mount"><p class="section-label">돕소니언</p><h4>경위대 방식으로 가볍게 밀어요</h4><p>대개 경통을 위아래로 기울이고 받침대를 좌우로 돌려요. 바닥이 안정적인지 확인한 뒤 손잡이나 경통을 부드럽게 움직이세요.</p><p>일반 수동형은 <b>손으로 조금씩 따라가며</b> 관측해요. 자동 추적형은 기종 안내를 따르세요.</p></article>
+          <article class="scope-mount"><p class="section-label">적도의 · EQ</p><h4>극축을 맞춘 뒤 두 축으로 찾아요</h4><p>설명서에 따라 경통과 무게추의 균형을 맞춰요. 축 잠금을 풀 때는 경통과 추를 받쳐 갑자기 돌아가지 않게 하세요.</p><p><b>한국에서는</b> 극축을 진북의 하늘 북극 쪽으로 향하게 하고 높이를 관측지 위도에 맞춰요. 안산은 약 37.3°예요. 북극성은 하늘 북극과 정확히 같은 위치가 아니므로 정밀 정렬은 극축망원경·기종 안내를 따르세요.</p><p>천체는 적경(RA)·적위(DEC) 축으로 찾아요. 극축 정렬이 잘되면 별을 따라갈 때 주로 적경축을 조절하며, 달·행성은 추가 보정이 필요할 수 있어요.</p></article>
+        </div>
+        <aside class="scope-note"><h4>자동 도입(GoTo)은 별도의 기능이에요</h4><p>경위대와 적도의 모두 자동 도입형이 있어요. 날짜·시간·위치와 기종에 맞는 별 정렬을 먼저 확인하세요. 자동으로 움직이는 동안 경통·케이블이 삼각대에 걸리지 않는지 살피고, 모터가 잠긴 상태에서 억지로 밀지 않아요. 적도의의 극축 정렬과 GoTo의 별 정렬은 역할이 달라요.</p></aside>
+      </section>
+
+      <section id="scope-trouble" class="scope-section" aria-labelledby="scope-trouble-title">
+        <div class="section-heading"><h3 id="scope-trouble-title">잘 안 보일 때</h3></div>
+        <div class="scope-faq">
+          <details><summary>파인더에는 보이는데 본망원경에는 안 보여요</summary><p>낮은 배율의 접안렌즈로 바꾸고 덮개가 열려 있는지 확인해요. 그래도 없다면 파인더 정렬을 다시 확인하세요. 이미 배율을 높였다면 목표가 좁은 시야 밖으로 나갔을 수 있어요.</p></details>
+          <details><summary>달이 흐리고 초점이 잘 안 맞아요</summary><p>낮은 배율에서 달 가장자리를 보며 초점을 천천히 바꿔요. 창문을 통하지 않고 관측하며, 실내에서 꺼낸 망원경은 바깥 온도에 적응할 시간을 주세요. 결로나 구름, 지평선 근처의 흔들리는 공기도 확인하세요. 상이 일렁이면 배율을 낮추는 편이 좋아요.</p></details>
+          <details><summary>별이 커다란 원이나 고리처럼 보여요</summary><p>밝은 별 하나를 골라 초점을 조절해 가장 작은 점으로 모이게 해 보세요. 크게 퍼진 원이나 고리는 초점이 맞지 않았을 때 생길 수 있어요. 초점을 맞춘 뒤에도 비대칭으로 퍼지면 기종 설명서의 광축 점검 방법을 확인하세요.</p></details>
+          <details><summary>상이 거꾸로 보이거나, 좌우가 바뀌었어요</summary><p>광학 방식과 천정미러·프리즘 구성에 따라 생기는 정상적인 모습일 수 있어요. 고장으로 단정하지 말고, 낮의 지상 표적으로 방향이 어떻게 바뀌는지 익혀 두세요.</p></details>
+          <details><summary>달이 자꾸 시야 밖으로 나가요</summary><p>지구의 자전 때문에 천체가 하늘에서 이동해 보여요. 높은 배율일수록 움직임이 더 눈에 띄어요. 낮은 배율로 돌아가 중앙에 놓고, 가대에 맞는 조절부로 조금씩 따라가세요.</p></details>
+          <details><summary>접안렌즈 주변이 검게 가려져요</summary><p>눈을 너무 가까이 대거나 멀리 떼면 시야가 가려질 수 있어요. 고개를 천천히 앞뒤로 움직여 가장 넓게 보이는 거리를 찾아요. 눈으로 망원경을 누르거나 붙잡지 않아요.</p></details>
+        </div>
+      </section>
+
+      <section id="scope-solar" class="scope-section scope-solar" aria-labelledby="scope-solar-title"><h3 id="scope-solar-title">태양 관측은 별도로 준비하세요</h3><p>처음이라면 숙련된 지도자와 함께 장비부터 확인하세요. 태양 관측 전용 망원경은 해당 기기의 설명서를 따라야 해요.</p><ul><li>일반 망원경에는 기기에 맞는 <b>태양 관측 전용 필터를 빛이 들어오는 맨 앞쪽에</b> 단단히 고정해야 해요. 손상·틈·이탈 가능성을 관측 전에 확인하세요.</li><li><b>일식 안경을 쓴 채 망원경이나 쌍안경을 들여다보면 안 돼요.</b> 선글라스·일반 감광 필터도 대용품이 아니에요.</li><li>일반 광학 파인더로 태양을 찾지 마세요. 파인더는 분리하거나 덮개를 단단히 고정해 사용하지 못하게 해요.</li><li>안전 장비가 준비되지 않았다면 <a href="https://sdo.gsfc.nasa.gov/data/" target="_blank" rel="noopener noreferrer">NASA 태양 영상</a>으로 관찰하세요.</li></ul><a class="text-link" href="https://science.nasa.gov/eclipses/safety/" target="_blank" rel="noopener noreferrer">NASA 태양 관측 안전 안내 ↗</a></section>
+
+      <aside class="scope-note"><h4>관측을 마친 뒤</h4><p>파인더와 전원을 끄고 접안렌즈를 챙겨요. 결로가 있다면 통풍되는 곳에서 충분히 말린 뒤 덮개를 씌워 건조하게 보관하세요. 렌즈·거울을 손으로 만지거나 옷소매로 닦지 말고, 청소는 기종 안내를 따르세요.</p></aside>
+      <details class="scope-sources"><summary>참고한 공식 사용 안내</summary><p>기종 공통의 입문 안내입니다. 조립·균형·잠금·정렬의 세부 절차는 사용 중인 모델의 설명서를 우선하세요.</p><ul><li><a href="https://www.celestron.com/blogs/knowledgebase/aligning-your-celestron-finderscope-a-step-by-step-guide" target="_blank" rel="noopener noreferrer">Celestron · 파인더 정렬</a></li><li><a href="https://www.celestron.com/blogs/knowledgebase/how-do-i-use-my-telescope-eyepieces" target="_blank" rel="noopener noreferrer">Celestron · 접안렌즈와 초점 조절</a></li><li><a href="https://www.celestron.com/blogs/knowledgebase/what-is-magnification-power-as-it-pertains-to-telescopes" target="_blank" rel="noopener noreferrer">Celestron · 배율 계산</a></li><li><a href="https://www.celestron.com/blogs/knowledgebase/why-is-my-telescope-showing-everything-upside-down-is-there-something-wrong-with-it" target="_blank" rel="noopener noreferrer">Celestron · 상의 방향</a></li><li><a href="https://www.celestron.com/pages/skyalign-technology" target="_blank" rel="noopener noreferrer">Celestron · 자동 도입 전 별 정렬 예시</a></li><li><a href="https://skywatcher.com/download/manual/manual-operated-telescope/" target="_blank" rel="noopener noreferrer">Sky-Watcher · 경위대·적도의·돕소니언 설명서</a></li><li><a href="https://science.nasa.gov/eclipses/safety/" target="_blank" rel="noopener noreferrer">NASA · 태양 관측 안전</a></li></ul></details>
+    </section>
     <section id="upcoming-section" class="upcoming"><div class="section-heading"><h2>다가오는 천문현상</h2><button type="button" class="text-button" id="show-calendar">천문력 보기 →</button></div><div id="upcoming" class="event-grid"></div></section>
-    <details class="method"><summary>자료와 계산 기준</summary><div><p>시각은 모두 한국 표준시(KST)입니다. 도시 선택은 대표 좌표·해발 0m를 사용합니다. 좌표와 높이를 직접 넣어 관측지를 바꿀 수 있습니다. 선택한 관측지는 이 브라우저에만 저장됩니다.</p><p>해·달의 출몰은 표준 대기굴절을 적용한 천체 윗부분과 지평선을 기준으로 계산합니다. 산·건물·실제 대기 상태는 반영하지 않습니다. 천문박명은 태양 중심의 고도가 −18°인 때입니다. 고도 0°는 지평선, 90°는 머리 위이며, 방위각은 북 0°·동 90°·남 180°·서 270°입니다.</p><p>월령은 직전 삭부터 지난 시간입니다. 관측 화면은 선택한 시각, 달력은 해당 날짜 21시를 기준으로 합니다. 달 그림은 위상만 나타내며 달 표면·기울기·겉보기 크기를 재현한 영상이 아닙니다.</p><p>일월식은 선택한 장소의 지평선 위 관측 구간을 함께 안내합니다. 최대식 시각이 지평선 아래이면 최대 가림비율을 관측값처럼 안내하지 않습니다. 날씨는 계산에 포함하지 않습니다.</p><p>계산: <a href="https://github.com/cosinekitty/astronomy" target="_blank" rel="noopener noreferrer">Astronomy Engine 2.1.19</a> · <a href="vendor/astronomy-engine-LICENSE.txt">MIT 라이선스</a>. 공식 역서와 계산 방법 차이가 있어 시각이 다를 수 있으며, 특히 달의 근원지점 시각은 근삿값입니다.</p><p>별의 좌표·기준 V등급: <a href="https://iauarchive.eso.org/public/themes/naming_stars/" target="_blank" rel="noopener noreferrer">IAU 별 이름 목록</a>. J2000 좌표를 사용한 위치 안내이며 별의 고유운동과 실시간 변광은 반영하지 않습니다. 천문현상 대조: <a href="https://astro.kasi.re.kr/life/ephemeris" target="_blank" rel="noopener noreferrer">한국천문연구원</a>. 태양 관측 안전: <a href="https://science.nasa.gov/eclipses/safety/" target="_blank" rel="noopener noreferrer">NASA</a>.</p></div></details>
+    <details class="method" id="calculation-method"><summary>자료와 계산 기준</summary><div><p>시각은 모두 한국 표준시(KST)입니다. 도시 선택은 대표 좌표·해발 0m를 사용합니다. 좌표와 높이를 직접 넣어 관측지를 바꿀 수 있습니다. 선택한 관측지는 이 브라우저에만 저장됩니다.</p><p>해·달의 출몰은 표준 대기굴절을 적용한 천체 윗부분과 지평선을 기준으로 계산합니다. 산·건물·실제 대기 상태는 반영하지 않습니다. 천문박명은 태양 중심의 고도가 −18°인 때입니다. 고도 0°는 지평선, 90°는 머리 위이며, 방위각은 북 0°·동 90°·남 180°·서 270°입니다.</p><p>월령은 직전 삭부터 지난 시간입니다. 관측 화면은 선택한 시각, 달력은 해당 날짜 21시를 기준으로 합니다. 달 그림은 위상만 나타내며 달 표면·기울기·겉보기 크기를 재현한 영상이 아닙니다.</p><p>일월식은 선택한 장소의 지평선 위 관측 구간을 함께 안내합니다. 최대식 시각이 지평선 아래이면 최대 가림비율을 관측값처럼 안내하지 않습니다. 날씨는 계산에 포함하지 않습니다.</p><p>계산: <a href="https://github.com/cosinekitty/astronomy" target="_blank" rel="noopener noreferrer">Astronomy Engine 2.1.19</a> · <a href="vendor/astronomy-engine-LICENSE.txt">MIT 라이선스</a>. 공식 역서와 계산 방법 차이가 있어 시각이 다를 수 있으며, 특히 달의 근원지점 시각은 근삿값입니다.</p><p>별의 좌표·기준 V등급: <a href="https://iauarchive.eso.org/public/themes/naming_stars/" target="_blank" rel="noopener noreferrer">IAU 별 이름 목록</a>. J2000 좌표를 사용한 위치 안내이며 별의 고유운동과 실시간 변광은 반영하지 않습니다. 천문현상 대조: <a href="https://astro.kasi.re.kr/life/ephemeris" target="_blank" rel="noopener noreferrer">한국천문연구원</a>. 태양 관측 안전: <a href="https://science.nasa.gov/eclipses/safety/" target="_blank" rel="noopener noreferrer">NASA</a>.</p></div></details>
     <footer class="page-footer"><a href="/">KJE의 작업실</a><span>만든이 KJE</span></footer>
   </main>
 </body>

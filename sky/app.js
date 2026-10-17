@@ -1,6 +1,8 @@
 (function(){
   'use strict';
   const $=id=>document.getElementById(id),C=window.SkyCore;
+  const tabs=['day','night','calendar','telescope'];
+  function hashView(){const hash=window.location.hash.slice(1);return hash.startsWith('scope-')?'telescope':tabs.includes(hash)?hash:null;}
   if(!C){$('error').hidden=false;$('error').textContent='계산 파일을 불러오지 못했어요. 새로고침해 주세요.';$('loading').textContent='';return;}
   const LOCATIONS={ansan:{name:'안산',lat:37.3219,lon:126.8309},siheung:{name:'시흥',lat:37.3802,lon:126.8029},seoul:{name:'서울',lat:37.5665,lon:126.9780},incheon:{name:'인천',lat:37.4563,lon:126.7052},suwon:{name:'수원',lat:37.2636,lon:127.0286},chuncheon:{name:'춘천',lat:37.8813,lon:127.7298},gangneung:{name:'강릉',lat:37.7519,lon:128.8761},daejeon:{name:'대전',lat:36.3504,lon:127.3845},sejong:{name:'세종',lat:36.4800,lon:127.2890},cheongju:{name:'청주',lat:36.6424,lon:127.4890},jeonju:{name:'전주',lat:35.8242,lon:127.1480},gwangju:{name:'광주',lat:35.1595,lon:126.8526},daegu:{name:'대구',lat:35.8714,lon:128.6014},busan:{name:'부산',lat:35.1796,lon:129.0756},ulsan:{name:'울산',lat:35.5384,lon:129.3114},changwon:{name:'창원',lat:35.2285,lon:128.6811},jeju:{name:'제주',lat:33.4996,lon:126.5312}};
   const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -15,8 +17,8 @@
   try{const saved=JSON.parse(localStorage.getItem('kje-sky-location-v1')||'null');if(saved&&((saved.key&&LOCATIONS[saved.key])||saved.key==='custom')){C.observer(saved.key==='custom'?saved.custom:LOCATIONS[saved.key]);initialLocation=saved.key;if(saved.custom)custom=saved.custom;}}catch(_){/* Preferences are optional. */}
   const now=new Date(),today=C.dateKey(now),nowClock=hhmm(now);
   const initialObserver=C.observer(initialLocation==='custom'?custom:LOCATIONS[initialLocation]);
-  const initialView=C.position('Sun',now,initialObserver).alt>=0?'day':'night';
-  const state={date:today,clock:nowClock,view:initialView,locationKey:initialLocation,custom,times:{day:initialView==='day'?nowClock:'12:00',night:initialView==='night'?nowClock:'20:00'},calendar:null,daily:null,events:[]};
+  const currentSkyView=C.position('Sun',now,initialObserver).alt>=0?'day':'night',initialView=hashView()||currentSkyView;
+  const state={date:today,clock:nowClock,view:initialView,locationKey:initialLocation,custom,times:{day:currentSkyView==='day'?nowClock:'12:00',night:currentSkyView==='night'?nowClock:'20:00'},calendar:null,daily:null,events:[]};
   const location=()=>state.locationKey==='custom'?state.custom:LOCATIONS[state.locationKey];
   function rememberLocation(){try{localStorage.setItem('kje-sky-location-v1',JSON.stringify({key:state.locationKey,custom:state.custom}));}catch(_){}}
   function showError(message){$('error').textContent=message;$('error').hidden=!message;}
@@ -95,6 +97,7 @@
     }catch(e){if(v===calendarVersion)showError('천문력을 계산하지 못했어요. '+(e.message||e));}
   }
   async function refresh(){
+    if(state.view==='telescope')return;
     const v=++refreshVersion;showError('');$('loading').textContent='계산 중';
     try{
       C.atTime(state.date,state.clock);C.observer(location());
@@ -106,17 +109,24 @@
       void loadExtras();if(state.view==='calendar')void renderCalendar();
     }catch(e){if(v===refreshVersion){showError(e.message||String(e));$('loading').textContent='';$('panel-day').setAttribute('aria-busy','false');$('panel-night').setAttribute('aria-busy','false');}}
   }
-  function setView(view,changeTime=true){
-    if(changeTime&&view!=='calendar'&&view!==state.view)state.clock=state.times[view];state.view=view;
-    ['day','night','calendar'].forEach(name=>{const active=name===view;$('tab-'+name).setAttribute('aria-selected',String(active));$('tab-'+name).tabIndex=active?0:-1;$('panel-'+name).hidden=!active;});
-    $('upcoming-section').hidden=view==='calendar';void refresh();
+  function setView(view,changeTime=true,writeHash=true){
+    if(!tabs.includes(view))return;
+    if(changeTime&&['day','night'].includes(view)&&view!==state.view)state.clock=state.times[view];state.view=view;
+    tabs.forEach(name=>{const active=name===view;$('tab-'+name).setAttribute('aria-selected',String(active));$('tab-'+name).tabIndex=active?0:-1;$('panel-'+name).hidden=!active;});
+    const guide=view==='telescope';
+    $('observation-form').hidden=guide;$('observation-context').hidden=guide;$('calculation-method').hidden=guide;
+    $('upcoming-section').hidden=guide||view==='calendar';
+    if(writeHash){try{history.replaceState(null,'','#'+view);}catch(_){}}
+    if(guide){++refreshVersion;++calendarVersion;showError('');$('loading').textContent='';}else void refresh();
   }
   function selectCalendarDate(key){state.date=key;setView('calendar',false);}
   function changeDate(key){try{C.dateStart(key);state.date=key;void refresh();}catch(e){showError(e.message);$('date').value=state.date;}}
   function changeMonth(delta){try{const base=state.date.split('-').map(Number),d=new Date(Date.UTC(base[0],base[1]-1+delta,1)),year=d.getUTCFullYear(),month=d.getUTCMonth()+1,last=new Date(Date.UTC(year,month,0)).getUTCDate(),key=year+'-'+String(month).padStart(2,'0')+'-'+String(Math.min(base[2],last)).padStart(2,'0');changeDate(key);}catch(e){showError(e.message);}}
-  const tabs=['day','night','calendar'];tabs.forEach((view,i)=>{$('tab-'+view).addEventListener('click',()=>setView(view));$('tab-'+view).addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();const index=e.key==='Home'?0:e.key==='End'?2:(i+(e.key==='ArrowRight'?1:-1)+3)%3;setView(tabs[index]);$('tab-'+tabs[index]).focus();});});
+  tabs.forEach((view,i)=>{$('tab-'+view).addEventListener('click',()=>setView(view));$('tab-'+view).addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();const index=e.key==='Home'?0:e.key==='End'?tabs.length-1:(i+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;setView(tabs[index]);$('tab-'+tabs[index]).focus();});});
+  document.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>setView(button.dataset.view)));
+  window.addEventListener('hashchange',()=>{const view=hashView();if(view)setView(view,true,false);});
   $('observation-form').addEventListener('submit',e=>{e.preventDefault();void refresh();});
-  $('date').addEventListener('change',e=>changeDate(e.target.value));$('time').addEventListener('change',e=>{try{C.atTime(state.date,e.target.value);state.clock=e.target.value;if(state.view!=='calendar')state.times[state.view]=state.clock;void refresh();}catch(err){showError(err.message);$('time').value=state.clock;}});
+  $('date').addEventListener('change',e=>changeDate(e.target.value));$('time').addEventListener('change',e=>{try{C.atTime(state.date,e.target.value);state.clock=e.target.value;if(['day','night'].includes(state.view))state.times[state.view]=state.clock;void refresh();}catch(err){showError(err.message);$('time').value=state.clock;}});
   $('previous-day').addEventListener('click',()=>changeDate(C.shiftDate(state.date,-1)));$('next-day').addEventListener('click',()=>changeDate(C.shiftDate(state.date,1)));
   $('previous-month').addEventListener('click',()=>changeMonth(-1));$('next-month').addEventListener('click',()=>changeMonth(1));
   $('now').addEventListener('click',()=>{const n=new Date();state.date=C.dateKey(n);state.clock=hhmm(n);const view=C.position('Sun',n,C.observer(location())).alt>=0?'day':'night';state.times[view]=state.clock;setView(view,false);});
@@ -126,5 +136,5 @@
   $('geolocate').addEventListener('click',()=>{if(!navigator.geolocation){showError('이 브라우저에서는 현재 위치를 가져올 수 없어요. 관측지를 직접 골라 주세요.');return;}$('geolocate').disabled=true;$('geolocate').textContent='확인 중';navigator.geolocation.getCurrentPosition(result=>{state.custom={name:'내 위치',lat:Number(result.coords.latitude.toFixed(5)),lon:Number(result.coords.longitude.toFixed(5)),height:0};state.locationKey='custom';$('location').value='custom';$('custom-location').hidden=false;$('latitude').value=state.custom.lat;$('longitude').value=state.custom.lon;$('height').value=0;rememberLocation();$('geolocate').disabled=false;$('geolocate').textContent='내 위치';void refresh();},()=>{$('geolocate').disabled=false;$('geolocate').textContent='내 위치';showError('현재 위치를 가져오지 못했어요. 관측지를 직접 선택하거나 좌표를 입력해 주세요.');},{enableHighAccuracy:false,timeout:10000,maximumAge:300000});});
   $('show-calendar').addEventListener('click',()=>setView('calendar'));
   $('open-selected-date').addEventListener('click',()=>setView(C.position('Sun',C.atTime(state.date,state.clock),C.observer(location())).alt>=0?'day':'night',false));
-  setView(initialView,false);
+  setView(initialView,false,false);
 })();
