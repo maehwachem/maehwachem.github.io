@@ -52,7 +52,7 @@
 /* One installation entry; show only the route chosen for this mount. */
 .scope-mount-choice{margin:24px 0 0;padding:0;border:0;min-width:0}
 .scope-mount-choice legend{padding:0;margin-bottom:12px;font-size:15px;font-weight:650;color:var(--ink)}
-.scope-mount-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.scope-mount-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .scope-mount-options label{display:flex;align-items:center;gap:12px;padding:17px 20px;border:1px solid var(--line);border-radius:12px;background:var(--panel);cursor:pointer;min-width:0}
 .scope-mount-options label:has(input:checked){border-color:var(--accent);background:var(--soft);box-shadow:inset 0 0 0 1px var(--accent)}
 .scope-mount-options label:focus-within{outline:2px solid var(--accent);outline-offset:3px}
@@ -60,7 +60,8 @@
 .scope-mount-options strong,.scope-mount-options small{display:block;word-break:keep-all}
 .scope-mount-options strong{font-size:15px;color:var(--ink)}
 .scope-mount-options small{margin-top:5px;font-size:12px;color:var(--muted)}
+.scope-mount-hint{margin:12px 0 0}
 .scope-assembly-route{scroll-margin-top:24px}
 .scope-packup>.illustrated-guide{margin-top:4px}
-@media(max-width:650px){.scope-mount-options{gap:8px}.scope-mount-options label{gap:8px;padding:14px 12px}.scope-mount-options strong{font-size:13px}.scope-mount-options small{font-size:11px}.ill-long .ill-step-nav{grid-template-columns:repeat(4,minmax(0,1fr))}.scope-packup{padding:0 10px}}
+@media(max-width:650px){.scope-mount-options{grid-template-columns:1fr;gap:8px}.scope-mount-options label{gap:12px;padding:12px 14px}.scope-mount-options strong{font-size:13px}.scope-mount-options small{font-size:11px}.ill-long .ill-step-nav{grid-template-columns:repeat(4,minmax(0,1fr))}.scope-packup{padding:0 10px}}
 @media print{.scope-mount-choice{display:none!important}}
