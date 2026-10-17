@@ -9,14 +9,16 @@
   <meta property="og:description" content="오늘 볼 천체와 관측 시간을 한눈에. 낮 관측·밤 관측·천문력.">
   <meta property="og:image" content="https://kjelab.kr/assets/uploads/cover-sky-observatory.webp">
   <title>하늘 관측실 · KJE의 작업실</title>
-  <link rel="stylesheet" href="style.css?v=20261017-photo">
+  <link rel="stylesheet" href="style.css?v=20261017-drawings">
   <link rel="stylesheet" href="photography.css?v=20261017">
+  <link rel="stylesheet" href="illustrated-guides.css?v=20261017">
   <script src="vendor/astronomy.browser.min.js" defer></script>
   <script src="stars.js" defer></script>
   <script src="core.js" defer></script>
   <script src="app.js?v=20261017-photo" defer></script>
-  <script src="telescope.js?v=20261017-equipment" defer></script>
+  <script src="telescope.js?v=20261017-drawings" defer></script>
   <script src="photography.js?v=20261017" defer></script>
+  <script src="illustrated-guides.js?v=20261017" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">관측 정보로 이동</a>
@@ -68,7 +70,7 @@
       <section class="month-events"><div class="section-heading"><h2>이달의 주요 천문현상</h2><a class="text-link" href="https://astro.kasi.re.kr/life/ephemeris" target="_blank" rel="noopener noreferrer">한국천문연구원 자료 ↗</a></div><div id="month-events"></div><p class="small">달 위상·근원지점·춘분·하지·추분·동지와 관측지에서 보이는 일월식을 계산합니다. 유성우는 출처를 확인한 날짜만 추가하며, 모든 천문현상을 나열한 목록은 아닙니다.</p></section>
     </section>
     <section id="panel-telescope" class="scope-guide" role="tabpanel" aria-labelledby="tab-telescope" hidden>
-      <div class="scope-intro"><p class="section-label">망원경·쌍안경·스마트망원경</p><h2>장비를 준비하는 순간부터<br>첫 별을 만날 때까지</h2><p>망원경은 조립부터, 쌍안경은 내 눈에 맞추는 것부터 시작해요. 스마트망원경으로 화면에 쌓이는 빛을 보는 방법도 있어요. 장비별 사용법과 구입 기준을 살펴보세요.</p></div>
+      <div class="scope-intro"><p class="section-label">망원경·쌍안경·스마트망원경</p><h2>장비를 준비하는 순간부터<br>첫 별을 만날 때까지</h2><p>망원경은 조립부터, 쌍안경은 내 눈에 맞추는 것부터 시작해요. 스마트망원경으로 화면에 쌓이는 빛을 보는 방법도 있어요. 직접 그린 그림을 따라 장비별 사용법을 익히고, 구입 기준도 살펴보세요.</p></div>
       <nav class="scope-guide-menu" aria-label="관측 장비 안내 목차">
         <a href="#scope-assembly"><span>01</span><strong>망원경 조립</strong><small>부품 연결과 가대별 준비</small></a>
         <a href="#scope-start"><span>02</span><strong>망원경 사용</strong><small>정렬·초점·배율</small></a>
@@ -77,7 +79,7 @@
         <a href="#scope-buying"><span>05</span><strong>구입 전 살펴보기</strong><small>관측 목적에 맞는 장비 선택</small></a>
       </nav>
       <aside class="safety scope-first-safety"><strong>낮에 연습할 때도 태양을 향하지 않아요</strong><p>망원경·쌍안경·파인더로 태양을 직접 보면 눈이 손상될 수 있어요. 연습은 태양과 충분히 떨어진 방향의 지상 표적으로 해요. <a href="#scope-solar">태양 관측 안전 확인 ↓</a></p></aside>
-      <nav class="scope-jumps" aria-label="추가 안내 바로가기"><a href="#scope-videos">설명 영상 4편</a><a href="#scope-eyepieces">배율 계산</a><a href="#scope-mounts">가대별 조작</a><a href="#scope-trouble">잘 안 보일 때</a></nav>
+      <nav class="scope-jumps" aria-label="추가 안내 바로가기"><a href="#scope-videos">그림 안내 7개</a><a href="#scope-eyepieces">배율 계산</a><a href="#scope-mounts">가대별 조작</a><a href="#scope-trouble">잘 안 보일 때</a></nav>
 
       <section class="scope-section" aria-labelledby="scope-parts-title">
         <div class="section-heading"><h3 id="scope-parts-title">먼저, 이 다섯 곳을 찾아보세요</h3><span class="small">굴절망원경과 경위대 예시</span></div>
@@ -108,45 +110,45 @@
       <section id="scope-assembly" class="scope-section" aria-labelledby="scope-assembly-title">
         <div class="section-heading"><h3 id="scope-assembly-title">망원경 조립부터 시작해요</h3><span class="small">삼각대형 망원경의 기본 흐름</span></div>
         <p class="small">처음에는 밝고 넓은 곳에서 부품 목록과 설명서를 펼쳐 놓아요. 조립 중에는 렌즈 덮개를 닫고, 경통을 받칠 자리를 마련하세요. 아래 순서는 일반적인 예시이며, 연결 방식과 나사 위치는 기종 설명서를 따릅니다.</p>
-        <ol class="scope-steps">
+        <article id="scope-video-assembly" class="illustrated-guide" aria-labelledby="scope-video-assembly-title">
+          <header class="ill-header"><div><p class="section-label">망원경 · 조립 · 그림 안내</p><h4 id="scope-video-assembly-title">처음부터 조립해 보기</h4></div><span class="ill-credit">KJE LAB<br>ILLUSTRATED GUIDE</span></header>
+          <div class="ill-layout"><figure class="ill-figure"><div class="ill-stage" style="--step-count:6"><img src="guides/telescope-assembly.svg?v=20261017-drawings" width="3840" height="400" loading="lazy" decoding="async" alt="위에 경통, 가운데 가대, 아래 삼각대가 분리되어 있고 옆에 접안렌즈가 놓인 그림."></div></figure><div class="ill-copy"><p class="ill-counter" aria-live="polite" aria-atomic="true">01 / 06 단계</p><ol class="ill-step-list"><li id="scope-video-assembly-step-1" data-short="부품" data-alt="위에 경통, 가운데 가대, 아래 삼각대가 분리되어 있고 옆에 접안렌즈가 놓인 그림."><h5>부품을 나눠 놓아요</h5><p>삼각대·가대·경통·파인더·접안렌즈를 확인해요. 조립 중에는 렌즈 덮개를 닫고 유리 면에 손을 대지 않아요.</p></li><li id="scope-video-assembly-step-2" data-short="삼각대" data-alt="삼각대의 세 다리와 잠금부가 강조되어 있고 양옆 화살표가 다리를 펼치는 방향을 가리킨다."><h5>다리를 펼치고 잠가요</h5><p>단단하고 평평한 바닥에서 다리를 벌려요. 높이를 맞춘 뒤 다리 잠금과 벌림대·받침대의 고정을 확인해요.</p></li><li id="scope-video-assembly-step-3" data-short="가대" data-alt="삼각대 위로 가대가 내려오는 화살표와 아래에서 조이는 연결 볼트의 확대 표시."><h5>가대를 삼각대에 고정해요</h5><p>가대를 정해진 방향으로 놓고 지정된 연결 볼트로 고정해요. 일체형은 체결 상태를 확인하면 돼요.</p><p class="ill-tip">적도의는 경통을 올리기 전에 무게추 설치 순서를 확인해요.</p></li><li id="scope-video-assembly-step-4" data-short="경통" data-alt="두 손으로 경통 아래를 받치고, 중앙 장착 레일을 가대에 결합하는 그림."><h5>경통을 받친 채 잠가요</h5><p>두 손으로 경통을 받치고 레일이나 경통 밴드를 가대에 결합해요. 고정·안전 나사를 확인한 뒤 천천히 손의 힘을 줄여요.</p><p class="ill-tip">파인더나 초점 손잡이를 잡고 경통을 들어 올리지 않아요.</p></li><li id="scope-video-assembly-step-5" data-short="접안부" data-alt="경통 위에 파인더, 뒤쪽 천정미러 위에 25밀리미터 접안렌즈를 끼우는 화살표."><h5>파인더와 접안부를 연결해요</h5><p>지정된 받침에 파인더를 고정해요. 굴절망원경은 보통 천정미러와 긴 초점거리 접안렌즈를 연결해 시작해요.</p><p class="ill-tip">그림은 굴절망원경 예시예요. 뉴턴식은 보통 옆 초점부에 접안렌즈를 직접 끼워요.</p></li><li id="scope-video-assembly-step-6" data-short="점검" data-alt="완성된 경위대 망원경에서 위아래와 좌우 방향이 화살표로 표시되어 있다."><h5>움직임과 균형을 확인해요</h5><p>관측할 부속품을 끼운 상태로 경통을 받치며 천천히 움직여요. 기울어짐·충돌·케이블 걸림을 확인해요.</p><p class="ill-tip">전동형은 잠긴 축을 억지로 밀지 않아요. 기종별 잠금·균형 절차를 따라요.</p></li></ol></div></div>
+          <div class="ill-toolbar" hidden><ol class="ill-step-nav" aria-label="처음부터 조립해 보기 단계 선택"></ol><div class="ill-controls"><button type="button" class="ill-prev" aria-label="처음부터 조립해 보기 이전 단계">← 이전</button><button type="button" class="ill-play" aria-pressed="false" aria-label="처음부터 조립해 보기 순서대로 재생 또는 일시 정지">▶ 순서대로 재생</button><button type="button" class="ill-next" aria-label="처음부터 조립해 보기 다음 단계">다음 →</button></div></div>
+          <p class="ill-note">일반적인 수동 경위대와 굴절망원경을 단순화한 그림이에요. 실제 연결 방식은 기종 설명서로 확인하세요. 재생하면 8초마다 다음 그림으로 넘어가요.</p>
+        </article>
+        <details class="ill-details"><summary>조립 순서를 글로 자세히 보기</summary><ol class="scope-steps">
           <li><h4>부품을 꺼내 이름 맞추기</h4><p>삼각대, 가대, 경통, 파인더, 접안렌즈를 나눠 놓아요. 천정미러·프리즘, 미동 손잡이, 무게추는 해당 기종에만 있어요. 부속 나사를 확인하고 렌즈·거울 면에는 손을 대지 않아요.</p></li>
           <li><h4>삼각대를 펼치고 고정하기</h4><p>단단한 바닥에서 다리를 벌리고 관측하기 편한 높이에 고정해요. 처음부터 다리를 끝까지 뽑지 않아도 돼요. 다리 벌림대와 부품 받침대가 있다면 설명서대로 연결해 벌어짐을 고정하세요.</p></li>
           <li><h4>가대를 삼각대에 연결하기</h4><p>방향을 움직이는 받침인 가대를 삼각대 위에 놓고 지정된 볼트로 고정해요. 일체형이면 연결 상태만 확인하세요. 적도의는 경통을 올리기 전에 아래의 <b>무게추 설치 순서</b>를 먼저 확인해요.</p></li>
           <li><h4>경통을 올리고 잠금 확인하기</h4><p>경통을 두 손으로 받치고 장착 레일(도브테일)이나 경통 밴드를 가대에 결합해요. 고정 나사와 안전 나사를 확인한 뒤 천천히 손의 힘을 줄여요. 파인더나 초점 손잡이를 잡고 경통을 들어 올리지 않아요.</p></li>
           <li><h4>파인더와 접안부 연결하기</h4><p>파인더 받침을 지정된 자리에 끼워 고정해요. 굴절·일부 복합식은 설명서에 맞춰 천정미러·프리즘과 접안렌즈를 연결하고, 뉴턴식 반사망원경은 보통 옆 초점부에 접안렌즈를 직접 끼워요. 25 mm처럼 긴 초점거리부터 준비하세요.</p></li>
           <li><h4>움직임과 균형 점검하기</h4><p>경통을 받친 채 잠금·마찰 장치를 조절해 움직여 봐요. 경통이 갑자기 숙여지거나 다리에 닿지 않는지 확인해요. 필요한 균형 조절을 마치고, 전동형은 케이블의 여유와 전원을 확인한 뒤 정렬을 시작하세요.</p></li>
-        </ol>
+        </ol></details>
         <div class="scope-faq scope-assembly-types">
           <details><summary>경위대(AZ)라면 · 위아래와 좌우 움직임 확인</summary><p>가대에 경통을 장착한 뒤 접안렌즈까지 끼운 상태에서 균형을 확인해요. 경통 위치를 옮겨야 한다면 반드시 경통을 받친 채 고정 나사를 조금 풀고, 이동 후 다시 잠가요. 한쪽으로 쏠리지 않도록 설명서의 균형·마찰 조절 방법을 따르세요. 전동 경위대는 잠긴 축을 손으로 밀지 않아요.</p></details>
           <details><summary>적도의(EQ)라면 · 무게추와 두 축의 균형까지</summary><ol class="scope-detail-steps"><li>삼각대와 가대를 고정하고, 설명서가 정한 축 위치와 잠금 상태를 만들어요.</li><li>일반적인 독일식 적도의는 <b>무게추 봉 → 무게추 → 봉 끝의 이탈 방지 나사 → 경통</b> 순서로 연결해요. 무게추를 손으로 받치며 고정하고, 기종에서 정한 순서를 우선하세요.</li><li>관측할 접안렌즈와 부속품을 장착한 상태로 균형을 맞춰요. 경통과 추를 받치며 적경축(RA)을 조절할 때는 추의 위치를, 적위축(DEC)은 경통의 위치를 조정해요. 각 단계의 축 잠금은 설명서를 따르세요.</li><li>균형을 맞춘 뒤 관측지 위도와 북쪽 방향에 맞춰 극축을 정렬해요. <a href="#scope-mounts">극축 정렬과 움직임 설명 ↓</a></li></ol><p>철수할 때도 경통이 달린 채 무게추부터 빼지 않아요. 부품을 받치면서 기종에서 정한 분해 순서를 따르세요.</p></details>
           <details><summary>돕소니언이라면 · 삼각대 대신 받침대부터</summary><ol class="scope-detail-steps"><li>분리형 받침대는 바닥판·측판과 회전부를 설명서의 나사·와셔 순서대로 조립해요. 이미 조립된 받침대는 체결 상태를 확인해요.</li><li>평평한 바닥에 놓고 경통 양옆의 고도 베어링을 받침 홈에 안착시켜요. 경통을 받치며 손잡이·스프링·마찰 조절부를 기종에 맞게 연결해요.</li><li>파인더와 접안렌즈를 장착하고 위아래·좌우 움직임을 확인해요. 접이식·트러스형은 펼침과 잠금 단계가 더 있어요. 운반 후에는 설명서에 따라 광축도 점검하세요.</li></ol></details>
         </div>
-        <div class="scope-video-row">
-          <article id="scope-video-assembly" class="scope-video" aria-labelledby="scope-video-assembly-title">
-            <div class="scope-video-screen"><button type="button" class="scope-video-load" data-youtube="PyWfOgw7y_M" data-video-title="망원경 조립 · Celestron AstroMaster 90AZ" aria-label="망원경 조립 영상 보기, 2분 3초"><span class="scope-play" aria-hidden="true">▶</span><span>조립 영상 보기</span><small>2분 03초</small></button></div>
-            <div class="scope-video-caption"><p class="section-label">망원경 · 조립 영상</p><h4 id="scope-video-assembly-title">경위대 망원경을 조립하는 순서</h4><p>Celestron 공식 · AstroMaster 90AZ · 영어</p><a href="https://www.youtube.com/watch?v=PyWfOgw7y_M" target="_blank" rel="noopener noreferrer">YouTube에서 보기 ↗</a></div>
-          </article>
-          <div class="scope-video-notes"><h4>영상과 함께 확인하세요</h4><ul><li>삼각대 다리와 받침대의 고정</li><li>가대에 경통을 올리고 잠그는 부분</li><li>접안부 부품을 끼우고 고정하는 위치</li></ul><p>이 영상은 특정 경위대 모델의 예시예요. 같은 브랜드여도 적도의·돕소니언은 조립 방식이 달라요.</p></div>
-        </div>
+
       </section>
 
       <section id="scope-start" class="scope-section" aria-labelledby="scope-start-title">
         <div class="section-heading"><h3 id="scope-start-title">첫 관측, 이 순서로 해 보세요</h3><span class="small">설치 → 파인더 정렬 → 달 찾기 → 초점 → 배율</span></div>
-        <ol class="scope-steps">
+        <article id="scope-video-finder" class="illustrated-guide" aria-labelledby="scope-video-finder-title">
+          <header class="ill-header"><div><p class="section-label">망원경 · 파인더 사용 · 그림 안내</p><h4 id="scope-video-finder-title">두 시야의 중심 맞추기</h4></div><span class="ill-credit">KJE LAB<br>ILLUSTRATED GUIDE</span></header>
+          <div class="ill-layout"><figure class="ill-figure"><div class="ill-stage" style="--step-count:4"><img src="guides/telescope-finder.svg?v=20261017-drawings" width="2560" height="400" loading="lazy" decoding="async" alt="25밀리미터 접안렌즈가 강조되고 10밀리미터 접안렌즈와 비교되어 있다."></div></figure><div class="ill-copy"><p class="ill-counter" aria-live="polite" aria-atomic="true">01 / 04 단계</p><ol class="ill-step-list"><li id="scope-video-finder-step-1" data-short="낮은 배율" data-alt="25밀리미터 접안렌즈가 강조되고 10밀리미터 접안렌즈와 비교되어 있다."><h5>긴 초점거리부터 시작해요</h5><p>25 mm와 10 mm가 있다면 25 mm부터 끼워요. 낮은 배율의 넓은 시야에서 먼 고정 표적을 찾기 쉬워요.</p><p class="ill-tip">낮 연습은 태양과 충분히 떨어진 방향의 지상 표적으로 해요.</p></li><li id="scope-video-finder-step-2" data-short="본망원경" data-alt="본망원경의 안테나는 중앙에, 파인더의 안테나는 십자선에서 벗어나 있다."><h5>본망원경 중앙에 먼저 놓아요</h5><p>본망원경으로 표적을 찾아 초점을 맞추고 시야 가운데 놓아요. 이때 파인더의 중심과는 어긋나 있어도 괜찮아요.</p></li><li id="scope-video-finder-step-3" data-short="파인더" data-alt="본망원경의 표적은 고정되어 있고 파인더 십자선도 같은 표적 중앙에 맞춰져 있다."><h5>경통은 그대로, 파인더만 조절해요</h5><p>경통을 움직이지 않아요. 파인더의 조절 나사로 십자선이나 붉은 점을 같은 표적에 맞춰요.</p></li><li id="scope-video-finder-step-4" data-short="재확인" data-alt="다른 표적인 가로등이 본망원경과 파인더 양쪽 중앙에 들어와 있고 확인 표시가 있다."><h5>다른 표적으로 한 번 더 확인해요</h5><p>다른 먼 표적을 파인더 중앙에 놓고 본망원경에도 들어오는지 봐요. 운반한 뒤에는 정렬이 유지되는지 다시 확인해요.</p><p class="ill-tip">상하·좌우 방향은 광학 구성에 따라 달라요. 그림은 중심을 맞추는 원리만 보여 줘요.</p></li></ol></div></div>
+          <div class="ill-toolbar" hidden><ol class="ill-step-nav" aria-label="두 시야의 중심 맞추기 단계 선택"></ol><div class="ill-controls"><button type="button" class="ill-prev" aria-label="두 시야의 중심 맞추기 이전 단계">← 이전</button><button type="button" class="ill-play" aria-pressed="false" aria-label="두 시야의 중심 맞추기 순서대로 재생 또는 일시 정지">▶ 순서대로 재생</button><button type="button" class="ill-next" aria-label="두 시야의 중심 맞추기 다음 단계">다음 →</button></div></div>
+          <p class="ill-note">낮의 지상 표적으로 연습한 뒤 밤에는 달이나 밝은 별을 찾아보세요. 재생하면 8초마다 다음 그림으로 넘어가요.</p>
+        </article>
+        <details class="ill-details"><summary>첫 관측부터 배율 조절까지 자세히 보기</summary><ol class="scope-steps">
           <li><h4>조립을 마치고 관측 준비하기</h4><p><a href="#scope-assembly">조립과 고정 상태</a>를 확인한 뒤, 태양과 떨어진 방향에서 앞 덮개와 접안렌즈 덮개를 열어요. 창문 너머보다 실외에서 관측하는 편이 좋아요. 실내에서 꺼낸 경통이 바깥 온도에 적응할 시간도 주세요.</p><p class="small">적도의는 균형과 극축 정렬이 필요해요. <a href="#scope-mounts">내 가대의 준비 방법 ↓</a></p></li>
           <li><h4>긴 초점거리의 접안렌즈 끼우기</h4><p>25 mm와 10 mm가 있다면 <b>25 mm부터</b> 사용해요. 배율이 낮아 처음 목표를 찾기 수월해요. 접안렌즈를 고정하고, 첫 연습에서는 바로우렌즈를 빼 두세요.</p></li>
           <li><h4>낮에 파인더와 본망원경 맞추기</h4><p>태양과 떨어진 방향에서 멀리 있는 안테나 끝처럼 작은 고정 표적을 골라요.</p><div class="scope-finder-order"><p><b>먼저 본망원경</b>으로 표적을 찾아 초점을 맞추고 시야 한가운데 놓아요.</p><p><b>경통을 움직이지 않고</b> 파인더의 조절 나사로 십자선이나 붉은 점을 같은 표적에 맞춰요.</p><p><b>다른 먼 표적</b>으로도 확인해요. 이동 후에는 정렬이 틀어지지 않았는지 다시 살펴보세요.</p></div></li>
           <li><h4>밤에는 파인더로 달 찾기</h4><p>‘밤 관측’에서 달이 떠 있는 방향과 고도를 확인해요. 파인더 중앙에 달을 넣은 뒤 본망원경을 보고, 천천히 움직여 시야 가운데에 놓아요. 파인더의 점이나 십자선이 달 전체를 가리면 가장자리를 기준으로 찾아도 좋아요.</p><button type="button" class="text-button" data-view="night">달의 위치 확인하기 →</button></li>
           <li><h4>가장 또렷한 초점 찾기</h4><p>접안렌즈에서 눈의 거리를 조금씩 바꿔 원형 시야를 확보해요. 초점 손잡이를 천천히 돌려 달 가장자리나 분화구가 가장 선명한 지점을 찾아요. 지나치면 반대로 조금 되돌리세요. 손잡이가 끝에 닿으면 억지로 돌리지 않아요.</p></li>
           <li><h4>중앙에 놓은 뒤, 필요하면 확대하기</h4><p>상이 선명하면 더 짧은 초점거리의 접안렌즈로 바꾸고 초점을 다시 맞춰요. 흐려지거나 흔들림만 커지면 낮은 배율로 돌아가세요. 천체가 시야 밖으로 움직이면 가대의 조절부로 조금씩 따라가요.</p></li>
-        </ol>
-        <div class="scope-video-row">
-          <article id="scope-video-finder" class="scope-video" aria-labelledby="scope-video-finder-title">
-            <div class="scope-video-screen"><button type="button" class="scope-video-load" data-youtube="pH4MksauCjY" data-video-title="망원경 사용 · Celestron 파인더 정렬" aria-label="망원경 파인더 사용 영상 보기, 2분 36초"><span class="scope-play" aria-hidden="true">▶</span><span>파인더 사용 영상 보기</span><small>2분 36초</small></button></div>
-            <div class="scope-video-caption"><p class="section-label">망원경 · 사용 영상</p><h4 id="scope-video-finder-title">파인더와 본망원경의 방향 맞추기</h4><p>Celestron 공식 · How To Align Your Finderscope · 영어</p><a href="https://www.youtube.com/watch?v=pH4MksauCjY" target="_blank" rel="noopener noreferrer">YouTube에서 보기 ↗</a></div>
-          </article>
-          <div class="scope-video-notes"><h4>순서를 기억해 두세요</h4><ol><li>낮은 배율의 본망원경으로 먼 표적을 중앙에 놓아요.</li><li>경통을 그대로 두고 파인더의 조준점을 맞춰요.</li><li>다른 표적으로 확인한 뒤 밤 관측에 사용해요.</li></ol><p>낮 연습은 태양과 충분히 떨어진 방향에서 해요. 붉은 점 조준기와 광학 파인더는 눈을 대는 거리가 달라요.</p></div>
-        </div>
+        </ol></details>
+
       </section>
 
       <section id="scope-eyepieces" class="scope-section" aria-labelledby="scope-eyepieces-title">
@@ -174,54 +176,59 @@
         <p class="small">일반적인 7~10배 쌍안경은 행성의 표면 무늬를 자세히 확대하는 용도에는 한계가 있어요. 넓은 영역을 쌍안경으로 찾고 망원경으로 세부를 보는 식으로 함께 써도 좋아요.</p>
         <h4 class="scope-subtitle">준비 · 스트랩과 필요한 지지대부터</h4>
         <p class="small">보통 쌍안경 본체는 조립된 상태로 나와요. 광학부를 분해하지 않고 스트랩·덮개를 준비하며, 무겁거나 오래 관측할 때 삼각대를 연결합니다.</p>
-        <ol class="scope-steps scope-bino-prep">
+        <article id="scope-video-binocular-mount" class="illustrated-guide" aria-labelledby="scope-video-binocular-mount-title">
+          <header class="ill-header"><div><p class="section-label">쌍안경 · 준비 · 그림 안내</p><h4 id="scope-video-binocular-mount-title">쌍안경도 차근차근 준비해요</h4></div><span class="ill-credit">KJE LAB<br>ILLUSTRATED GUIDE</span></header>
+          <div class="ill-layout"><figure class="ill-figure"><div class="ill-stage" style="--step-count:3"><img src="guides/binocular-setup.svg?v=20261017-drawings" width="1920" height="400" loading="lazy" decoding="async" alt="쌍안경 양옆 고리에 스트랩이 연결되고 아래에서 손이 본체를 받치는 그림."></div></figure><div class="ill-copy"><p class="ill-counter" aria-live="polite" aria-atomic="true">01 / 03 단계</p><ol class="ill-step-list"><li id="scope-video-binocular-mount-step-1" data-short="스트랩" data-alt="쌍안경 양옆 고리에 스트랩이 연결되고 아래에서 손이 본체를 받치는 그림."><h5>스트랩을 연결하고 확인해요</h5><p>양쪽 고리에 스트랩을 설명서대로 연결해요. 낮은 높이에서 본체를 받친 채 살짝 당겨 빠지지 않는지 확인해요.</p></li><li id="scope-video-binocular-mount-step-2" data-short="어댑터" data-alt="쌍안경 중앙 앞쪽의 삼각대 소켓과 아래의 L자 어댑터가 분리되어 있고 연결 방향이 표시되어 있다."><h5>호환되는 연결부를 확인해요</h5><p>삼각대 연결을 지원하는지 확인해요. 나사 소켓형은 보호 캡을 열고 호환 어댑터를 연결해요. 본체를 분해하지 않아요.</p><p class="ill-tip">중앙 지지봉·전용 홀더 방식도 있어요. 맞지 않는 나사를 억지로 끼우지 않아요.</p></li><li id="scope-video-binocular-mount-step-3" data-short="삼각대" data-alt="쌍안경이 어댑터와 삼각대 위에 연결되어 있고 연결부에 확인 표시가 있다."><h5>받친 채 고정하고 기울여 봐요</h5><p>안정된 삼각대에 어댑터를 고정해요. 본체를 받치며 잠금과 이탈 방지 장치를 확인하고 위쪽 하늘을 볼 수 있는지 살펴요.</p><p class="ill-tip">본체·어댑터·헤드의 호환 규격과 삼각대의 허용 하중을 함께 확인해요.</p></li></ol></div></div>
+          <div class="ill-toolbar" hidden><ol class="ill-step-nav" aria-label="쌍안경도 차근차근 준비해요 단계 선택"></ol><div class="ill-controls"><button type="button" class="ill-prev" aria-label="쌍안경도 차근차근 준비해요 이전 단계">← 이전</button><button type="button" class="ill-play" aria-pressed="false" aria-label="쌍안경도 차근차근 준비해요 순서대로 재생 또는 일시 정지">▶ 순서대로 재생</button><button type="button" class="ill-next" aria-label="쌍안경도 차근차근 준비해요 다음 단계">다음 →</button></div></div>
+          <p class="ill-note">쌍안경 본체는 보통 조립되어 있어요. 광학부를 열지 않고 스트랩과 필요한 지지대를 준비해요. 재생하면 8초마다 다음 그림으로 넘어가요.</p>
+        </article>
+        <details class="ill-details"><summary>쌍안경 준비를 글로 자세히 보기</summary><ol class="scope-steps scope-bino-prep">
           <li><h4>스트랩 연결과 덮개 확인</h4><p>양쪽 고리에 스트랩을 설명서대로 통과시켜 버클을 잠가요. 낮은 높이에서 본체를 받치고 살짝 당겨 빠지지 않는지 확인해요. 관측 전에는 양쪽 대물렌즈와 접안렌즈의 덮개를 모두 열어요.</p></li>
           <li><h4>삼각대 어댑터 연결하기</h4><p>삼각대 연결을 지원하는지 먼저 확인해요. 나사 소켓형은 보호 캡을 열고 호환 어댑터를 고정해요. 중앙 지지봉·전용 홀더 방식은 해당 부품을 사용하세요. 맞지 않는 나사를 억지로 돌리거나 본체를 분해하지 않아요.</p></li>
           <li><h4>삼각대에 올리고 균형 확인</h4><p>삼각대를 펼쳐 잠그고, 어댑터와 헤드를 설명서대로 연결해요. 쌍안경을 손으로 받치며 잠금과 이탈 방지 장치를 확인하세요. 위쪽 하늘을 보아도 기울어지거나 다리에 부딪히지 않는 높이와 각도를 찾아요.</p></li>
-        </ol>
-        <div class="scope-video-row">
-          <article id="scope-video-binocular-mount" class="scope-video" aria-labelledby="scope-video-binocular-mount-title">
-            <div class="scope-video-screen"><button type="button" class="scope-video-load" data-youtube="3DaJXyquYfk" data-video-title="쌍안경 준비 · Vortex 삼각대 어댑터 연결" aria-label="쌍안경 삼각대 연결 영상 보기, 4분 30초"><span class="scope-play" aria-hidden="true">▶</span><span>삼각대 연결 영상 보기</span><small>4분 30초</small></button></div>
-            <div class="scope-video-caption"><p class="section-label">쌍안경 · 준비 영상</p><h4 id="scope-video-binocular-mount-title">어댑터로 삼각대에 장착하기</h4><p>Vortex Optics 공식 · Pro Binocular Adapter · 영어</p><a href="https://www.youtube.com/watch?v=3DaJXyquYfk" target="_blank" rel="noopener noreferrer">YouTube에서 보기 ↗</a></div>
-          </article>
-          <div class="scope-video-notes"><h4>연결 방식부터 비교하세요</h4><p>이 영상은 Vortex 전용 어댑터의 시연이에요. 소켓에 고정하는 부분과 삼각대에 잠그는 부분을 구분해 보세요.</p><p>쌍안경마다 호환 부품과 잠금 구조가 달라요. 구입 전 본체·어댑터·삼각대 헤드의 호환 여부와 허용 하중을 함께 확인하세요.</p></div>
-        </div>
+        </ol></details>
+
         <h4 class="scope-subtitle">사용 · 내 눈에 맞춘 뒤 하늘로</h4>
         <p class="small">아래는 중앙 초점 손잡이와 오른쪽 시도 조절 링이 있는 쌍안경의 예시예요. 시도 조절부 위치와 잠금 방식은 기종마다 달라요.</p>
-        <ol class="scope-steps">
+        <article id="scope-video-binocular-focus" class="illustrated-guide" aria-labelledby="scope-video-binocular-focus-title">
+          <header class="ill-header"><div><p class="section-label">쌍안경 · 사용 · 그림 안내</p><h4 id="scope-video-binocular-focus-title">내 눈에 맞추는 다섯 단계</h4></div><span class="ill-credit">KJE LAB<br>ILLUSTRATED GUIDE</span></header>
+          <div class="ill-layout"><figure class="ill-figure"><div class="ill-stage" style="--step-count:5"><img src="guides/binocular-focus.svg?v=20261017-drawings" width="3200" height="400" loading="lazy" decoding="async" alt="위에서 본 쌍안경. 아래쪽 두 접안부의 아이컵과 높이 조절 방향이 강조되어 있다."></div></figure><div class="ill-copy"><p class="ill-counter" aria-live="polite" aria-atomic="true">01 / 05 단계</p><ol class="ill-step-list"><li id="scope-video-binocular-focus-step-1" data-short="아이컵" data-alt="위에서 본 쌍안경. 아래쪽 두 접안부의 아이컵과 높이 조절 방향이 강조되어 있다."><h5>눈과 렌즈 사이 거리를 맞춰요</h5><p>안경을 썼다면 보통 아이컵을 낮추고, 안경이 없다면 올려서 시작해요. 검은 테두리 없이 시야가 보이는 거리를 찾아요.</p><p class="ill-tip">그림은 위에서 본 방향이에요. 왼쪽·오른쪽은 사용하는 사람을 기준으로 해요.</p></li><li id="scope-video-binocular-focus-step-2" data-short="눈 간격" data-alt="쌍안경 중앙에서 좌우 간격 조절 화살표가 나타나며 오른쪽 위에는 하나의 원형 시야가 있다."><h5>시야가 하나의 원이 되게 해요</h5><p>양쪽 경통을 조금씩 접거나 벌려 두 눈 사이 간격에 맞춰요. 시야가 하나의 원으로 보이는 위치를 찾아요.</p></li><li id="scope-video-binocular-focus-step-3" data-short="왼쪽 눈" data-alt="오른쪽 대물렌즈에 주황색 덮개가 있고 중앙 초점 손잡이가 강조되어 있다."><h5>왼쪽 눈은 중앙 손잡이로 맞춰요</h5><p>오른쪽 앞 렌즈를 덮개로 가려요. 왼쪽 눈으로 먼 표적을 보며 중앙 초점 손잡이를 돌려 또렷하게 맞춰요.</p><p class="ill-tip">눈을 찡그리기보다 앞 렌즈를 덮개로 가려요. 유리 면을 손으로 누르지 않아요.</p></li><li id="scope-video-binocular-focus-step-4" data-short="오른쪽 눈" data-alt="왼쪽 대물렌즈가 가려지고 오른쪽 접안부의 시도 조절 링이 주황색으로 강조된다."><h5>오른쪽 눈은 시도 링으로 맞춰요</h5><p>왼쪽 앞 렌즈를 가리고 오른쪽을 열어요. 중앙 손잡이는 그대로 두고 오른쪽 시도 조절 링만 돌려 같은 표적을 선명하게 해요.</p></li><li id="scope-video-binocular-focus-step-5" data-short="두 눈" data-alt="양쪽 렌즈가 열려 있고 중앙 손잡이만 강조되어 있으며 두 눈에 확인 표시가 있다."><h5>양쪽을 열고 함께 확인해요</h5><p>두 눈의 차이를 맞춘 뒤에는 보통 중앙 손잡이로 대상의 거리에 따른 초점을 조절해요. 두 손으로 잡고 팔을 받쳐 흔들림을 줄여요.</p><p class="ill-tip">오른쪽 시도 링이 있는 중앙 초점식 예시예요. 개별 초점식은 양쪽 접안부를 각각 맞춰요.</p></li></ol></div></div>
+          <div class="ill-toolbar" hidden><ol class="ill-step-nav" aria-label="내 눈에 맞추는 다섯 단계 단계 선택"></ol><div class="ill-controls"><button type="button" class="ill-prev" aria-label="내 눈에 맞추는 다섯 단계 이전 단계">← 이전</button><button type="button" class="ill-play" aria-pressed="false" aria-label="내 눈에 맞추는 다섯 단계 순서대로 재생 또는 일시 정지">▶ 순서대로 재생</button><button type="button" class="ill-next" aria-label="내 눈에 맞추는 다섯 단계 다음 단계">다음 →</button></div></div>
+          <p class="ill-note">아이컵 → 눈 간격 → 왼쪽 초점 → 오른쪽 시도 보정 → 두 눈 순서로 따라 해요. 재생하면 8초마다 다음 그림으로 넘어가요.</p>
+        </article>
+        <details class="ill-details"><summary>눈 간격과 초점 조절을 글로 자세히 보기</summary><ol class="scope-steps">
           <li><h4>아이컵 높이 맞추기</h4><p>눈을 대는 테두리가 아이컵이에요. 안경을 썼다면 보통 낮추고, 안경이 없다면 올려서 시작해요. 눈과 렌즈 사이 거리를 조금씩 바꿔 검은 테두리 없이 시야 전체가 보이는 위치를 찾아요.</p></li>
           <li><h4>두 눈 사이 간격 맞추기</h4><p>양쪽 경통을 천천히 접거나 벌려 <b>두 시야가 하나의 원</b>으로 겹치게 해요. 다른 사람이 사용한 뒤에는 다시 맞춰 주세요. 영화처럼 두 원이 겹친 모양으로 보는 것이 아니에요.</p></li>
           <li><h4>왼쪽 눈은 중앙 손잡이로</h4><p>태양과 떨어진 먼 표적을 골라요. 오른쪽 앞 렌즈를 덮개로 가리고, 왼쪽 눈으로 보며 중앙 초점 손잡이를 돌려 가장 선명하게 맞춰요. 손으로 렌즈 표면을 누르지 않아요.</p></li>
           <li><h4>오른쪽 눈은 시도 조절 링으로</h4><p>이번에는 왼쪽 앞 렌즈를 가리고 오른쪽을 열어요. 같은 표적을 보며 <b>중앙 손잡이는 그대로 두고</b> 오른쪽 시도 조절 링을 돌려요. 두 눈의 초점 차이를 보정하는 단계예요.</p></li>
           <li><h4>두 눈으로 보고 초점 다시 맞추기</h4><p>양쪽 덮개를 열고 확인해요. 이후 거리가 다른 대상을 볼 때는 보통 중앙 손잡이만 조절하면 돼요. 시도 조절값을 기억해 두면 편해요. 양쪽 접안부를 각각 돌리는 개별 초점식(IF)은 눈마다 따로 맞춰요.</p></li>
           <li><h4>맨눈으로 찾은 위치에 들어 올리기</h4><p>먼저 맨눈으로 달이나 밝은 별을 찾고, 시선을 유지하며 쌍안경을 눈앞에 가져와요. 두 손으로 잡고 팔꿈치를 몸에 붙이거나 의자에서 팔을 받쳐 흔들림을 줄이세요. 오래 보거나 배율이 높다면 지지대를 사용해요.</p></li>
-        </ol>
-        <div class="scope-video-row">
-          <article id="scope-video-binocular-focus" class="scope-video" aria-labelledby="scope-video-binocular-focus-title">
-            <div class="scope-video-screen"><button type="button" class="scope-video-load" data-youtube="_dRBsDpUUiE" data-video-title="쌍안경 사용 · Nikon 아이컵과 초점 조절" aria-label="쌍안경 초점 조절 영상 보기, 1분 1초"><span class="scope-play" aria-hidden="true">▶</span><span>초점 조절 영상 보기</span><small>1분 01초</small></button></div>
-            <div class="scope-video-caption"><p class="section-label">쌍안경 · 사용 영상</p><h4 id="scope-video-binocular-focus-title">아이컵과 두 눈의 초점 맞추기</h4><p>Nikon Canada 공식 · How to set up your binoculars! · 영어</p><a href="https://www.youtube.com/watch?v=_dRBsDpUUiE" target="_blank" rel="noopener noreferrer">YouTube에서 보기 ↗</a></div>
-          </article>
-          <div class="scope-video-notes"><h4>두 조절부의 역할을 구분해요</h4><ul><li><b>중앙 초점 손잡이:</b> 대상의 거리에 맞춰 초점을 조절해요.</li><li><b>시도 조절 링:</b> 두 눈 사이의 초점 차이를 보정해요.</li><li><b>아이컵:</b> 눈과 접안렌즈 사이 거리를 맞춰요.</li></ul><p>두 개의 상이 계속 보이거나 눈이 불편하면 관측을 멈추고 간격·초점을 확인하세요. 계속되면 광축 문제일 수 있으므로 제조사에 점검을 맡겨요.</p></div>
-        </div>
+        </ol></details>
+
       </section>
 
       <section id="scope-smart" class="scope-section" aria-labelledby="scope-smart-title">
         <div class="section-heading"><h3 id="scope-smart-title">스마트망원경, 화면에 빛을 모으는 관측</h3><span class="small">카메라와 자동 제어를 한 장비에</span></div>
         <p>카메라 일체형 스마트망원경은 빛을 받는 센서와 구동 장치, 앱을 묶어 대상 찾기·추적·촬영을 도와줘요. 여러 장을 정렬해 합치는 <b>스태킹</b>으로 희미한 천체를 화면에서 조금씩 드러낼 수 있어요. 휴대폰은 주로 조작과 결과 확인에 쓰이며, 실제 빛을 받는 곳은 망원경의 카메라예요.</p>
         <aside class="scope-note"><h4>접안렌즈로 보는 관측과 구분해요</h4><p>많은 카메라 일체형 모델은 접안렌즈가 없어요. 눈으로 직접 보고 싶은지, 화면으로 함께 보고 사진을 남기고 싶은지 먼저 생각해 보세요. 자동 도입(GoTo) 기능만 있는 일반 망원경이 모두 카메라 일체형인 것은 아니에요.</p></aside>
-        <ol class="scope-steps">
+        <article id="scope-smart-guide" class="illustrated-guide" aria-labelledby="scope-smart-guide-title">
+          <header class="ill-header"><div><p class="section-label">스마트망원경 · 준비와 촬영 · 그림 안내</p><h4 id="scope-smart-guide-title">화면에 빛을 모으는 순서</h4></div><span class="ill-credit">KJE LAB<br>ILLUSTRATED GUIDE</span></header>
+          <div class="ill-layout"><figure class="ill-figure"><div class="ill-stage" style="--step-count:4"><img src="guides/smart-telescope.svg?v=20261017-drawings" width="2560" height="400" loading="lazy" decoding="async" alt="브랜드 표시가 없는 카메라 일체형 망원경과 삼각대, 수평계가 그려져 있다."></div></figure><div class="ill-copy"><p class="ill-counter" aria-live="polite" aria-atomic="true">01 / 04 단계</p><ol class="ill-step-list"><li id="scope-smart-guide-step-1" data-short="설치" data-alt="브랜드 표시가 없는 카메라 일체형 망원경과 삼각대, 수평계가 그려져 있다."><h5>본체를 고정하고 수평을 맞춰요</h5><p>하늘이 트인 곳에서 삼각대와 본체를 고정해요. 전원·배터리와 경통이 움직일 공간을 확인해요.</p><p class="ill-tip">적도의 모드를 쓰는 기종은 전용 설치와 극축 정렬을 추가로 해요.</p></li><li id="scope-smart-guide-step-2" data-short="연결" data-alt="스마트망원경과 휴대폰 사이 연결이 표시되고 휴대폰 화면에 위치와 시각 확인 표시가 있다."><h5>앱을 연결하고 위치·시각을 확인해요</h5><p>공식 앱으로 연결한 뒤 관측 위치와 시각, 저장 공간을 확인해요. 덮개와 초기 보정은 기종 안내를 따라요.</p><p class="ill-tip">인터넷 없이 쓸 수 있는 기능과 연결 방식은 기종마다 달라요.</p></li><li id="scope-smart-guide-step-3" data-short="초점" data-alt="망원경이 별이 있는 하늘을 향하고 휴대폰 화면의 별을 중심으로 초점 확인 표시가 있다."><h5>대상을 찾고 별의 초점을 확인해요</h5><p>가려지지 않은 대상을 골라 자동 정렬·도입·초점 절차를 진행해요. 별이 퍼지지 않는지, 대상 전체가 화각에 드는지 살펴요.</p></li><li id="scope-smart-guide-step-4" data-short="누적" data-alt="세 장의 별 사진을 겹친 그림에서 한 장의 결과 이미지와 저장 화살표로 이어진다."><h5>여러 장을 쌓고 원본도 저장해요</h5><p>딥스카이 촬영은 여러 장을 정렬해 합치며 신호를 모아요. 결과 이미지와 지원되는 원본을 저장하고 정해진 순서로 종료해요.</p><p class="ill-tip">그림은 합성 원리예요. 구름·흔들림으로 제외되는 장이 있고, 결과는 하늘·노출·장비에 따라 달라요.</p></li></ol></div></div>
+          <div class="ill-toolbar" hidden><ol class="ill-step-nav" aria-label="화면에 빛을 모으는 순서 단계 선택"></ol><div class="ill-controls"><button type="button" class="ill-prev" aria-label="화면에 빛을 모으는 순서 이전 단계">← 이전</button><button type="button" class="ill-play" aria-pressed="false" aria-label="화면에 빛을 모으는 순서 순서대로 재생 또는 일시 정지">▶ 순서대로 재생</button><button type="button" class="ill-next" aria-label="화면에 빛을 모으는 순서 다음 단계">다음 →</button></div></div>
+          <p class="ill-note">빛을 받는 곳은 망원경의 카메라예요. 휴대폰은 조작과 결과 확인에 사용해요. 재생하면 8초마다 다음 그림으로 넘어가요.</p>
+        </article>
+        <details class="ill-details"><summary>스마트망원경 준비와 촬영을 자세히 보기</summary><ol class="scope-steps">
           <li><h4>삼각대와 본체부터 고정</h4><p>설명서에 맞는 삼각대에 본체를 고정하고 전원·배터리를 확인해요. 하늘이 트인 곳에서 수평을 맞추고, 움직이는 경통 주변을 비워요. 적도의 모드를 사용하는 기종은 전용 장착과 극축 정렬이 추가로 필요해요.</p></li>
           <li><h4>앱 연결과 관측 준비</h4><p>공식 앱으로 연결하고 위치·시각, 펌웨어, 남은 저장 공간을 확인해요. 제조사가 정한 덮개·결로 방지·보정 절차를 따르세요. Wi-Fi 연결 방식과 야외 인터넷 필요 여부는 기종마다 달라요.</p></li>
           <li><h4>대상 찾기와 초점 확인</h4><p>밤하늘에서 충분히 높이 뜬 대상을 고르고 자동 정렬·도입·초점 절차를 진행해요. 가지나 건물에 가리면 실패할 수 있어요. 미리보기에서 별이 퍼지지 않는지, 대상 전체가 화각에 들어오는지 확인해요.</p></li>
           <li><h4>촬영을 누적하고 원본 저장</h4><p>딥스카이는 앱의 촬영·스태킹을 진행하며 유효하게 쌓인 시간을 확인해요. 구름이나 흔들림으로 버려지는 장도 있어요. 결과 이미지와 지원되는 원본(FITS 등)을 저장한 뒤 앱의 종료·경통 수납 순서를 따르세요.</p></li>
-        </ol>
+        </ol></details>
         <div class="scope-buy-card scope-smart-check"><p class="section-label">스마트망원경 구입 전 확인</p><h4>자동화 기능과 실제 화각을 따로 비교해요</h4><dl>
           <div><dt>대상과 화각</dt><dd>한 장의 가로·세로 화각을 확인해요. 딥스카이용 모델도 행성을 찍을 수는 있지만, 짧은 초점거리에서는 행성이 작게 나올 수 있어요. 은하수 전체를 원한다면 광각 촬영용 카메라·모드가 있는지도 확인하세요. 보조 광각 카메라가 탐색 전용인지도 구분해요.</dd></div>
           <div><dt>모자이크와 촬영 시간</dt><dd>모자이크는 여러 구역을 촬영해 더 넓게 이어 붙이는 기능이에요. 원래 한 장의 화각이 넓어지는 것은 아니며, 필요한 촬영 시간과 가장자리 품질을 함께 살펴야 해요.</dd></div>
           <div><dt>원본·저장·앱 지원</dt><dd>JPEG 외에 개별 촬영분이나 FITS를 꺼낼 수 있는지, 휴대폰 운영체제와 호환되는지 확인해요. 오프라인 사용 범위, 배터리·외부 전원·저장 용량, 추가 기능 비용과 국내 수리 지원도 총비용에 포함해요.</dd></div>
           <div><dt>행성과 태양 모드</dt><dd>행성용 동영상·스태킹 지원과 실제 결과 예시를 확인해요. 태양 촬영은 해당 모델의 전용 태양 필터와 절차가 필요하며, 내장 광공해 필터로 대신할 수 없어요. <a href="#scope-solar">태양 관측 안전 ↓</a></dd></div>
         </dl></div>
-        <p class="small scope-official-links"><a href="https://www.seestar.com/products/seestar-s30-all-in-one-smart-telescope" target="_blank" rel="noopener noreferrer">Seestar · 사양과 설명서 예시 ↗</a><a href="https://vaonis.com/pages/manuals-documents" target="_blank" rel="noopener noreferrer">Vaonis · 모델별 설명서 ↗</a><a href="https://us.seestar.com/blogs/tutorial/seestar-video-stack-tutorial" target="_blank" rel="noopener noreferrer">Seestar · 달·행성 동영상 스태킹 안내 ↗</a></p>
         <a class="text-link" href="#photo-smart">스마트망원경으로 촬영하고 기록하기 →</a>
       </section>
 
@@ -260,9 +267,9 @@
       </section>
 
       <section id="scope-videos" class="scope-section" aria-labelledby="scope-videos-title">
-        <div class="section-heading"><h3 id="scope-videos-title">설명 영상만 찾아보기</h3><span class="small">제조사 공식 시연 · 영어</span></div>
-        <nav class="scope-video-index" aria-label="장비별 설명 영상"><a href="#scope-video-assembly"><span>망원경 조립</span><small>경위대 설치 · 2:03</small></a><a href="#scope-video-finder"><span>망원경 사용</span><small>파인더 정렬 · 2:36</small></a><a href="#scope-video-binocular-mount"><span>쌍안경 준비</span><small>삼각대 연결 · 4:30</small></a><a href="#scope-video-binocular-focus"><span>쌍안경 사용</span><small>아이컵·초점 조절 · 1:01</small></a></nav>
-        <p class="small">각 영상에 한국어 핵심 순서를 함께 적었어요. 영상의 기종과 내 장비의 차이를 확인하세요. 영상은 버튼을 눌렀을 때 불러오며, 재생이 제한되면 ‘YouTube에서 보기’로 열 수 있어요. 영상 자막 제공 여부는 제작자와 YouTube에 따라 달라요.</p>
+        <div class="section-heading"><h3 id="scope-videos-title">그림 안내 모아 보기</h3><span class="small">직접 그린 7개 안내 · 30개 장면</span></div>
+        <nav class="scope-illustration-index" aria-label="장비와 촬영 그림 안내"><a href="#scope-video-assembly"><span>망원경 · 조립</span><small>6단계 · 한국어 그림 설명</small></a><a href="#scope-video-finder"><span>망원경 · 파인더 사용</span><small>4단계 · 한국어 그림 설명</small></a><a href="#scope-video-binocular-mount"><span>쌍안경 · 준비</span><small>3단계 · 한국어 그림 설명</small></a><a href="#scope-video-binocular-focus"><span>쌍안경 · 사용</span><small>5단계 · 한국어 그림 설명</small></a><a href="#scope-smart-guide"><span>스마트망원경 · 준비와 촬영</span><small>4단계 · 한국어 그림 설명</small></a><a href="#photo-phone-wide-guide"><span>휴대폰 · 삼각대 촬영</span><small>4단계 · 한국어 그림 설명</small></a><a href="#photo-phone-eyepiece-guide"><span>휴대폰 · 접안 촬영</span><small>4단계 · 한국어 그림 설명</small></a></nav>
+        <p class="small">그림을 한 장씩 넘겨 보거나 ‘순서대로 재생’을 눌러 따라 해 보세요. 필요한 단계에서 멈춰 두고 직접 해 볼 수 있어요.</p>
       </section>
 
       <section id="scope-trouble" class="scope-section" aria-labelledby="scope-trouble-title">
@@ -280,15 +287,15 @@
       <section id="scope-solar" class="scope-section scope-solar" aria-labelledby="scope-solar-title"><h3 id="scope-solar-title">태양 관측은 별도로 준비하세요</h3><p>처음이라면 숙련된 지도자와 함께 장비부터 확인하세요. 태양 관측 전용 망원경은 해당 기기의 설명서를 따라야 해요.</p><ul><li>일반 망원경에는 기기에 맞는 <b>태양 관측 전용 필터를 빛이 들어오는 맨 앞쪽에</b> 단단히 고정해야 해요. 쌍안경은 <b>양쪽 대물렌즈 모두</b>에 적합한 전용 필터가 필요해요. 필터의 손상·틈·이탈 가능성을 관측 전에 확인하세요.</li><li><b>일식 안경을 쓴 채 망원경이나 쌍안경을 들여다보면 안 돼요.</b> 선글라스·일반 감광 필터도 대용품이 아니에요.</li><li>일반 광학 파인더로 태양을 찾지 마세요. 파인더는 분리하거나 덮개를 단단히 고정해 사용하지 못하게 해요.</li><li>안전 장비가 준비되지 않았다면 <a href="https://sdo.gsfc.nasa.gov/data/" target="_blank" rel="noopener noreferrer">NASA 태양 영상</a>으로 관찰하세요.</li></ul><a class="text-link" href="https://science.nasa.gov/eclipses/safety/" target="_blank" rel="noopener noreferrer">NASA 태양 관측 안전 안내 ↗</a></section>
 
       <aside class="scope-note"><h4>관측을 마친 뒤</h4><p>파인더와 전원을 끄고 접안렌즈를 챙겨요. 결로가 있다면 통풍되는 곳에서 충분히 말린 뒤 덮개를 씌워 건조하게 보관하세요. 렌즈·거울을 손으로 만지거나 옷소매로 닦지 말고, 청소는 기종 안내를 따르세요.</p></aside>
-      <details class="scope-sources"><summary>참고한 공식 사용 안내</summary><p>기종 공통의 입문 안내입니다. 조립·균형·잠금·정렬의 세부 절차는 사용 중인 모델의 설명서를 우선하세요.</p><ul><li><a href="https://www.celestron.com/blogs/knowledgebase/aligning-your-celestron-finderscope-a-step-by-step-guide" target="_blank" rel="noopener noreferrer">Celestron · 파인더 정렬</a></li><li><a href="https://www.celestron.com/blogs/knowledgebase/how-do-i-use-my-telescope-eyepieces" target="_blank" rel="noopener noreferrer">Celestron · 접안렌즈와 초점 조절</a></li><li><a href="https://www.celestron.com/blogs/knowledgebase/what-is-magnification-power-as-it-pertains-to-telescopes" target="_blank" rel="noopener noreferrer">Celestron · 배율 계산</a></li><li><a href="https://www.celestron.com/blogs/knowledgebase/why-is-my-telescope-showing-everything-upside-down-is-there-something-wrong-with-it" target="_blank" rel="noopener noreferrer">Celestron · 상의 방향</a></li><li><a href="https://www.celestron.com/pages/skyalign-technology" target="_blank" rel="noopener noreferrer">Celestron · 자동 도입 전 별 정렬 예시</a></li><li><a href="https://skywatcher.com/download/manual/manual-operated-telescope/" target="_blank" rel="noopener noreferrer">Sky-Watcher · 경위대·적도의·돕소니언 설명서</a></li><li><a href="https://www.celestron.com/pages/manuals" target="_blank" rel="noopener noreferrer">Celestron · 기종별 조립 설명서</a></li>
-        <li><a href="https://www.celestron.com/pages/how-to-buy-your-first-telescope" target="_blank" rel="noopener noreferrer">Celestron · 망원경 구입 기준과 광학 방식</a></li>
-        <li><a href="https://imaging.nikon.com/sport-optics/guide/binoculars/using/using_01/" target="_blank" rel="noopener noreferrer">Nikon · 쌍안경 눈 간격과 초점 조절</a></li>
-        <li><a href="https://imaging.nikon.com/sport-optics/guide/binoculars/using/using_03/" target="_blank" rel="noopener noreferrer">Nikon · 쌍안경 잡는 방법과 삼각대 사용</a></li>
-        <li><a href="https://imaging.nikon.com/sport-optics/guide/binoculars/choosing/choosing_02/" target="_blank" rel="noopener noreferrer">Nikon · 쌍안경 사양을 비교하는 방법</a></li>
-        <li><a href="https://nij.nikon.com/enjoy/life/stars/point/binocular.html" target="_blank" rel="noopener noreferrer">Nikon · 별 관측용 쌍안경의 특징과 선택</a></li>
-        <li><a href="https://www.celestron.com/blogs/knowledgebase/setting-the-diopter-compensation-adjustment-dial-on-a-binocular" target="_blank" rel="noopener noreferrer">Celestron · 쌍안경 시도 보정</a></li>
-        <li><a href="https://vortexoptics.com/pro-binocular-adapter.html" target="_blank" rel="noopener noreferrer">Vortex Optics · 영상에 사용된 삼각대 어댑터</a></li>
-        <li><a href="https://science.nasa.gov/eclipses/safety/" target="_blank" rel="noopener noreferrer">NASA · 망원경·쌍안경의 태양 관측 안전</a></li></ul><p>설명서와 영상 연결 확인: 2026년 10월 17일. 영상 속 제품은 사용법을 보여 주는 예시입니다.</p></details>
+      <details class="scope-sources"><summary>그림 제작과 내용 참고 자료</summary><p>그림·구성: KJE LAB. 원리를 설명하기 위해 직접 만든 도해이며 실제 장비의 치수·잠금 구조와는 다를 수 있어요. 기종별 조립·균형·잠금 절차는 사용하는 장비의 설명서를 확인하세요.</p><ul>
+        <li><a href="https://skywatcher.com/download/manual/manual-operated-telescope/" target="_blank" rel="noopener noreferrer">경위대·적도의·돕소니언 조립 설명서 · Sky-Watcher</a></li>
+        <li><a href="https://www.celestron.com/blogs/knowledgebase/aligning-your-celestron-finderscope-a-step-by-step-guide" target="_blank" rel="noopener noreferrer">파인더 정렬 원리 · Celestron</a></li>
+        <li><a href="https://imaging.nikon.com/sport-optics/guide/binoculars/using/using_01/" target="_blank" rel="noopener noreferrer">쌍안경 눈 간격과 초점 조절 · Nikon</a></li>
+        <li><a href="https://imaging.nikon.com/sport-optics/guide/binoculars/choosing/choosing_02/" target="_blank" rel="noopener noreferrer">쌍안경 사양 읽는 방법 · Nikon</a></li>
+        <li><a href="https://vaonis.com/pages/manuals-documents" target="_blank" rel="noopener noreferrer">카메라 일체형 망원경의 기종별 절차 · Vaonis</a></li>
+        <li><a href="https://us.seestar.com/blogs/tutorial/seestar-video-stack-tutorial" target="_blank" rel="noopener noreferrer">달·행성 동영상 스태킹 기능 예시 · Seestar</a></li>
+        <li><a href="https://science.nasa.gov/eclipses/safety/" target="_blank" rel="noopener noreferrer">망원경·쌍안경의 태양 관측 안전 · NASA</a></li>
+        </ul><p>내용 참고 자료 확인: 2026년 10월 17일.</p></details>
     </section>
     <section id="panel-photo" class="scope-guide photo-guide" role="tabpanel" aria-labelledby="tab-photo" hidden>
       <div class="scope-intro"><p class="section-label">관측에서 촬영과 기록으로</p><h2>어떤 하늘을 담고 싶나요?</h2><p>풍경 속 은하수부터 작은 행성까지, 대상이 차지하는 하늘의 크기가 달라요. 화각에 맞는 장비를 고르고, 휴대폰으로도 첫 촬영을 시작해 보세요.</p></div>
@@ -333,10 +340,22 @@
 
       <section id="photo-phone" class="scope-section" aria-labelledby="photo-phone-title">
         <div class="section-heading"><h3 id="photo-phone-title">휴대폰으로 시작하는 두 가지 방법</h3></div>
-        <div class="photo-phone-grid">
+        <article id="photo-phone-wide-guide" class="illustrated-guide" aria-labelledby="photo-phone-wide-guide-title">
+          <header class="ill-header"><div><p class="section-label">휴대폰 · 삼각대 촬영 · 그림 안내</p><h4 id="photo-phone-wide-guide-title">휴대폰만으로 별 찍기</h4></div><span class="ill-credit">KJE LAB<br>ILLUSTRATED GUIDE</span></header>
+          <div class="ill-layout"><figure class="ill-figure"><div class="ill-stage" style="--step-count:4"><img src="guides/phone-wide.svg?v=20261017-drawings" width="2560" height="400" loading="lazy" decoding="async" alt="풍경을 향한 휴대폰이 삼각대 위에 놓여 있고 타이머 아이콘이 있다."></div></figure><div class="ill-copy"><p class="ill-counter" aria-live="polite" aria-atomic="true">01 / 04 단계</p><ol class="ill-step-list"><li id="photo-phone-wide-guide-step-1" data-short="고정" data-alt="풍경을 향한 휴대폰이 삼각대 위에 놓여 있고 타이머 아이콘이 있다."><h5>휴대폰을 단단히 받쳐요</h5><p>삼각대나 안정된 받침을 사용해요. 플래시를 끄고 타이머나 원격 셔터로 손이 만드는 흔들림을 줄여요.</p></li><li id="photo-phone-wide-guide-step-2" data-short="초점" data-alt="가로 휴대폰 화면의 별에 초점 사각형이 놓이고 1배 기본 화각이 표시되어 있다."><h5>주 카메라로 먼 곳에 초점을 맞춰요</h5><p>주 카메라의 기본 화각에서 시작해요. 밝은 별이나 먼 불빛으로 초점을 확인하고, 가능하면 초점을 고정해요.</p></li><li id="photo-phone-wide-guide-step-3" data-short="시험 촬영" data-alt="휴대폰 화면 옆에 5초와 ISO 800이 시험값으로 표시되고 조절 화살표가 있다."><h5>설정은 한 번에 하나씩 바꿔요</h5><p>야간·천체 모드가 있다면 활용해요. 수동 촬영이 가능하면 5초·ISO 800을 시험해 보고 하늘과 별의 모양에 맞춰 조절해요.</p><p class="ill-tip">모든 기종에 공통인 정답 설정은 아니에요. 야간 모드 전체 처리 시간과 한 장의 노출 시간도 구분해요.</p></li><li id="photo-phone-wide-guide-step-4" data-short="결과 확인" data-alt="왼쪽 확대 화면의 별은 점이고 오른쪽 화면의 별은 길게 늘어진 선으로 비교되어 있다."><h5>확대해서 별의 모양을 살펴요</h5><p>별이 작은 점인지 확인해요. 길게 늘어지면 한 장의 노출을 줄이고, 흔들렸다면 고정과 타이머를 점검해 다시 찍어요.</p></li></ol></div></div>
+          <div class="ill-toolbar" hidden><ol class="ill-step-nav" aria-label="휴대폰만으로 별 찍기 단계 선택"></ol><div class="ill-controls"><button type="button" class="ill-prev" aria-label="휴대폰만으로 별 찍기 이전 단계">← 이전</button><button type="button" class="ill-play" aria-pressed="false" aria-label="휴대폰만으로 별 찍기 순서대로 재생 또는 일시 정지">▶ 순서대로 재생</button><button type="button" class="ill-next" aria-label="휴대폰만으로 별 찍기 다음 단계">다음 →</button></div></div>
+          <p class="ill-note">은하수·별자리·하늘 풍경을 넓게 담는 방법이에요. 그림의 화면은 특정 앱을 재현한 것이 아니에요. 재생하면 8초마다 다음 그림으로 넘어가요.</p>
+        </article>
+        <article id="photo-phone-eyepiece-guide" class="illustrated-guide" aria-labelledby="photo-phone-eyepiece-guide-title">
+          <header class="ill-header"><div><p class="section-label">휴대폰 · 접안 촬영 · 그림 안내</p><h4 id="photo-phone-eyepiece-guide-title">휴대폰을 망원경에 연결하기</h4></div><span class="ill-credit">KJE LAB<br>ILLUSTRATED GUIDE</span></header>
+          <div class="ill-layout"><figure class="ill-figure"><div class="ill-stage" style="--step-count:4"><img src="guides/phone-eyepiece.svg?v=20261017-drawings" width="2560" height="400" loading="lazy" decoding="async" alt="완성된 망원경과 그 원형 시야 한가운데 있는 달이 그려져 있다."></div></figure><div class="ill-copy"><p class="ill-counter" aria-live="polite" aria-atomic="true">01 / 04 단계</p><ol class="ill-step-list"><li id="photo-phone-eyepiece-guide-step-1" data-short="달 찾기" data-alt="완성된 망원경과 그 원형 시야 한가운데 있는 달이 그려져 있다."><h5>먼저 눈으로 달을 가운데 놓아요</h5><p>휴대폰을 연결하기 전에 낮은 배율로 달을 찾아 초점을 맞춰요. 중앙에 놓고 시작하면 카메라를 연결한 뒤 찾기 쉬워요.</p></li><li id="photo-phone-eyepiece-guide-step-2" data-short="연결" data-alt="옆에서 본 접안렌즈와 휴대폰. 어댑터가 접안렌즈를 감싸고 휴대폰을 지지한다."><h5>어댑터로 휴대폰을 받쳐요</h5><p>휴대폰과 접안렌즈에 맞는 어댑터를 연결해요. 휴대폰을 손으로 받친 채 잠금과 경통의 균형을 확인해요.</p><p class="ill-tip">그림은 연결 원리예요. 어댑터 구조와 카메라 위치는 기종마다 달라요.</p></li><li id="photo-phone-eyepiece-guide-step-3" data-short="중심 맞추기" data-alt="접안렌즈의 큰 원과 휴대폰 카메라의 작은 원이 왼쪽에서는 어긋나 있고 오른쪽에서는 동심원으로 맞춰져 있다."><h5>카메라 렌즈를 중심에 맞춰요</h5><p>실제로 사용하는 휴대폰 카메라를 접안렌즈의 중심에 맞춰요. 좌우·높이·앞뒤 거리를 조금씩 조절해 검은 시야 가림을 줄여요.</p><p class="ill-tip">멀티 카메라가 자동으로 바뀌면 사용할 렌즈를 고정할 수 있는지 확인해요.</p></li><li id="photo-phone-eyepiece-guide-step-4" data-short="노출·촬영" data-alt="휴대폰 화면에 무늬가 있는 달이 보이고 노출 조절 막대가 아래쪽으로 내려와 있다."><h5>달 무늬가 보이게 노출을 낮춰요</h5><p>화면에서 초점을 다시 확인해요. 달이 하얗게 날아가지 않도록 노출을 낮추고 타이머나 원격 셔터로 촬영해요.</p><p class="ill-tip">추적하지 않는 망원경은 달이 시야에서 움직여요. 필요할 때 다시 중앙으로 옮겨 주세요.</p></li></ol></div></div>
+          <div class="ill-toolbar" hidden><ol class="ill-step-nav" aria-label="휴대폰을 망원경에 연결하기 단계 선택"></ol><div class="ill-controls"><button type="button" class="ill-prev" aria-label="휴대폰을 망원경에 연결하기 이전 단계">← 이전</button><button type="button" class="ill-play" aria-pressed="false" aria-label="휴대폰을 망원경에 연결하기 순서대로 재생 또는 일시 정지">▶ 순서대로 재생</button><button type="button" class="ill-next" aria-label="휴대폰을 망원경에 연결하기 다음 단계">다음 →</button></div></div>
+          <p class="ill-note">밝고 찾기 쉬운 달부터 연습해 보세요. 접안렌즈를 통해 휴대폰 카메라로 촬영하는 방식이에요. 재생하면 8초마다 다음 그림으로 넘어가요.</p>
+        </article>
+        <details class="ill-details"><summary>휴대폰 촬영 두 가지 방법을 글로 자세히 보기</summary><div class="photo-phone-grid">
           <article class="photo-phone-route"><p class="section-label">A · 휴대폰 단독 + 삼각대</p><h4>은하수·별자리·하늘 풍경</h4><ol class="scope-detail-steps"><li>렌즈를 깨끗이 하고, 휴대폰을 삼각대나 안정된 받침에 고정해요. 플래시는 끄고 타이머를 사용해요.</li><li>주 카메라의 기본 화각부터 시작해요. 초광각은 더 넓지만 기종에 따라 어두운 곳의 화질이 떨어질 수 있어요. 디지털 확대는 처음에는 줄여요.</li><li>야간 모드 또는 지원되는 천체사진 모드를 골라요. 밝은 별이나 먼 불빛에서 초점을 확인하고, 가능하면 초점을 고정해요.</li><li>수동 설정이 가능하다면 <b>5초·ISO 800</b>을 시험값으로 시작할 수 있어요. 어두우면 노출·ISO를 조절하고, 별이 길어지거나 하늘이 지나치게 밝으면 한 장의 노출을 줄여요. 정답 설정은 장소와 기종마다 달라요.</li><li>촬영이 끝날 때까지 움직이지 않고 기다려요. 결과를 확대해 흔들림과 초점을 확인한 뒤 같은 구도로 조건을 하나씩 바꿔 보세요.</li></ol><p class="small">야간·천체 모드의 표시 시간은 여러 장을 촬영·처리하는 전체 시간일 수 있어요. 단일 프레임의 셔터 시간과 구분해 기록하세요.</p></article>
           <article class="photo-phone-route"><p class="section-label">B · 휴대폰 + 망원경 접안렌즈</p><h4>달부터, 밝은 행성까지</h4><ol class="scope-detail-steps"><li>먼저 눈으로 망원경을 보며 낮은 배율에서 달을 중앙에 놓고 초점을 맞춰요.</li><li>휴대폰과 접안렌즈에 맞는 어댑터를 단단히 연결해요. 휴대폰을 손으로 받치며 무게 때문에 경통이 숙여지지 않는지 확인해요.</li><li>현재 사용하는 휴대폰 카메라 렌즈를 접안렌즈 중앙에 맞춰요. 앞뒤·좌우·높이를 조금씩 조정해 검은 시야 가림을 줄여요. 여러 카메라가 자동 전환되면 사용할 렌즈를 고정할 수 있는지 확인하세요.</li><li>휴대폰 화면에서 다시 초점을 확인하고, 달의 밝은 부분이 하얗게 날아가지 않게 노출을 낮춰요. 타이머나 원격 셔터로 촬영해요.</li><li>익숙해지면 달·행성의 짧은 동영상도 찍어 보세요. 필요하면 선명한 프레임을 골라 합성해요. 추적하지 않는 망원경은 대상이 시야를 벗어나므로 중간에 다시 중앙으로 옮겨요.</li></ol><p class="small">쌍안경도 호환 어댑터로 한쪽 접안렌즈를 촬영할 수 있지만, 본체와 휴대폰을 안정적으로 받치고 연결 규격을 확인해야 해요.</p></article>
-        </div>
+        </div></details>
         <div class="scope-faq photo-phone-help">
           <details><summary>갤럭시와 아이폰에서는 어떤 모드를 쓰나요?</summary><p><b>갤럭시:</b> 기본 카메라의 야간 모드부터 시작해요. 지원 모델은 Expert RAW의 천체사진 기능도 사용할 수 있어요. 지원 기종·해상도·메뉴 위치는 앱과 운영체제 버전에 따라 달라지므로 공식 안내를 확인하세요.</p><p><b>아이폰:</b> 지원 모델에서는 어두운 환경에서 야간 모드를 사용할 수 있어요. 삼각대로 고정하고 표시된 촬영 시간이 끝날 때까지 기다려요. 모든 렌즈와 모드에서 같은 기능이 제공되는 것은 아니에요.</p><p><a href="https://www.samsung.com/uk/support/mobile-devices/professional-photography-with-galaxy-expert-raw-app/" target="_blank" rel="noopener noreferrer">Samsung · Expert RAW 공식 안내 ↗</a> · <a href="https://support.apple.com/ko-kr/guide/iphone/iph1a3c5b4c3/ios" target="_blank" rel="noopener noreferrer">Apple · 야간 모드 안내 ↗</a></p></details>
           <details><summary>휴대폰에 별이 거의 안 찍히거나, 달이 하얗게만 나와요</summary><p>별 촬영은 고정·초점·어두운 하늘부터 확인해요. 달 표면은 밝으므로 긴 야간 노출이 오히려 세부를 지울 수 있어요. 망원경 연결 시 검은 화면만 보이면 렌즈 중심과 접안렌즈까지의 거리를 먼저 맞춰 보세요.</p></details>

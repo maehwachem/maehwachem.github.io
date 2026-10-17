@@ -1,0 +1,40 @@
+/* Original KJE LAB drawing players. No external player or video service. */
+.illustrated-guide{margin:24px 0;border:1px solid var(--line);border-radius:16px;background:var(--panel);overflow:hidden;scroll-margin-top:24px}
+.ill-header{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px 24px;border-bottom:1px solid var(--line)}
+.ill-header .section-label{font-size:11px;margin-bottom:4px}
+.scope-guide .ill-header h4,.photo-guide .ill-header h4{font-size:20px;margin:0;line-height:1.45}
+.ill-credit{font-size:10px;letter-spacing:.13em;color:var(--muted);white-space:nowrap;line-height:1.8;text-align:right}
+.ill-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);align-items:center}
+.ill-figure{min-width:0;margin:0;align-self:stretch;background:#f7f4eb;display:grid;align-items:center}
+.ill-stage{aspect-ratio:8/5;overflow:hidden;width:100%;isolation:isolate}
+.ill-stage img{display:block;width:calc(100% * var(--step-count));max-width:none;height:100%;transform:translateX(0);transition:transform .4s ease}
+.ill-copy{padding:24px;min-width:0}
+.ill-counter{font-size:12px;color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums;margin:0 0 10px}
+.ill-step-list{list-style:none;padding:0;margin:0}
+.ill-step-list li+li{margin-top:16px}
+.ill-ready .ill-step-list li{margin-top:0}
+.scope-guide .ill-step-list h5,.photo-guide .ill-step-list h5{margin:0 0 12px;font-size:18px;line-height:1.55;letter-spacing:-.035em;word-break:keep-all}
+.ill-step-list p{color:var(--muted);font-size:14px;line-height:1.8;margin:0}
+.ill-step-list .ill-tip{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:12px;line-height:1.75}
+.ill-toolbar{border-top:1px solid var(--line);padding:16px 24px}
+.ill-step-nav{display:flex;gap:4px;margin:0 0 14px;padding:0;list-style:none}
+.ill-step-nav li{flex:1;min-width:0}
+.ill-step-nav button{width:100%;padding:7px 3px;border:0;border-radius:6px;background:transparent;color:var(--muted);font-size:11px;line-height:1.5;min-height:50px;display:flex;gap:3px;align-items:center;flex-direction:column}
+.ill-step-nav button span:first-child{font-variant-numeric:tabular-nums;font-size:12px;font-weight:650}
+.ill-step-nav button:hover{background:var(--soft)}
+.ill-step-nav button[aria-current=step]{background:var(--soft);color:var(--ink);box-shadow:inset 0 -2px var(--accent)}
+.ill-controls{display:flex;justify-content:center;align-items:center;gap:10px}
+.ill-controls button{min-height:44px;padding:8px 16px;font-size:13px}
+.ill-controls .ill-play{min-width:142px;background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.ill-controls button:disabled{opacity:.4;cursor:default}
+.ill-play[aria-pressed=true]{background:var(--soft);color:var(--ink);border-color:var(--line)}
+.ill-note{border-top:1px solid var(--line);padding:12px 24px;margin:0!important;font-size:12px;color:var(--muted);line-height:1.7}
+.ill-details{margin:18px 0;border:1px solid var(--line);border-radius:10px;padding:0 16px;background:var(--panel)}
+.ill-details>summary{cursor:pointer;min-height:48px;padding:12px 0;font-size:13px;color:var(--ink)}
+.ill-details>ol,.ill-details>.photo-phone-grid{margin:4px 0 16px}
+.scope-illustration-index{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(min-width:851px){.ill-ready .ill-copy{min-height:315px;display:flex;flex-direction:column;justify-content:center}}
+@media(max-width:850px){.ill-layout{grid-template-columns:minmax(0,1fr)}.ill-stage{max-height:390px;aspect-ratio:8/5;max-width:624px;justify-self:center}.ill-figure{padding:0}.ill-copy{padding:20px 24px}.ill-ready .ill-copy{min-height:210px}.ill-header{padding:18px 24px}}
+@media(max-width:650px){.ill-header{padding:16px;align-items:flex-start}.scope-guide .ill-header h4,.photo-guide .ill-header h4{font-size:18px}.ill-credit{font-size:9px}.ill-copy{padding:18px 16px}.ill-ready .ill-copy{min-height:238px}.ill-step-list p{font-size:13px}.scope-guide .ill-step-list h5,.photo-guide .ill-step-list h5{font-size:16px}.ill-toolbar{padding:12px 12px 16px}.ill-step-nav{gap:2px}.ill-step-nav button{font-size:10px;letter-spacing:-.03em}.ill-controls{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.7fr) minmax(0,1fr);gap:8px}.ill-controls button{padding:8px 4px;min-width:0;white-space:nowrap}.ill-controls .ill-play{min-width:0}.ill-note{padding:12px 16px;font-size:11px}.scope-illustration-index{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(prefers-reduced-motion:reduce){.ill-stage img{transition:none}}
+@media print{.ill-toolbar{display:none!important}.ill-layout{display:block}.ill-stage{max-width:450px}.ill-step-list li[hidden]{display:list-item!important}.ill-step-list li+li{margin-top:16px}.illustrated-guide{break-inside:avoid}.ill-copy{min-height:0!important}.ill-details>ol,.ill-details>.photo-phone-grid{display:grid!important}}
