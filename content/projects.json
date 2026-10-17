@@ -393,24 +393,6 @@
           }
         ],
         "subject": "tools"
-      },
-      {
-        "kind": "tool",
-        "title": "하늘 관측실",
-        "date": "2026-10-17",
-        "poster": "star",
-        "words": "하늘\n관측실",
-        "tag": "천문 · 관측 안내",
-        "level": "학생 · 교사 · 일반 관측자",
-        "desc": "관측 날짜와 장소를 골라 낮의 태양과 달, 밤의 행성과 밝은 별, 해·달 출몰 시각과 월별 천문현상을 확인하는 도구.",
-        "cover": "assets/uploads/cover-sky-observatory.webp",
-        "links": [
-          {
-            "label": "관측실 열기",
-            "url": "/sky/"
-          }
-        ],
-        "subject": "earth"
       }
     ],
     "lesson": [
@@ -503,6 +485,28 @@
           }
         ],
         "subject": "chemistry"
+      }
+    ]
+  },
+  "hobbies": {
+    "astronomy": [
+      {
+        "kind": "hobby",
+        "title": "하늘 관측실",
+        "date": "2026-10-17",
+        "poster": "star",
+        "words": "하늘\n관측실",
+        "tag": "천문 · 관측 안내",
+        "level": "학생 · 교사 · 일반 관측자",
+        "desc": "관측 날짜와 장소를 골라 낮의 태양과 달, 밤의 행성과 밝은 별, 해·달 출몰 시각과 월별 천문현상을 확인하는 도구.",
+        "cover": "assets/uploads/cover-sky-observatory.webp",
+        "links": [
+          {
+            "label": "관측실 열기",
+            "url": "/sky/"
+          }
+        ],
+        "subject": "earth"
       }
     ]
   }

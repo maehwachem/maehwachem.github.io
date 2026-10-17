@@ -58,8 +58,8 @@
       const list=root.querySelector('.kje-explore-list');list.replaceChildren();
       site.explorations.forEach(item=>{if(!item)return;const article=node('article');article.append(node('h3','',item.title),node('p','',item.text));addLink(article,item.link_label,item.link);list.append(article);});
     }
-    setText('#journal-title',site.interests_title);setText('.kje-about-copy',site.interests_text);
-    if(Array.isArray(site.interests)){const list=root.querySelector('.kje-interests');list.replaceChildren(...site.interests.map(value=>node('span','',value)));}
+    setText('#hobbies-title',site.interests_title);setText('.kje-about-copy',site.interests_text);
+    if(Array.isArray(site.interests)){const list=root.querySelector('.kje-interests');list.replaceChildren(...site.interests.map(value=>{const link=value==='천문관측';const item=node(link?'a':'span','',value);if(link)item.href='#hobby-astronomy';return item;}));}
   }
   let selectedCategory='lab';
   function selectCategory(key,writeHash=false) {
@@ -95,20 +95,30 @@
     const list=root.querySelector('#kje-project-list');const fragment=document.createDocumentFragment();
     for(const item of orderedItems(projects,data.display_order)) {
       if(!item || !text(item.title) || !own(formats,item.kind))continue;
-      const card=node('article','kje-project');card.dataset.kind=item.kind;card.dataset.subject=own(categories,item.subject)&&item.subject!=='all'?item.subject:'tools';
+      fragment.append(projectCard(item,data));
+    }
+    list.replaceChildren(fragment);selectCategory(selectedCategory);
+    const astronomy=data.hobbies?.astronomy;
+    if(Array.isArray(astronomy)){
+      const hobbies=root.querySelector('#kje-astronomy-list');const cards=document.createDocumentFragment();
+      for(const item of orderedItems(astronomy,data.display_order)){if(item && text(item.title))cards.append(projectCard(item,data,true));}
+      hobbies.replaceChildren(cards);root.querySelector('#hobby-astronomy').hidden=!hobbies.children.length;
+    }
+  }
+  function projectCard(item,data,hobby=false) {
+      const card=node('article','kje-project'+(hobby?' kje-hobby-card':''));if(!hobby)card.dataset.kind=item.kind;card.dataset.subject=own(categories,item.subject)&&item.subject!=='all'?item.subject:'tools';
       const posterName=own(art,item.poster)?item.poster:'note';const poster=node('div','kje-poster kje-poster-'+posterName);poster.setAttribute('aria-hidden','true');
       const cover=safeURL(item.cover,true);
       if(cover){if(/\/cover-(?:watercolor|series)-/.test(cover))poster.classList.add('kje-watercolor-cover');if(item.kind!=='lab'&&item.kind!=='game'&&/-illustrated(?:-v\d+)?\.webp$/.test(cover))poster.classList.add('kje-editorial-illustrated');if(item.kind==='lab'&&/lab-[a-z-]+-illustrated\.webp$/.test(cover))poster.classList.add('kje-lab-illustrated');const img=node('img','kje-project-cover');img.src=cover;img.alt='';img.loading='lazy';poster.append(img);if(item.kind==='game'){poster.classList.add('kje-game-cover');poster.append(node('span','kje-poster-cap',/gameplay\.webp$/.test(cover)?'실제 플레이 화면':categories[card.dataset.subject][0]+' · '+formats[item.kind][0]),node('span','kje-poster-word',item.title));}}
-      else{poster.innerHTML=art[posterName];poster.prepend(node('span','kje-poster-cap',categories[card.dataset.subject][0]+' · '+formats[item.kind][0]));poster.append(node('span','kje-poster-word',item.words||item.title));}
-      card.append(poster,node('p','kje-project-tag',item.tag),node('h3','kje-project-title',item.title),node('p','kje-project-desc',item.desc));
-      if(text(item.level).trim()){const level=node('p','kje-project-level');level.append(node('span','kje-project-level-label','대상'),document.createTextNode(item.level));card.append(level);}
-      if(data.show_dates!==false && dateKey(item.date))card.append(postMeta(item,false));
+      else{poster.innerHTML=art[posterName];poster.prepend(node('span','kje-poster-cap',hobby?'취미 · 천문관측':categories[card.dataset.subject][0]+' · '+formats[item.kind][0]));poster.append(node('span','kje-poster-word',item.words||item.title));}
+      card.append(poster);const copy=hobby?node('div','kje-hobby-copy'):card;
+      copy.append(node('p','kje-project-tag',item.tag),node(hobby?'h4':'h3','kje-project-title',item.title),node('p','kje-project-desc',item.desc));
+      if(text(item.level).trim()){const level=node('p','kje-project-level');level.append(node('span','kje-project-level-label','대상'),document.createTextNode(item.level));copy.append(level);}
+      if(data.show_dates!==false && dateKey(item.date))copy.append(postMeta(item,false));
       const links=node('div','kje-project-links');
       (Array.isArray(item.links)?item.links:[]).forEach(link=>{if(link)addLink(links,link.label,link.url);});
       if(!links.children.length)links.append(node('span','kje-project-status','공개 준비 중'));
-      card.append(links);fragment.append(card);
-    }
-    list.replaceChildren(fragment);selectCategory(selectedCategory);
+      copy.append(links);if(hobby)card.append(copy);return card;
   }
   /* Rebuild rich text from an explicit allowlist; no scripts, event handlers, forms or embeds. */
   function safeRichText(html) {

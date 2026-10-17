@@ -809,6 +809,131 @@ content:
             message: https:// 로 시작하는 주소 또는 / 로 시작하는 페이지 경로를 입력해 주세요.
         description: 링크가 없으면 홈페이지에 공개 준비 중으로 표시됩니다.
       description: 목록 안에서는 점 손잡이로 순서를 바꿉니다. 다른 분류로 이동하려면 항목 안의 이동 메뉴를 사용하세요.
+  - name: hobbies
+    label: 취미 콘텐츠
+    type: object
+    description: 일상에서 이어지는 관심 아래에 표시할 콘텐츠입니다.
+    fields:
+    - name: astronomy
+      label: 천문관측
+      type: object
+      list:
+        collapsible:
+          collapsed: true
+          summary: '{title}'
+      fields:
+      - name: title
+        label: 콘텐츠 이름
+        type: string
+        required: true
+      - name: subject
+        label: 카드 색상 기준
+        type: select
+        required: true
+        default: tools
+        options:
+          values:
+          - name: physics
+            label: 물리
+          - name: chemistry
+            label: 화학
+          - name: biology
+            label: 생명과학
+          - name: earth
+            label: 지구과학
+          - name: environment
+            label: 환경
+          - name: tools
+            label: 도구
+        description: 카드의 색상만 정합니다. 프로젝트 분류에는 영향을 주지 않습니다.
+      - name: date
+        label: 게시일 (업로드 날짜)
+        type: date
+        default: ''
+        options:
+          format: yyyy-MM-dd
+        description: 처음 게시한 날짜를 선택하세요. 날짜를 모르는 기존 프로젝트는 비워 두면 표시되지 않습니다.
+      - name: desc
+        label: 설명
+        type: text
+        required: true
+      - name: tag
+        label: 주제 태그
+        type: string
+        description: '예: 산과 염기 · 중화 적정'
+      - name: level
+        label: 대상
+        type: string
+        description: '예: 고등학교 통합과학, 화학 / 중학교 과학, 고등학교 화학. 비워 두면 표시하지 않습니다.'
+      - name: cover
+        label: 대표 이미지
+        type: image
+        description: 선택 사항입니다. 비워 두면 아래 표지 스타일을 사용합니다.
+      - name: poster
+        label: 기본 표지 스타일
+        type: select
+        default: note
+        options:
+          values:
+          - name: lab
+            label: 실험
+          - name: gas
+            label: 기체
+          - name: heat
+            label: 열화학
+          - name: rate
+            label: 반응 속도
+          - name: equil
+            label: 화학 평형
+          - name: battery
+            label: 배터리
+          - name: island
+            label: 섬
+          - name: power
+            label: 전기
+          - name: note
+            label: 노트
+          - name: earth
+            label: 지구
+          - name: acid
+            label: 산과 염기
+          - name: glass
+            label: 실험도구
+          - name: solution
+            label: 용액과 농도
+          - name: sensor
+            label: 센서
+          - name: heart
+            label: 하트
+          - name: star
+            label: 별자리
+          - name: exhibit
+            label: 전시대
+      - name: words
+        label: 기본 표지에 들어갈 글자
+        type: text
+        description: 줄바꿈을 넣을 수 있습니다. 비워 두면 프로젝트 이름이 표시됩니다.
+      - name: links
+        label: 연결할 링크
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: '{label}'
+        fields:
+        - name: label
+          label: 버튼 이름
+          type: string
+          required: true
+        - name: url
+          label: 연결 주소
+          type: string
+          required: true
+          pattern:
+            regex: ^(https?://|/|#|mailto:).+
+            message: https:// 로 시작하는 주소 또는 / 로 시작하는 페이지 경로를 입력해 주세요.
+        description: 링크가 없으면 홈페이지에 공개 준비 중으로 표시됩니다.
+      description: 포트폴리오의 취미 → 천문관측에 표시합니다. 점 손잡이로 순서를 바꿀 수 있습니다.
 - name: shortlinks
   label: 짧은 주소
   type: file

@@ -56,3 +56,16 @@
 /* Watercolor covers include original hand lettering; never overlay a typeset title. */
 #kje-portfolio .kje-project .kje-poster.kje-watercolor-cover{height:auto;aspect-ratio:3/2;background:#f6efdd}
 #kje-portfolio .kje-watercolor-cover .kje-project-cover{width:100%;height:100%;object-fit:contain;object-position:center}
+
+/* Astronomy belongs to the personal interests section. */
+#kje-portfolio .kje-interests a{text-decoration:underline;text-underline-offset:4px}
+#kje-portfolio .kje-hobby-group{margin-top:32px;padding-top:26px;border-top:1px solid var(--kje-line)}
+#kje-portfolio .kje-hobby-group>h3{font-size:20px;font-weight:500;letter-spacing:-.5px;margin-bottom:18px}
+#kje-portfolio .kje-hobby-list{display:grid;gap:24px}
+#kje-portfolio .kje-project.kje-hobby-card{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:center;background:var(--kje-white);padding:22px}
+#kje-portfolio .kje-hobby-card .kje-poster{height:auto;aspect-ratio:3/2;margin:0}
+#kje-portfolio .kje-hobby-card .kje-project-cover{object-fit:contain}
+#kje-portfolio .kje-hobby-copy{min-width:0}
+#kje-portfolio .kje-hobby-copy .kje-project-tag{margin-top:0}
+#kje-portfolio .kje-hobby-copy .kje-project-links{margin-top:18px}
+@media(max-width:650px){#kje-portfolio .kje-hobby-group{margin-top:25px;padding-top:22px}#kje-portfolio .kje-project.kje-hobby-card{grid-template-columns:minmax(0,1fr);gap:20px;padding:18px}}
