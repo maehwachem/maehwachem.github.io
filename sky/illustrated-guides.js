@@ -4,6 +4,13 @@
   const players=[];
   const interval=8000;
   const reduced=window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+  function available(card){
+    if(card.closest('[hidden]'))return false;
+    for(let parent=card.parentElement;parent;parent=parent.parentElement){
+      if(parent.tagName==='DETAILS'&&!parent.open)return false;
+    }
+    return true;
+  }
   document.querySelectorAll('.illustrated-guide').forEach(card=>{
     const steps=[...card.querySelectorAll('.ill-step-list>li')];
     const img=card.querySelector('.ill-stage img');
@@ -16,7 +23,8 @@
     const panel=card.closest('[role=tabpanel]');
     if(!steps.length||!img||!toolbar||!panel)return;
     let index=0,timer=null;
-    const player={stop};players.push(player);
+    const player={card,stop,show};players.push(player);
+    if(steps.length>6)card.classList.add('ill-long');
     const buttons=steps.map((step,i)=>{
       const item=document.createElement('li'),button=document.createElement('button');
       button.type='button';
@@ -45,7 +53,7 @@
       play.textContent=index===steps.length-1?'↻ 다시 재생':'▶ 순서대로 재생';
     }
     function advance(){
-      if(panel.hidden||document.hidden||index===steps.length-1){stop();return;}
+      if(!available(card)||document.hidden||index===steps.length-1){stop();return;}
       show(index+1);
       timer=setTimeout(advance,interval);
     }
@@ -53,6 +61,7 @@
     next.addEventListener('click',()=>{stop();show(Math.min(steps.length-1,index+1));});
     play.addEventListener('click',()=>{
       if(timer!==null){stop();return;}
+      if(!available(card))return;
       players.forEach(p=>p.stop());
       if(index===steps.length-1)show(0);
       // Repeated live announcements interrupt screen-reader reading during playback.
@@ -60,9 +69,52 @@
       play.setAttribute('aria-pressed','true');play.textContent='Ⅱ 잠깐 멈추기';
       timer=setTimeout(advance,interval);
     });
-    new MutationObserver(()=>{if(panel.hidden)stop();}).observe(panel,{attributes:true,attributeFilter:['hidden']});
+    const visibilityObserver=new MutationObserver(()=>{if(!available(card))stop();});
+    for(let parent=card.parentElement;parent;parent=parent.parentElement){
+      if(parent.matches('[role=tabpanel],.scope-assembly-route,details')){
+        visibilityObserver.observe(parent,{attributes:true,attributeFilter:['hidden','open']});
+      }
+    }
     toolbar.hidden=false;card.classList.add('ill-ready');show(0);
   });
+  const mountChoice=document.querySelector('.scope-mount-choice');
+  const routes=[...document.querySelectorAll('[data-assembly-route]')];
+  if(mountChoice&&routes.length){
+    const choices=[...mountChoice.querySelectorAll('input[name="assembly-mount"]')];
+    function selectRoute(value){
+      routes.forEach(route=>{route.hidden=route.dataset.assemblyRoute!==value;});
+      choices.forEach(choice=>{choice.checked=choice.value===value;});
+      players.forEach(player=>{if(!available(player.card))player.stop();});
+    }
+    function revealTarget(target){
+      const route=target&&target.closest('[data-assembly-route]');
+      if(!route)return;
+      selectRoute(route.dataset.assemblyRoute);
+      for(let parent=target.parentElement;parent;parent=parent.parentElement){
+        if(parent.tagName==='DETAILS')parent.open=true;
+      }
+      const step=target.closest('.ill-step-list>li');
+      if(step){
+        const player=players.find(p=>p.card.contains(step));
+        if(player){player.stop();player.show([...step.parentElement.children].indexOf(step));}
+      }
+      // The main tab handler may have scrolled before this route was revealed.
+      if(typeof target.scrollIntoView==='function'){
+        requestAnimationFrame(()=>target.scrollIntoView({block:'start'}));
+      }
+    }
+    const revealHash=()=>revealTarget(document.getElementById(window.location.hash.slice(1)));
+    choices.forEach(choice=>choice.addEventListener('change',()=>{if(choice.checked)selectRoute(choice.value);}));
+    selectRoute(choices.find(choice=>choice.checked)?.value||'az');
+    mountChoice.hidden=false;
+    revealHash();
+    window.addEventListener('hashchange',revealHash);
+    // An existing fragment can be clicked again after changing the mount choice.
+    document.addEventListener('click',event=>{
+      const link=event.target.closest('a[href^="#"]');
+      if(link)revealTarget(document.getElementById(link.getAttribute('href').slice(1)));
+    });
+  }
   document.addEventListener('visibilitychange',()=>{if(document.hidden)players.forEach(p=>p.stop());});
   window.addEventListener('pagehide',()=>players.forEach(p=>p.stop()));
   // CSS omits transitions for reduced motion; preference changes also stop playback.
