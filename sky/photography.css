@@ -1,0 +1,58 @@
+/* Photography retains the observatory's paper and ink palette. */
+.scope-guide>.scope-guide-menu{grid-template-columns:repeat(5,minmax(0,1fr))}
+.scope-smart-check{margin-top:22px}
+.scope-smart-check dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 24px}
+.scope-official-links{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:16px}
+#panel-photo>.photo-menu{grid-template-columns:repeat(4,minmax(0,1fr))}
+.photo-menu a>span{font-size:11px;margin-bottom:8px}
+.photo-fov-box{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;padding:24px;background:var(--sky);border-radius:14px;margin:20px 0 12px;align-items:center}
+.photo-presets{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.photo-presets button{font-size:12px;min-height:44px;padding:6px 11px}
+.photo-fov-inputs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.photo-fov-inputs label:last-child{grid-column:1/-1}
+.photo-fov-inputs label,.photo-log-form label{display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--muted);min-width:0}
+.photo-fov-inputs input{width:100%}
+.photo-fov-result{margin-top:20px}
+.photo-fov-result>span{font-size:12px;color:var(--muted)}
+.photo-fov-result output{display:block;font-size:25px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.04em}
+.photo-fov-result p{font-size:12px;color:var(--muted);margin:6px 0 0}
+.photo-fov-figure{margin:0;min-width:0}
+.photo-fov-figure svg{display:block;width:100%;height:auto;overflow:hidden}
+#photo-frame{fill:var(--paper);stroke:var(--accent);stroke-width:2}
+#photo-moon-scale{fill:var(--accent)}
+#photo-m31-scale,#photo-m31-left,#photo-m31-right{stroke:var(--ink);stroke-width:2;stroke-dasharray:5 4}
+#photo-frame-label{font-size:17px;fill:var(--muted);font-family:inherit}
+.photo-fov-figure figcaption{display:flex;flex-wrap:wrap;gap:7px 15px;font-size:11px;color:var(--muted)}
+.photo-key-moon{color:var(--accent)}
+.photo-key-galaxy{color:var(--ink)}
+.photo-fov-figure figcaption small{display:block;width:100%;font-size:11px;line-height:1.7}
+.photo-detail{border-bottom:1px solid var(--line);font-size:13px;margin-top:14px}
+.photo-detail summary{cursor:pointer;min-height:44px;padding:10px 0}
+.photo-detail p{color:var(--muted);max-width:850px}
+.photo-target-grid,.photo-phone-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.photo-target,.photo-phone-route{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:22px;min-width:0;scroll-margin-top:24px}
+.photo-guide .photo-target h4,.photo-guide .photo-phone-route h4{font-size:18px;margin:4px 0 17px}
+.photo-target dl{margin:0}
+.photo-target dl>div{border-top:1px solid var(--line);padding-top:13px;margin-top:13px}
+.photo-target dt{font-size:12px;font-weight:650;margin-bottom:5px}
+.photo-target dd{font-size:13px;color:var(--muted);margin:0;overflow-wrap:anywhere}
+.photo-phone-route .scope-detail-steps{padding-left:19px;margin:16px 0}
+.photo-phone-route li{margin-bottom:14px}
+.photo-phone-help{margin-top:20px}
+.photo-smart-flow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:18px 0 12px}
+.photo-smart-flow article{background:var(--soft);padding:19px;border-radius:12px;min-width:0}
+.photo-smart-flow article>span{display:block;font-size:12px;color:var(--accent);margin-bottom:12px}
+.photo-smart-flow p{font-size:13px;color:var(--muted);margin-bottom:0}
+.photo-log-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;padding:23px;background:var(--panel);border:1px solid var(--line);border-radius:13px;margin-top:18px}
+.photo-log-form input,.photo-log-form textarea{width:100%;min-width:0}
+.photo-log-form textarea{font:inherit;font-size:14px;line-height:1.7;border:1px solid var(--line);border-radius:9px;padding:11px 13px;background:var(--paper);color:var(--ink);resize:vertical;min-height:100px}
+.photo-log-form textarea:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.photo-log-form input::placeholder,.photo-log-form textarea::placeholder{color:var(--muted);opacity:1}
+.photo-log-wide,.photo-log-actions{grid-column:1/-1}
+.photo-log-actions{display:flex;align-items:center;flex-wrap:wrap;gap:12px 18px}
+.photo-log-actions button{background:var(--accent);color:var(--panel);border-color:var(--accent);font-size:13px}
+.photo-log-actions button:hover{background:var(--ink)}
+.photo-safety{margin-top:30px}
+@media(max-width:850px){.scope-guide>.scope-guide-menu,#panel-photo>.photo-menu{grid-template-columns:repeat(2,minmax(0,1fr))}.scope-guide>.scope-guide-menu>a:last-child:nth-child(odd){grid-column:1/-1}.photo-fov-box{gap:20px}.photo-smart-flow{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:650px){.tabs{display:flex;gap:0;overflow-x:auto}.tabs button{flex:1 0 auto;min-width:56px;padding-inline:5px;font-size:12px}.photo-fov-box,.photo-target-grid,.photo-phone-grid,.scope-smart-check dl{grid-template-columns:minmax(0,1fr)}.photo-fov-box{padding:18px;gap:16px}.photo-fov-figure{max-width:500px;width:100%;margin-inline:auto}.photo-target,.photo-phone-route{padding:18px}.photo-log-form{padding:18px;grid-template-columns:minmax(0,1fr)}.photo-fov-result output{font-size:24px}.photo-log-form textarea{font-size:16px}.scope-smart-check h4{font-size:17px}}
+@media print{.photo-presets,.photo-log-actions{display:none}.photo-target,.photo-phone-route,.photo-fov-box,.photo-smart-flow article{break-inside:avoid}.photo-log-form{display:block}.photo-log-form label{margin-bottom:12px}.photo-detail>p{display:block!important}}

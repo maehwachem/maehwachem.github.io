@@ -1,8 +1,8 @@
 (function(){
   'use strict';
   const $=id=>document.getElementById(id),C=window.SkyCore;
-  const tabs=['day','night','calendar','telescope'];
-  function hashView(){const hash=window.location.hash.slice(1);return hash.startsWith('scope-')?'telescope':tabs.includes(hash)?hash:null;}
+  const tabs=['day','night','calendar','telescope','photo'];
+  function hashView(){const hash=window.location.hash.slice(1);return hash.startsWith('scope-')?'telescope':hash.startsWith('photo-')?'photo':tabs.includes(hash)?hash:null;}
   if(!C){$('error').hidden=false;$('error').textContent='계산 파일을 불러오지 못했어요. 새로고침해 주세요.';$('loading').textContent='';return;}
   const LOCATIONS={ansan:{name:'안산',lat:37.3219,lon:126.8309},siheung:{name:'시흥',lat:37.3802,lon:126.8029},seoul:{name:'서울',lat:37.5665,lon:126.9780},incheon:{name:'인천',lat:37.4563,lon:126.7052},suwon:{name:'수원',lat:37.2636,lon:127.0286},chuncheon:{name:'춘천',lat:37.8813,lon:127.7298},gangneung:{name:'강릉',lat:37.7519,lon:128.8761},daejeon:{name:'대전',lat:36.3504,lon:127.3845},sejong:{name:'세종',lat:36.4800,lon:127.2890},cheongju:{name:'청주',lat:36.6424,lon:127.4890},jeonju:{name:'전주',lat:35.8242,lon:127.1480},gwangju:{name:'광주',lat:35.1595,lon:126.8526},daegu:{name:'대구',lat:35.8714,lon:128.6014},busan:{name:'부산',lat:35.1796,lon:129.0756},ulsan:{name:'울산',lat:35.5384,lon:129.3114},changwon:{name:'창원',lat:35.2285,lon:128.6811},jeju:{name:'제주',lat:33.4996,lon:126.5312}};
   const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -97,7 +97,7 @@
     }catch(e){if(v===calendarVersion)showError('천문력을 계산하지 못했어요. '+(e.message||e));}
   }
   async function refresh(){
-    if(state.view==='telescope')return;
+    if(['telescope','photo'].includes(state.view))return;
     const v=++refreshVersion;showError('');$('loading').textContent='계산 중';
     try{
       C.atTime(state.date,state.clock);C.observer(location());
@@ -113,7 +113,7 @@
     if(!tabs.includes(view))return;
     if(changeTime&&['day','night'].includes(view)&&view!==state.view)state.clock=state.times[view];state.view=view;
     tabs.forEach(name=>{const active=name===view;$('tab-'+name).setAttribute('aria-selected',String(active));$('tab-'+name).tabIndex=active?0:-1;$('panel-'+name).hidden=!active;});
-    const guide=view==='telescope';
+    const guide=['telescope','photo'].includes(view);
     $('observation-form').hidden=guide;$('observation-context').hidden=guide;$('calculation-method').hidden=guide;
     $('upcoming-section').hidden=guide||view==='calendar';
     if(writeHash){try{history.replaceState(null,'','#'+view);}catch(_){}}
@@ -124,7 +124,11 @@
   function changeMonth(delta){try{const base=state.date.split('-').map(Number),d=new Date(Date.UTC(base[0],base[1]-1+delta,1)),year=d.getUTCFullYear(),month=d.getUTCMonth()+1,last=new Date(Date.UTC(year,month,0)).getUTCDate(),key=year+'-'+String(month).padStart(2,'0')+'-'+String(Math.min(base[2],last)).padStart(2,'0');changeDate(key);}catch(e){showError(e.message);}}
   tabs.forEach((view,i)=>{$('tab-'+view).addEventListener('click',()=>setView(view));$('tab-'+view).addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();const index=e.key==='Home'?0:e.key==='End'?tabs.length-1:(i+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;setView(tabs[index]);$('tab-'+tabs[index]).focus();});});
   document.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>setView(button.dataset.view)));
-  window.addEventListener('hashchange',()=>{const view=hashView();if(view)setView(view,true,false);});
+  window.addEventListener('hashchange',()=>{
+    const view=hashView();if(view)setView(view,true,false);
+    const anchor=window.location.hash.slice(1),target=$(anchor);
+    if(/^(scope-|photo-)/.test(anchor)&&target&&typeof target.scrollIntoView==='function')target.scrollIntoView({block:'start'});
+  });
   $('observation-form').addEventListener('submit',e=>{e.preventDefault();void refresh();});
   $('date').addEventListener('change',e=>changeDate(e.target.value));$('time').addEventListener('change',e=>{try{C.atTime(state.date,e.target.value);state.clock=e.target.value;if(['day','night'].includes(state.view))state.times[state.view]=state.clock;void refresh();}catch(err){showError(err.message);$('time').value=state.clock;}});
   $('previous-day').addEventListener('click',()=>changeDate(C.shiftDate(state.date,-1)));$('next-day').addEventListener('click',()=>changeDate(C.shiftDate(state.date,1)));
