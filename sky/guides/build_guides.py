@@ -167,6 +167,44 @@ af.append(step('중심 맞추기','카메라 렌즈를 중심에 맞춰요','실
 af.append(step('노출·촬영','달 무늬가 보이게 노출을 낮춰요','화면에서 초점을 다시 확인해요. 달이 하얗게 날아가지 않도록 노출을 낮추고 타이머나 원격 셔터로 촬영해요.','휴대폰 화면에 무늬가 있는 달이 보이고 노출 조절 막대가 아래쪽으로 내려와 있다.',phone(320,205,1.55,moon(-27,-3,48)+path('M81-51V36',stroke=MUTED,width=2)+circle(81,21,7,GOLD,ORANGE,2)+text(81,-57,'+',16)+text(81,56,'−',16),True)+label(320,55,'밝은 부분의 무늬를 살려요')+text(320,372,'초점 확인 → 노출 조절 → 타이머',23),'추적하지 않는 망원경은 달이 시야에서 움직여요. 필요할 때 다시 중앙으로 옮겨 주세요.'))
 add('phone-eyepiece','photo-phone-eyepiece-guide','휴대폰을 망원경에 연결하기','휴대폰 · 접안 촬영','밝고 찾기 쉬운 달부터 연습해 보세요. 접안렌즈를 통해 휴대폰 카메라로 촬영하는 방식이에요.',af)
 
+# Counterweights: original close-up schematics. Axis directions/dimensions are not a setup template.
+def cw(y=210,x=320,scale=1,highlight=False):
+    edge=ORANGE if highlight else INK
+    s=rect(-56,-20,112,40,MINT,4,edge)+ellipse(0,-20,56,13,WHITE,edge)+ellipse(0,-20,8,4,WHITE,edge,2)+ellipse(0,20,56,13,MINT,edge)
+    s+=path('M56 0H78',stroke=edge,width=5)+rect(76,-11,17,22,GOLD if highlight else INK,4,edge,2)
+    return group(s,x,y,scale)
+def eq_saddle(x,y,scale=1):
+    s=rect(-37,-8,74,18,MINT,5)+path('M-21 10V42H21V10Z',MINT)+circle(0,26,14,WHITE)
+    s+=path('M38 0H55',width=4)+rect(53,-8,10,16,GOLD,3,ORANGE)
+    return group(s,x,y,scale)
+def cw_shaft(end=284,stop=True):
+    s=rect(285,51,70,47,MINT,10)+rect(305,91,30,21,INK,4)+rect(314,110,12,end-110,WHITE,2)
+    if stop:s+=rect(298,end,44,12,GOLD,4,ORANGE,3)
+    return s
+
+def shoe(x,y,flip=False):
+    s=path('M-23-23H-3L4-4 30 2Q42 6 36 17H-25Z',WHITE,INK,2.5)+path('M-26 18H37M-6-14l12-2',width=2)
+    return f'<g transform="translate({x} {y}) scale({-1 if flip else 1} 1)">{s}</g>'
+
+def lock(x,y):
+    return path(f'M{x-9} {y-2}v-10a9 9 0 0 1 18 0v10',stroke=INK,width=3)+rect(x-15,y-2,30,23,GOLD,4)+circle(x,y+8,3,INK,'none')
+
+cw_install=[]
+cw_install.append(step('자리','추 아래에 발이 놓이지 않게 해요','삼각대와 가대를 단단히 고정해요. 추를 다루기 전에 발을 낙하 경로 밖에 두고 주변을 비워요. 설치 자세와 축 고정은 기종 설명서를 따라요.','무게추 아래 낙하 경로가 빗금으로 표시되고 두 발은 양옆에 떨어져 있다. 상단에는 축을 고정하라는 자물쇠가 있다.',cw_shaft()+cw(205)+rect(268,305,104,63,'#f1ddc9',5,'none')+''.join(path(f'M{x} 363l32-53',stroke='#d5ab88',width=2) for x in [270,290,310,330])+shoe(161,342)+shoe(479,342,True)+arrow('M318 311V350')+label(320,35,'발은 추 바로 아래에서 비켜요')+lock(469,103)+text(469,155,'축 고정',22)+path('M70 370H570',stroke=MUTED,width=2),'혼자 안전하게 받치기 무거우면 도움을 받아요. 학생이 조립할 때는 지도자가 함께해요.'))
+cw_install.append(step('추 끼우기','봉을 고정한 뒤, 추를 받쳐 끼워요','무게추 봉을 지정된 방식으로 고정하고 아래쪽으로 향하게 해요. 끝 안전장치를 잠시 분리한 뒤 추를 하나씩 받쳐 끼우고, 추의 고정 나사를 조여요.','가대에 고정된 봉 끝으로 무게추를 들어 올리는 그림. 양손이 추를 받치고 분리한 끝 안전장치는 옆에 놓여 있다.',cw_shaft(end=237,stop=False)+cw(284)+hand(277,305)+hand(363,305,True)+arrow('M444 292V232')+label(320,34,'추를 받친 채 천천히')+rect(479,190,44,12,GOLD,4,ORANGE)+text(501,151,'끝 안전장치',21)+leader('M500 169V184')+text(154,209,'봉 고정',22)+leader('M195 203L306 115'),'추가 여러 개면 각 추를 고정한 다음 다음 추를 끼워요. 추와 추 사이에 손가락이 끼이지 않게 해요.'))
+cw_install.append(step('안전장치','고정 나사와 봉 끝 장치를 모두 확인해요','추의 고정 나사를 조이고, 봉 끝의 이탈 방지 나사·캡을 다시 단단히 체결해요. 두 곳을 확인할 때까지 추를 받쳐요.','추 옆 고정 나사와 봉 끝의 안전장치가 각각 강조되고 손이 추를 지지한다.',cw_shaft(end=291)+cw(208,highlight=True)+hand(277,230)+hand(365,230,True)+label(320,34,'고정 나사 + 끝 안전장치')+text(508,196,'추 고정',23)+leader('M463 191L414 205')+check(430,232)+text(146,308,'이탈 방지',23)+leader('M211 300H289')+check(363,297),'봉 끝 장치만으로 추를 지지하지 않아요. 부품이 없거나 나사산이 손상됐다면 설치를 멈추고 맞는 부품부터 준비해요.'))
+cw_install.append(step('경통','무게추를 고정한 다음 경통을 올려요','봉·추·끝 안전장치와 가대의 축 고정을 확인해요. 그다음 경통을 두 손으로 받쳐 장착하고 경통 잠금을 확인해요.','왼쪽은 고정된 무게추와 확인 표시, 오른쪽은 두 손으로 받치는 경통이다. 화살표가 무게추에서 경통으로 이어진다.',group(cw_shaft()+cw(209),-83,18,.78)+check(226,134)+tube(462,191,.58)+hand(402,210)+hand(528,210,True)+eq_saddle(460,264,.7)+arrow('M270 197H336')+label(167,334,'① 추 고정')+label(462,334,'② 경통 장착')+text(320,39,'순서를 바꾸지 않아요',24),'일반적인 무게추형 독일식 적도의 예시예요. 균형을 맞추기 전에는 축 잠금을 함부로 풀지 않아요.'))
+cw_install.append(step('적경 균형','적경축 균형은 추의 위치로 맞춰요','관측할 부속품을 모두 장착한 상태로 설명서의 균형 절차를 따라요. 경통과 추를 받친 뒤 필요한 축만 풀고, 추를 옮긴 뒤 고정 나사를 다시 조여요.','적경축을 보는 개념도에서 경통은 왼쪽, 무게추는 오른쪽에 있다. 추를 봉을 따라 이동하는 방향과 두 쪽을 받치는 손이 표시되어 있다.',path('M320 250V185M180 185H538',stroke=INK,width=10)+circle(320,185,26,MINT)+circle(320,185,9,WHITE)+circle(168,185,55,WHITE)+circle(168,185,43,'#a9c5cb')+group(cw(0,0,1,True),454,185,1,-90)+rect(537,164,12,42,GOLD,3,ORANGE)+hand(160,245)+hand(456,249,True)+arrow('M409 60H495')+arrow('M495 80H409')+label(320,38,'적경축 RA · 추 위치 조절')+text(168,309,'경통을 받쳐요',22)+text(458,309,'추를 받쳐요',22)+text(320,367,'균형 원리를 단순화한 그림',20),'한 축씩 점검해요. 잠금 해제 순간 갑자기 회전할 수 있어요. 균형 조절 중에도 봉 끝 안전장치는 유지해요.'))
+cw_install.append(step('적위 균형','적위축 균형은 경통 위치로 맞춰요','경통과 부속품을 받친 채 기종의 절차에 따라 경통을 앞뒤로 옮겨요. 장착 레일·밴드와 축의 잠금을 다시 확인한 뒤 다른 축의 균형도 재확인해요.','두 손이 경통을 받치고 경통의 앞뒤 이동 방향이 표시된다. 가운데 장착부와 잠금 확인 표시가 있다.',tube(306,176,1,True)+hand(205,201)+hand(415,201,True)+eq_saddle(308,233)+path('M309 265v54',width=9)+rect(282,319,54,17,MINT,4)+arrow('M238 79H375')+arrow('M375 101H238')+check(356,238)+label(320,37,'적위축 DEC · 경통 위치 조절')+text(320,375,'받친 채 조절 → 다시 고정',23),'그림은 경통 위치 조절 부분만 보여 줘요. 무게추를 임의로 빼거나, 모든 잠금을 한꺼번에 풀지 않아요.'))
+add('counterweight-install','scope-counterweight-install','무게추부터 안전하게 설치해요','적도의 · 무게추 설치와 균형','무게추형 독일식 적도의의 일반적인 흐름이에요. 설치 자세·축 잠금·균형 조절 순서는 사용하는 가대의 설명서를 우선하세요.',cw_install)
+
+cw_remove=[]
+cw_remove.append(step('경통 먼저','철수할 때는 경통부터 내려요','전동형은 설명서대로 종료·수납 자세로 옮긴 뒤 전원을 꺼요. 지정된 자세에서 축을 고정하고, 경통을 확실히 받친 채 장착부를 풀어 안전한 받침에 내려놓아요.','왼쪽의 경통을 두 손으로 먼저 내려놓는 그림과, 오른쪽에서 계속 고정되어 있는 무게추가 함께 보인다.',tube(201,159,.71)+hand(134,185)+hand(275,185,True)+arrow('M200 238V280')+rect(74,308,253,27,MINT,8)+group(cw_shaft()+cw(209),253,25,.75)+lock(553,133)+label(200,64,'경통 먼저')+text(487,315,'추는 고정 유지',21),'경통이 달린 채 무게추부터 빼면 균형이 무너져 경통이 급회전하거나 장비가 넘어질 수 있어요.'))
+cw_remove.append(step('추 내리기','추는 하나씩 받쳐서 빼요','경통을 내린 다음 진행해요. 남은 추의 고정을 확인하고, 빼낼 추를 받친 상태에서 끝 안전장치를 분리해요. 그 추의 고정 나사를 풀어 봉에서 천천히 내려 빼요.','경통이 없는 봉에서 무게추 한 개를 두 손으로 받쳐 내린다. 끝 안전장치는 옆에 분리되어 있고 아래로 향한 화살표가 있다.',cw_shaft(end=224,stop=False)+cw(287)+hand(277,309)+hand(365,309,True)+arrow('M444 223V288')+rect(479,165,44,12,GOLD,4,ORANGE)+text(500,134,'안전장치 분리',20)+label(320,35,'경통을 내린 다음, 한 개씩')+text(320,383,'발은 추 바로 아래에 두지 않아요',22),'추를 다룰 때 계속 지지해요. 여러 추를 한꺼번에 풀지 않고, 한 손으로 버거우면 도움을 받아요.'))
+cw_remove.append(step('봉 정리','모든 추를 내린 뒤 봉을 정리해요','추는 굴러가거나 넘어지지 않게 낮고 안정된 곳에 놓아요. 모든 추를 뺀 것을 확인한 다음, 설명서대로 봉을 분리하거나 수납해요.','무게추 두 개가 바닥에 안정적으로 놓여 있고, 비어 있는 봉을 가대에서 분리하는 화살표가 있다.',rect(285,51,70,47,MINT,10)+rect(305,91,30,21,INK,4)+rect(314,155,12,142,WHITE,2)+rect(298,297,44,12,GOLD,4,ORANGE)+arrow('M376 142V210')+cw(329,158,.8)+cw(329,482,.8)+check(158,277)+check(482,277)+path('M65 359H575',stroke=MUTED,width=2)+label(320,34,'추를 모두 내린 뒤')+text(467,176,'봉 분리·수납',22)+text(320,392,'추가 달린 채 봉을 빼지 않아요',22),'끝 안전장치와 고정 부품은 잃어버리지 않도록 함께 보관해요.'))
+add('counterweight-remove','scope-counterweight-remove','철수할 때는 경통부터 내려요','적도의 · 무게추 분리와 보관','일반적인 분리 순서는 경통 → 무게추 → 무게추 봉이에요. 각 부품을 받친 상태로 기종의 분해 절차를 따라요.',cw_remove)
+
+
 # Each self-contained SVG is a horizontal storyboard. The viewer clips one frame;
 # images remain sharp at every size, work offline and contain no external resources.
 css='text{font-family:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif}path,rect,circle,ellipse{stroke-linecap:round;stroke-linejoin:round}'

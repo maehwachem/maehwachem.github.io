@@ -38,3 +38,12 @@
 @media(max-width:650px){.ill-header{padding:16px;align-items:flex-start}.scope-guide .ill-header h4,.photo-guide .ill-header h4{font-size:18px}.ill-credit{font-size:9px}.ill-copy{padding:18px 16px}.ill-ready .ill-copy{min-height:238px}.ill-step-list p{font-size:13px}.scope-guide .ill-step-list h5,.photo-guide .ill-step-list h5{font-size:16px}.ill-toolbar{padding:12px 12px 16px}.ill-step-nav{gap:2px}.ill-step-nav button{font-size:10px;letter-spacing:-.03em}.ill-controls{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.7fr) minmax(0,1fr);gap:8px}.ill-controls button{padding:8px 4px;min-width:0;white-space:nowrap}.ill-controls .ill-play{min-width:0}.ill-note{padding:12px 16px;font-size:11px}.scope-illustration-index{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(prefers-reduced-motion:reduce){.ill-stage img{transition:none}}
 @media print{.ill-toolbar{display:none!important}.ill-layout{display:block}.ill-stage{max-width:450px}.ill-step-list li[hidden]{display:list-item!important}.ill-step-list li+li{margin-top:16px}.illustrated-guide{break-inside:avoid}.ill-copy{min-height:0!important}.ill-details>ol,.ill-details>.photo-phone-grid{display:grid!important}}
+
+/* Counterweight handling is visible before assembly, not hidden in a disclosure. */
+.scope-cw-notice{margin:18px 0;padding:18px 20px;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:0 12px 12px 0;background:var(--gold-sky)}
+.scope-cw-notice strong,.scope-cw-notice b{color:var(--ink)}
+.scope-cw-notice>p{margin:7px 0 0;color:var(--muted);font-size:13px;line-height:1.85}
+.scope-cw-notice a{display:inline-block;min-height:36px;padding-top:5px}
+.scope-cw-safety ul{padding-left:20px;margin:12px 0 0;font-size:13px;color:var(--muted)}
+.scope-cw-safety li{padding-left:3px;margin:9px 0;line-height:1.85}
+@media(max-width:650px){.scope-cw-notice{padding:16px}.scope-cw-safety li{font-size:12px}}
