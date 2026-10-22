@@ -249,6 +249,23 @@
     "tool": [
       {
         "kind": "tool",
+        "title": "우리 반의 하루",
+        "date": "2026-10-22",
+        "poster": "note",
+        "words": "우리 반의\n하루",
+        "tag": "학급 운영 · 공공데이터",
+        "level": "초·중·고 교사와 학생",
+        "desc": "시간표·급식·학사일정과 날씨·대기질을 한 화면에 모아 보는 학급 게시판. 날짜 선택, 크게 보기, 이 브라우저에 저장하는 알림 메모가 있습니다. 현재 예시 화면을 공개하며 실제 자료 연결을 준비하고 있습니다.",
+        "links": [
+          {
+            "label": "게시판 열기",
+            "url": "https://classroom-day.kjeung.chatgpt.site"
+          }
+        ],
+        "subject": "tools"
+      },
+      {
+        "kind": "tool",
         "title": "마이크로비트 센서 기록기",
         "poster": "sensor",
         "words": "마이크로비트\n센서 기록기",
