@@ -140,6 +140,11 @@
       "key": "heat",
       "label": "지구의 열수지",
       "path": "/science-tools/earth/heat-budget.html"
+    },
+    {
+      "key": "induction",
+      "label": "전자기 유도",
+      "path": "/science-tools/physics/electromagnetic-induction.html"
     }
   ]
 }

@@ -467,6 +467,24 @@
       },
       {
         "kind": "lesson",
+        "title": "전자기 유도",
+        "date": "2026-10-23",
+        "poster": "power",
+        "words": "전자기\n유도",
+        "tag": "전기와 자기 · 발전",
+        "level": "고등학교 통합과학",
+        "desc": "자석과 코일, 검류계로 유도 전류가 언제, 어느 방향으로 흐르는지 장면을 넘기며 살펴보는 인터랙티브 자료. 자석이 코일을 통과할 때의 그래프, 렌츠 법칙, 발전기와 발전소, 생활 속 이용을 다루고, 자석을 직접 끌어 보는 실험과 확인 문제가 있습니다.",
+        "cover": "assets/uploads/electromagnetic-induction-scene.webp",
+        "links": [
+          {
+            "label": "자료 열기",
+            "url": "https://maehwachem.github.io/science-tools/physics/electromagnetic-induction.html"
+          }
+        ],
+        "subject": "physics"
+      },
+      {
+        "kind": "lesson",
         "title": "산·염기 중화 반응",
         "poster": "acid",
         "words": "산·염기\n중화 반응",
