@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+const source=fs.readFileSync(new URL('../assets/office-site-tools.js',import.meta.url),'utf8');
+const tools=[],events={};let opened=0;
+const context={document:{modelContext:{registerTool(tool,options){tools.push({...tool,signal:options.signal});}},querySelector(){return {href:'https://kong-studio.kjeung.chatgpt.site/',click(){opened++;}};}},window:{addEventListener(name,fn){events[name]=fn;}},AbortController};
+vm.runInNewContext(source,context);
+await new Promise(resolve=>setImmediate(resolve));
+assert.equal(tools.length,2);
+assert.equal(tools[0].execute({}).requiresLogin,true);
+assert.throws(()=>tools[1].execute({task:'not-allowed'}),/추가 입력/);
+assert.equal(opened,0);
+assert.equal(tools[1].execute({}).taskStarted,false);assert.equal(opened,1);
+events.pagehide();assert.ok(tools.every(tool=>tool.signal.aborted));
+events.pageshow({persisted:true});await new Promise(resolve=>setImmediate(resolve));assert.equal(tools.length,4);assert.equal(tools[3].signal.aborted,false);
+context.document.modelContext=undefined;vm.runInNewContext(source,context);assert.equal(tools.length,4);
+console.log('PASS: connection guide, exact navigation target, invalid input, cleanup, history restoration, unsupported browser fallback. Native browser verification is still required.');
