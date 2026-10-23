@@ -153,7 +153,7 @@
         "tag": "전자기 유도 · 교사 설명용",
         "level": "고등학교 통합과학",
         "desc": "수업 중 교사가 화면에 띄워 시연하는 설명용 가상 실험실. 자석과 코일, 코일을 통과해 떨어지는 자석의 전류 그래프, 관 속 자석 낙하, 손발전기의 전압과 돌리는 힘을 실험하고 기록표와 그래프로 정리합니다. 학생 제출·평가 기능은 없습니다.",
-        "cover": "assets/uploads/electromagnetic-induction-lab-scene.webp",
+        "cover": "assets/uploads/cover-series-22-v3.webp",
         "links": [
           {
             "label": "실험 열기",
@@ -493,7 +493,7 @@
         "tag": "전기와 자기 · 발전",
         "level": "고등학교 통합과학",
         "desc": "자석과 코일, 검류계로 유도 전류가 언제, 어느 방향으로 흐르는지 장면을 넘기며 살펴보는 인터랙티브 자료. 자석이 코일을 통과할 때의 그래프, 렌츠 법칙, 발전기와 발전소, 생활 속 이용을 다루고, 자석을 직접 끌어 보는 실험과 확인 문제가 있습니다.",
-        "cover": "assets/uploads/cover-watercolor-electromagnetic-induction.webp",
+        "cover": "assets/uploads/cover-series-21-v3.webp",
         "links": [
           {
             "label": "자료 열기",
