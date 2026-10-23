@@ -1,6 +1,7 @@
 import metadata from './air-stations.json' with {type:'json'};
 import type {WeatherLocation} from './weather-locations';
 const stations=new Map(metadata.map(r=>[r[0]+'|'+r[1],{address:r[2],network:r[3]}]));
+export function stationOptions(region:string){return metadata.filter(r=>r[0]===region).map(r=>({stationName:r[1]}));}
 export function stationInfo(region:string,name:string){return stations.get(region+'|'+name)}
 export function stationsForDistrict<T extends {stationName:string}>(rows:T[],region:string,location?:WeatherLocation){
  if(!location?.district)return [];
