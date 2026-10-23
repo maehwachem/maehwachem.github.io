@@ -6,3 +6,5 @@ export function readAirCache(storage:Pick<Storage,'getItem'>,key:string,station:
   return cached;
  }catch{return null}
 }
+
+export function isAirCacheFresh(cached:{savedAt:number}|null,now=Date.now()){return !!cached&&now>=cached.savedAt&&now-cached.savedAt<5*60*1000}
