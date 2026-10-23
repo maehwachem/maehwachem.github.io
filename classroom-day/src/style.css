@@ -10,3 +10,5 @@
 :fullscreen .sidebar{display:none}:fullscreen .main-wrap{margin-left:0}:fullscreen .topbar{height:50px}:fullscreen main{max-width:1600px}:fullscreen .hero{height:155px}:fullscreen .hero-date{display:none}:fullscreen .subject strong{font-size:17px}:fullscreen .menu-list{font-size:15px}:fullscreen .notes li{font-size:15px}
 
 .weather-location-fields{border:0;padding:0;margin:24px 0 0;min-width:0}.weather-location-fields legend{font-weight:700;font-size:14px;color:var(--ink);padding:0}.weather-location-fields .field-row{align-items:start}.weather-location-fields select{max-width:100%;text-overflow:ellipsis}.weather-location-fields .field-row label{min-width:0}.weather .source-line .textbutton{font-size:inherit;margin-top:5px}@media(max-width:650px){.weather-location-fields .field-row{grid-template-columns:1fr;display:grid;gap:0}}
+
+.station-scope{font-size:11px;color:var(--green);margin:12px 0 5px}.station-picker .station-select{margin-top:0}.station-expand{font-size:10px!important;margin-top:5px}.air .source-line{overflow-wrap:anywhere}
