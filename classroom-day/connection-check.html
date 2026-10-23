@@ -1,0 +1,60 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https://apis.data.go.kr https://classroom-day.kjeung.chatgpt.site; form-action https://apis.data.go.kr; base-uri 'none'"><title>날씨·미세먼지 연결 점검 · 우리 반의 하루</title><style>*{box-sizing:border-box}body{margin:0;background:#f5f6ef;color:#263a2e;font:17px/1.7 system-ui,sans-serif}main{max-width:760px;margin:auto;padding:32px 20px 64px}a{color:#426844}h1{font-size:30px;line-height:1.4}h2{font-size:20px;margin-top:0}.card{background:white;border:1px solid #dbe2d5;border-radius:18px;padding:24px;margin-top:22px}.muted{font-size:14px;color:#5b695e}label{display:block;font-weight:700;margin:18px 0 8px}input{font:inherit;width:100%;border:1px solid #a8b99d;border-radius:9px;padding:14px}button{font:inherit;font-weight:650;border:0;border-radius:10px;padding:13px 18px;background:#54794b;color:white;cursor:pointer;min-height:48px}button:disabled{opacity:.6;cursor:wait}.secondary{color:#385632;background:#edf2e6}.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.row{padding:12px;background:#f6f7f1;border-radius:10px;overflow-wrap:anywhere}.row strong{display:block}.result{font-size:14px;color:#75533d}.good{color:#2d623b}#summary{background:#edf3e5;border-left:4px solid #668859;padding:16px;margin-top:20px}code{font-size:14px}summary{cursor:pointer}li{margin:8px 0}:focus-visible{outline:3px solid #54794b;outline-offset:3px}@media(max-width:520px){.grid{grid-template-columns:1fr}.card{padding:18px}}</style></head><body><main><a href="./">← 우리 반의 하루</a><p class="muted">운영자 연결 점검</p><h1>날씨·미세먼지,<br>어디서 막히는지 확인해요.</h1><p>포털 인증키로 직접 조회한 결과와 현재 사이트 서버의 결과를 비교합니다.</p><section class="card"><h2>1. 인증키를 넣고 검사하기</h2><p>공공데이터포털에서 복사한 <strong>일반 인증키</strong>를 붙여 넣어 주세요. 나이스 인증키가 아닙니다.</p><label for="key">공공데이터포털 인증키</label><input id="key" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="일반 인증키 붙여 넣기"><p class="muted">인코딩·디코딩 키 모두 처리합니다. 입력한 키는 이 페이지나 사이트 서버에 저장하지 않고, 직접 조회할 때 공공데이터포털 API로만 보냅니다.</p><div class="actions"><button id="run" type="button">두 서비스 검사</button><button id="clear" type="button" class="secondary">입력한 키 지우기</button></div><div id="summary" role="status" aria-live="polite">검사 후 아래 결과 화면을 공유하면 돼요. 키는 가려져 있어요.</div></section><section class="card"><h2>2. 조회 결과</h2><div class="grid"><div class="row"><strong>날씨 · 직접 조회</strong><span class="muted">방금 입력한 키</span><p class="result" id="dw">검사 전</p></div><div class="row"><strong>날씨 · 사이트 서버</strong><span class="muted">서버에 저장된 키</span><p class="result" id="sw">검사 전</p></div><div class="row"><strong>미세먼지 · 직접 조회</strong><span class="muted">방금 입력한 키</span><p class="result" id="da">검사 전</p></div><div class="row"><strong>미세먼지 · 사이트 서버</strong><span class="muted">서버에 저장된 키</span><p class="result" id="sa">검사 전</p></div></div><p class="muted">점검 지역은 서울입니다. 학교 설정은 바뀌지 않습니다.</p></section><section class="card"><h2>응답을 읽지 못했다면</h2><p>브라우저 제한일 수 있어요. 아래 버튼으로 공공데이터 응답을 새 탭에서 열어 주세요.</p><div class="actions"><button type="button" class="secondary" id="raw-weather">날씨 원문 열기</button><button type="button" class="secondary" id="raw-air">미세먼지 원문 열기</button></div><p class="muted">원문 화면에서는 결과 본문의 코드만 알려 주세요. 새 탭 주소에 인증키가 포함되므로 주소 전체는 공유하지 마세요.</p><details><summary>결과에서 볼 부분</summary><ul><li><code>resultCode</code>가 <code>00</code>이면 정상 응답입니다.</li><li><code>SERVICE_KEY_IS_NOT_REGISTERED_ERROR</code>는 인증키 미등록입니다.</li><li><code>SERVICE_ACCESS_DENIED_ERROR</code>는 서비스 권한 거절입니다.</li></ul></details></section><p class="muted">공식 안내: <a href="https://www.data.go.kr/data/15084084/openapi.do" target="_blank" rel="noreferrer">기상청</a> · <a href="https://www.data.go.kr/data/15073861/openapi.do" target="_blank" rel="noreferrer">에어코리아</a></p></main><script>
+function normalizeKey(raw){
+ let key=raw.trim();if(!key)throw Error('공공데이터포털 인증키를 먼저 붙여 넣어 주세요.');
+ try{key=decodeURIComponent(key)}catch{throw Error('잘못된 % 문자가 있어요. 포털에서 인증키를 다시 복사해 주세요.')}
+ if(/\s/.test(key))throw Error('인증키 중간에 공백이나 줄바꿈이 있어요. 인증키만 복사해 주세요.');
+ return key;
+}
+function directRequest(kind,key,now=Date.now()){
+ const d=new Date(now+7*3600000).toISOString();
+ return kind==='weather'?{
+ endpoint:'https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst',
+ params:{serviceKey:key,pageNo:'1',numOfRows:'20',dataType:'JSON',base_date:d.slice(0,10).replace(/-/g,''),base_time:d.slice(11,13)+'00',nx:'60',ny:'127'}
+ }:{
+ endpoint:'https://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getCtprvnRltmMesureDnsty',
+ params:{serviceKey:key,pageNo:'1',numOfRows:'5',returnType:'json',sidoName:'서울',ver:'1.3'}
+ };
+}
+const errorNames={SERVICE_KEY_IS_NOT_REGISTERED_ERROR:'인증키 미등록',SERVICE_ACCESS_DENIED_ERROR:'서비스 이용 권한 거절',SERVICE_KEY_IS_NULL:'인증키 누락',DEADLINE_HAS_EXPIRED_ERROR:'인증키 기간 만료',LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR:'하루 호출량 초과',LIMITED_NUMBER_OF_SERVICE_REQUESTS_PER_SECOND_EXCEEDS_ERROR:'초당 호출량 초과',PERMISSION_DENIED:'접근 권한 거절',BLACKLIST_IP_ACCESS_ERROR:'접속 주소 차단',INVALID_REQUEST_PARAMETER_ERROR:'조회 조건 오류',SERVICETIMEOUT_ERROR:'공공데이터 응답 지연'};
+function classify(body,status,server){
+ for(const code of Object.keys(errorNames))if(body.includes(code))return{ok:false,text:errorNames[code]+' · '+code};
+ let j;try{j=JSON.parse(body)}catch{}
+ if(server&&status>=200&&status<300&&(j?.values||Array.isArray(j?.rows)))return{ok:true,text:'정상 · 자료를 받았어요.'};
+ if(!server&&j?.response?.header?.resultCode==='00')return{ok:true,text:'정상 · 결과코드 00'};
+ const c=j?.response?.header?.resultCode;
+ return{ok:false,text:c&&/^[0-9]{1,3}$/.test(String(c))?'공공데이터 결과코드 '+c:'정상 응답 미확인 · HTTP '+status};
+}
+
+const $=id=>document.getElementById(id);let running=false;
+async function inspect(kind,key,server){
+ let url;if(server)url='https://classroom-day.kjeung.chatgpt.site/api/data?'+new URLSearchParams({kind,region:'서울'});
+ else{const r=directRequest(kind,key);url=r.endpoint+'?'+new URLSearchParams(r.params)}
+ const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),15000);
+ try{const r=await fetch(url,{signal:ctrl.signal,credentials:'omit',referrerPolicy:'no-referrer',cache:'no-store'});return classify(await r.text(),r.status,server)}
+ catch{return{ok:null,text:server?'사이트 서버 응답을 읽지 못했어요.':'응답을 읽지 못했어요. 아래 원문 열기로 확인해 주세요. 인증키 오류로 판정할 수는 없어요.'}}
+ finally{clearTimeout(timer)}
+}
+$('run').onclick=async()=>{
+ if(running)return;let key;try{key=normalizeKey($('key').value)}catch(e){$('summary').textContent=e.message;return}
+ running=true;$('run').disabled=true;$('summary').textContent='두 경로로 조회 중이에요. 최대 15초 정도 걸려요.';
+ const specs=[['weather',false,'dw'],['air',false,'da'],['weather',true,'sw'],['air',true,'sa']];
+ specs.forEach(x=>$(x[2]).textContent='조회 중…');
+ try{
+ const [dw,da,sw,sa]=await Promise.all(specs.map(async([kind,server,id])=>{const r=await inspect(kind,key,server);$(id).textContent=r.text;$(id).className=r.ok?'result good':'result';return r}));
+ $('summary').textContent=sw.ok&&sa.ok?'사이트 서버에서 두 자료를 받았어요. 우리 반의 하루에서 새로고침하고 지금 공기의 측정소를 선택해 주세요.':
+ (dw.ok&&!sw.ok)||(da.ok&&!sa.ok)?'직접 조회는 성공했지만 사이트 서버 조회는 실패한 항목이 있어요. 서버에 저장된 키 또는 서버 요청 방식 점검이 필요해요. 이 결과 화면을 보내 주세요.':
+ dw.ok===null||da.ok===null?'브라우저가 직접 조회 응답을 읽지 못했어요. 아래 원문 열기를 누르고 새 탭의 결과코드만 알려 주세요.':
+ '위 결과 화면을 보내 주세요. 직접 조회도 키 미등록이면 방금 붙여 넣은 키가 공공데이터 API에서 거절된 것이에요.';
+ }finally{key='';running=false;$('run').disabled=false}
+};
+for(const kind of ['weather','air'])$('raw-'+kind).onclick=()=>{
+ let key;try{key=normalizeKey($('key').value)}catch(e){$('summary').textContent=e.message;return}
+ const r=directRequest(kind,key),form=document.createElement('form');
+ form.method='GET';form.action=r.endpoint;form.target='_blank';form.rel='noopener noreferrer';
+ for(const [name,value]of Object.entries(r.params)){const i=document.createElement('input');i.type='hidden';i.name=name;i.value=value;form.append(i)}
+ document.body.append(form);form.submit();form.remove();key='';
+ $('summary').textContent='새 탭의 결과 본문에서 코드만 알려 주세요. 새 탭 주소에는 인증키가 포함되므로 주소 전체는 공유하지 마세요.';
+};
+$('clear').onclick=()=>{$('key').value='';$('summary').textContent='입력한 인증키를 지웠어요.'};
+window.addEventListener('pagehide',()=>{$('key').value=''});
+</script></body></html>
