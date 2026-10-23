@@ -14,3 +14,29 @@
 .station-scope{font-size:11px;color:var(--green);margin:12px 0 5px}.station-picker .station-select{margin-top:0}.station-expand{font-size:10px!important;margin-top:5px}.air .source-line{overflow-wrap:anywhere}
 
 .air-refresh{font-size:12px;line-height:1.7;color:#687561;margin:10px 0}.air-refresh .textbutton{font-size:12px;display:inline-flex;margin-left:6px}.air-refresh button:disabled{opacity:.65;cursor:wait}
+
+/* A quiet, CSS-only window scene. The weather card supplies its observations. */
+.scene-wrap{flex:0 0 280px;width:280px;height:184px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-right:6px;position:relative}
+.scene-art{width:100%;height:158px;overflow:visible;flex-shrink:0}
+.scene-art stop,.scene-art path,.scene-art circle{transition:fill 1.6s ease,stop-color 1.6s ease}
+.scene-caption{display:flex;align-items:center;justify-content:center;gap:9px;font-size:9px;line-height:1.5;color:#65775f;white-space:nowrap}
+.scene-caption button{font-size:9px;padding:4px 6px;border:1px solid #82957740;border-radius:6px;background:#ffffff55;color:#526b50;min-height:27px}
+.scene-plant{transform-origin:232px 137px;animation:scene-leaf 7s ease-in-out infinite}
+.scene-windy .scene-plant{animation-duration:4.5s}
+.scene-cloud{animation:scene-cloud 16s ease-in-out infinite alternate}
+.scene-stars{animation:scene-stars 7s ease-in-out infinite alternate}
+.scene-steam{animation:scene-steam 6s ease-in-out infinite}
+.scene-rain{animation:scene-rain 2.5s linear infinite}
+.scene-snow{animation:scene-snow 7s linear infinite}
+.scene-paused *{animation-play-state:paused!important}
+@keyframes scene-leaf{0%,100%{transform:rotate(-1.2deg)}50%{transform:rotate(1.5deg)}}
+@keyframes scene-cloud{from{transform:translateX(-5px)}to{transform:translateX(7px)}}
+@keyframes scene-stars{from{opacity:.55}to{opacity:.95}}
+@keyframes scene-steam{0%,100%{opacity:.25;transform:translateY(1px)}50%{opacity:.6;transform:translateY(-4px)}}
+@keyframes scene-rain{from{transform:translate(3px,-12px);opacity:0}20%,80%{opacity:.7}to{transform:translate(-8px,27px);opacity:0}}
+@keyframes scene-snow{from{transform:translate(-3px,-12px);opacity:0}20%,80%{opacity:.9}to{transform:translate(6px,31px);opacity:0}}
+:fullscreen .scene-wrap{height:145px;width:240px;flex-basis:240px}:fullscreen .scene-art{height:119px}
+@media(max-width:1000px){.scene-wrap{width:240px;flex-basis:240px;height:175px}.scene-art{height:148px}}
+@media(max-width:650px){.hero{height:210px}.hero-text{align-self:flex-start;max-width:75%}.scene-wrap{position:absolute;right:5px;bottom:6px;width:180px;height:137px;margin:0}.scene-art{height:110px}.scene-caption{gap:4px;font-size:8px}.scene-caption button{font-size:8px;padding:4px;min-height:25px}:fullscreen .scene-wrap{width:165px;height:125px}:fullscreen .scene-art{height:99px}:fullscreen .hero{height:190px}}
+@media(prefers-reduced-motion:reduce){.scene-art *{animation:none!important;transition:none!important}}
+@media print{.scene-art *{animation:none!important}.scene-caption button{display:none}}
