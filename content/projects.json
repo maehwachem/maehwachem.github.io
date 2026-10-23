@@ -143,6 +143,24 @@
           }
         ],
         "subject": "chemistry"
+      },
+      {
+        "kind": "lab",
+        "title": "전자기 유도 가상 실험실",
+        "date": "2026-10-23",
+        "poster": "power",
+        "words": "전자기 유도\n가상 실험실",
+        "tag": "전자기 유도 · 교사 설명용",
+        "level": "고등학교 통합과학",
+        "desc": "수업 중 교사가 화면에 띄워 시연하는 설명용 가상 실험실. 자석과 코일, 코일을 통과해 떨어지는 자석의 전류 그래프, 관 속 자석 낙하, 손발전기의 전압과 돌리는 힘을 실험하고 기록표와 그래프로 정리합니다. 학생 제출·평가 기능은 없습니다.",
+        "cover": "assets/uploads/electromagnetic-induction-lab-scene.webp",
+        "links": [
+          {
+            "label": "실험 열기",
+            "url": "https://maehwachem.github.io/science-tools/physics/virtual-lab.html"
+          }
+        ],
+        "subject": "physics"
       }
     ],
     "real": [
