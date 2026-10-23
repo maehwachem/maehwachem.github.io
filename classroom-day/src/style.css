@@ -21,22 +21,27 @@
 .scene-art stop,.scene-art path,.scene-art circle{transition:fill 1.6s ease,stop-color 1.6s ease}
 .scene-caption{display:flex;align-items:center;justify-content:center;gap:9px;font-size:9px;line-height:1.5;color:#65775f;white-space:nowrap}
 .scene-caption button{font-size:9px;padding:4px 6px;border:1px solid #82957740;border-radius:6px;background:#ffffff55;color:#526b50;min-height:27px}
-.scene-plant{transform-origin:232px 137px;animation:scene-leaf 7s ease-in-out infinite}
-.scene-windy .scene-plant{animation-duration:4.5s}
-.scene-cloud{animation:scene-cloud 16s ease-in-out infinite alternate}
-.scene-stars{animation:scene-stars 7s ease-in-out infinite alternate}
-.scene-steam{animation:scene-steam 6s ease-in-out infinite}
-.scene-rain{animation:scene-rain 2.5s linear infinite}
-.scene-snow{animation:scene-snow 7s linear infinite}
+.scene-plant{transform-origin:232px 137px;animation:scene-leaf 4s ease-in-out infinite}
+.scene-windy .scene-plant{animation:scene-leaf-wind 3.2s ease-in-out infinite}
+.scene-cloud{animation:scene-cloud 9s ease-in-out infinite alternate}
+.scene-stars{animation:scene-stars 4s ease-in-out infinite alternate}
+.scene-steam{animation:scene-steam 3.4s ease-in-out infinite}
+.scene-rain{animation:scene-rain 1.8s linear infinite}
+.scene-snow{animation:scene-snow 5s linear infinite}
 .scene-paused *{animation-play-state:paused!important}
-@keyframes scene-leaf{0%,100%{transform:rotate(-1.2deg)}50%{transform:rotate(1.5deg)}}
-@keyframes scene-cloud{from{transform:translateX(-5px)}to{transform:translateX(7px)}}
-@keyframes scene-stars{from{opacity:.55}to{opacity:.95}}
-@keyframes scene-steam{0%,100%{opacity:.25;transform:translateY(1px)}50%{opacity:.6;transform:translateY(-4px)}}
-@keyframes scene-rain{from{transform:translate(3px,-12px);opacity:0}20%,80%{opacity:.7}to{transform:translate(-8px,27px);opacity:0}}
-@keyframes scene-snow{from{transform:translate(-3px,-12px);opacity:0}20%,80%{opacity:.9}to{transform:translate(6px,31px);opacity:0}}
+@keyframes scene-leaf{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(8deg)}}
+@keyframes scene-cloud{from{transform:translateX(-22px)}to{transform:translateX(28px)}}
+@keyframes scene-stars{from{opacity:.3}to{opacity:1}}
+@keyframes scene-steam{0%{opacity:0;transform:translate(0,7px)}25%{opacity:.65}75%{opacity:.45}100%{opacity:0;transform:translate(5px,-17px)}}
+@keyframes scene-rain{from{transform:translate(3px,-12px);opacity:0}20%,80%{opacity:.7}to{transform:translate(-20px,62px);opacity:0}}
+@keyframes scene-snow{from{transform:translate(-3px,-12px);opacity:0}20%,80%{opacity:.9}to{transform:translate(16px,57px);opacity:0}}
 :fullscreen .scene-wrap{height:145px;width:240px;flex-basis:240px}:fullscreen .scene-art{height:119px}
 @media(max-width:1000px){.scene-wrap{width:240px;flex-basis:240px;height:175px}.scene-art{height:148px}}
 @media(max-width:650px){.hero{height:210px}.hero-text{align-self:flex-start;max-width:75%}.scene-wrap{position:absolute;right:5px;bottom:6px;width:180px;height:137px;margin:0}.scene-art{height:110px}.scene-caption{gap:4px;font-size:8px}.scene-caption button{font-size:8px;padding:4px;min-height:25px}:fullscreen .scene-wrap{width:165px;height:125px}:fullscreen .scene-art{height:99px}:fullscreen .hero{height:190px}}
 @media(prefers-reduced-motion:reduce){.scene-art *{animation:none!important;transition:none!important}}
 @media print{.scene-art *{animation:none!important}.scene-caption button{display:none}}
+
+.scene-sun{animation:scene-sun-float 6s ease-in-out infinite}.scene-rays{transform-box:view-box;animation:scene-rays 28s linear infinite}.scene-plant{transform-box:view-box}.scene-moon{animation:scene-sun-float 8s ease-in-out infinite}.scene-fair-cloud{animation-duration:11s}
+@keyframes scene-sun-float{0%,100%{transform:translateY(-3px)}50%{transform:translateY(4px)}}
+@keyframes scene-rays{to{transform:rotate(360deg)}}
+@keyframes scene-leaf-wind{0%,100%{transform:rotate(-11deg)}50%{transform:rotate(12deg)}}
