@@ -298,7 +298,8 @@
             "url": "/attend/index.html"
           }
         ],
-        "subject": "tools"
+        "subject": "tools",
+        "cover": "assets/uploads/cover-watercolor-nfc-attendance-v1.webp"
       },
       {
         "kind": "tool",
