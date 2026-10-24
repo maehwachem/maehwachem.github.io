@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>NFC 출석</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#f4f6fb; --card:#fff; --ink:#0f172a; --sub:#64748b; --line:#e2e8f0;
+          --brand:#4f46e5; --ok:#059669; --okbg:#ecfdf5; --warn:#d97706; --warnbg:#fffbeb; --bad:#e11d48; --badbg:#fff1f2; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:'Noto Sans KR',system-ui,sans-serif; background:var(--bg); color:var(--ink);
+         min-height:100vh; display:flex; align-items:center; justify-content:center; padding:16px; }
+  .card { width:100%; max-width:400px; background:var(--card); border-radius:24px; padding:28px 22px;
+          box-shadow:0 10px 30px rgba(15,23,42,.08); text-align:center; }
+  .school { font-size:13px; color:var(--sub); margin-bottom:4px; }
+  h1 { font-size:20px; margin:0 0 18px; }
+  .big { font-size:64px; line-height:1; margin:8px 0 12px; }
+  .status { font-size:26px; font-weight:800; margin:4px 0; }
+  .who { font-size:18px; font-weight:600; margin-top:10px; }
+  .time { font-family:ui-monospace,monospace; color:var(--sub); margin-top:4px; }
+  .box { border-radius:18px; padding:22px 14px; margin-top:8px; }
+  .ok { background:var(--okbg); color:var(--ok); } .warn { background:var(--warnbg); color:var(--warn); }
+  .bad { background:var(--badbg); color:var(--bad); } .neutral { background:#f1f5f9; color:var(--ink); }
+  .msg { font-size:14px; color:var(--ink); margin-top:10px; line-height:1.6; }
+  form { text-align:left; margin-top:6px; }
+  label { display:block; font-size:13px; font-weight:600; margin:14px 0 6px; }
+  input { width:100%; font-size:17px; padding:13px 14px; border:1.5px solid var(--line); border-radius:12px; font-family:inherit; }
+  input:focus { outline:none; border-color:var(--brand); }
+  button { width:100%; margin-top:20px; padding:15px; border:0; border-radius:14px; background:var(--brand);
+           color:#fff; font-size:16px; font-weight:700; font-family:inherit; }
+  button:disabled { opacity:.6; }
+  button.ghost { background:#eef2ff; color:var(--brand); margin-top:12px; }
+  .hint { font-size:12px; color:var(--sub); margin-top:10px; line-height:1.6; }
+  .spinner { width:40px; height:40px; border:4px solid #e0e7ff; border-top-color:var(--brand); border-radius:50%;
+             margin:20px auto; animation:spin 0.9s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .hidden { display:none; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="school" id="schoolName"></div>
+
+  <!-- 처리 중 -->
+  <div id="vLoading">
+    <h1>출석 확인 중</h1>
+    <div class="spinner"></div>
+    <div class="hint" id="loadingHint">잠시만 기다려 주세요</div>
+  </div>
+
+  <!-- 결과 -->
+  <div id="vResult" class="hidden">
+    <div id="resultBox" class="box">
+      <div class="big" id="resultIcon"></div>
+      <div class="status" id="resultStatus"></div>
+      <div class="who" id="resultWho"></div>
+      <div class="time" id="resultTime"></div>
+    </div>
+    <div class="msg" id="resultMsg"></div>
+    <button class="ghost hidden" id="btnRetry" onclick="start()">다시 시도</button>
+  </div>
+
+  <!-- 최초 등록 -->
+  <div id="vRegister" class="hidden">
+    <h1>처음 한 번만 등록해 주세요</h1>
+    <div class="hint" style="margin-top:-8px">선생님께 받은 <b>등록코드</b>로 이 휴대폰을 본인 기기로 등록합니다.<br>다음부터는 NFC를 대기만 하면 바로 출석돼요.</div>
+    <form id="regForm">
+      <label for="fId">학번</label>
+      <input id="fId" inputmode="numeric" autocomplete="off" required placeholder="예: 30101">
+      <label for="fName">이름</label>
+      <input id="fName" autocomplete="name" required placeholder="예: 홍길동">
+      <label for="fCode">등록코드</label>
+      <input id="fCode" maxlength="20" autocomplete="one-time-code" required placeholder="선생님께 받은 코드">
+      <div class="hint hidden" id="selfHint" style="text-align:left">📝 명단에 없는 학생은 선생님이 알려주신 <b>추가 등록 코드</b>를 넣어 주세요.</div>
+      <button type="submit" id="btnReg">등록하고 출석하기</button>
+    </form>
+    <div class="hint">⚠️ 친구 휴대폰으로 등록하면 내 출석이 그 폰에 묶여요. 꼭 본인 휴대폰에서 해 주세요.<br>시크릿(개인정보 보호) 모드에서는 등록이 유지되지 않아요.</div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+const CFG = window.ATTEND_CONFIG;
+const sb = supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_KEY, { auth: { persistSession: false } });
+const TOKEN_KEY = 'nfc_attend_token_v1';
+document.getElementById('schoolName').textContent = CFG.SCHOOL_NAME || '';
+
+// ---------- 기기 토큰 (localStorage + 쿠키 이중 보관) ----------
+function readCookie(k) {
+  const m = document.cookie.match(new RegExp('(?:^|; )' + k + '=([^;]*)'));
+  return m ? decodeURIComponent(m[1]) : null;
+}
+function getToken() {
+  let t = null;
+  try { t = localStorage.getItem(TOKEN_KEY); } catch (e) {}
+  if (!t) t = readCookie(TOKEN_KEY);
+  if (t) saveToken(t);
+  return t;
+}
+function saveToken(t) {
+  try { localStorage.setItem(TOKEN_KEY, t); } catch (e) {}
+  document.cookie = `${TOKEN_KEY}=${encodeURIComponent(t)}; max-age=34560000; path=/; SameSite=Lax; Secure`;
+}
+function clearToken() {
+  try { localStorage.removeItem(TOKEN_KEY); } catch (e) {}
+  document.cookie = `${TOKEN_KEY}=; max-age=0; path=/`;
+}
+function newToken() {
+  const b = new Uint8Array(32); crypto.getRandomValues(b);
+  return Array.from(b, x => x.toString(16).padStart(2, '0')).join('');
+}
+
+// ---------- 화면 전환 ----------
+function show(id) { ['vLoading', 'vResult', 'vRegister'].forEach(v => document.getElementById(v).classList.toggle('hidden', v !== id)); }
+function result(kind, icon, status, who, time, msg, retry) {
+  const box = document.getElementById('resultBox');
+  box.className = 'box ' + kind;
+  document.getElementById('resultIcon').textContent = icon;
+  document.getElementById('resultStatus').textContent = status;
+  document.getElementById('resultWho').textContent = who || '';
+  document.getElementById('resultTime').textContent = time || '';
+  document.getElementById('resultMsg').innerHTML = msg || '';
+  document.getElementById('btnRetry').classList.toggle('hidden', !retry);
+  show('vResult');
+  if (navigator.vibrate && kind !== 'bad') navigator.vibrate(120);
+}
+
+// ---------- 위치 ----------
+let settings = null;
+async function loadSettings() {
+  if (settings) return settings;
+  const { data, error } = await sb.rpc('get_public_settings');
+  if (error) throw error;
+  settings = data; return data;
+}
+function getLocation() {
+  return new Promise((resolve) => {
+    if (!navigator.geolocation) return resolve(null);
+    navigator.geolocation.getCurrentPosition(
+      p => resolve({ lat: p.coords.latitude, lng: p.coords.longitude, acc: p.coords.accuracy }),
+      () => resolve(null),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 });
+  });
+}
+
+// ---------- 출석 ----------
+async function doCheckIn(token) {
+  const s = await loadSettings();
+  let loc = null;
+  if (s.geo_required) {
+    document.getElementById('loadingHint').textContent = '학교 안에 있는지 위치를 확인하고 있어요';
+    loc = await getLocation();
+  }
+  const { data, error } = await sb.rpc('check_in', {
+    p_token: token, p_lat: loc ? loc.lat : null, p_lng: loc ? loc.lng : null, p_acc: loc ? loc.acc : null });
+  if (error) throw error;
+  return data;
+}
+
+function showCheckIn(r) {
+  const who = r.name ? `${r.name} (${r.student_id || ''})` : '';
+  if (r.ok) {
+    const late = r.status === 'late';
+    const label = r.status === 'excused' ? '출석 인정' : (late ? '지각 처리' : '출석 완료');
+    result(late ? 'warn' : 'ok', late ? '⏰' : '✅', label, who, r.time,
+      r.already ? '오늘은 이미 출석이 기록되어 있어요.' : (late ? `출석 마감(${r.deadline}) 이후에 태그했어요.` : '좋은 하루 보내세요!'));
+    return;
+  }
+  const map = {
+    closed: ['🔒', '지금은 출석 시간이 아니에요', `출석 가능 시간: ${r.open_time} ~ ${r.close_time}`],
+    need_location: ['📍', '위치 확인이 필요해요', '위치 권한을 허용한 뒤 다시 시도해 주세요.<br>(휴대폰 설정 → 브라우저 → 위치 허용)'],
+    too_far: ['📍', '학교 밖으로 확인돼요', `학교에서 약 ${r.distance}m 떨어진 곳으로 측정됐어요. 학교 안이라면 잠시 후 다시 시도해 주세요.`],
+    geo_not_configured: ['⚙️', '아직 준비 중이에요', '선생님께 위치 설정이 필요하다고 알려 주세요.']
+  };
+  const m = map[r.error] || ['⚠️', '출석하지 못했어요', '잠시 후 다시 시도해 주세요.'];
+  result('bad', m[0], m[1], who, '', m[2], true);
+}
+
+async function start() {
+  show('vLoading');
+  document.getElementById('loadingHint').textContent = '잠시만 기다려 주세요';
+  const token = getToken();
+  if (!token) { showRegister(); return; }
+  try {
+    const r = await doCheckIn(token);
+    if (!r.ok && r.error === 'unknown_device') {
+      clearToken();
+      showRegister();
+      return;
+    }
+    showCheckIn(r);
+  } catch (e) {
+    result('bad', '📶', '연결이 불안정해요', '', '', '인터넷 연결을 확인하고 다시 시도해 주세요.', true);
+  }
+}
+
+// ---------- 최초 등록 ----------
+async function showRegister() {
+  show('vRegister');
+  try {
+    settings = null;
+    const s = await loadSettings();
+    document.getElementById('selfHint').classList.toggle('hidden', !s.allow_self_signup);
+  } catch (e) {}
+}
+document.getElementById('regForm').addEventListener('submit', async (ev) => {
+  ev.preventDefault();
+  const btn = document.getElementById('btnReg');
+  btn.disabled = true; btn.textContent = '확인 중…';
+  const token = newToken();
+  try {
+    const { data, error } = await sb.rpc('register_device', {
+      p_student_id: document.getElementById('fId').value.trim(),
+      p_name: document.getElementById('fName').value.trim(),
+      p_code: document.getElementById('fCode').value.trim(),
+      p_token: token });
+    if (error) throw error;
+    if (!data.ok) {
+      const msg = {
+        mismatch: '학번·이름·등록코드가 명단과 맞지 않아요. 다시 확인해 주세요.' + (data.left >= 0 ? ` (남은 시도 ${data.left}회)` : ''),
+        locked: '여러 번 틀려서 잠겼어요. 선생님께 코드 재발급을 요청해 주세요.',
+        already_bound: '이 학번은 이미 다른 휴대폰에 등록돼 있어요. 휴대폰을 바꿨다면 선생님께 기기 초기화를 요청해 주세요.',
+        device_in_use: '이 휴대폰은 이미 다른 학생으로 등록돼 있어요.',
+        not_on_roster: '출석 명단에 없는 학번이에요. 학번을 다시 확인하거나 선생님께 문의해 주세요.',
+        bad_signup_code: '명단에 없는 학번이라 추가 등록 코드가 필요해요. 코드를 다시 확인해 주세요.',
+        bad_input: '학번은 숫자로, 이름은 2~20자로 입력해 주세요.'
+      }[data.error] || '등록하지 못했어요. 다시 시도해 주세요.';
+      alert(msg);
+      return;
+    }
+    saveToken(token);
+    show('vLoading');
+    const r = await doCheckIn(token);
+    showCheckIn(r);
+  } catch (e) {
+    alert('연결이 불안정해요. 다시 시도해 주세요.');
+  } finally {
+    btn.disabled = false; btn.textContent = '등록하고 출석하기';
+  }
+});
+
+start();
+</script>
+</body>
+</html>
