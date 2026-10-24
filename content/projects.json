@@ -493,7 +493,7 @@
         "tag": "전기와 자기 · 발전",
         "level": "고등학교 통합과학",
         "desc": "자석과 코일, 검류계로 유도 전류가 언제, 어느 방향으로 흐르는지 장면을 넘기며 살펴보는 인터랙티브 자료. 자석이 코일을 통과할 때의 그래프, 렌츠 법칙, 발전기와 발전소, 생활 속 이용을 다루고, 자석을 직접 끌어 보는 실험과 확인 문제가 있습니다.",
-        "cover": "assets/uploads/cover-series-21-v3.webp",
+        "cover": "assets/uploads/cover-series-induction-v4.webp",
         "links": [
           {
             "label": "자료 열기",
@@ -559,7 +559,8 @@
             "url": "/lectures/energy-efficiency.html?s=1"
           }
         ],
-        "subject": "physics"
+        "subject": "physics",
+        "cover": "assets/uploads/cover-series-energy-efficiency-v1.webp"
       }
     ]
   },
