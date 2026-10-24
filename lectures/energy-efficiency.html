@@ -1,0 +1,1745 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#000000"><title>강의 · 에너지 효율과 신재생 에너지 · KJE</title><style>
+/* ═══════════════════════════════════════════════════════════════
+   core.css — 소비 전력 강의 덱 공통 (Apple DESIGN.md 언어)
+   무대 1920×1080 · 면 색이 구획 · 액션 블루 하나 · UI 그림자 없음
+   ═══════════════════════════════════════════════════════════════ */
+:root{
+  /* 면 */
+  --c-white:#ffffff; --c-parchment:#f5f5f7; --c-black:#000000; --c-dark:#1d1d1f; --c-graphite:#272729;
+  /* 글자 */
+  --ink:#1d1d1f; --ink-2:#6e6e73; --ink-3:#86868b; --on-dark:#f5f5f7; --on-dark-2:#a1a1a6; --on-dark-3:#6e6e73;
+  --hair:#e0e0e0; --hair-dark:#3a3a3c;
+  /* 행동 */
+  --action:#0066cc; --action-dark:#2997ff;
+  /* 에너지 — 어두운 면 기본값(밝은 면에서 아래 .slide[data-tile] 규칙이 덮어씀) */
+  --elec:#64D2FF; --light:#FFD60A; --heat:#FF6A3D; --sound:#BF5AF2; --kin:#30D158;
+  /* 에너지 — 면과 무관하게 고정된 두 벌(그림 속에서 직접 고를 때) */
+  --elec-hi:#64D2FF; --light-hi:#FFD60A; --heat-hi:#FF6A3D; --sound-hi:#BF5AF2; --kin-hi:#30D158;
+  --elec-lo:#0077B6; --light-lo:#9A7400; --heat-lo:#C4391B; --sound-lo:#8A3FC0; --kin-lo:#1E8B3E;
+  /* 글꼴 */
+  --font:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"SF Pro Display","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+  /* 움직임 */
+  --ease-out:cubic-bezier(.2,.8,.2,1); --ease-inout:cubic-bezier(.65,0,.35,1); --ease-spring:cubic-bezier(.34,1.56,.64,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:#000}
+body{font-family:var(--font);color:var(--ink);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  word-break:keep-all;overflow-wrap:break-word;-webkit-user-select:none;user-select:none;font-feature-settings:"ss03"}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+
+/* ── 무대 ── */
+#viewport{position:fixed;inset:0;overflow:hidden;background:#000}
+#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden;background:#000;contain:layout paint}
+.slide{position:absolute;inset:0;display:none;overflow:hidden;isolation:isolate}
+.slide.is-on{display:block}
+.slide.is-out{display:block;z-index:1}
+.slide.is-on{z-index:2}
+
+/* ── 면(타일) ── 다크: 에너지가 빛나는 무대 / 라이트: 정의와 타이포 */
+.slide[data-tile="black"]{background:var(--c-black);color:var(--on-dark)}
+.slide[data-tile="dark"]{background:var(--c-dark);color:var(--on-dark)}
+.slide[data-tile="graphite"]{background:var(--c-graphite);color:var(--on-dark)}
+.slide[data-tile="light"]{background:var(--c-white);color:var(--ink)}
+.slide[data-tile="parchment"]{background:var(--c-parchment);color:var(--ink)}
+.slide[data-tile="light"],.slide[data-tile="parchment"]{
+  --elec:var(--elec-lo); --light:var(--light-lo); --heat:var(--heat-lo); --sound:var(--sound-lo); --kin:var(--kin-lo);
+  --t2:var(--ink-2); --t3:var(--ink-3); --hl:var(--hair); --act:var(--action);
+}
+.slide[data-tile="black"],.slide[data-tile="dark"],.slide[data-tile="graphite"]{
+  --t2:var(--on-dark-2); --t3:var(--on-dark-3); --hl:var(--hair-dark); --act:var(--action-dark);
+}
+
+/* ── 글자 체계 (무대 px) — 최소 24px ── */
+.t-hero{font-size:168px;font-weight:600;line-height:1.02;letter-spacing:-.035em}
+.t-display{font-size:120px;font-weight:600;line-height:1.05;letter-spacing:-.03em}
+.t-title{font-size:84px;font-weight:600;line-height:1.1;letter-spacing:-.025em}
+.t-head{font-size:60px;font-weight:600;line-height:1.14;letter-spacing:-.022em}
+.t-lead{font-size:44px;font-weight:400;line-height:1.3;letter-spacing:-.012em}
+.t-airy{font-size:40px;font-weight:300;line-height:1.4;letter-spacing:-.005em}
+.t-label{font-size:34px;font-weight:600;line-height:1.2;letter-spacing:-.01em}
+.t-body{font-size:32px;font-weight:400;line-height:1.47;letter-spacing:-.01em}
+.t-cap{font-size:26px;font-weight:400;line-height:1.35;letter-spacing:-.005em}
+.t-eyebrow{font-size:30px;font-weight:600;line-height:1.2;letter-spacing:.01em;color:var(--t2)}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum","ss03";letter-spacing:-.02em}
+.mute{color:var(--t2)} .mute2{color:var(--t3)}
+.c-elec{color:var(--elec)} .c-light{color:var(--light)} .c-heat{color:var(--heat)} .c-sound{color:var(--sound)} .c-kin{color:var(--kin)}
+.unit{font-weight:400;letter-spacing:0;margin-left:.12em}
+.center{text-align:center}
+
+/* 배치 도우미 — 슬라이드 조각이 자유롭게 쓴다 */
+.abs{position:absolute}
+.fill{position:absolute;inset:0}
+.full-svg{position:absolute;inset:0;width:1920px;height:1080px;overflow:visible}
+.row{display:flex;align-items:center}
+.col{display:flex;flex-direction:column}
+.pill{display:inline-flex;align-items:center;gap:12px;border-radius:9999px;padding:12px 26px;font-size:28px;font-weight:600}
+.pill.ghost{border:2px solid currentColor}
+.chip-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;border-radius:9999px;padding:16px 34px;font-size:30px;font-weight:600;
+  background:var(--act);color:#fff;transition:transform .15s var(--ease-out)}
+.chip-btn:active{transform:scale(.95)}
+.card{border-radius:18px;border:1px solid var(--hl);padding:32px}
+svg text{font-family:var(--font)}
+
+/* ── 선언형 등장: data-in(들어올 때) / data-step="k"(k번째 클릭) / data-out="k" ── */
+[data-in],[data-step]{opacity:0}
+[data-fx="draw"],[data-fx="draw"] :is(path,line,polyline,polygon,circle,ellipse,rect){stroke-dasharray:1 1;stroke-dashoffset:1}
+[data-fx="draw"]{opacity:1}
+svg [data-in],svg [data-step],svg .tb{transform-box:fill-box;transform-origin:center}
+.tb{transform-box:fill-box;transform-origin:center}
+.tb-bl{transform-box:fill-box;transform-origin:left bottom}
+.tb-b{transform-box:fill-box;transform-origin:center bottom}
+
+/* ── HUD (Apple 원형 칩) ── */
+#hud{position:fixed;right:22px;bottom:18px;display:flex;align-items:center;gap:8px;z-index:50;opacity:0;transform:translateY(8px);
+  transition:opacity .35s var(--ease-out),transform .35s var(--ease-out);pointer-events:none}
+#hud.show{opacity:1;transform:none;pointer-events:auto}
+#hud button{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:rgba(210,210,215,.64);color:#1d1d1f;
+  -webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);transition:transform .15s var(--ease-out)}
+#hud button:active{transform:scale(.92)}
+#hud button svg{width:20px;height:20px}
+#hud .count{min-width:84px;height:44px;border-radius:9999px;display:grid;place-items:center;padding:0 16px;background:rgba(210,210,215,.64);color:#1d1d1f;
+  font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px)}
+#progress{position:fixed;left:0;right:0;bottom:0;height:3px;z-index:40;background:transparent}
+#progress i{display:block;height:100%;width:0;background:rgba(255,255,255,.38);transition:width .5s var(--ease-out),background .4s}
+body.on-light #progress i{background:rgba(0,0,0,.22)}
+#stepdots{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:9px;z-index:40;opacity:0;transition:opacity .35s}
+#stepdots.show{opacity:1}
+#stepdots i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.28);transition:background .3s,transform .3s}
+#stepdots i.on{background:rgba(255,255,255,.9);transform:scale(1.15)}
+body.on-light #stepdots i{background:rgba(0,0,0,.16)} body.on-light #stepdots i.on{background:rgba(0,0,0,.62)}
+
+/* ── 덮개(노트·전체보기·도움말) ── */
+.overlay{position:fixed;inset:0;z-index:60;display:none}
+.overlay.show{display:block}
+#notes{position:fixed;left:0;right:0;bottom:0;height:36vh;z-index:55;transform:translateY(102%);transition:transform .45s var(--ease-out);
+  background:rgba(22,22,23,.86);color:#f5f5f7;-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);
+  padding:22px 40px 26px;overflow:auto;border-top:1px solid rgba(255,255,255,.08)}
+#notes.show{transform:none}
+#notes .nh{display:flex;align-items:baseline;gap:14px;margin-bottom:10px;font-size:15px;color:#a1a1a6;font-weight:600;letter-spacing:.01em}
+#notes .nh b{color:#f5f5f7;font-size:18px}
+#notes .nh .nx{margin-left:auto;font-weight:400}
+#notes p{font-size:clamp(17px,1.55vw,24px);line-height:1.6;margin:0 0 .7em;color:#e8e8ed;max-width:1500px}
+#notes p .pn{display:inline-block;font-size:.66em;font-weight:700;color:#2997ff;margin-right:.6em;vertical-align:.12em}
+#notes p b{color:#fff;font-weight:700}
+#notes p .cue{display:inline-block;margin-top:.3em;padding:2px 12px;border-radius:9999px;background:rgba(41,151,255,.18);color:#8cc8ff;font-size:.85em}
+
+#overview{background:rgba(0,0,0,.72);-webkit-backdrop-filter:saturate(180%) blur(24px);backdrop-filter:saturate(180%) blur(24px);overflow:auto;padding:56px 5vw}
+#overview h2{color:#f5f5f7;font-size:28px;font-weight:600;letter-spacing:-.01em;margin-bottom:22px}
+#overview .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+#overview .ov{position:relative;aspect-ratio:16/9;border-radius:11px;padding:14px 16px;display:flex;flex-direction:column;justify-content:space-between;text-align:left;
+  border:1px solid rgba(255,255,255,.1);transition:transform .2s var(--ease-out)}
+#overview .ov:active{transform:scale(.97)}
+#overview .ov.cur{outline:3px solid #2997ff;outline-offset:3px}
+#overview .ov .n{font-size:14px;font-weight:700;opacity:.6;font-variant-numeric:tabular-nums}
+#overview .ov .tt{font-size:19px;font-weight:600;line-height:1.25;letter-spacing:-.01em}
+#overview .ov[data-tile="black"],#overview .ov[data-tile="dark"],#overview .ov[data-tile="graphite"]{background:#1d1d1f;color:#f5f5f7}
+#overview .ov[data-tile="light"]{background:#fff;color:#1d1d1f}
+#overview .ov[data-tile="parchment"]{background:#f5f5f7;color:#1d1d1f}
+
+#help{background:rgba(0,0,0,.6);display:none;place-items:center}
+#help.show{display:grid}
+#help .box{background:#fff;color:#1d1d1f;border-radius:18px;padding:34px 40px;min-width:520px}
+#help h3{font-size:24px;font-weight:600;margin-bottom:16px;letter-spacing:-.01em}
+#help table{border-collapse:collapse;font-size:17px}
+#help td{padding:7px 18px 7px 0;border-bottom:1px solid #f0f0f0}
+#help kbd{display:inline-block;min-width:30px;padding:3px 9px;border-radius:8px;background:#f5f5f7;border:1px solid #e0e0e0;font:600 15px var(--font);text-align:center}
+#blank{position:fixed;inset:0;z-index:70;display:none}
+#blank.black{display:block;background:#000} #blank.white{display:block;background:#fff}
+
+/* 정지 화면(검증 스크린샷) — 크롬 UI 숨김 */
+html.still #hud,html.still #progress,html.still #stepdots{display:none!important}
+html.still *{cursor:none!important}
+/* 격자 보기(?grid=1) */
+#gridov{position:absolute;inset:0;z-index:30;pointer-events:none;display:none;
+  background-image:linear-gradient(rgba(255,0,80,.25) 1px,transparent 1px),linear-gradient(90deg,rgba(255,0,80,.25) 1px,transparent 1px);
+  background-size:120px 120px}
+html.grid #gridov{display:block}
+html.grid #gridov::after{content:"";position:absolute;inset:80px 120px;border:2px dashed rgba(255,0,80,.6)}
+
+@media (prefers-reduced-motion: reduce){ .slide *{scroll-behavior:auto} }
+
+/* ── 소리 단추·알림 ── */
+#hud button.off{opacity:.55}
+#sfxToast{position:fixed;left:50%;bottom:78px;transform:translate(-50%,8px);z-index:80;padding:10px 22px;border-radius:9999px;background:rgba(29,29,31,.86);color:#f5f5f7;
+  font-size:16px;font-weight:600;letter-spacing:-.01em;opacity:0;pointer-events:none;transition:opacity .25s var(--ease-out),transform .25s var(--ease-out);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px)}
+#sfxToast.show{opacity:1;transform:translate(-50%,0)}
+html.still #sfxToast{display:none}
+
+/* ── 학생 모드(?s=1): 대본 숨김 ── */
+html.student #notes{display:none!important}
+
+/* ── 장면 머리(제목) ── */
+.hd{position:absolute;left:120px;top:78px;right:120px;z-index:3}
+.hd .eb{font-size:28px;font-weight:600;letter-spacing:.01em;color:var(--t2);margin-bottom:10px}
+.hd .eb b{color:var(--act);font-weight:700;margin-right:.35em}
+.hd h2{font-size:66px;font-weight:600;line-height:1.1;letter-spacing:-.028em}
+.hd h2 .soft{color:var(--t2);font-weight:400}
+
+/* ── 개념정리 학습지 카드 · 빈칸(번호 = 학습지 빈칸 번호 ①~㉖) ── */
+.ws-card{position:absolute;border-radius:18px;padding:30px 44px 26px;background:#f5f5f7;z-index:3}
+.slide[data-tile="parchment"] .ws-card{background:#fff}
+.slide[data-tile="black"] .ws-card,.slide[data-tile="dark"] .ws-card,.slide[data-tile="graphite"] .ws-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
+.ws-card .ws-h{display:flex;align-items:baseline;gap:18px;margin-bottom:6px}
+.ws-card .ws-h b{font-size:40px;font-weight:700;letter-spacing:-.02em}
+.ws-card .ws-h span{font-size:28px;color:var(--t2)}
+.ws-row{display:grid;grid-template-columns:110px 1fr;gap:22px;align-items:baseline;font-size:38px;line-height:1.55;padding:12px 0;border-top:1px solid var(--hl)}
+.ws-row:first-of-type{border-top:0}
+.ws-row .tm{font-size:26px;font-weight:600;color:var(--t2);letter-spacing:.01em}
+.ws-line{font-size:38px;line-height:1.6}
+.bk{position:relative;display:inline-block;min-width:3.4em;margin:0 .2em;padding:0 .3em;text-align:center;line-height:1.3;white-space:nowrap;
+  border-bottom:4px solid #c7c7cc}
+.slide[data-tile="black"] .bk,.slide[data-tile="dark"] .bk,.slide[data-tile="graphite"] .bk{border-bottom-color:#48484a}
+.bk .a{display:inline-block;font-weight:700;color:var(--act)}
+.bk .n{position:absolute;left:-.62em;top:-.5em;min-width:1.25em;height:1.25em;padding:0 .2em;border-radius:9999px;background:var(--act);color:#fff;
+  font-size:.46em;font-weight:700;line-height:1.25em;text-align:center;font-variant-numeric:tabular-nums}
+.bk.wide{min-width:5.6em}
+.qbox{position:absolute;border-radius:18px;border:1px solid var(--hl);padding:26px 34px;font-size:32px;line-height:1.5}
+.qbox .qh{font-size:26px;font-weight:600;color:var(--t2);margin-bottom:6px}
+.say-line{position:absolute;left:120px;right:120px;text-align:center;font-size:44px;font-weight:600;letter-spacing:-.02em;z-index:3}
+.fine{position:absolute;left:120px;bottom:40px;font-size:24px;color:var(--t3);z-index:3}
+
+
+:root{--font:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",NanumGothic,sans-serif}
+.slide{--acid:#edaa55;--base:#67bdff;--na:#b9c1cf;--anion:#b9a5eb;--glass:rgba(220,235,255,.55);--liquid:rgba(186,212,242,.055)}
+.slide[data-tile="light"],.slide[data-tile="parchment"]{--acid:#a95708;--base:#0070b5;--na:#647184;--anion:#7955a8;--glass:rgba(50,72,94,.42);--liquid:rgba(93,139,175,.055)}
+.acid{color:var(--acid)}.base{color:var(--base)}.anion{color:var(--anion)}.neutral{color:var(--t2)}
+.hd{top:78px}.hd h2{font-size:68px;line-height:1.2}.hd .eb{font-size:28px;margin-bottom:18px}
+.fine{position:absolute;bottom:60px;left:120px;right:120px;font-size:25px;line-height:1.45;color:var(--t2)}
+.statement{font-size:62px;line-height:1.35;letter-spacing:-.035em;font-weight:600}
+.eq{font-size:76px;letter-spacing:-.02em;white-space:nowrap;line-height:1.4}
+.eq small{font-size:.42em;font-weight:400;color:var(--t2)}
+.abs.eq{position:absolute}
+sub,sup{font-size:.58em;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.22em}sup{top:-.5em}
+.big-number{font-size:150px;font-weight:600;letter-spacing:-.05em;line-height:1.2}
+.keyline{border-top:2px solid var(--hl);padding-top:26px}
+.body-copy{font-size:36px;line-height:1.6}.mini{font-size:28px;line-height:1.5;color:var(--t2)}
+.tagline{font-size:44px;line-height:1.5}.note-line{font-size:30px;line-height:1.5;color:var(--t2)}
+.value{font-variant-numeric:tabular-nums;white-space:nowrap}
+.callout{padding:28px 36px;border-radius:18px;background:rgba(127,127,127,.075);font-size:34px;line-height:1.5}
+.col-rule{position:absolute;top:310px;bottom:245px;border-left:2px solid var(--hl)}
+.legend{display:flex;gap:28px;align-items:center;font-size:27px;color:var(--t2)}.legend span{display:flex;align-items:center;gap:12px}.legend svg{width:52px;height:52px;overflow:visible}
+.lab-controls{position:absolute;left:1140px;top:295px;width:660px;font-size:32px}
+.lab-controls label{display:flex;align-items:baseline;justify-content:space-between;margin:30px 0 22px}.lab-controls output{font-size:58px;line-height:1;font-weight:600;font-variant-numeric:tabular-nums;color:var(--base)}
+input[type=range]{width:100%;height:42px;accent-color:var(--base);cursor:pointer;touch-action:pan-y}input[type=range]::-webkit-slider-thumb{width:32px;height:32px}
+.controls-row{display:flex;gap:16px;margin-top:22px}.smallbtn{border:1px solid var(--hl);border-radius:99px;padding:14px 24px;font-size:27px}.smallbtn:focus-visible,.chip-btn:focus-visible{outline:4px solid var(--act);outline-offset:4px}.smallbtn:hover{background:rgba(127,127,127,.1)}
+.live-table{margin-top:32px;border-top:2px solid var(--hl)}.live-row{display:flex;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--hl);font-size:31px}.live-row b{font-variant-numeric:tabular-nums}
+.status{font-size:65px;letter-spacing:-.04em;font-weight:600;margin-bottom:12px}.status-sub{font-size:30px;color:var(--t2);line-height:1.5;min-height:90px}
+.check-row{display:grid;grid-template-columns:64px 1fr 240px;align-items:center;gap:20px;font-size:37px;padding:30px 0;border-bottom:1px solid var(--hl)}.check-row b{font-size:48px}.check-row .answer{color:var(--act);font-size:36px}
+.source-copy{font-size:28px;color:var(--t2);line-height:1.7}
+.progress-hint{position:absolute;right:120px;bottom:60px;font-size:25px;color:var(--t2)}
+.slide svg{font-family:var(--font)}.beaker-outline{fill:none;stroke:var(--glass);stroke-width:4;stroke-linecap:round}.water-surface{stroke:var(--glass);stroke-width:2;opacity:.65}
+#hud{gap:7px}#hud .count{min-width:70px}#hud button{width:44px;height:44px}
+#alwaysNav{position:fixed;left:18px;bottom:18px;z-index:45;display:flex;gap:6px}#alwaysNav button{font-size:14px;padding:10px 14px;color:#ddd;background:rgba(45,45,49,.8);border-radius:99px;backdrop-filter:blur(12px)}
+html.still #alwaysNav{display:none}#stepdots{bottom:23px}
+@media(max-width:600px){#hud{right:10px;bottom:10px;gap:4px}#hud button{width:36px;height:36px}#hud .count{height:36px;font-size:13px;min-width:60px;padding:0 10px}#alwaysNav{left:10px;bottom:56px}#alwaysNav button{font-size:12px;padding:8px 12px}#help .box{min-width:0;width:92vw;padding:22px}#help td{font-size:14px;padding:5px}#notes{padding:18px;height:45vh}#notes .nx{display:none}#stepdots{bottom:17px;left:60px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ── 에너지 효율 덱 ── 에너지 색은 core.css 의 --elec --light --heat --sound --kin(면에 따라 저절로 바뀜) + 화학 --chem */
+.slide{--chem:#FF7AB6}
+.slide[data-tile="light"],.slide[data-tile="parchment"]{--chem:#B8306E}
+.c-chem{color:var(--chem)}
+.e-elec{--ec:var(--elec)} .e-light{--ec:var(--light)} .e-heat{--ec:var(--heat)} .e-sound{--ec:var(--sound)} .e-kin{--ec:var(--kin)} .e-chem{--ec:var(--chem)}
+.echip{display:inline-flex;align-items:center;gap:12px;padding:10px 22px;border-radius:9999px;font-size:30px;font-weight:600;color:var(--ec);
+  background:color-mix(in srgb,var(--ec) 14%,transparent);white-space:nowrap}
+.echip::before{content:"";width:14px;height:14px;border-radius:50%;background:var(--ec)}
+.dev-card{position:absolute;top:300px;width:520px;height:560px;border-radius:18px;padding:40px 40px 34px;background:rgba(127,127,127,.075);display:flex;flex-direction:column;gap:22px}
+.dev-card h3{font-size:50px;font-weight:600;letter-spacing:-.025em;line-height:1.15}
+.dev-card .flowcol{display:flex;flex-direction:column;align-items:flex-start;gap:16px}
+.dev-card .arrow{font-size:40px;color:var(--t2);line-height:1;padding-left:20px}
+.dev-card .outs{display:flex;flex-wrap:wrap;gap:12px}
+.dev-card p{font-size:30px;line-height:1.5;color:var(--t2);margin-top:auto}
+.dev-card .lead2{font-size:32px;line-height:1.5;color:inherit}
+.sk-lab{font-weight:600}
+.lab-controls .smallbtn.on{background:var(--act);color:#fff;border-color:transparent}
+.lab-controls output{color:var(--elec)}
+.lab-controls input[type=range]{accent-color:var(--act)}
+.devbtns{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
+.devbtns .smallbtn{padding:12px 20px;font-size:26px}
+.effbig{font-size:120px;font-weight:600;letter-spacing:-.05em;line-height:1.1;font-variant-numeric:tabular-nums}
+.grade-row{display:flex;align-items:center;gap:18px;height:62px}
+.grade-row b{width:44px;font-size:34px;text-align:center;font-variant-numeric:tabular-nums}
+.grade-row i{display:block;height:46px;border-radius:0 23px 23px 0}
+.tip-list{display:flex;flex-direction:column;gap:26px}
+.tip{display:grid;grid-template-columns:72px 1fr;gap:20px;align-items:baseline;font-size:36px;line-height:1.45}
+.tip .no{font-size:30px;font-weight:700;color:var(--act)}
+.tip small{display:block;font-size:28px;color:var(--t2);line-height:1.45;margin-top:4px}
+.ws-card .ws-line.big{font-size:46px;line-height:1.8}
+.sk-in{fill:#000}
+.slide[data-tile="light"] .sk-in,.slide[data-tile="parchment"] .sk-in{fill:#fff}
+/* ── 보강 ── */
+.dev-card>.echip,.dev-card>.chips{align-self:flex-start}
+.chips{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.chips .to,.chain-row .to{font-size:34px;color:var(--t2)}
+.stack{display:flex;flex-direction:column;align-items:flex-start;gap:18px}
+.colh{font-size:44px;font-weight:600;letter-spacing:-.02em;line-height:1.2;margin-bottom:6px}
+.colsub{font-size:28px;color:var(--t2);margin-bottom:28px}
+.colh+.tip-list{margin-top:22px}
+.chain-row{display:flex;align-items:center;gap:16px}
+.rowlab{width:120px;font-size:44px;font-weight:600;letter-spacing:-.02em}
+.tip .no{white-space:nowrap}
+.tip{grid-template-columns:96px 1fr}
+.elabel{position:absolute;width:360px;border-radius:14px;background:#fff;color:#1d1d1f;border:3px solid #1d1d1f;padding-bottom:18px}
+.elabel .eh{background:#1d1d1f;color:#fff;font-size:24px;font-weight:600;padding:10px 18px;border-radius:10px 10px 0 0}
+.elabel .eg{display:flex;align-items:baseline;gap:10px;padding:14px 18px 6px}
+.elabel .eg b{font-size:96px;line-height:1;font-weight:700}
+.elabel .eg span{font-size:32px;font-weight:600}
+.elabel .ebars{padding:6px 18px 4px;display:flex;flex-direction:column;gap:6px}
+.elabel .ebars i{display:block;height:20px;border-radius:0 10px 10px 0;position:relative;opacity:.45}
+.elabel .ebars i.on{opacity:1}
+.elabel .ebars i.on::after{content:"◀";position:absolute;left:calc(100% + 8px);top:-5px;font-size:22px;font-style:normal;color:#1d1d1f}
+.elabel .em{padding:12px 18px 0;font-size:24px;color:#555}
+.elabel .em b{display:block;font-size:46px;color:#1d1d1f;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+/* 분수 */
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 .15em;line-height:1.25}
+.frac>span{display:block;padding:.06em .3em;text-align:center;white-space:nowrap}
+.frac>span:first-child{border-bottom:.07em solid currentColor;padding-bottom:.14em}
+.frac>span:last-child{padding-top:.18em}
+.frac .bk{margin:0}
+.ws-line.big .frac{font-size:1em}
+/* 쪽 바로 가기 */
+#alwaysNav #navPage{font-variant-numeric:tabular-nums;min-width:74px}
+#count{cursor:pointer}
+#overview .ovhead{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px;margin-bottom:22px}
+#overview .ovhead h2{margin:0}
+.ovjump{display:flex;align-items:center;gap:8px}
+.ovjump label{color:#a1a1a6;font-size:15px;font-weight:600}
+.ovjump input{width:84px;height:40px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#f5f5f7;font:600 18px var(--font);text-align:center;font-variant-numeric:tabular-nums}
+.ovjump input:focus{outline:2px solid #2997ff;outline-offset:2px}
+.ovjump button{height:40px;padding:0 16px;border-radius:9999px;background:#2997ff;color:#fff;font-size:15px;font-weight:600}
+.ovjump .ovclose{background:rgba(255,255,255,.12)}
+@media(max-width:600px){#overview{padding:24px 14px}#overview .grid{grid-template-columns:repeat(2,1fr);gap:10px}#overview .ov .tt{font-size:15px}#alwaysNav #navPage{min-width:60px}}
+</style></head><body><div id="viewport"><main id="stage"><section class="slide" id="cover" data-title="에너지 효율과 신재생 에너지" data-tile="black" data-say="통합과학2 에너지 효율과 신재생 에너지 수업입니다. 1부(에너지 보존, 효율의 뜻과 계산, 열기관, 발전과 가정의 효율, 효율 높이기)와 2부(신재생 에너지)로 나뉘며, 2차시 이상으로 나눌 때는 2부 표지에서 끊으면 됩니다. 화면의 수치는 개념을 보이기 위한 **예시 값**이며 기기와 조건에 따라 다릅니다. 학습지 빈칸 번호 ①~⑳는 화면의 번호와 같습니다. → 또는 화면 오른쪽 클릭: 다음 단계. ←: 이전 단계. R: 단계 다시 보기. O: 전체 보기. T: 수업 메모. F: 전체 화면. M: 소리 켜기/끄기(오른쪽 아래 단추도 같음). 효과음은 첫 클릭 뒤부터 나고, 학생 모드(?s=1)에서는 처음에 꺼져 있습니다. 소리 파일 없이 브라우저에서 합성하므로 인터넷이 없어도 납니다."><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="hero-flow"></g></svg><div class="abs t-eyebrow center" style="left:120px;top:684px;width:1680px;" data-in="200">에너지 효율 · 신재생 에너지</div><div class="abs t-display center" style="left:120px;top:746px;width:1680px;" data-in="450">에너지 효율</div><div class="abs t-lead center mute" style="left:120px;top:899px;width:1680px;" data-in="800">넣어 준 에너지 중 얼마나 쓸모 있게 쓰일까?</div><div class="abs t-lead center mute" style="left:0;width:1920px;top:990px;font-size:30px;letter-spacing:.06em" data-in="1100">제작 · KJE</div><div class="progress-hint">클릭 또는 → 로 시작</div></section><section class="slide" id="question" data-title="같은 밝기, 다른 전기" data-tile="dark" data-say="두 전구의 밝기가 비슷하다는 것만 먼저 보여 주고, 어느 쪽이 전기를 덜 쓸지 예측을 받습니다. 첫 클릭에서 소비 전력을 공개합니다. 60 W 백열전구와 9 W 안팎의 LED 전구는 밝기(약 800 lm)가 비슷한 **예시 조합**이며 제품마다 다릅니다. 밝기(lm)는 사람 눈의 색깔별 감도를 반영한 양이라, 밝기가 같다고 빛 에너지까지 정확히 같다고 볼 수는 없습니다. 뒤의 계산에서는 **두 전구가 빛으로 내는 전력을 모두 3 W로 가정**합니다. 두 번째 클릭에서 켜 둔 전구를 만졌을 때를 떠올리게 하세요. 백열전구가 훨씬 뜨겁습니다. 실제로 켜진 전구는 화상 위험이 있으므로 만져 보게 하지 않습니다."><div class="hd" data-in><div class="eb"><b>01</b>먼저 예상하기</div><h2>밝기가 같은 두 전구, 어느 쪽이 전기를 덜 쓸까?</h2></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="q-bulbs"></g></svg><div class="abs t-label center" style="left:380px;top:720px;width:480px;" data-in="200">백열전구</div><div class="abs t-label center" style="left:1060px;top:720px;width:480px;" data-in="300">LED 전구</div><div class="abs t-head center c-elec" style="left:380px;top:784px;width:480px;" data-step="1">60 W</div><div class="abs t-head center c-elec" style="left:1060px;top:784px;width:480px;" data-step="1">9 W</div><div class="abs tagline center" style="left:120px;top:880px;width:1680px;" data-step="2">더 뜨거운 쪽은 백열전구. 전기 에너지는 어디로 갔을까?</div><div class="fine">밝기 약 800 lm(루멘) 기준의 예시 조합 · 뒤의 계산에서는 두 전구 모두 빛으로 내는 전력을 3 W로 가정한다.</div></section><section class="slide" id="convert" data-title="에너지 전환" data-tile="light" data-say="전기 기기는 전기 에너지를 다른 형태의 에너지로 전환합니다. 기기를 쓰는 목적에 맞는 에너지를 **유용한 에너지**, 목적과 관계없이 생기는 에너지를 **버려지는(손실되는) 에너지**로 구분합니다. 같은 열이라도 전기난로에서는 유용한 에너지입니다. 휴대 전화 충전은 전기 에너지가 전지 속 화학 에너지로 저장되는 예입니다. 세 기기 모두 열이 함께 생긴다는 점을 짚어 주세요."><div class="hd" data-in><div class="eb"><b>02</b>에너지 전환</div><h2>전기 에너지는 어떤 에너지로 바뀔까?</h2></div><div class="dev-card" style="left:120px" data-in="150"><h3>전구</h3><div class="flowcol"><span class="echip e-elec">전기 에너지</span><span class="arrow">↓</span><div class="outs"><span class="echip e-light" data-step="1">빛 에너지</span><span class="echip e-heat" data-step="1" data-delay="200">열 에너지</span></div></div><p data-step="1" data-delay="400">쓰려는 것은 빛</p></div><div class="dev-card" style="left:700px" data-in="300"><h3>선풍기</h3><div class="flowcol"><span class="echip e-elec">전기 에너지</span><span class="arrow">↓</span><div class="outs"><span class="echip e-kin" data-step="2">운동 에너지</span><span class="echip e-sound" data-step="2" data-delay="200">소리 에너지</span><span class="echip e-heat" data-step="2" data-delay="400">열 에너지</span></div></div><p data-step="2" data-delay="600">쓰려는 것은 날개의 운동</p></div><div class="dev-card" style="left:1280px" data-in="450"><h3>휴대 전화 충전</h3><div class="flowcol"><span class="echip e-elec">전기 에너지</span><span class="arrow">↓</span><div class="outs"><span class="echip e-chem" data-step="3">화학 에너지</span><span class="echip e-heat" data-step="3" data-delay="200">열 에너지</span></div></div><p data-step="3" data-delay="400">쓰려는 것은 전지에 저장되는 에너지</p></div><div class="fine" data-step="3" data-delay="700">세 기기 모두, 쓰려는 에너지와 함께 열 에너지가 생긴다.</div></section><section class="slide" id="conserve" data-title="에너지 보존" data-tile="parchment" data-say="에너지 보존 법칙: 에너지는 형태가 바뀌어도 새로 생기거나 없어지지 않으며 총량이 일정합니다. 따라서 공급한 에너지는 유용하게 쓰인 에너지와 버려진 에너지의 합과 같습니다. 화면의 백열전구 값(빛 5 J, 열 95 J)은 교과서에서 흔히 쓰는 **예시 값**입니다. 빈칸 ① 일정, ② 버려진 에너지."><div class="hd" data-in><div class="eb"><b>03</b>에너지 보존</div><h2>에너지는 사라지지 않는다</h2></div><div class="ws-card" style="left:120px;top:300px;width:1280px" data-in="200"><div class="ws-h"><b>에너지 보존 법칙</b></div><div class="ws-row"><span class="tm">총량</span><span>에너지는 형태가 바뀌어도 그 총량은 <span class="bk"><span class="a" data-step="1" data-fx="pop">일정</span><span class="n">1</span></span>하다.</span></div><div class="ws-row"><span class="tm">관계</span><span>공급한 에너지 = 유용한 에너지 + <span class="bk wide"><span class="a" data-step="2" data-fx="pop">버려진 에너지</span><span class="n">2</span></span></span></div></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="cons-bulb"></g><g id="cons-bar"></g></svg><div class="fine">백열전구 예시 · 1 J(줄)은 에너지의 단위이다.</div></section><section class="slide" id="spread" data-title="흩어지는 열" data-tile="black" data-say="첫 클릭에서 한곳에 모여 있던 열이 주변으로 퍼집니다. 에너지의 총량은 그대로지만, 넓게 퍼진 열은 다시 모아 빛을 내거나 물체를 움직이는 데 쓰기 어렵습니다. 그래서 에너지가 보존되는데도 **에너지를 아껴야** 합니다. 알갱이는 에너지의 양을 나타내는 표시이며 실제 입자가 아닙니다. 빈칸 ③ 열."><div class="hd" data-in><div class="eb"><b>04</b>에너지 보존인데 왜 아낄까?</div><h2>한번 흩어진 열은 다시 모으기 어렵다</h2></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="spread-g"></g></svg><div class="abs t-head" style="left:1180px;top:340px;width:620px;" data-in="200">총량은 그대로</div><div class="abs ws-line" style="left:1180px;top:470px;width:640px;" data-step="1">전환 과정에서 에너지의 일부는 <span class="bk"><span class="a" data-step="1" data-fx="pop" data-delay="900">열</span><span class="n">3</span></span> 에너지로 주변에 흩어진다.</div><div class="abs statement" style="left:1180px;top:690px;width:640px;font-size:52px;white-space:pre-line" data-step="2">쓸모 있게 다시 쓸 수 있는
+에너지는 줄어든다.</div><div class="fine">알갱이 하나는 같은 양의 에너지를 나타내는 모형이다.</div></section><section class="slide" id="define" data-title="에너지 효율의 뜻" data-tile="light" data-say="에너지 효율은 공급한 에너지 중 유용하게 쓰인 에너지의 비율입니다. 보통 백분율로 나타냅니다. 같은 시간 동안의 에너지 대신 전력(W)으로 나누어도 같은 값이 나옵니다(60 W 중 빛 3 W → 5 %). 효율이 높다는 것은 공급한 에너지 중 버려지는 에너지의 **비율**이 작다는 뜻입니다. 효율은 양이 아니라 비율이므로, 공급량이 많으면 효율이 높아도 버려지는 양은 더 클 수 있습니다(100 J·효율 50 % → 50 J, 1000 J·효율 90 % → 100 J). 빈칸 ④ 유용하게 쓰인 에너지, ⑤ 공급한 에너지."><div class="hd" data-in><div class="eb"><b>05</b>에너지 효율</div><h2>공급한 에너지 중 유용하게 쓰인 비율</h2></div><div class="ws-card" style="left:120px;top:330px;width:1680px" data-in="200"><div class="ws-h"><b>에너지 효율(%)</b></div><div class="ws-line big" style="display:flex;align-items:center;gap:.4em">= <span class="frac"><span><span class="bk wide"><span class="a" data-step="1" data-fx="pop">유용하게 쓰인 에너지</span><span class="n">4</span></span></span><span><span class="bk wide"><span class="a" data-step="2" data-fx="pop">공급한 에너지</span><span class="n">5</span></span></span></span> × 100</div></div><div class="abs tagline center" style="left:120px;top:680px;width:1680px;" data-step="3">효율이 높다 = 공급한 에너지 중 버려지는 비율이 작다</div><div class="abs t-lead center mute" style="left:120px;top:770px;width:1680px;" data-step="3">백열전구: 100 J 중 빛 5 J → <span class="frac"><span>5</span><span>100</span></span> × 100 = <b class="c-light">5 %</b></div><div class="fine">전력(W)은 1초 동안 쓰는 에너지(J)이므로, 전력으로 계산해도 효율은 같다.</div></section><section class="slide" id="flowread" data-title="에너지 흐름도 읽기" data-tile="dark" data-say="에너지 흐름도(띠 그림)에서 띠의 굵기는 에너지의 양을 나타냅니다. 들어간 띠의 굵기와 나온 띠 굵기의 합은 같습니다(에너지 보존). 백열전구는 빛 5 %, LED 전구는 약 33 %의 **예시 값**입니다. LED 값은 앞에서 본 9 W 중 3 W가 빛이라는 가정에서 나왔습니다. 실제 값은 제품마다 다르며 교과서 수치를 따르세요."><div class="hd" data-in><div class="eb"><b>06</b>에너지 흐름도</div><h2>띠의 굵기로 효율을 비교한다</h2></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="fr-a"></g><g id="fr-b"></g></svg><div class="abs t-label mute" style="left:120px;top:300px;width:600px;" data-in="100">백열전구</div><div class="abs effbig c-light" style="left:1440px;top:330px;width:400px;" data-step="2">5 %</div><div class="abs t-label mute" style="left:120px;top:640px;width:600px;" data-step="3">LED 전구</div><div class="abs effbig c-light" style="left:1440px;top:670px;width:400px;" data-step="3" data-delay="1300">33 %</div><div class="fine">띠의 굵기 = 에너지의 양 · 공급 에너지를 100으로 본 예시 값</div></section><section class="slide" id="power" data-title="전력과 시간으로 효율 구하기" data-tile="light" data-say="전기 기기에 공급한 전기 에너지는 소비 전력(W)에 사용 시간(s)을 곱해 구합니다. 2000 W 전기 주전자를 200초 동안 쓰면 공급한 전기 에너지는 400 000 J입니다. 물 1 kg을 20 °C에서 100 °C까지 데우는 데 필요한 열은 중학교에서 배운 열량 식(Q = c·m·Δt)으로 4.2 J/(g·°C) × 1000 g × 80 °C = 336 000 J입니다. 효율은 84 %이고, 나머지 64 000 J은 주전자 몸체와 주변 공기로 빠져나갔습니다. 여기서는 **열이 유용한 에너지**라는 점을 전구와 비교해 짚어 주세요. 열량 식을 다루지 않는다면 336 000 J을 주어진 값으로 쓰면 됩니다. 수치는 예시 값입니다. 빈칸 ⑥ 시간, ⑦ 84."><div class="hd" data-in><div class="eb"><b>07</b>예제 ① · 전력 × 시간</div><h2>전기 주전자는 물을 데우는 데 에너지를 얼마나 쓸까?</h2></div><div class="ws-card" style="left:120px;top:300px;width:1040px" data-in="200"><div class="ws-h"><b>전기 주전자</b><span>소비 전력 2000 W · 200초 사용 · 물 1 kg</span></div><div class="ws-row" data-step="1"><span class="tm">공급</span><span>공급한 전기 에너지 = 소비 전력 × <span class="bk"><span class="a" data-step="1" data-fx="pop" data-delay="300">시간</span><span class="n">6</span></span></span></div><div class="ws-row" data-step="1" data-delay="500"><span class="tm"></span><span class="num">2000 W × 200 s = <b class="c-elec">400 000 J</b></span></div><div class="ws-row" data-step="2"><span class="tm">유용</span><span>물이 얻은 열 (20 °C → 100 °C) <b class="c-heat">336 000 J</b></span></div><div class="ws-row" data-step="3"><span class="tm">효율</span><span class="num"><span class="frac"><span>336 000</span><span>400 000</span></span> × 100 = <span class="bk"><span class="a" data-step="3" data-fx="pop" data-delay="300">84</span><span class="n">7</span></span> %</span></div><div class="ws-row" data-step="4"><span class="tm">손실</span><span class="num">64 000 J <span class="mute">주전자 몸체와 공기로 나간 열</span></span></div></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="kettle-g"></g></svg><div class="fine">물 1 kg의 온도를 1 °C 높이는 데 약 4200 J · 1 W = 1초에 1 J · 예시 값</div></section><section class="slide" id="example" data-title="효율 계산하기 ②" data-tile="parchment" data-say="전동기(모터)가 전기 에너지 2000 J을 받아 물체를 들어 올렸고, 정지해 있던 물체를 들어 올려 다시 멈추게 했으므로 운동 에너지의 변화는 없고, 물체의 위치 에너지가 1500 J 늘었습니다. 효율은 1500 ÷ 2000 × 100 = 75 %입니다. 에너지 보존에 따라 나머지 500 J은 열과 소리 등으로 전환되었습니다. 계산 전에 '유용한 에너지가 무엇인지'를 먼저 말하게 하세요. 빈칸 ⑧ 75, ⑨ 500."><div class="hd" data-in><div class="eb"><b>08</b>예제 ②</div><h2>전동기로 물체를 들어 올렸다</h2></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="ex-crane"></g></svg><div class="ws-card" style="left:860px;top:300px;width:940px" data-in="200"><div class="ws-h"><b>조건</b><span>전동기</span></div><div class="ws-row"><span class="tm">공급</span><span>전기 에너지 <b class="c-elec">2000 J</b></span></div><div class="ws-row"><span class="tm">유용</span><span>늘어난 위치 에너지 <b class="c-kin">1500 J</b></span></div><div class="ws-row"><span class="tm">효율</span><span><span class="frac"><span>1500</span><span>2000</span></span> × 100 = <span class="bk"><span class="a num" data-step="1" data-fx="pop">75</span><span class="n">8</span></span> %</span></div><div class="ws-row"><span class="tm">손실</span><span>2000 − 1500 = <span class="bk"><span class="a num" data-step="2" data-fx="pop">500</span><span class="n">9</span></span> J <span class="mute" data-step="2" data-delay="400">(열·소리 등)</span></span></div></div><div class="fine">정지한 물체를 들어 올려 다시 멈추게 함 · 늘어난 위치 에너지 = 전동기가 한 유용한 일</div></section><section class="slide" id="lab" data-title="기기별 효율 비교" data-tile="black" data-say="기기 단추를 눌러 에너지 흐름을 비교하고, 이 모형에서는 기기마다 효율을 일정하게 가정하므로, 공급 에너지를 바꿔도 **효율은 그대로**입니다(실제 기기는 운전 조건에 따라 효율이 달라질 수 있습니다). 띠 전체의 굵기는 공급 에너지에 비례합니다. 공급 에너지를 2배로 하면 유용한 에너지와 버려진 에너지가 모두 2배가 됩니다. 수치는 모두 예시 값입니다. 전기 모터 80 %, 자동차 엔진 25 %, 화력 발전소 40 %, 전기 주전자 84 %(앞 장의 계산), 태양광 패널 20 %로 두었습니다. 전기 주전자는 열이 유용한 에너지라는 점도 다시 짚어 주세요. 학생에게 버려지는 에너지가 가장 큰 기기와 그 형태를 묻습니다."><div class="hd" data-in><div class="eb"><b>09</b>직접 조작하기</div><h2>기기마다 효율은 얼마일까?</h2></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="lab-flow"></g></svg><div class="lab-controls" style="left:1180px;top:280px;width:620px" data-interactive><div class="devbtns"><button class="smallbtn" data-dev="bulb">백열전구</button><button class="smallbtn" data-dev="led">LED 전구</button><button class="smallbtn" data-dev="motor">전기 모터</button><button class="smallbtn" data-dev="engine">자동차 엔진</button><button class="smallbtn" data-dev="plant">화력 발전소</button><button class="smallbtn" data-dev="kettle">전기 주전자</button><button class="smallbtn" data-dev="solar">태양광 패널</button></div><label for="supply">공급 에너지 <output id="supplyOut">500 J</output></label><input id="supply" type="range" min="100" max="1000" step="100" value="500" aria-label="공급 에너지"><div class="live-table"><div class="live-row"><span>유용한 에너지</span><b id="usefulOut">5 J</b></div><div class="live-row"><span>버려진 에너지</span><b id="wasteOut">95 J</b></div><div class="live-row"><span>에너지 효율</span><b id="effOut">5 %</b></div></div></div><div class="fine">모든 수치는 개념 이해를 위한 예시 값이다. 실제 효율은 제품과 사용 조건에 따라 다르다.</div></section><section class="slide" id="samelight" data-title="같은 빛을 얻으려면" data-tile="light" data-say="빛 에너지 3 J을 얻는 데 필요한 전기 에너지를 비교합니다. 효율 5 %인 백열전구는 3 ÷ 0.05 = 60 J, 효율 약 33 %인 LED 전구는 약 9 J이 필요합니다. 첫 장의 두 전구가 빛으로 내는 전력을 모두 3 W로 가정한 계산입니다. 효율이 높을수록 같은 일을 하는 데 필요한 에너지가 적습니다. 빈칸 ⑩ 적다."><div class="hd" data-in><div class="eb"><b>10</b>효율과 에너지 소비</div><h2>빛 3 J을 얻으려면 전기 에너지가 얼마나 필요할까?</h2></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="sl-bars"></g></svg><div class="abs ws-line" style="left:120px;top:800px;width:1680px;font-size:42px" data-step="3">에너지 효율이 높을수록 같은 일을 하는 데 필요한 에너지가 <span class="bk"><span class="a" data-step="3" data-fx="pop" data-delay="300">적다</span><span class="n">10</span></span>.</div><div class="fine">두 전구 모두 빛 3 J로 가정한 계산 모형 · 노란 부분 = 빛 · 주황 부분 = 열로 버려진 에너지</div></section><section class="slide" id="limit" data-title="효율의 한계" data-tile="dark" data-say="공급한 것보다 많은 에너지를 내는 장치는 에너지 보존 법칙에 어긋나므로, 에너지 효율은 100 %를 넘을 수 없습니다. 실제 기기에서는 마찰, 전기 저항 등으로 쓰려는 에너지 외의 에너지가 함께 생기므로 대부분 100 %보다 작습니다. 다만 전기난로처럼 열이 목적인 기기는 사용하는 곳에서 전기 → 열 전환을 거의 100 %로 다루기도 하므로, '열이 생기면 효율이 무조건 낮다'로 일반화하지 않습니다. 열기관은 공급받은 열을 모두 일로 바꿀 수 없으므로 열효율이 항상 100 %보다 작습니다(다음 장). 열펌프(히트 펌프)의 '효율 100 % 이상' 표시는 바깥에서 옮겨 온 열까지 셈한 성능 계수이므로, 에너지를 새로 만든 것이 아니라는 점과 함께 따로 해석하게 하세요. 빈칸 ⑪ 100."><div class="hd" data-in><div class="eb"><b>11</b>효율의 한계</div><h2>효율이 100 %를 넘는 기기를 만들 수 있을까?</h2></div><div class="abs ws-line big" style="left:120px;top:310px;width:1680px;font-size:58px" data-step="1">에너지 효율은 <span class="bk"><span class="a num" data-step="1" data-fx="pop" data-delay="300">100</span><span class="n">11</span></span> %를 넘을 수 없다.</div><div class="abs body-copy mute" style="left:120px;top:425px;width:1680px" data-step="1" data-delay="500">공급한 것보다 많은 에너지를 내는 장치는 에너지 보존 법칙에 어긋난다.</div><div class="abs" style="left:120px;top:545px;width:1680px;display:flex;gap:16px" data-step="2"><span class="echip e-heat">마찰</span><span class="echip e-heat">전기 저항</span><span class="echip e-sound">소음·진동</span></div><div class="abs body-copy" style="left:120px;top:635px;width:1680px" data-step="2">실제 기기는 쓰려는 에너지 외에 다른 에너지도 함께 생겨, 대부분 100 %보다 작다.</div><div class="abs tagline" style="left:120px;top:780px;width:1680px" data-step="3">열기관은 공급받은 열을 모두 일로 바꿀 수 없어, 열효율이 항상 100 %보다 작다.</div><div class="fine">전기난로처럼 열이 목적인 기기는 쓰는 곳에서 전기 → 열 전환이 거의 100 %이다 · 열펌프의 성능은 바깥에서 옮겨 온 열까지 셈한 값이라 따로 해석한다.</div></section><section class="slide" id="engine" data-title="열기관의 열효율" data-tile="parchment" data-say="열기관은 열을 받아 일을 하는 장치입니다. 자동차 엔진에서는 연료가 탈 때 나오는 열 Q₁ 중 일부만 일 W가 되고, 나머지 Q₂는 배기가스와 냉각수로 바깥에 버려집니다. 에너지 보존으로 W = Q₁ − Q₂입니다. 예시에서 Q₁ = 100, W = 25이면 열효율은 25 %입니다. 화살표의 굵기는 에너지의 양에 비례합니다. 교과서가 열기관을 다루지 않으면 이 장은 건너뛰어도 됩니다. 빈칸 ⑫ 25."><div class="hd" data-in><div class="eb"><b>12</b>열기관</div><h2>자동차 엔진은 연료의 에너지를 얼마나 쓸까?</h2></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="eng-g"></g></svg><div class="ws-card" style="left:1060px;top:320px;width:760px" data-in="200"><div class="ws-h"><b>열효율</b></div><div class="ws-row"><span class="tm">보존</span><span>W = Q₁ − Q₂</span></div><div class="ws-row"><span class="tm">정의</span><span>열효율 = <span class="frac"><span>W</span><span>Q₁</span></span> × 100</span></div><div class="ws-row"><span class="tm">예시</span><span style="white-space:nowrap"><span class="frac"><span>25</span><span>100</span></span> × 100 = <span class="bk"><span class="a num" data-step="3" data-fx="pop">25</span><span class="n">12</span></span> %</span></div></div><div class="fine">Q₁: 연료가 타며 엔진에 공급한 열 · W: 엔진이 한 일 · Q₂: 바깥으로 버린 열 (예시 값)</div></section><section class="slide" id="engineflow" data-title="엔진의 에너지 흐름" data-tile="dark" data-say="자동차 엔진에 공급한 연료의 화학 에너지 100 중 바퀴를 돌리는 일은 약 25이고, 나머지는 대부분 배기가스와 냉각수(라디에이터)를 통해 열로 버려집니다. 마찰과 소리로도 일부가 빠져나갑니다. 비율은 자료마다 다른 **예시 값**입니다. 전기 자동차의 모터 효율은 훨씬 높지만, 충전하는 전기를 만드는 발전소의 효율까지 함께 따져야 한다는 점을 뒤의 '발전소에서 우리 집 전구까지' 장과 연결합니다."><div class="hd" data-in><div class="eb"><b>13</b>열기관의 에너지 흐름</div><h2>엔진에서 버려지는 에너지는 어디로 갈까?</h2></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="ef-g"></g></svg><div class="abs statement" style="left:1460px;top:350px;width:380px;font-size:50px;white-space:pre-line" data-step="2">버려지는 에너지의
+대부분은 열</div><div class="abs body-copy mute" style="left:1460px;top:600px;width:380px" data-step="3">전기 자동차의 모터는 효율이 높지만, 충전할 전기를 만드는 발전소의 효율도 함께 따져야 한다.</div><div class="fine">연료 에너지를 100으로 본 예시 값 · 실제 비율은 엔진과 주행 조건에 따라 다르다.</div></section><section class="slide" id="plants" data-title="발전 방식별 효율" data-tile="parchment" data-say="발전소마다 처음 에너지를 전기 에너지로 바꾸는 효율이 다릅니다. 석탄 화력과 원자력 발전은 열로 물을 끓여 증기 터빈을 돌리는 열기관이라 효율이 30~40 %대입니다. LNG 복합 화력은 가스 터빈에서 나온 뜨거운 배기가스로 증기를 만들어 증기 터빈을 한 번 더 돌리므로 효율이 높습니다(버려지는 열 다시 쓰기). 수력은 물의 위치 에너지를 터빈의 운동으로 직접 바꾸어 효율이 가장 높습니다. 풍력은 바람의 운동 에너지 중 이론적으로 최대 약 59 %(베츠 한계)까지만 얻을 수 있습니다. 태양광 패널은 약 20 %입니다. 효율이 낮은 태양광도 연료비가 들지 않고 햇빛이 고갈되지 않는다는 점을 2부와 연결하세요. 모두 대략적인 값입니다."><div class="hd" data-in><div class="eb"><b>14</b>발전의 효율</div><h2>발전 방식마다 효율은 얼마일까?</h2></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="pl-g"></g></svg><div class="abs tagline center" style="left:120px;top:870px;width:1680px;font-size:40px" data-step="3">효율이 낮아도 햇빛과 바람은 연료비가 들지 않고 고갈되지 않는다.</div><div class="fine">대략적인 값 · 설비와 운전 조건에 따라 다르다.</div></section><section class="slide" id="chain" data-title="발전소에서 우리 집 전구까지" data-tile="black" data-say="에너지가 여러 단계를 거치면 단계마다 손실이 생깁니다. 연료 에너지 100 → 화력 발전소(효율 40 %) 전기 40 → 송전·배전(약 96 % 전달) 38.4 → LED 전구(약 33 %) 빛 약 13입니다. 전체 효율은 각 단계 효율의 곱입니다(0.40 × 0.96 × 0.33 ≈ 0.13). 백열전구였다면 0.40 × 0.96 × 0.05 ≈ 0.02로 약 2만 남습니다. 수치는 예시 값입니다. 빈칸 ⑬ 곱."><div class="hd" data-in><div class="eb"><b>15</b>단계마다 손실</div><h2>연료 에너지 100은 전구 빛으로 얼마나 남을까?</h2></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="chain-g"></g></svg><div class="abs ws-line" style="left:120px;top:930px;width:1680px;font-size:40px" data-step="4">전체 효율 = 각 단계 효율의 <span class="bk"><span class="a" data-step="4" data-fx="pop" data-delay="200">곱</span><span class="n">13</span></span> <span class="mute">(0.40 × 0.96 × 0.33 ≈ 0.13)</span></div></section><section class="slide" id="kwh" data-title="1년 동안 쓰는 전기" data-tile="black" data-say="전력량은 전력에 사용 시간을 곱한 값이고, 가정에서는 kWh(킬로와트시)를 씁니다. 1 kWh는 1 kW(1000 W)의 전력을 1시간 동안 쓴 전력량이며 3 600 000 J입니다. 60 W 백열전구를 하루 5시간씩 1년(365일) 켜면 60 × 5 × 365 = 109 500 Wh ≈ 109.5 kWh, 9 W LED 전구는 약 16.4 kWh입니다. 슬라이더로 사용 시간과 전구 수를 바꾸게 하고, 두 값의 비(9 : 60)는 그대로라는 점을 확인합니다. 첫 클릭에서 단위 빈칸이 채워집니다. 빈칸 ⑭ kWh."><div class="hd" data-in><div class="eb"><b>16</b>전력량</div><h2>전구를 1년 동안 켜면 전기 에너지가 얼마나 들까?</h2></div><div class="abs ws-line" style="left:120px;top:300px;width:1000px;font-size:36px" data-in="200">전력량(Wh) = 전력(W) × 사용 시간(h) · 단위 <span class="bk"><span class="a" data-step="1" data-fx="pop">kWh</span><span class="n">14</span></span></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="kw-g"></g></svg><div class="lab-controls" style="left:1180px;top:280px;width:620px" data-interactive><label for="hours">하루 사용 시간 <output id="hOut">5시간</output></label><input id="hours" type="range" min="1" max="12" step="1" value="5" aria-label="하루 사용 시간"><label for="bulbs">전구 수 <output id="nOut">1개</output></label><input id="bulbs" type="range" min="1" max="10" step="1" value="1" aria-label="전구 수"><div class="live-table"><div class="live-row"><span>백열전구 1년</span><b id="kw1">109.5 kWh</b></div><div class="live-row"><span>LED 전구 1년</span><b id="kw2">16.4 kWh</b></div><div class="live-row"><span>1년 차이</span><b id="kwd">93.1 kWh</b></div></div></div><div class="fine">1년 = 365일 · 1 kWh = 1000 W × 1시간 = 3 600 000 J</div></section><section class="slide" id="label" data-title="효율 등급 라벨 읽기" data-tile="parchment" data-say="우리나라 가전제품에는 에너지 소비 효율 등급(1~5등급)이 표시되어 있고, 1등급에 가까울수록 같은 일을 하는 데 에너지를 적게 씁니다. 라벨에는 등급과 함께 월간 소비 전력량, 1시간 사용할 때의 이산화 탄소 배출량, 연간 에너지 비용 등이 적혀 있습니다. 화면의 두 라벨은 단순화한 **모형**이며 수치는 예시입니다. 1등급 냉장고(월 25 kWh)와 4등급 냉장고(월 40 kWh)를 1년 쓰면 (40 − 25) × 12 = 180 kWh 차이가 납니다. 등급 기준은 제품 종류와 크기마다 다르므로 같은 종류·비슷한 크기끼리 비교해야 합니다. 빈칸 ⑮ 1."><div class="hd" data-in><div class="eb"><b>17</b>효율 등급</div><h2>라벨로 효율을 비교할 수 있을까?</h2></div><div class="abs" style="left:120px;top:300px;width:760px" data-in="200"><div class="t-label" style="margin-bottom:22px">에너지 소비 효율 등급</div><div id="grades"></div></div><div class="abs ws-line" style="left:120px;top:700px;width:760px;font-size:36px" data-step="1"><span class="bk"><span class="a num" data-step="1" data-fx="pop" data-delay="200">1</span><span class="n">15</span></span>등급에 가까울수록 효율이 높다.</div><div class="elabel" style="left:1000px;top:300px" data-step="2" id="lbA"></div><div class="elabel" style="left:1420px;top:300px" data-step="2" data-delay="250" id="lbB"></div><div class="abs ws-line num" style="left:1000px;top:770px;width:820px;font-size:38px" data-step="3">1년 차이 (40 − 25) × 12 = <b style="color:var(--act)">180 kWh</b></div><div class="abs mute" style="left:1000px;top:842px;width:820px;font-size:28px" data-step="3" data-delay="300">같은 종류, 비슷한 크기의 제품끼리 비교한다.</div><div class="fine">라벨은 표시 방식을 단순화한 모형이다 · 수치는 예시 값</div></section><section class="slide" id="reuse" data-title="버려지는 열 다시 쓰기" data-tile="light" data-say="효율을 높이는 한 가지 방법은 버려지던 에너지를 다시 쓰는 것입니다. 열병합 발전은 전기를 만들고 남은 열로 지역 난방을 합니다. 하이브리드 자동차와 전기 자동차는 브레이크를 밟을 때 운동 에너지 일부를 전기 에너지로 되돌려 전지에 저장합니다(회생 제동). 공장의 뜨거운 배출 열로 물을 데우거나 난방에 쓰기도 합니다. 학생에게 주변의 다른 예를 찾게 하세요."><div class="hd" data-in><div class="eb"><b>18</b>효율 높이기 ①</div><h2>버려지던 에너지를 다시 쓴다</h2></div><div class="dev-card" style="left:120px" data-step="1"><h3>열병합 발전</h3><div class="flowcol"><span class="echip e-heat">남은 열</span><span class="arrow">↓</span><div class="outs"><span class="echip e-heat">지역 난방·온수</span></div></div><p class="lead2">전기를 만들고 남은 열로 집과 건물을 데운다.</p></div><div class="dev-card" style="left:700px" data-step="2"><h3>회생 제동</h3><div class="flowcol"><span class="echip e-kin">달리던 운동 에너지</span><span class="arrow">↓</span><div class="outs"><span class="echip e-elec">전기 에너지</span></div></div><p class="lead2">멈출 때 운동 에너지 일부를 전지에 다시 저장한다.</p></div><div class="dev-card" style="left:1280px" data-step="3"><h3>폐열 회수</h3><div class="flowcol"><span class="echip e-heat">공장 배출 열</span><span class="arrow">↓</span><div class="outs"><span class="echip e-heat">물 데우기·난방</span></div></div><p class="lead2">밖으로 버리던 뜨거운 공기나 물의 열을 다시 쓴다.</p></div></section><section class="slide" id="life" data-title="효율 높이기와 에너지 절약" data-tile="light" data-say="효율 높이기는 같은 일을 더 적은 에너지로 하는 것이고, 절약은 필요 없는 사용을 줄이는 것입니다. LED 조명, 단열, 높은 등급 제품 고르기는 효율 높이기입니다. 쓰지 않는 기기의 플러그 뽑기(대기 전력 차단), 냉난방 지나치게 하지 않기, 빈방 불 끄기는 절약입니다. 대기 전력을 줄이도록 설계한 제품처럼 둘이 겹치는 경우도 있으니 학생이 분류한 이유를 말하게 하세요. 둘 다 에너지 사용량과 탄소 배출을 줄입니다."><div class="hd" data-in><div class="eb"><b>19</b>효율 높이기 ②</div><h2>효율 높이기와 절약, 무엇이 다를까?</h2></div><div class="abs" style="left:120px;top:300px;width:800px" data-step="1"><div class="colh">효율 높이기</div><div class="colsub">같은 일을 더 적은 에너지로</div><div class="tip-list"><div class="tip"><span class="no">조명</span><span>LED 조명으로 바꾸기<small>같은 밝기에 전기를 적게 쓴다.</small></span></div><div class="tip"><span class="no">단열</span><span>이중창·단열재 쓰기<small>새어 나가는 열이 줄어 냉난방 에너지가 준다.</small></span></div><div class="tip"><span class="no">등급</span><span>1등급에 가까운 제품 고르기<small>같은 일을 적은 전기로 한다.</small></span></div></div></div><div class="abs" style="left:1000px;top:300px;width:800px" data-step="2"><div class="colh">절약</div><div class="colsub">필요 없는 사용 줄이기</div><div class="tip-list"><div class="tip"><span class="no">대기</span><span>쓰지 않는 기기의 플러그 뽑기<small>대기 전력으로 새는 전기를 막는다.</small></span></div><div class="tip"><span class="no">냉난방</span><span>냉난방 지나치게 하지 않기<small>실내외 온도 차가 클수록 에너지가 많이 든다.</small></span></div><div class="tip"><span class="no">끄기</span><span>빈방 불 끄기<small>쓰지 않는 시간의 사용을 없앤다.</small></span></div></div></div><div class="abs tagline center" style="left:120px;top:880px;width:1680px" data-step="3">둘 다 에너지 사용량과 탄소 배출을 줄인다.</div></section><section class="slide" id="carbon" data-title="효율과 탄소" data-tile="dark" data-say="같은 빛을 얻는 데 필요한 연료 에너지를 비교합니다. 발전 40 %, 송전 96 %를 거친 뒤 백열전구(5 %)로 빛 1을 얻으려면 연료 약 52, LED 전구(33 %)는 약 8이 필요합니다. 화석 연료를 덜 태우면 이산화 탄소 배출도 줄어듭니다. 앞 단원의 지구 온난화·탄소 중립과 연결합니다. 수치는 예시 값입니다."><div class="hd" data-in><div class="eb"><b>20</b>효율과 환경</div><h2>같은 빛, 태우는 연료는?</h2></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="cb-bars"></g></svg><div class="abs statement" style="left:1180px;top:360px;width:640px;font-size:54px;white-space:pre-line" data-step="2">연료를 덜 태우면
+이산화 탄소도 줄어든다.</div><div class="abs tagline c-kin" style="left:1180px;top:620px;width:640px" data-step="3">효율 높이기 = 에너지 절약 = 탄소 배출 줄이기</div><div class="fine">빛 1을 얻는 데 필요한 연료 에너지 · 발전 40 %, 송전 96 % 가정 (예시 값)</div></section><section class="slide" id="check" data-title="스스로 확인하기 ①" data-tile="parchment" data-say="1번: 효율이 높아도 에너지를 새로 만들지는 않습니다. 버리는 에너지가 적을 뿐입니다. 2번: 100 ÷ 500 × 100 = 20 %. 3번: 500 − 100 = 400 J, 에너지 보존. 4번: W = 효율 × Q₁에서 50 = 0.25 × Q₁, Q₁ = 200 J. 답만 말하지 않고 '공급·유용·버려진 에너지'를 먼저 구분하게 하세요."><div class="hd" data-in><div class="eb"><b>21</b>확인하기</div><h2>공급·유용·버려진 에너지를 구분할 수 있을까?</h2></div><div class="abs" style="left:120px;top:300px;width:1680px;"><div class="check-row"><b>1</b><span>효율이 높은 기기는 에너지를 새로 만들어 낸다.</span><span class="answer" data-step="1">×</span></div><div class="check-row"><b>2</b><span>전기 에너지 500 J로 빛 에너지 100 J을 얻었다. 효율은?</span><span class="answer" data-step="2">20 %</span></div><div class="check-row"><b>3</b><span>위 기기에서 버려진 에너지는?</span><span class="answer" data-step="3">400 J</span></div><div class="check-row"><b>4</b><span>열효율 25 %인 엔진이 일 50 J을 하려면 공급할 열은?</span><span class="answer" data-step="4">200 J</span></div></div><div class="fine">매 클릭마다 답 하나가 나타난다.</div></section><section class="slide" id="part2" data-title="2부 · 신재생 에너지" data-tile="black" data-say="2부는 신재생 에너지입니다. 1부에서 효율을 높여도 화석 연료를 쓰는 한 고갈과 탄소 배출 문제가 남는다는 점을 이어서 질문합니다. 차시를 나눌 때는 이 장부터 시작하세요."><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="p2-hero"></g></svg><div class="abs t-eyebrow center" style="left:120px;top:684px;width:1680px;" data-in="200">2부</div><div class="abs t-display center" style="left:120px;top:746px;width:1680px;" data-in="450">신재생 에너지</div><div class="abs t-lead center mute" style="left:120px;top:899px;width:1680px;" data-in="800">효율을 높이는 것만으로 충분할까?</div></section><section class="slide" id="fossil" data-title="화석 연료의 한계" data-tile="dark" data-say="석탄·석유·천연가스 같은 화석 연료는 오래전 생물이 땅속에서 아주 오랜 시간에 걸쳐 변해 만들어졌으므로, 쓰는 속도만큼 다시 만들어지지 않습니다. 태울 때 나오는 이산화 탄소는 지구 온난화를 강화하고, 미세 먼지와 황·질소 산화물 같은 대기 오염 물질도 나옵니다. 우리나라는 화석 연료 대부분을 수입한다는 점도 함께 이야기할 수 있습니다. 그래서 고갈될 걱정과 탄소 배출이 적은 에너지원이 필요합니다."><div class="hd" data-in><div class="eb"><b>22</b>왜 신재생 에너지일까?</div><h2>화석 연료를 계속 쓸 수 있을까?</h2></div><div class="dev-card" style="left:120px;height:420px" data-step="1"><span class="echip e-chem">고갈</span><h3>다시 채워지지 않는다</h3><p class="lead2">땅속에서 아주 오랜 시간에 걸쳐 만들어져, 쓰는 만큼 다시 생기지 않는다.</p></div><div class="dev-card" style="left:700px;height:420px" data-step="2"><span class="echip e-heat">이산화 탄소</span><h3>지구 온난화</h3><p class="lead2">태울 때 나오는 이산화 탄소가 지구 온난화를 강화한다.</p></div><div class="dev-card" style="left:1280px;height:420px" data-step="3"><span class="echip e-sound">대기 오염</span><h3>오염 물질</h3><p class="lead2">미세 먼지, 황 산화물, 질소 산화물 같은 오염 물질이 나온다.</p></div><div class="abs tagline center" style="left:120px;top:800px;width:1680px" data-step="4">고갈될 걱정과 탄소 배출이 적은 에너지원이 필요하다.</div></section><section class="slide" id="renewdef" data-title="신재생 에너지의 뜻" data-tile="light" data-say="교과서는 신재생 에너지를 재생 에너지와 신에너지로 나누어 설명합니다. 재생 에너지는 햇빛, 바람, 물의 흐름, 지구 내부의 열처럼 자연에서 계속 다시 얻을 수 있어 고갈될 걱정이 적은 에너지입니다. 신에너지는 수소 에너지, 연료 전지처럼 새로운 기술로 만들어 쓰는 에너지입니다. 참고로 2026년 2월 국회를 통과한 개정법은 법 이름을 「재생에너지 개발·이용·보급 촉진법」으로 바꾸고, 수소·연료 전지 관련 규정을 「수소법」으로 옮겼고, 2026년 9월 18일부터 시행되었습니다. 수업은 교과서의 분류를 따르고, 필요하면 이 변화를 소개하세요. 빈칸 ⑯ 고갈."><div class="hd" data-in><div class="eb"><b>23</b>신재생 에너지</div><h2>신재생 에너지란 무엇일까?</h2></div><div class="ws-card" style="left:120px;top:300px;width:1680px" data-in="200"><div class="ws-h"><b>신재생 에너지</b><span>= 재생 에너지 + 신에너지</span></div><div class="ws-row"><span class="tm">재생</span><span>자연에서 계속 다시 얻을 수 있어 <span class="bk"><span class="a" data-step="1" data-fx="pop">고갈</span><span class="n">16</span></span>될 걱정이 적은 에너지</span></div><div class="ws-row" data-step="2"><span class="tm"></span><span class="chips"><span class="echip e-light">태양광</span><span class="echip e-heat">태양열</span><span class="echip e-kin">풍력</span><span class="echip e-elec">수력</span><span class="echip e-elec">해양(조력·파력)</span><span class="echip e-heat">지열</span><span class="echip e-kin">바이오 에너지</span></span></div><div class="ws-row" data-step="3"><span class="tm">신</span><span>새로운 기술로 만들어 쓰는 에너지 <span class="chips" style="margin-left:12px"><span class="echip e-chem">수소 에너지</span><span class="echip e-chem">연료 전지</span></span></span></div></div><div class="fine">교과서 분류 기준 · 2026년 9월 18일 시행된 개정법은 수소·연료 전지 관련 규정을 「수소법」으로 옮겨 따로 다룬다.</div></section><section class="slide" id="origin" data-title="에너지의 근원" data-tile="dark" data-say="신재생 에너지원을 에너지의 근원으로 나눕니다. 태양광·태양열은 햇빛을 직접 쓰고, 풍력은 태양이 땅과 바다를 고르지 않게 데워 생긴 바람, 수력은 태양 에너지로 일어나는 물의 순환, 바이오 에너지는 광합성으로 저장된 에너지, 파력은 바람이 일으킨 파도를 이용하므로 모두 태양 에너지에서 옵니다. 조력은 달과 태양의 인력으로 생기는 밀물과 썰물, 지열은 지구 내부의 열을 이용합니다. 태양 에너지는 태양 중심부의 수소 핵융합에서 나온다는 앞 단원과 연결하세요. 화석 연료도 근원은 오래전의 태양 에너지라는 점을 덧붙일 수 있습니다. 빈칸 ⑰ 태양."><div class="hd" data-in><div class="eb"><b>24</b>에너지의 근원</div><h2>신재생 에너지는 어디에서 왔을까?</h2></div><div class="dev-card" style="left:120px;width:820px;height:400px" data-step="1"><h3>태양</h3><div class="chips"><span class="echip e-light">태양광</span><span class="echip e-heat">태양열</span><span class="echip e-kin">풍력</span><span class="echip e-elec">수력</span><span class="echip e-elec">파력</span><span class="echip e-kin">바이오</span></div><p>햇빛, 햇빛이 만든 바람과 물의 순환, 광합성</p></div><div class="dev-card" style="left:1000px;width:380px;height:400px" data-step="2"><h3>달과 태양의 인력</h3><div class="chips"><span class="echip e-elec">조력</span></div><p>밀물과 썰물</p></div><div class="dev-card" style="left:1420px;width:380px;height:400px" data-step="3"><h3>지구 내부</h3><div class="chips"><span class="echip e-heat">지열</span></div><p>지구 내부의 열</p></div><div class="abs ws-line" style="left:120px;top:780px;width:1680px;font-size:44px" data-step="4">대부분의 신재생 에너지는 <span class="bk"><span class="a" data-step="4" data-fx="pop" data-delay="200">태양</span><span class="n">17</span></span> 에너지에서 온다.</div><div class="fine">태양 에너지는 태양 중심부의 수소 핵융합 반응에서 나온다.</div></section><section class="slide" id="solar" data-title="태양광 발전의 원리" data-tile="light" data-say="태양 전지는 p형 반도체와 n형 반도체를 붙여 만듭니다. 빛을 받으면 접합면 근처에서 전자와 양공(전자가 빠져나간 자리)이 생기고, 전자는 n형 쪽으로, 양공은 p형 쪽으로 이동합니다. 두 반도체를 도선으로 연결하면 전자가 n형에서 도선을 거쳐 p형 쪽으로 흐르며 전류가 생깁니다. 빛 에너지가 직접 전기 에너지로 바뀌므로 터빈이나 발전기가 필요 없습니다. 태양열 발전은 햇빛을 모아 물을 끓여 터빈을 돌리는 방식이라 원리가 다릅니다. 교과서 범위에 따라 전자·양공의 이동은 간단히 다뤄도 됩니다. 빈칸 ⑱ 전기."><div class="hd" data-in><div class="eb"><b>25</b>태양광 발전</div><h2>태양 전지는 빛을 어떻게 전기로 바꿀까?</h2></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="sol-g"></g></svg><div class="abs tip-list" style="left:1200px;top:330px;width:620px"><div class="tip" data-step="1"><span class="no">1</span><span>빛을 받으면 전자(−)와 양공(+)이 생긴다.</span></div><div class="tip" data-step="2"><span class="no">2</span><span>전자는 n형, 양공은 p형 쪽으로 이동한다.</span></div><div class="tip" data-step="3"><span class="no">3</span><span>도선을 연결하면 전류가 흐른다.</span></div></div><div class="abs ws-line" style="left:1200px;top:760px;width:640px;font-size:42px" data-step="3" data-delay="400">빛 에너지 → <span class="bk"><span class="a" data-step="3" data-fx="pop" data-delay="700">전기</span><span class="n">18</span></span> 에너지</div><div class="fine">양공: 전자가 빠져나간 빈자리로, (+)전하처럼 움직인다 · 태양열 발전은 햇빛의 열로 터빈을 돌린다.</div></section><section class="slide" id="solarlab" data-title="태양광 패널 발전량" data-tile="black" data-say="맑은 날 한낮 지면에 닿는 햇빛은 1 m²당 약 1000 W로 보고 계산합니다(태양광 패널 성능 시험의 기준 조건). 효율 20 %, 면적 10 m²이면 1000 × 10 × 0.20 = 2000 W의 전력을 만듭니다. 흐린 날 단추를 누르면 햇빛이 약해져 발전량이 줄고, 밤에는 0이 됩니다. 띠 전체의 굵기는 들어오는 빛의 전력에 비례합니다. 효율을 높이거나 면적을 넓히면 발전량이 늘어난다는 점, 그리고 날씨와 시간에 따라 발전량이 바뀐다는 점(뒤의 과제)을 확인하세요. 흐린 날 200 W/m²는 예시 값입니다."><div class="hd" data-in><div class="eb"><b>26</b>직접 조작하기</div><h2>태양광 패널은 전기를 얼마나 만들까?</h2></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="pv-flow"></g></svg><div class="lab-controls" style="left:1180px;top:280px;width:620px" data-interactive><div class="devbtns"><button class="smallbtn" data-sun="1000">맑은 한낮</button><button class="smallbtn" data-sun="200">흐린 날</button><button class="smallbtn" data-sun="0">밤</button></div><label for="peff">패널 효율 <output id="pvEffOut">20 %</output></label><input id="peff" type="range" min="10" max="25" step="1" value="20" aria-label="패널 효율"><label for="parea">패널 면적 <output id="pvAreaOut">10 m²</output></label><input id="parea" type="range" min="1" max="30" step="1" value="10" aria-label="패널 면적"><div class="live-table"><div class="live-row"><span>들어오는 빛의 전력</span><b id="pvIn">10,000 W</b></div><div class="live-row"><span>만든 전력</span><b id="pvOut">2,000 W</b></div></div></div><div class="fine">햇빛 1000 W/m²는 맑은 날 한낮 기준 · 흐린 날 값은 예시 · 1 W = 1초에 1 J</div></section><section class="slide" id="turbine" data-title="풍력·수력·조력 발전" data-tile="parchment" data-say="풍력, 수력, 조력 발전은 모두 터빈을 돌려 발전기에서 전기를 만듭니다. 풍력은 바람의 운동 에너지, 수력은 높은 곳에 있는 물의 위치 에너지, 조력은 밀물과 썰물 때 생기는 바닷물 높이 차를 이용합니다. 발전기 속에서 자석과 코일이 상대적으로 움직이면 전자기 유도로 전류가 생깁니다. 앞 차시의 전자기 유도와 연결하세요. 우리나라 시화호 조력 발전소가 조력의 예입니다. 빈칸 ⑲ 전자기 유도."><div class="hd" data-in><div class="eb"><b>27</b>터빈과 발전기</div><h2>바람과 물로 어떻게 전기를 만들까?</h2></div><div class="abs" style="left:120px;top:320px;width:1680px;display:flex;flex-direction:column;gap:44px"><div class="chain-row" data-step="1"><span class="rowlab">풍력</span><span class="echip e-kin">바람의 운동 에너지</span><span class="to">→</span><span class="echip e-kin">터빈·발전기 회전</span><span class="to">→</span><span class="echip e-elec">전기 에너지</span></div><div class="chain-row" data-step="2"><span class="rowlab">수력</span><span class="echip e-kin">높은 곳 물의 위치 에너지</span><span class="to">→</span><span class="echip e-kin">터빈·발전기 회전</span><span class="to">→</span><span class="echip e-elec">전기 에너지</span></div><div class="chain-row" data-step="3"><span class="rowlab">조력</span><span class="echip e-kin">밀물·썰물의 높이 차</span><span class="to">→</span><span class="echip e-kin">터빈·발전기 회전</span><span class="to">→</span><span class="echip e-elec">전기 에너지</span></div></div><div class="ws-card" style="left:120px;top:700px;width:1680px" data-step="4"><div class="ws-line">발전기 속 자석과 코일이 상대적으로 움직이면 <span class="bk wide"><span class="a" data-step="4" data-fx="pop" data-delay="300">전자기 유도</span><span class="n">19</span></span>로 전류가 생긴다.</div></div><div class="fine">태양광 발전은 터빈과 발전기 없이 빛을 바로 전기로 바꾼다.</div></section><section class="slide" id="hydrogen" data-title="수소 연료 전지" data-tile="dark" data-say="수소 연료 전지는 수소와 산소가 반응하여 물이 생성되는 반응의 화학 에너지를 직접 전기 에너지로 바꿉니다. 열기관처럼 연료를 태워 터빈을 돌리는 과정을 거치지 않습니다. 고분자 전해질형의 경우 (−)극에서 H₂ → 2H⁺ + 2e⁻, (+)극에서 O₂ + 4H⁺ + 4e⁻ → 2H₂O 반응이 일어나고, 전자는 도선으로, 수소 이온은 전해질을 통해 이동합니다. 수소와 산소의 반응으로 생성되는 물질은 물이고(열도 함께 나옵니다), 이산화 탄소는 생성되지 않습니다. 그러나 수소는 자연에 홀로 거의 없어 만들어 써야 합니다. 천연가스에서 수소를 뽑으면 이산화 탄소가 나오고, 재생 에너지로 만든 전기로 물을 전기 분해하면 탄소 배출이 거의 없습니다. 빈칸 ⑳ 물."><div class="hd" data-in><div class="eb"><b>28</b>신에너지</div><h2>수소 연료 전지는 어떻게 전기를 만들까?</h2></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="fc-g"></g></svg><div class="abs eq" style="left:1200px;top:330px;width:640px;font-size:64px" data-step="1">2H₂ + O₂ → 2H₂O</div><div class="abs chips" style="left:1200px;top:470px;width:640px" data-step="2"><span class="echip e-chem">화학 에너지</span><span class="to">→</span><span class="echip e-elec">전기 에너지</span><span class="echip e-heat">열</span></div><div class="abs ws-line" style="left:1200px;top:580px;width:640px;font-size:40px" data-step="3">생성되는 물질은 <span class="bk"><span class="a" data-step="3" data-fx="pop" data-delay="200">물</span><span class="n">20</span></span>이다.</div><div class="abs body-copy mute" style="left:1200px;top:700px;width:640px;font-size:32px" data-step="4">수소는 만들어 써야 한다. 재생 에너지로 만든 전기로 물을 전기 분해하면 탄소 배출이 거의 없다.</div><div class="fine">(−)극: H₂ → 2H⁺ + 2e⁻ · (+)극: O₂ + 4H⁺ + 4e⁻ → 2H₂O (고분자 전해질형의 예)</div></section><section class="slide" id="proscons" data-title="신재생 에너지의 장점과 과제" data-tile="light" data-say="장점과 과제는 에너지원마다 다르므로 대표 예를 밝혀 말합니다. 재생 에너지는 고갈될 걱정이 적습니다. 태양광·풍력·수력은 발전 과정에서 이산화 탄소를 직접 배출하지 않지만, 바이오 연료는 태울 때 이산화 탄소와 대기 오염 물질이 나옵니다(바이오매스는 자라면서 흡수한 탄소를 내놓는다는 점에서 탄소 중립적이라고 설명하기도 합니다). 국내의 햇빛·바람 등을 활용하면 수입 연료 의존도를 줄일 수 있습니다. 과제로는 태양광·풍력의 발전량이 날씨와 시간에 따라 달라진다는 점, 넓은 공간과 알맞은 지역 조건, 설치 비용, 그리고 변동성을 보완하기 위한 저장 장치·전력망 연계 등이 있습니다. 수력·지열처럼 비교적 일정하게 발전할 수 있는 방식도 있습니다. 설비를 만들고 설치하는 과정의 탄소 배출, 경관·소음·생태계 영향을 둘러싼 지역 갈등도 토의 주제로 쓸 수 있습니다."><div class="hd" data-in><div class="eb"><b>29</b>장점과 과제</div><h2>신재생 에너지는 무엇이 좋고, 무엇이 어려울까?</h2></div><div class="abs" style="left:120px;top:300px;width:820px" data-step="1"><div class="colh c-kin">장점</div><div class="tip-list"><div class="tip"><span class="no">고갈</span><span>고갈될 걱정이 적다<small>햇빛, 바람, 물의 흐름은 계속 공급된다.</small></span></div><div class="tip"><span class="no">탄소</span><span>태양광·풍력·수력은 발전할 때 이산화 탄소를 직접 배출하지 않는다<small>바이오 연료는 태울 때 이산화 탄소가 나온다.</small></span></div><div class="tip"><span class="no">수입</span><span>수입 연료 의존도를 줄일 수 있다<small>국내의 햇빛·바람 등을 활용한다.</small></span></div></div></div><div class="abs" style="left:1000px;top:300px;width:820px" data-step="2"><div class="colh c-heat">과제</div><div class="tip-list"><div class="tip"><span class="no">날씨</span><span>태양광·풍력은 날씨·시간에 따라 발전량이 달라진다<small>흐린 날, 밤, 바람이 약한 날</small></span></div><div class="tip"><span class="no">공간</span><span>넓은 공간과 알맞은 지역이 필요하다<small>햇빛, 바람, 물의 조건이 맞아야 한다.</small></span></div><div class="tip"><span class="no">보완</span><span>설치 비용이 들고, 변동성을 보완할 방법이 필요하다<small>저장 장치, 전력망 연계 등</small></span></div></div></div><div class="fine">장점과 과제는 에너지원마다 다르다 · 설비를 만들고 설치하는 과정에서는 탄소가 배출될 수 있다.</div></section><section class="slide" id="storage" data-title="발전량과 저장" data-tile="black" data-say="그래프는 맑은 날 하루 동안의 태양광 발전량과 전력 수요를 단순화한 **모형**입니다. 한낮에는 발전량이 수요보다 많아 전기가 남고, 해가 진 저녁에는 수요가 많은데 발전량이 0에 가까워 부족합니다. 남는 전기를 에너지 저장 장치(ESS)에 저장하거나, 양수 발전(남는 전기로 물을 높은 곳에 퍼 올렸다가 필요할 때 흘려보냄)으로 위치 에너지로 저장하거나, 물을 전기 분해하여 수소로 저장했다가 꺼내 씁니다. 여러 지역과 여러 에너지원을 연결해 서로 보완하는 방법도 있습니다."><div class="hd" data-in><div class="eb"><b>30</b>발전량 변화와 저장</div><h2>해가 진 뒤에는 전기를 어떻게 쓸까?</h2></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="st-g"></g></svg><div class="abs" style="left:1220px;top:330px;width:600px" data-step="3" data-delay="400"><div class="colh">남는 전기를 저장한다</div><div class="stack"><span class="echip e-elec">에너지 저장 장치(ESS)</span><span class="echip e-kin">양수 발전 · 위치 에너지로</span><span class="echip e-chem">수소로 · 물 전기 분해</span></div></div><div class="abs body-copy mute" style="left:1220px;top:720px;width:600px" data-step="4">여러 지역과 여러 에너지원을 연결해 서로 보완하기도 한다.</div><div class="fine">맑은 날 하루를 단순화한 모형 · 세로축은 상대적인 값</div></section><section class="slide" id="check2" data-title="스스로 확인하기 ②" data-tile="parchment" data-say="1번: 날씨와 시간에 따라 발전량이 바뀝니다. 2번: 1000 W/m² × 5 m² × 0.20 = 1000 W. 3번: 발전기 속 자석과 코일의 상대 운동으로 전류가 생기는 전자기 유도입니다. 4번: 2H₂ + O₂ → 2H₂O이므로 반응으로 생성되는 물질은 물입니다(열도 함께 나옵니다). 답과 함께 근거를 말하게 하세요."><div class="hd" data-in><div class="eb"><b>31</b>확인하기</div><h2>신재생 에너지를 설명할 수 있을까?</h2></div><div class="abs" style="left:120px;top:300px;width:1680px;"><div class="check-row"><b>1</b><span>태양광 발전은 날씨와 관계없이 일정한 전기를 만든다.</span><span class="answer" data-step="1">×</span></div><div class="check-row"><b>2</b><span>햇빛 1000 W/m², 효율 20 %인 패널 5 m²의 발전 전력은?</span><span class="answer" data-step="2">1000 W</span></div><div class="check-row"><b>3</b><span>풍력 발전기가 전기를 만드는 원리는?</span><span class="answer" data-step="3">전자기 유도</span></div><div class="check-row"><b>4</b><span>수소 연료 전지에서 반응으로 생성되는 물질은?</span><span class="answer" data-step="4">물</span></div></div><div class="fine">매 클릭마다 답 하나가 나타난다.</div></section><section class="slide" id="summary" data-title="오늘의 정리" data-tile="black" data-say="처음 질문(60 W와 9 W)과 2부의 질문(효율을 높이는 것만으로 충분할까?)을 학생의 말로 다시 설명하게 합니다. 효율 높이기와 절약은 에너지 사용량을 줄이고, 신재생 에너지는 에너지원 자체를 바꿉니다. 두 가지가 함께 탄소 중립에 기여합니다. 학생에게 자료를 배포할 때 주소 뒤에 ?s=1을 붙이면 수업 메모 버튼을 숨깁니다. 이는 화면 표시 설정이며 보안 기능은 아닙니다."><div class="abs t-eyebrow center" style="left:120px;top:110px;width:1680px;" data-in="100">에너지 효율과 신재생 에너지</div><div class="abs t-display center" style="left:120px;top:190px;width:1680px;font-size:62px;display:flex;justify-content:center;align-items:center;gap:.3em" data-in="300">에너지 효율 = <span class="frac"><span>유용한 에너지</span><span>공급한 에너지</span></span> × 100</div><div class="abs t-head center" style="left:120px;top:410px;width:1680px;font-size:54px" data-step="1">에너지는 보존되지만, 일부는 열로 흩어진다.</div><div class="abs t-lead center" style="left:120px;top:540px;width:1680px;" data-step="2">효율 높이기와 절약 → 같은 일을 적은 에너지로</div><div class="abs t-lead center" style="left:120px;top:630px;width:1680px;" data-step="3">신재생 에너지 → 고갈 걱정과 탄소 배출이 적은 에너지원으로</div><div class="abs t-lead center mute" style="left:120px;top:720px;width:1680px;" data-step="3" data-delay="300">남은 과제: 태양광·풍력의 발전량 변화와 저장</div><div class="abs t-label center mute" style="left:120px;top:880px;width:1680px;" data-step="4">처음 질문에, 이제 에너지 흐름으로 답해 보세요.</div></section></main></div><div id="alwaysNav"><button onclick="Deck.prev()" aria-label="이전 단계">← 이전</button><button onclick="Deck.next()" aria-label="다음 단계">다음 →</button><button id="navPage" onclick="Deck.toggleOverview()" aria-label="쪽 목록 열기">1 / 34</button></div><script>
+
+/* ═══════════════════════════════════════════════════════════════
+   core.js — 강의 덱 엔진
+   · 1920×1080 무대를 화면에 맞춰 배율(레터박스)
+   · 장면(scene) = 도입(enter, 저절로) + 빌드 단계(go(k), 클릭마다)
+   · 되돌아가기·건너뛰기는 "처음 상태로 복원 → 순간 재생"이라 언제나 같은 모습
+   · 애니메이션 도구는 ctx 가 쥐고 있어 장면을 떠나면 저절로 정리됨
+   ═══════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+  const SW = 1920, SH = 1080;
+  const Q = new URLSearchParams(location.search);
+  const STILL = Q.get('still') === '1';
+  /* 학생 모드(?s=1): 대본(노트) 숨김 — 허브 「칠판 다시보기」용. sc_teacher=1 이 저장된 기기는 그대로 교사 화면 */
+  let TEACHER_DEV = false; try { TEACHER_DEV = localStorage.getItem('sc_teacher') === '1'; } catch (e) {}
+  const STUDENT = Q.get('s') === '1';
+  if (STUDENT) document.documentElement.classList.add('student');
+  const REDUCED = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  if (STILL || Q.get('clean') === '1') document.documentElement.classList.add('still');
+  if (Q.get('grid') === '1') document.documentElement.classList.add('grid');
+  if (Q.get('log') === '1') {   // 검증용: 콘솔 수준을 앞머리로 남김(console.py 가 읽음)
+    const oe = console.error.bind(console), ow = console.warn.bind(console);
+    const txt = a => a.map(x => (x && x.stack) ? String(x.stack).split(String.fromCharCode(10)).slice(0, 2).join(' | ') : (typeof x === 'object' ? (() => { try { return JSON.stringify(x); } catch (e) { return String(x); } })() : String(x))).join(' ');
+    console.error = (...a) => oe('[ERR] ' + txt(a));
+    console.warn = (...a) => ow('[WARN] ' + txt(a));
+    window.addEventListener('error', e => oe('[ERR] uncaught ' + (e.message || '') + ' @' + (e.lineno || '')));
+    window.addEventListener('unhandledrejection', e => oe('[ERR] rejection ' + ((e.reason && e.reason.stack) || e.reason)));
+  }
+
+  /* ── 곡선 ── */
+  const EASE = {
+    out: 'cubic-bezier(.2,.8,.2,1)', outQuint: 'cubic-bezier(.22,1,.36,1)', inOut: 'cubic-bezier(.65,0,.35,1)',
+    in: 'cubic-bezier(.55,0,.75,.1)', spring: 'cubic-bezier(.34,1.56,.64,1)', soft: 'cubic-bezier(.25,.1,.25,1)', linear: 'linear',
+  };
+  const JE = {
+    linear: t => t,
+    out: t => 1 - Math.pow(1 - t, 3),
+    outQuint: t => 1 - Math.pow(1 - t, 5),
+    inOut: t => (t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2),
+    in: t => t * t * t,
+    soft: t => t * t * (3 - 2 * t),
+    spring: t => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); },
+    elastic: t => (t === 0 || t === 1) ? t : Math.pow(2, -10 * t) * Math.sin((t * 10 - .75) * (2 * Math.PI) / 3) + 1,
+  };
+
+  /* ── 등장 모양(선언형·ctx.reveal 공용) ── svg 요소에는 blur(필터) 빼고 */
+  const REVEAL = {
+    rise:  { k: [{ opacity: 0, transform: 'translateY(28px)', filter: 'blur(12px)' }, { opacity: 1, transform: 'translateY(0px)', filter: 'blur(0px)' }], dur: 900 },
+    fade:  { k: [{ opacity: 0 }, { opacity: 1 }], dur: 700 },
+    blur:  { k: [{ opacity: 0, transform: 'scale(1.06)', filter: 'blur(24px)' }, { opacity: 1, transform: 'scale(1)', filter: 'blur(0px)' }], dur: 1100 },
+    scale: { k: [{ opacity: 0, transform: 'scale(.92)' }, { opacity: 1, transform: 'scale(1)' }], dur: 900 },
+    pop:   { k: [{ opacity: 0, transform: 'scale(.5)' }, { opacity: 1, transform: 'scale(1)' }], dur: 750, ease: 'spring' },
+    left:  { k: [{ opacity: 0, transform: 'translateX(-64px)' }, { opacity: 1, transform: 'translateX(0px)' }], dur: 900 },
+    right: { k: [{ opacity: 0, transform: 'translateX(64px)' }, { opacity: 1, transform: 'translateX(0px)' }], dur: 900 },
+    down:  { k: [{ opacity: 0, transform: 'translateY(-28px)' }, { opacity: 1, transform: 'translateY(0px)' }], dur: 900 },
+    up:    { k: [{ opacity: 0, transform: 'translateY(72px)' }, { opacity: 1, transform: 'translateY(0px)' }], dur: 1000 },
+    draw:  { k: [{ opacity: 1, strokeDashoffset: 1 }, { opacity: 1, strokeDashoffset: 0 }], dur: 1200, ease: 'inOut' },
+    wipe:  { k: [{ opacity: 1, clipPath: 'inset(0 100% 0 0)' }, { opacity: 1, clipPath: 'inset(0 0% 0 0)' }], dur: 1000, ease: 'inOut' },
+    none:  { k: [{ opacity: 1 }, { opacity: 1 }], dur: 1 },
+  };
+  const isSVG = el => el instanceof SVGElement && !(el instanceof SVGSVGElement);
+  const GEOM = 'path,line,polyline,polygon,circle,ellipse,rect';
+  const noFilter = k => k.map(f => { const g = Object.assign({}, f); delete g.filter; return g; });
+
+  const STUB = { finished: Promise.resolve(), cancel() {}, finish() {}, pause() {}, play() {}, playbackRate: 1, effect: null };
+
+  /* ═════════ 장면 도구 상자 ═════════ */
+  class Ctx {
+    constructor(root, idx) {
+      this.root = root; this.idx = idx; this.instant = false; this.alive = true;
+      this.reduced = REDUCED; this.still = STILL; this.E = EASE; this.JE = JE; this.data = {};
+      this._anims = []; this._loops = []; this._timers = []; this._waits = []; this._tweens = []; this._sfxT = []; this._disp = [];
+    }
+    /** 효과음: SFX.play(name, a, b) 를 delay ms 뒤에. 순간 모드(되돌리기·복원)·건너뛰기·장면 나감이면 조용히 */
+    sfx(name, delay = 0, a, b) {
+      if (STILL || this.instant || !this.alive || !window.SFX) return;
+      if (delay > 0) { const id = setTimeout(() => { if (this.alive && !this.instant) SFX.play(name, a, b); }, delay); this._sfxT.push(id); }
+      else SFX.play(name, a, b);
+    }
+    /** 이어지는 소리('fan'|'hum'|'boil') — 장면을 떠나면 저절로 멎는다. 반환: {level(v), whine(v), stop()} */
+    sfxLoop(kind, o) { const h = window.SFX ? SFX.loop(kind, o) : null; if (h) this._disp.push(() => h.stop()); return h; }
+    onDispose(fn) { this._disp.push(fn); }
+    $(s) { return this.root.querySelector(s); }
+    $$(s) { return Array.from(this.root.querySelectorAll(s)); }
+    _el(el) { return typeof el === 'string' ? this.$(el) : el; }
+    _els(els) { if (typeof els === 'string') return this.$$(els); if (!els) return []; return (els.length !== undefined && !(els instanceof Element)) ? Array.from(els) : [els]; }
+
+    /** Web Animations 한 방. o: {dur, delay, ease, fill, iter, dir, composite}. 순간 모드면 바로 끝 상태 */
+    a(el, kf, o = {}) {
+      el = this._el(el);
+      if (!el || !this.alive) return STUB;
+      const infinite = o.iter === Infinity;
+      const inst = (this.instant || this.reduced) && !infinite;
+      const an = el.animate(kf, {
+        duration: inst ? 0 : (o.dur ?? 700), delay: inst ? 0 : (o.delay ?? 0),
+        easing: EASE[o.ease] || o.ease || EASE.out, fill: o.fill || 'both',
+        iterations: o.iter ?? 1, direction: o.dir || 'normal', composite: o.composite || 'replace',
+      });
+      if (inst) { try { an.finish(); } catch (e) {} }
+      this._anims.push(an);
+      return an;
+    }
+    /** 여러 요소에 시차(stagger ms)를 두고 같은 애니 */
+    all(els, kf, o = {}) {
+      return this._els(els).map((e, i) => this.a(e, typeof kf === 'function' ? kf(e, i) : kf, Object.assign({}, o, { delay: (o.delay || 0) + i * (o.stagger || 0) })));
+    }
+    /** 등장: fx = rise|fade|blur|scale|pop|left|right|down|up|draw|wipe */
+    reveal(el, fx = 'rise', o = {}) {
+      const els = this._els(el); const out = [];
+      els.forEach((e, i) => {
+        const P = REVEAL[fx] || REVEAL.rise;
+        const d = Object.assign({ dur: P.dur, ease: P.ease || 'out' }, o);
+        if (o.stagger) d.delay = (o.delay || 0) + i * o.stagger;
+        // 효과음: 학습지 빈칸 답이 채워지면 「띠링」, pop·up 등장이면 「톡」
+        if (!this.instant) {
+          const sk = (e.classList && e.classList.contains('a') && e.parentElement && e.parentElement.classList.contains('bk')) ? 'blank' : ((fx === 'pop' || fx === 'up') ? 'pop' : null);
+          if (sk) this.sfx(sk, d.delay || 0);
+        }
+        if (fx === 'draw') {
+          const geo = (e.matches && e.matches(GEOM)) ? [e] : Array.from(e.querySelectorAll(GEOM));
+          this.a(e, [{ opacity: 1 }, { opacity: 1 }], { dur: 1, delay: d.delay });
+          geo.forEach(g => { if (!g.hasAttribute('pathLength')) g.setAttribute('pathLength', '1'); out.push(this.a(g, P.k, d)); });
+        } else {
+          out.push(this.a(e, isSVG(e) ? noFilter(P.k) : P.k, d));
+        }
+      });
+      return out.length === 1 ? out[0] : { finished: Promise.all(out.map(x => x.finished)), list: out };
+    }
+    /** 사라짐(기본: 흐려지며 살짝 위로) */
+    hide(el, o = {}) {
+      return this.all(el, isSVG(this._els(el)[0] || document.body) ? [{ opacity: 1 }, { opacity: 0 }] : [{ opacity: 1, filter: 'blur(0px)' }, { opacity: 0, filter: 'blur(8px)' }],
+        Object.assign({ dur: 500, ease: 'out' }, o));
+    }
+    /** 기다리기(순간 모드면 곧장) */
+    wait(ms) {
+      if (this.instant || !this.alive) return Promise.resolve();
+      return new Promise(res => { const w = { res }; w.t = setTimeout(() => { const i = this._waits.indexOf(w); if (i >= 0) this._waits.splice(i, 1); res(); }, ms); this._waits.push(w); });
+    }
+    /** JS 트윈 — WAAPI 로 못 움직이는 것(속성·viewBox·path d·숫자). fn(p, rawT) */
+    tween(dur, fn, o = {}) {
+      const ease = typeof o.ease === 'function' ? o.ease : (JE[o.ease] || JE.out);
+      if (this.instant || !this.alive) { if (this.alive) fn(1, 1); return Promise.resolve(); }
+      const delay = o.delay || 0;
+      return new Promise(res => {
+        let start = null, done = false, id = 0;
+        const tw = {
+          finish: () => { if (done) return; done = true; cancelAnimationFrame(id); try { fn(1, 1); } catch (e) { console.error(e); } res(); },
+          kill: () => { if (done) return; done = true; cancelAnimationFrame(id); res(); },
+        };
+        this._tweens.push(tw);
+        if (!o.noInit) { try { fn(0, 0); } catch (e) { console.error(e); } }
+        const tick = now => {
+          if (done) return;
+          if (start === null) start = now + delay;
+          const t = (now - start) / dur;
+          if (t < 0) { id = requestAnimationFrame(tick); return; }
+          if (t >= 1) { tw.finish(); return; }
+          try { fn(ease(t), t); } catch (e) { console.error(e); tw.kill(); return; }
+          id = requestAnimationFrame(tick);
+        };
+        id = requestAnimationFrame(tick);
+      });
+    }
+    /** 숫자 굴리기. o.fmt(v) 로 모양 */
+    count(el, from, to, o = {}) {
+      el = this._el(el); if (!el) return Promise.resolve();
+      const fmt = o.fmt || (v => Math.round(v).toLocaleString('ko-KR'));
+      if (to !== from) this.sfx('counter', o.delay || 0, o.dur ?? 1200);
+      return this.tween(o.dur ?? 1200, p => { el.textContent = fmt(from + (to - from) * p); }, Object.assign({ ease: 'outQuint' }, o));
+    }
+    /** 선 그리기(pathLength=1 을 붙여 stroke-dashoffset 1→0) */
+    draw(el, o = {}) { return this.reveal(el, 'draw', o); }
+    /** SVG 카메라 — viewBox 를 [x,y,w,h] 로 옮김 */
+    camera(svg, to, o = {}) {
+      svg = this._el(svg); if (!svg) return Promise.resolve();
+      const from = (svg.getAttribute('viewBox') || `0 0 ${SW} ${SH}`).split(/[\s,]+/).map(Number);
+      this.sfx('whoosh', o.delay || 0, o.dur ?? 1400, .55);
+      return this.tween(o.dur ?? 1400, p => { svg.setAttribute('viewBox', from.map((v, i) => (v + (to[i] - v) * p).toFixed(2)).join(' ')); }, Object.assign({ ease: 'inOut' }, o));
+    }
+    /** 장면이 살아 있는 동안 도는 고리. fn(t초, dt초). 반환값.stop() */
+    loop(fn) {
+      const L = { on: true, t: 0, last: null, id: 0 };
+      const tick = now => {
+        if (!L.on || !this.alive) return;
+        const dt = L.last === null ? 0 : Math.min(0.05, (now - L.last) / 1000);
+        L.last = now; L.t += dt;
+        try { fn(L.t, dt); } catch (e) { console.error('[loop]', e); L.on = false; return; }
+        L.id = requestAnimationFrame(tick);
+      };
+      L.stop = () => { L.on = false; cancelAnimationFrame(L.id); };
+      L.id = requestAnimationFrame(tick);
+      this._loops.push(L);
+      return L;
+    }
+    timer(fn, ms) { const id = setTimeout(() => { if (this.alive) fn(); }, this.instant ? 0 : ms); this._timers.push(id); return id; }
+    every(fn, ms) { const id = setInterval(() => { if (this.alive) fn(); }, ms); this._timers.push(id); return id; }
+    /** 지금 도는 것을 끝 상태로(클릭이 애니 도중에 오면) */
+    hurry() {
+      this.instant = true;
+      this._sfxT.splice(0).forEach(id => clearTimeout(id));      // 아직 울리기 전인 효과음은 접는다
+      this._anims.forEach(a => { try { const t = a.effect && a.effect.getComputedTiming(); if (t && t.iterations !== Infinity && a.playState !== 'finished') a.finish(); } catch (e) {} });
+      this._tweens.slice().forEach(tw => tw.finish());
+      this._waits.splice(0).forEach(w => { clearTimeout(w.t); w.res(); });
+    }
+    dispose() {
+      this.alive = false;
+      this._sfxT.splice(0).forEach(id => clearTimeout(id));
+      this._disp.splice(0).forEach(fn => { try { fn(); } catch (e) {} });
+      this._loops.forEach(l => l.stop());
+      this._timers.forEach(id => clearTimeout(id));
+      this._tweens.slice().forEach(tw => tw.kill());
+      this._waits.splice(0).forEach(w => { clearTimeout(w.t); w.res(); });
+    }
+  }
+
+  /* ═════════ SVG 도우미 ═════════ */
+  const NS = 'http://www.w3.org/2000/svg';
+  const U = {
+    NS,
+    el(tag, attrs = {}, parent) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; },
+    lerp: (a, b, t) => a + (b - a) * t,
+    clamp: (v, a = 0, b = 1) => Math.max(a, Math.min(b, v)),
+    rand: (a = 0, b = 1) => a + Math.random() * (b - a),
+    /** 결정적 난수(검증 화면이 매번 같게): U.rng(seed)() */
+    rng(seed = 1) { let s = seed >>> 0 || 1; return () => { s ^= s << 13; s >>>= 0; s ^= s >> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; }; },
+    uid: (() => { let n = 0; return (p = 'u') => `${p}${(++n).toString(36)}`; })(),
+    E: EASE, JE,
+  };
+
+  /* ═════════ 덱 ═════════ */
+  const scenes = {};
+  const Deck = {
+    scene(id, def) { scenes[id] = def; },
+    list: [], i: -1, k: 0, ctx: null, busy: null, U, EASE, JE, Ctx, STILL, REDUCED, STUDENT,
+  };
+  window.Deck = Deck; window.U = U;
+
+  let stage, viewport, hud, prog, dots, notesEl, ovEl, helpEl, blankEl;
+  const fit = () => {
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const s = Math.min(vw / SW, vh / SH);
+    stage.style.transform = `translate(${(vw - SW * s) / 2 - vw / 2}px, ${(vh - SH * s) / 2 - vh / 2}px) scale(${s})`;
+    Deck.scale = s;
+  };
+  const defOf = sec => scenes[sec.id] || {};
+  const stepsOf = sec => {
+    if (sec.__steps != null) return sec.__steps;
+    let m = +(defOf(sec).steps || 0);
+    const tmp = document.createElement('div'); tmp.innerHTML = sec.__pristine;
+    tmp.querySelectorAll('[data-step]').forEach(e => { m = Math.max(m, +e.getAttribute('data-step') || 0); });
+    tmp.querySelectorAll('[data-out]').forEach(e => { m = Math.max(m, +e.getAttribute('data-out') || 0); });
+    return (sec.__steps = m);
+  };
+  const safe = async (fn, c) => { try { await fn(); } catch (e) { if (c && c.alive) console.error(`[scene ${c.root.id}]`, e); } };
+
+  function runDecl(c, k) {
+    if (k === 0) {
+      c.$$('[data-in]').forEach(el => {
+        const v = el.getAttribute('data-in'); const delay = +(el.dataset.delay || (v && !isNaN(+v) ? v : 0));
+        c.reveal(el, el.dataset.fx || 'rise', { delay, dur: el.dataset.dur ? +el.dataset.dur : undefined, ease: el.dataset.ease || undefined });
+      });
+    } else {
+      c.$$(`[data-step="${k}"]`).forEach(el => {
+        c.reveal(el, el.dataset.fx || 'rise', { delay: +(el.dataset.delay || 0), dur: el.dataset.dur ? +el.dataset.dur : undefined, ease: el.dataset.ease || undefined });
+      });
+      c.$$(`[data-out="${k}"]`).forEach(el => c.hide(el, { delay: +(el.dataset.outDelay || 0) }));
+    }
+  }
+
+  async function show(i, k = 0, opt = {}) {
+    const n = Deck.list.length; if (!n) return;
+    i = Math.max(0, Math.min(n - 1, i));
+    const to = Deck.list[i]; const from = Deck.i >= 0 ? Deck.list[Deck.i] : null;
+    k = Math.max(0, Math.min(stepsOf(to), k));
+    const instant = !!opt.instant || STILL || REDUCED;
+    if (Deck.ctx) { Deck.ctx.hurry(); Deck.ctx.dispose(); }
+    Deck.busy = null;
+
+    if (from && from !== to) {
+      from.classList.remove('is-on');
+      if (instant || opt.cut) { from.classList.remove('is-out'); from.innerHTML = ''; }
+      else {
+        from.classList.add('is-out');
+        const done = () => { if (!from.classList.contains('is-on')) { from.classList.remove('is-out'); from.innerHTML = ''; } };
+        setTimeout(done, 700);
+      }
+    }
+    to.getAnimations && to.getAnimations().forEach(a => a.cancel());
+    to.innerHTML = to.__pristine;
+    to.classList.remove('is-out'); to.classList.add('is-on');
+    Deck.i = i; Deck.k = k;
+    const tile = to.getAttribute('data-tile') || 'dark';
+    document.body.classList.toggle('on-light', tile === 'light' || tile === 'parchment');
+    if (from && from !== to && !instant && !opt.cut) {
+      to.animate([{ opacity: 0, transform: 'scale(1.015)' }, { opacity: 1, transform: 'scale(1)' }], { duration: 620, easing: EASE.out });
+      if (window.SFX) SFX.play('slide');
+    }
+    const c = new Ctx(to, i); Deck.ctx = c;
+    const def = defOf(to);
+    const run = (async () => {
+      c.instant = instant;
+      runDecl(c, 0);
+      if (def.enter) await safe(() => def.enter(c), c);
+      for (let s = 1; s <= k; s++) {
+        if (!c.alive) return;
+        c.instant = true; runDecl(c, s);
+        if (def.go) await safe(() => def.go(c, s), c);
+      }
+      c.instant = STILL;
+    })();
+    Deck.busy = run; ui();
+    await run;
+    if (Deck.busy === run) Deck.busy = null;
+    markReady();
+    try { history.replaceState(null, '', `#${i + 1}${k ? '.' + k : ''}`); } catch (e) {}
+  }
+  async function stepTo(k) {
+    const c = Deck.ctx, sec = Deck.list[Deck.i]; if (!c) return;
+    Deck.k = k; ui();
+    if (window.SFX && !STILL) SFX.play('step');
+    c.instant = STILL; runDecl(c, k);
+    const def = defOf(sec);
+    const run = def.go ? safe(() => def.go(c, k), c) : Promise.resolve();
+    Deck.busy = run;
+    await run;
+    if (Deck.busy === run) { Deck.busy = null; c.instant = STILL; }
+    try { history.replaceState(null, '', `#${Deck.i + 1}${k ? '.' + k : ''}`); } catch (e) {}
+  }
+  Deck.next = () => {
+    if (Deck.busy && Deck.ctx) { Deck.ctx.hurry(); return; }
+    const sec = Deck.list[Deck.i];
+    if (Deck.k < stepsOf(sec)) stepTo(Deck.k + 1);
+    else if (Deck.i < Deck.list.length - 1) show(Deck.i + 1, 0);
+  };
+  Deck.prev = () => {
+    if (Deck.k > 0) show(Deck.i, Deck.k - 1, { instant: true });
+    else if (Deck.i > 0) show(Deck.i - 1, stepsOf(Deck.list[Deck.i - 1]), { instant: true });
+  };
+  Deck.go = (i, k = 0, opt) => show(i, k, opt);
+  Deck.goId = (id, k = 0) => { const i = Deck.list.findIndex(s => s.id === id); if (i >= 0) show(i, k); };
+  /** 지금 단계 다시 보기(R) */
+  Deck.replay = async () => {
+    const k = Deck.k;
+    if (k === 0) { const i = Deck.i; Deck.i = -1; await show(i, 0, { cut: true }); }
+    else { await show(Deck.i, k - 1, { instant: true }); stepTo(k); }
+  };
+  Deck.steps = sec => stepsOf(sec || Deck.list[Deck.i]);
+
+  function markReady() {
+    const fin = () => { document.documentElement.dataset.ready = '1'; };
+    (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(() => setTimeout(fin, 60));
+  }
+
+  /* ── 화면 바깥 UI ── */
+  const ICON = {
+    prev: '<svg viewBox="0 0 20 20"><path d="M12.5 4 6.5 10l6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    next: '<svg viewBox="0 0 20 20"><path d="M7.5 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    grid: '<svg viewBox="0 0 20 20"><g fill="currentColor"><rect x="3" y="3" width="6" height="6" rx="1.5"/><rect x="11" y="3" width="6" height="6" rx="1.5"/><rect x="3" y="11" width="6" height="6" rx="1.5"/><rect x="11" y="11" width="6" height="6" rx="1.5"/></g></svg>',
+    notes: '<svg viewBox="0 0 20 20"><path d="M4 5h12M4 10h12M4 15h8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+    full: '<svg viewBox="0 0 20 20"><path d="M3.5 8V3.5H8M12 3.5h4.5V8M16.5 12v4.5H12M8 16.5H3.5V12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    replay: '<svg viewBox="0 0 20 20"><path d="M4.5 10a5.5 5.5 0 1 0 1.8-4.1M4.5 3.8v3.4h3.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    sound: '<svg viewBox="0 0 20 20"><path d="M3.5 8h3l4-3.5v11L6.5 12h-3z" fill="currentColor"/><path d="M13.5 7.2a4 4 0 0 1 0 5.6M15.6 5a7 7 0 0 1 0 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+    mute: '<svg viewBox="0 0 20 20"><path d="M3.5 8h3l4-3.5v11L6.5 12h-3z" fill="currentColor"/><path d="M13.5 7.5l4.5 5M18 7.5l-4.5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  };
+  function syncSound() {
+    const b = hud && hud.querySelector('[data-a="sound"]'); if (!b) return;
+    const on = !window.SFX || SFX.isOn();
+    b.innerHTML = on ? ICON.sound : ICON.mute; b.classList.toggle('off', !on); b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  }
+  function buildChrome() {
+    hud = document.createElement('div'); hud.id = 'hud';
+    hud.innerHTML = `<button data-a="replay" aria-label="이 단계 다시 보기(R)">${ICON.replay}</button>${STUDENT ? '' : `<button data-a="notes" aria-label="대본 보기(T)">${ICON.notes}</button>`}<button data-a="grid" aria-label="전체 보기(O)">${ICON.grid}</button><button data-a="prev" aria-label="이전">${ICON.prev}</button><span class="count" id="count">1 / 1</span><button data-a="next" aria-label="다음">${ICON.next}</button><button data-a="sound" aria-label="소리 켜기/끄기(M)">${ICON.sound}</button><button data-a="full" aria-label="전체 화면(F)">${ICON.full}</button>`;
+    document.body.appendChild(hud); syncSound();
+    hud.addEventListener('click', e => { if (e.target.closest('#count')) { e.stopPropagation(); toggleOverview(); return; } const b = e.target.closest('button'); if (!b) return; e.stopPropagation(); act(b.dataset.a); });
+    prog = document.createElement('div'); prog.id = 'progress'; prog.innerHTML = '<i></i>'; document.body.appendChild(prog);
+    dots = document.createElement('div'); dots.id = 'stepdots'; document.body.appendChild(dots);
+    notesEl = document.createElement('div'); notesEl.id = 'notes'; document.body.appendChild(notesEl);
+    ovEl = document.createElement('div'); ovEl.id = 'overview'; ovEl.className = 'overlay'; document.body.appendChild(ovEl);
+    helpEl = document.createElement('div'); helpEl.id = 'help'; helpEl.className = 'overlay';
+    helpEl.innerHTML = `<div class="box"><h3>강의 조작</h3><table>
+      <tr><td><kbd>→</kbd> <kbd>Space</kbd> 화면 클릭</td><td>다음(빌드 단계 → 다음 장)</td></tr>
+      <tr><td><kbd>←</kbd> 오른쪽 클릭</td><td>이전</td></tr>
+      <tr><td><kbd>R</kbd></td><td>이 단계 애니메이션 다시 보기</td></tr>
+      <tr><td><kbd>N</kbd></td><td>발표자 노트(대본)</td></tr>
+      <tr><td><kbd>O</kbd></td><td>전체 보기</td></tr>
+      <tr><td><kbd>F</kbd></td><td>전체 화면</td></tr>
+      <tr><td><kbd>M</kbd></td><td>소리 켜기/끄기</td></tr>
+      
+      <tr><td><kbd>B</kbd> / <kbd>W</kbd></td><td>검은 화면 / 흰 화면</td></tr>
+      <tr><td>숫자 + <kbd>Enter</kbd></td><td>그 장으로 이동</td></tr>
+      <tr><td>아래쪽 쪽 번호 단추</td><td>전체 보기에서 골라 이동</td></tr>
+      <tr><td>좌우로 밀기</td><td>전자칠판에서 넘기기</td></tr></table></div>`;
+    document.body.appendChild(helpEl);
+    helpEl.addEventListener('click', () => helpEl.classList.remove('show'));
+    blankEl = document.createElement('div'); blankEl.id = 'blank'; document.body.appendChild(blankEl);
+    blankEl.addEventListener('click', () => { blankEl.className = ''; });
+  }
+  function act(a) {
+    if (a === 'next') Deck.next(); else if (a === 'prev') Deck.prev();
+    else if (a === 'notes') toggleNotes(); else if (a === 'grid') toggleOverview();
+    else if (a === 'full') toggleFull(); else if (a === 'replay') Deck.replay();
+    else if (a === 'sound') { if (window.SFX) SFX.toggle(); syncSound(); }
+  }
+  function ui() {
+    const n = Deck.list.length, sec = Deck.list[Deck.i]; if (!sec || !hud) return;
+    const st = stepsOf(sec);
+    hud.querySelector('#count').textContent = `${Deck.i + 1} / ${n}`;
+    const np = document.getElementById('navPage'); if (np) np.textContent = `${Deck.i + 1} / ${n}`;
+    prog.firstChild.style.width = `${((Deck.i + (st ? Deck.k / (st + 1) : 0)) / Math.max(1, n - 1)) * 100}%`;
+    dots.innerHTML = st ? Array.from({ length: st + 1 }, (_, j) => `<i class="${j <= Deck.k ? 'on' : ''}"></i>`).join('') : '';
+    if (notesEl.classList.contains('show')) renderNotes();
+    if (ovEl.classList.contains('show')) renderOverview();
+  }
+  function md(s) { return s.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>'); }
+  function renderNotes() {
+    const sec = Deck.list[Deck.i]; const N = window.NOTES || {};
+    const keys = (sec.dataset.notes || '').split(/[\s,]+/).filter(Boolean);
+    const nx = Deck.list[Deck.i + 1];
+    const st = stepsOf(sec);
+    const extra = sec.dataset.say ? `<p>${md(sec.dataset.say)}</p>` : '';
+    notesEl.innerHTML = `<div class="nh"><b>${Deck.i + 1}. ${sec.dataset.title || sec.id}</b><span>${st ? `단계 ${Deck.k} / ${st}` : ''}</span><span class="nx">${nx ? '다음 → ' + (nx.dataset.title || '') : '마지막 장'}</span></div>` +
+      keys.map(key => N[key] ? `<p><span class="pn">${key}</span>${md(N[key])}</p>` : '').join('') + extra;
+  }
+  function toggleNotes() { notesEl.classList.toggle('show'); if (notesEl.classList.contains('show')) renderNotes(); }
+  function renderOverview() {
+    ovEl.innerHTML = `<div class="ovhead"><h2>전체 보기 · ${Deck.list.length}장</h2><form class="ovjump" autocomplete="off"><label for="ovNum">번호로 이동</label><input id="ovNum" type="number" inputmode="numeric" min="1" max="${Deck.list.length}" placeholder="${Deck.i + 1}"><button type="submit">이동</button><button type="button" class="ovclose" aria-label="닫기">닫기</button></form></div><div class="grid">` + Deck.list.map((s, i) =>
+      `<button class="ov ${i === Deck.i ? 'cur' : ''}" data-i="${i}" data-tile="${s.getAttribute('data-tile') || 'dark'}"><span class="n">${String(i + 1).padStart(2, '0')}</span><span class="tt">${s.dataset.title || s.id}</span></button>`).join('') + '</div>';
+  }
+  function toggleOverview() {
+    const on = !ovEl.classList.contains('show');
+    ovEl.classList.toggle('show', on);
+    if (on) { renderOverview(); const cur = ovEl.querySelector('.ov.cur'); if (cur) cur.scrollIntoView({ block: 'center' }); }
+  }
+  Deck.toggleOverview = toggleOverview;
+  function toggleFull() {
+    const d = document;
+    if (!d.fullscreenElement) (d.documentElement.requestFullscreen || d.documentElement.webkitRequestFullscreen || (() => {})).call(d.documentElement);
+    else (d.exitFullscreen || d.webkitExitFullscreen).call(d);
+  }
+
+  let hudTimer = 0;
+  function pokeHud() { if (STILL) return; hud.classList.add('show'); dots.classList.add('show'); clearTimeout(hudTimer); hudTimer = setTimeout(() => { hud.classList.remove('show'); dots.classList.remove('show'); }, 2600); }
+
+  function bind() {
+    let jump = '';
+    document.addEventListener('keydown', e => {
+      if (e.target.closest && e.target.closest('input,textarea,select,[contenteditable]')) return;
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      const key = e.key;
+      if (helpEl.classList.contains('show')) { helpEl.classList.remove('show'); e.preventDefault(); return; }
+      if (blankEl.className && key !== 'b' && key !== 'B' && key !== 'w' && key !== 'W') { blankEl.className = ''; e.preventDefault(); return; }
+      if (/^[0-9]$/.test(key)) { jump += key; return; }
+      if (key === 'Enter' && jump) { show(+jump - 1, 0); jump = ''; e.preventDefault(); return; }
+      jump = '';
+      if (ovEl.classList.contains('show') && (key === 'Escape' || key === 'o' || key === 'O')) { toggleOverview(); e.preventDefault(); return; }
+      switch (key) {
+        case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown': case 'Enter': Deck.next(); break;
+        case 'ArrowLeft': case 'ArrowUp': case 'PageUp': case 'Backspace': Deck.prev(); break;
+        case 'Home': show(0, 0); break;
+        case 'End': show(Deck.list.length - 1, 0); break;
+        case 'n': case 'N': case 't': case 'T': if (!STUDENT) toggleNotes(); break;
+        case 'o': case 'O': toggleOverview(); break;
+        case 'f': case 'F': toggleFull(); break;
+        case 'm': case 'M': act('sound'); break;
+        case 'r': case 'R': Deck.replay(); break;
+        case 'b': case 'B': blankEl.className = blankEl.className === 'black' ? '' : 'black'; break;
+        case 'w': case 'W': blankEl.className = blankEl.className === 'white' ? '' : 'white'; break;
+        case 'h': case 'H': case '?': helpEl.classList.add('show'); break;
+        case 'Escape': notesEl.classList.remove('show'); break;
+        default: return;
+      }
+      e.preventDefault();
+    });
+    ovEl.addEventListener('click', e => {
+      if (e.target.closest('.ovclose')) { ovEl.classList.remove('show'); return; }
+      if (e.target.closest('.ovjump')) return;
+      const b = e.target.closest('.ov'); if (b) { ovEl.classList.remove('show'); show(+b.dataset.i, 0); } else ovEl.classList.remove('show');
+    });
+    ovEl.addEventListener('submit', e => {
+      e.preventDefault();
+      const v = Math.round(+ovEl.querySelector('#ovNum').value);
+      if (v >= 1 && v <= Deck.list.length) { ovEl.classList.remove('show'); show(v - 1, 0); }
+      else { const inp = ovEl.querySelector('#ovNum'); inp.value = ''; inp.placeholder = `1~${Deck.list.length}`; inp.focus(); }
+    });
+    // 무대 클릭·밀기
+    let down = null;
+    viewport.addEventListener('pointerdown', e => { down = { x: e.clientX, y: e.clientY, t: performance.now(), inter: !!e.target.closest('button,a,input,select,textarea,label,[data-interactive]') }; pokeHud(); });
+    viewport.addEventListener('pointerup', e => {
+      if (!down) return; const dx = e.clientX - down.x, dy = e.clientY - down.y; const d0 = down; down = null;
+      if (d0.inter) return;
+      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.3) { dx < 0 ? Deck.next() : Deck.prev(); return; }
+      if (Math.abs(dx) < 12 && Math.abs(dy) < 12 && e.button === 0) {
+        const r = stage.getBoundingClientRect();
+        (e.clientX - r.left < r.width * 0.12) ? Deck.prev() : Deck.next();
+      }
+    });
+    viewport.addEventListener('contextmenu', e => { if (e.target.closest('[data-interactive]')) return; e.preventDefault(); Deck.prev(); });
+    document.addEventListener('mousemove', pokeHud, { passive: true });
+    window.addEventListener('resize', fit);
+  }
+
+  function boot() {
+    viewport = document.getElementById('viewport'); stage = document.getElementById('stage');
+    Deck.list = Array.from(stage.querySelectorAll(':scope > section.slide'));
+    // 한 번만: 장면별 build(root) → 처음 상태 저장
+    Deck.list.forEach(sec => {
+      const def = defOf(sec);
+      if (def.build) { try { def.build(sec, U); } catch (e) { console.error(`[build ${sec.id}]`, e); } }
+      sec.querySelectorAll('[data-fx="draw"]').forEach(g => {
+        const geo = g.matches(GEOM) ? [g] : Array.from(g.querySelectorAll(GEOM));
+        geo.forEach(x => { if (!x.hasAttribute('pathLength')) x.setAttribute('pathLength', '1'); });
+      });
+      sec.__pristine = sec.innerHTML;
+      sec.innerHTML = '';
+    });
+    buildChrome(); fit(); bind();
+    const h = (location.hash || '').replace('#', '').split('.');
+    let si = Q.has('p') ? (+Q.get('p') - 1) : (h[0] ? +h[0] - 1 : 0);
+    let sk = Q.has('k') ? +Q.get('k') : (h[1] ? +h[1] : 0);
+    if (Q.has('id')) { const j = Deck.list.findIndex(s => s.id === Q.get('id')); if (j >= 0) si = j; }
+    if (!(si >= 0)) si = 0;
+    if (sk === -1 || Q.get('k') === 'last') sk = 99;
+    if (Q.get('play') === '1' && sk > 0 && !STILL) { show(si, sk - 1, { instant: true }).then(() => stepTo(Math.min(sk, stepsOf(Deck.list[si])))); }
+    else show(si, sk, { instant: sk > 0 });
+    if (!STILL) setTimeout(pokeHud, 400);
+  }
+  Deck.boot = boot;
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(boot, 0));
+  else setTimeout(boot, 0);
+})();
+
+
+</script><script>
+/* ── 03_sfx.js ── */
+try{
+/* ═══════════════════════════════════════════════════════════════
+   03_sfx.js — 효과음(WebAudio 합성). 소리 파일 0개 · 오프라인 OK
+   · 장면에서는 c.sfx('blank', 지연ms) · c.sfxLoop('fan') 로 부른다(core.js 가 순간 모드·건너뛰기·장면 나감을 알아서 처리)
+   · 브라우저 정책상 첫 클릭·키 입력 뒤부터 소리가 난다. M 키·HUD 단추로 켜고 끔(기기에 기억). 학생 모드(?s=1)는 기본 꺼짐
+   · 점검: ?sfx=demo → 모든 소리를 눌러 들어 보는 패널 / SFX.analyze('blank') → 오프라인 렌더로 세기·길이 점검
+   · 주소 도우미: ?sound=1|0 강제 켜기·끄기 · ?nosfx=1 완전 끔 · ?sfxtest=1 클릭 없이 잠금 해제(자동 점검용)
+   ═══════════════════════════════════════════════════════════════ */
+window.SFX = (function () {
+  'use strict';
+  const Q = new URLSearchParams(location.search);
+  const D = window.Deck || {};
+  const OFF = !!D.STILL || Q.get('nosfx') === '1';
+  const KEY = 'sc_sfx';
+  const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+  let on = !D.STUDENT;
+  try { const s = localStorage.getItem(KEY); if (s === '1' || s === '0') on = s === '1'; } catch (e) {}
+  if (Q.get('sound') === '1') on = true; else if (Q.get('sound') === '0') on = false;
+  let ac = null, out = null, X = null, unlocked = Q.get('sfxtest') === '1', broken = false;
+  const pending = new Set();
+
+  /* ── 잡음(결정적) ── */
+  function noiseBuf(actx) {
+    const n = Math.floor(actx.sampleRate * 2), b = actx.createBuffer(1, n, actx.sampleRate), d = b.getChannelData(0);
+    let s = 12345;
+    for (let i = 0; i < n; i++) { s = (s * 1664525 + 1013904223) >>> 0; d[i] = s / 2147483648 - 1; }
+    return b;
+  }
+  function ensure() {
+    if (OFF || broken || !unlocked) return null;
+    if (!ac) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) { broken = true; return null; }
+      try { ac = new AC(); } catch (e) { broken = true; return null; }
+      const comp = ac.createDynamicsCompressor();
+      comp.threshold.value = -14; comp.knee.value = 18; comp.ratio.value = 4; comp.attack.value = .004; comp.release.value = .18;
+      out = ac.createGain(); out.gain.value = on ? .9 : 0;
+      out.connect(comp); comp.connect(ac.destination);
+      X = { ac, dest: out, nz: noiseBuf(ac) };
+    }
+    if (ac.state === 'suspended' && on && !document.hidden) ac.resume().catch(() => {});
+    return X;
+  }
+
+  /* ── 소리 부품 ── */
+  function env(g, t, a, d, peak) {
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(Math.max(0.0002, peak), t + a);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + a + d);
+  }
+  function route(x, node, pan) {
+    if (pan && x.ac.createStereoPanner) { const p = x.ac.createStereoPanner(); p.pan.value = clamp(pan, -1, 1); node.connect(p); p.connect(x.dest); return; }
+    node.connect(x.dest);
+  }
+  /** 톤: f(→f2) Hz, a 올림 s, d 사라짐 s, g 세기, type, vib[Hz, 깊이Hz], lp 저역통과, pan */
+  function tone(x, t, o) {
+    const ac = x.ac, osc = ac.createOscillator(), g = ac.createGain();
+    const a = o.a ?? .004, d = o.d ?? .3;
+    osc.type = o.type || 'sine';
+    osc.frequency.setValueAtTime(o.f, t);
+    if (o.f2) osc.frequency.exponentialRampToValueAtTime(o.f2, t + a + d);
+    if (o.vib) {
+      const l = ac.createOscillator(), lg = ac.createGain();
+      l.frequency.value = o.vib[0]; lg.gain.value = o.vib[1]; l.connect(lg); lg.connect(osc.frequency); l.start(t); l.stop(t + a + d + .06);
+    }
+    env(g, t, a, d, o.g ?? .2);
+    osc.connect(g);
+    let last = g;
+    if (o.lp) { const f = ac.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = o.lp; g.connect(f); last = f; }
+    route(x, last, o.pan);
+    osc.start(t); osc.stop(t + a + d + .07);
+  }
+  /** 잡음: type(bandpass|highpass|lowpass), f(→f2) Hz, q */
+  function noise(x, t, o) {
+    const ac = x.ac, s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+    const a = o.a ?? .003, d = o.d ?? .1;
+    s.buffer = x.nz; s.loop = true;
+    f.type = o.type || 'bandpass'; f.frequency.setValueAtTime(o.f || 2000, t);
+    if (o.f2) f.frequency.exponentialRampToValueAtTime(o.f2, t + a + d);
+    f.Q.value = o.q ?? 1;
+    env(g, t, a, d, o.g ?? .15);
+    s.connect(f); f.connect(g); route(x, g, o.pan);
+    s.start(t, (t * 7.13) % 1.5); s.stop(t + a + d + .07);
+  }
+  const PART = [[1, 1, 1], [2.76, .3, .55], [5.4, .1, .3], [8.93, .04, .18]];
+  function bell(x, t, f, g = .3, d = 1.1) { PART.forEach(([r, w, k]) => tone(x, t, { f: f * r, a: .002, d: d * k, g: g * w })); }
+  function tickAt(x, t, f, g) {
+    tone(x, t, { f, a: .001, d: .014, g });
+    noise(x, t, { a: .001, d: .006, g: g * .9, type: 'bandpass', f: f * 1.6, q: 1.5 });
+  }
+
+  /* ═════════ 소리 목록: (x, t, a, b) ═════════ */
+  const SCALE = [0, 2, 4, 7, 9, 12, 9, 7, 4, 2];       // 빈칸이 채워질 때마다 음계가 오르내린다
+  const S = {
+    /** 빈칸이 채워짐 — 마림바 같은 「띠링」. i = 몇 번째 빈칸(음 높이 순서) */
+    blank(x, t, i) {
+      const f = 659.25 * Math.pow(2, SCALE[(i | 0) % 10] / 12);
+      tone(x, t, { f, a: .003, d: .34, g: .24 });
+      tone(x, t, { f: f * 2, a: .002, d: .16, g: .07 });
+      tone(x, t, { f: f * 4.02, a: .001, d: .05, g: .025 });
+      noise(x, t, { a: .001, d: .012, g: .05, type: 'highpass', f: 3500 });
+    },
+    /** 무언가 톡 나타남 */
+    pop(x, t) {
+      tone(x, t, { f: 420, f2: 840, a: .002, d: .1, g: .2 });
+      noise(x, t, { a: .001, d: .02, g: .05, type: 'highpass', f: 3000 });
+    },
+    /** 클릭으로 다음 단계 — 아주 작은 톡 */
+    step(x, t) { tone(x, t, { f: 1500, f2: 900, type: 'triangle', a: .001, d: .045, g: .075 }); noise(x, t, { a: .001, d: .01, g: .03, f: 3000, q: 1.5 }); },
+    /** 다음 장으로 — 부드러운 슥 */
+    slide(x, t) {
+      noise(x, t, { a: .12, d: .5, g: .2, f: 400, f2: 2600, q: .8 });
+      tone(x, t, { f: 220, f2: 110, a: .005, d: .25, g: .09 });
+    },
+    /** 휙 — dur ms, gain */
+    whoosh(x, t, dur = 700, g = 1) {
+      const d = (dur || 700) / 1000;
+      noise(x, t, { a: d * .4, d: d * .6, g: .2 * (g ?? 1), f: 350, f2: 2400, q: .7 });
+    },
+    /** 숫자 굴러감 — 오르는 째깍째깍 */
+    counter(x, t, dur = 1200) {
+      const n = clamp(Math.round((dur || 1200) / 70), 4, 22), sp = (dur || 1200) / 1000 / n;
+      for (let i = 0; i < n; i++) tickAt(x, t + i * sp, 1500 + i * (900 / n), .07);
+    },
+    /** 세는 선을 조각이 지나감(가이거처럼) — p 음높이, g 세기 */
+    tick(x, t, p = 1, g = 1) { tickAt(x, t, 2100 * (p || 1), .1 * (g ?? 1)); },
+    /** 1초가 지남 — 나무 시계 */
+    clock(x, t) {
+      tone(x, t, { f: 1050, f2: 620, type: 'triangle', a: .001, d: .06, g: .17 });
+      noise(x, t, { a: .001, d: .012, g: .08, f: 2600, q: 2 });
+    },
+    /** 쾅(도장) */
+    thunk(x, t) {
+      tone(x, t, { f: 150, f2: 44, a: .002, d: .24, g: .5 });
+      noise(x, t, { a: .002, d: .1, g: .28, type: 'lowpass', f: 700, f2: 200 });
+    },
+    /** 땡 */
+    ding(x, t, k = 1) { bell(x, t, 1318.5 * (k || 1), .32, 1.1); },
+    /** 딩동딩동 ↑ (정답·완성) */
+    chime(x, t) { [1046.5, 1318.5, 1568, 2093].forEach((f, i) => bell(x, t + i * .085, f, .3, .9)); },
+    /** 명판 뒤집기 */
+    flip(x, t) {
+      noise(x, t, { a: .002, d: .03, g: .18, f: 3200, q: 1.5 });
+      noise(x, t + .12, { a: .002, d: .03, g: .18, f: 2600, q: 1.5 });
+      noise(x, t + .02, { a: .03, d: .16, g: .09, f: 900, f2: 2600 });
+    },
+    /** 토스터 레버 내림 — 철컥 */
+    lever(x, t) {
+      tone(x, t, { f: 260, f2: 75, type: 'triangle', a: .002, d: .14, g: .4 });
+      noise(x, t, { a: .002, d: .06, g: .22, type: 'lowpass', f: 1200, f2: 400 });
+      tone(x, t + .01, { f: 1900, f2: 1200, a: .001, d: .05, g: .04 });
+    },
+    /** 토스터 빵 튀어 오름 — 텅~ 팅! */
+    toasterPop(x, t) {
+      tone(x, t, { f: 150, f2: 55, a: .002, d: .12, g: .32 });
+      tone(x, t + .02, { f: 210, f2: 640, type: 'triangle', a: .005, d: .32, g: .11, vib: [22, 26] });
+      noise(x, t + .02, { a: .01, d: .2, g: .05, f: 2400, q: 1.2 });
+      bell(x, t + .16, 2637, .22, .9);
+    },
+    /** 열선이 달아오르며 탁탁 — dur ms */
+    sizzle(x, t, dur = 2000) {
+      const d = (dur || 2000) / 1000, n = Math.round(d * 34);
+      for (let i = 0; i < n; i++) noise(x, t + Math.random() * d, { a: .001, d: .009, g: .11 * (1 - i / n * .3), f: 2500 + Math.random() * 3500, q: 1.4, pan: (Math.random() - .5) * .6 });
+    },
+    /** 스피커 박 — strong 이면 큰 북, 아니면 작은 북 + 심벌 */
+    kick(x, t, strong, lv) {
+      const k = lv == null ? 1 : lv, g = (strong ? .5 : .3) * k;
+      tone(x, t, { f: strong ? 150 : 130, f2: 44, a: .002, d: strong ? .2 : .14, g });
+      noise(x, t, { a: .001, d: .05, g: g * .5, type: 'lowpass', f: 900, f2: 300 });
+      if (!strong) noise(x, t + .02, { a: .001, d: .04, g: .045, type: 'highpass', f: 7000 });
+    },
+    /** 백열전구 켜짐 — 딸깍 · 웅 · 팅 */
+    bulbOn(x, t) {
+      noise(x, t, { a: .001, d: .006, g: .12, f: 3000, q: 1.5 });
+      tone(x, t + .02, { f: 98, type: 'triangle', a: .05, d: .55, g: .08, lp: 500 });
+      noise(x, t + .03, { a: .08, d: .5, g: .05, type: 'lowpass', f: 300, f2: 3000 });
+      bell(x, t + .05, 1760, .12, .8);
+    },
+    /** LED 켜짐 — 딸깍 · 띠링 */
+    ledOn(x, t) {
+      noise(x, t, { a: .001, d: .006, g: .1, f: 3400, q: 1.5 });
+      tone(x, t + .01, { f: 1568, f2: 2093, a: .003, d: .2, g: .1 });
+      bell(x, t + .03, 2349, .1, .7);
+    },
+    /** 집 창문 켜짐 — 딸깍 · 띵띵띵 */
+    lightsOn(x, t) {
+      noise(x, t, { a: .001, d: .01, g: .08, f: 2600, q: 1.5 });
+      [1568, 1760, 1976].forEach((f, i) => bell(x, t + .04 + i * .09, f, .15, .7));
+    },
+    /** 송전선을 타고 전달 — 웅~ + 쉬익 + 지직, 소리가 왼쪽에서 오른쪽으로 움직임 */
+    zap(x, t, dur = 2400) {
+      const ac = x.ac, d = (dur || 2400) / 1000;
+      const o = ac.createOscillator(), lp = ac.createBiquadFilter(), g = ac.createGain();
+      o.type = 'sawtooth'; o.frequency.setValueAtTime(55, t); o.frequency.exponentialRampToValueAtTime(230, t + d * .8);
+      lp.type = 'lowpass'; lp.frequency.setValueAtTime(260, t); lp.frequency.exponentialRampToValueAtTime(1400, t + d);
+      g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(.15, t + d * .15); g.gain.setValueAtTime(.15, t + d * .7); g.gain.exponentialRampToValueAtTime(.0001, t + d + .5);
+      o.connect(lp); lp.connect(g);
+      if (ac.createStereoPanner) { const p = ac.createStereoPanner(); p.pan.setValueAtTime(-.85, t); p.pan.linearRampToValueAtTime(.85, t + d); g.connect(p); p.connect(x.dest); } else g.connect(x.dest);
+      o.start(t); o.stop(t + d + .6);
+      noise(x, t, { a: d * .3, d: d * .7, g: .07, f: 600, f2: 4200, q: .6 });
+      for (let i = 0, n = Math.round(d * 22); i < n; i++) noise(x, t + Math.random() * d, { a: .001, d: .008, g: .045, type: 'highpass', f: 5000, pan: -1 + 2 * Math.random() });
+    },
+    /** 열 보기 훑기 — 스캐너 */
+    scan(x, t, dur = 900) {
+      const d = (dur || 900) / 1000;
+      tone(x, t, { f: 280, f2: 1250, a: .04, d, g: .09, vib: [9, 14] });
+      tone(x, t, { f: 283, f2: 1262, type: 'triangle', a: .04, d, g: .04, pan: .4 });
+    },
+    /** 온도계가 오름 — 조용한 상승음 */
+    rise(x, t, dur = 2400) { tone(x, t, { f: 260, f2: 640, a: .15, d: (dur || 2400) / 1000, g: .07, vib: [5, 6] }); },
+    /** 바늘이 내려옴 — 슬라이드 휘슬 + 톡 */
+    sweepDown(x, t, dur = 1300) {
+      const d = (dur || 1300) / 1000;
+      tone(x, t, { f: 1100, f2: 380, a: .02, d, g: .09 });
+      tickAt(x, t + d, 1800, .08);
+    },
+    /** 푸슉(연기) */
+    puff(x, t) { noise(x, t, { a: .05, d: .5, g: .22, type: 'lowpass', f: 1000, f2: 300, q: .4 }); },
+    /** 싹둑 싹둑 */
+    snip(x, t) {
+      [0, .07, .14].forEach(o => { noise(x, t + o, { a: .001, d: .012, g: .18, f: 5000, q: 2 }); tone(x, t + o, { f: 3000, a: .001, d: .02, g: .03 }); });
+    },
+    /** 슥(선 그리기) */
+    zip(x, t, dur = 500) { noise(x, t, { a: .02, d: Math.min(.3, (dur || 500) / 1000 * .5), g: .12, f: 1500, f2: 4200, q: 1 }); },
+    /** 반짝 */
+    spark(x, t) { for (let i = 0; i < 4; i++) tone(x, t + i * .04 + Math.random() * .02, { f: 2200 + Math.random() * 2000, a: .001, d: .08, g: .04 }); },
+  };
+
+  /* ═════════ 이어지는 소리(선풍기·발전소·끓는 물) — level(0..1) 로 세기 조종 ═════════ */
+  function buildFan(x) {
+    const ac = x.ac, out = ac.createGain(); out.gain.value = 0; out.connect(x.dest);
+    const ns = ac.createBufferSource(); ns.buffer = x.nz; ns.loop = true;
+    const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 500; bp.Q.value = .7;
+    const gw = ac.createGain(); gw.gain.value = 0;
+    const lfo = ac.createOscillator(), lg = ac.createGain(); lfo.frequency.value = 3; lg.gain.value = 0; lfo.connect(lg); lg.connect(gw.gain);   // 날개가 바람을 자르는 울렁임
+    ns.connect(bp); bp.connect(gw); gw.connect(out);
+    const m1 = ac.createOscillator(), m2 = ac.createOscillator(), gm = ac.createGain(), lp = ac.createBiquadFilter();   // 모터 웅~
+    m1.type = 'triangle'; m1.frequency.value = 50; m2.type = 'sine'; m2.frequency.value = 100; gm.gain.value = 0;
+    lp.type = 'lowpass'; lp.frequency.value = 700; m1.connect(gm); m2.connect(gm); gm.connect(lp); lp.connect(out);
+    ns.start(0, .3); lfo.start(); m1.start(); m2.start();
+    let lv = 0, wh = 0;
+    const apply = () => {
+      const T = ac.currentTime, v = clamp(lv, 0, 1.1), tc = .07;
+      gw.gain.setTargetAtTime(v * v * .095, T, tc); lg.gain.setTargetAtTime(v * v * .035, T, tc);
+      lfo.frequency.setTargetAtTime(2 + 7 * v, T, tc);
+      bp.frequency.setTargetAtTime(380 + 900 * v, T, tc);
+      m1.frequency.setTargetAtTime(46 + 70 * v, T, tc); m2.frequency.setTargetAtTime(92 + 140 * v, T, tc);
+      gm.gain.setTargetAtTime(v > .02 ? .01 + .034 * v + wh * .04 : 0, T, tc);
+      out.gain.setTargetAtTime(v > .01 ? 1 : 0, T, .05);
+    };
+    return {
+      level(v) { lv = v; apply(); }, whine(v) { wh = v; apply(); },
+      stop() {
+        const T = ac.currentTime; out.gain.cancelScheduledValues(T); out.gain.setTargetAtTime(0, T, .08);
+        setTimeout(() => { try { ns.stop(); lfo.stop(); m1.stop(); m2.stop(); out.disconnect(); } catch (e) {} }, 500);
+      },
+    };
+  }
+  function buildHum(x) {   // 발전소 웅~
+    const ac = x.ac, out = ac.createGain(); out.gain.value = 0; out.connect(x.dest);
+    const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 220; lp.connect(out);
+    const o1 = ac.createOscillator(), o2 = ac.createOscillator(); o1.type = 'sawtooth'; o1.frequency.value = 50; o2.type = 'sine'; o2.frequency.value = 100;
+    const g2 = ac.createGain(); g2.gain.value = .5; o1.connect(lp); o2.connect(g2); g2.connect(lp);
+    const ns = ac.createBufferSource(); ns.buffer = x.nz; ns.loop = true; const nl = ac.createBiquadFilter(); nl.type = 'lowpass'; nl.frequency.value = 380; const ng = ac.createGain(); ng.gain.value = .5;
+    ns.connect(nl); nl.connect(ng); ng.connect(lp);
+    o1.start(); o2.start(); ns.start(0, .7);
+    return {
+      level(v) { const T = ac.currentTime; out.gain.setTargetAtTime(clamp(v, 0, 1.1) * .06, T, .15); o1.frequency.setTargetAtTime(44 + 8 * v, T, .3); },
+      stop() { const T = ac.currentTime; out.gain.setTargetAtTime(0, T, .1); setTimeout(() => { try { o1.stop(); o2.stop(); ns.stop(); out.disconnect(); } catch (e) {} }, 500); },
+    };
+  }
+  function buildBoil(x) {   // 주전자 끓는 소리: 쉬이~ + 보글보글
+    const ac = x.ac, out = ac.createGain(); out.gain.value = 0; out.connect(x.dest);
+    const ns = ac.createBufferSource(); ns.buffer = x.nz; ns.loop = true; const hp = ac.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 3200;
+    const gh = ac.createGain(); gh.gain.value = 0; ns.connect(hp); hp.connect(gh); gh.connect(out); ns.start(0, .2);
+    let lv = 0; const rnd = U_rng(7);
+    const id = setInterval(() => {
+      if (lv < .05 || !on) return;
+      if (rnd() < .15 + lv * .5) { const T = ac.currentTime + .005, f0 = 260 + rnd() * 260; tone({ ac, dest: out, nz: x.nz }, T, { f: f0, f2: f0 * 1.9, a: .003, d: .07, g: .1 * lv, pan: (rnd() - .5) * .8 }); }
+    }, 70);
+    return {
+      level(v) { lv = clamp(v, 0, 1); const T = ac.currentTime; gh.gain.setTargetAtTime(lv * .05, T, .4); out.gain.setTargetAtTime(lv > .01 ? 1 : 0, T, .1); },
+      stop() { clearInterval(id); const T = ac.currentTime; out.gain.setTargetAtTime(0, T, .1); setTimeout(() => { try { ns.stop(); out.disconnect(); } catch (e) {} }, 500); },
+    };
+  }
+  function U_rng(seed) { let s = seed >>> 0 || 1; return () => { s ^= s << 13; s >>>= 0; s ^= s >> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; }; }
+  const LOOPS = { fan: buildFan, hum: buildHum, boil: buildBoil };
+  const NULL_LOOP = { level() {}, whine() {}, stop() {} };
+
+  /* ═════════ 바깥 API ═════════ */
+  let blankN = 0;
+  const tickLog = [];
+  function play(name, a, b) {
+    if (OFF || !on) return;
+    const x = ensure(); if (!x) return;
+    const f = S[name]; if (!f) { console.warn('[SFX] 없는 소리:', name); return; }
+    if (name === 'blank') a = blankN++;
+    if (name === 'tick') {   // 빽빽할수록(100 W 레인) 톡톡이 작고 높은 지지직으로 — 촘촘한 정도에 따라 세기·음높이 자동 조절
+      const now = performance.now(); tickLog.push(now); while (tickLog.length && now - tickLog[0] > 250) tickLog.shift();
+      const n = tickLog.length;
+      b = (b ?? 1) / (1 + n * .22); a = (a ?? 1) * (1 + Math.min(n, 30) * .012);
+    }
+    try { f(x, x.ac.currentTime + .008, a, b); } catch (e) { console.error('[SFX]', name, e); }
+  }
+  function loop(kind, o) {
+    const build = LOOPS[kind];
+    if (OFF || !build) return NULL_LOOP;
+    const h = {
+      built: null, lvl: 0, wh: 0, dead: false,
+      level(v) { h.lvl = v; if (h.built) h.built.level(v); },
+      whine(v) { h.wh = v; if (h.built && h.built.whine) h.built.whine(v); },
+      stop() { h.dead = true; pending.delete(h); if (h.built) { h.built.stop(); h.built = null; } },
+      tryBuild() {
+        if (h.built || h.dead) return;
+        const x = ensure(); if (!x) return;
+        try { h.built = build(x, o || {}); h.built.level(h.lvl); if (h.wh && h.built.whine) h.built.whine(h.wh); }
+        catch (e) { console.error('[SFX loop]', kind, e); h.dead = true; }
+      },
+    };
+    pending.add(h); h.tryBuild();
+    return h;
+  }
+  function unlock() {
+    if (unlocked) return;
+    unlocked = true;
+    if (!OFF) { ensure(); pending.forEach(h => h.tryBuild()); }
+  }
+  ['pointerdown', 'keydown', 'touchstart'].forEach(ev => document.addEventListener(ev, unlock, { capture: true, once: false, passive: true }));
+  document.addEventListener('visibilitychange', () => {
+    if (!ac) return;
+    if (document.hidden) ac.suspend().catch(() => {}); else if (on) ac.resume().catch(() => {});
+  });
+
+  let toastEl = null, toastT = 0;
+  function toast(v) {
+    if (!document.body) return;
+    if (!toastEl) { toastEl = document.createElement('div'); toastEl.id = 'sfxToast'; document.body.appendChild(toastEl); }
+    toastEl.textContent = v ? '소리 켜짐' : '소리 꺼짐';
+    toastEl.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => toastEl.classList.remove('show'), 1400);
+  }
+  function toggle(v) {
+    on = v == null ? !on : !!v;
+    try { localStorage.setItem(KEY, on ? '1' : '0'); } catch (e) {}
+    unlock();
+    const x = ensure();
+    if (x && out) out.gain.setTargetAtTime(on ? .9 : 0, ac.currentTime, .03);
+    toast(on);
+    if (on) play('pop');
+    return on;
+  }
+
+  /* ═════════ 점검 도구 ═════════ */
+  function measure(buf) {
+    let peak = 0, sum = 0, n = 0, last = 0, first = -1, zc = 0, prev = 0;
+    const ch = buf.getChannelData(0), ch2 = buf.numberOfChannels > 1 ? buf.getChannelData(1) : ch, sr = buf.sampleRate;
+    for (let i = 0; i < ch.length; i++) {
+      const v = Math.max(Math.abs(ch[i]), Math.abs(ch2[i]));
+      if (v > peak) peak = v;
+      sum += ch[i] * ch[i]; n++;
+      if (v > .003) { last = i; if (first < 0) first = i; }
+      if ((ch[i] >= 0) !== (prev >= 0)) zc++; prev = ch[i];
+    }
+    const active = Math.max(1, last - Math.max(0, first)) / sr;
+    return { peak: +peak.toFixed(3), rms: +Math.sqrt(sum / n).toFixed(4), attack: first < 0 ? null : +(first / sr).toFixed(3), length: +(last / sr).toFixed(2), approxHz: Math.round(zc / 2 / active), clipped: peak >= .98, silent: peak < .01 };
+  }
+  async function analyze(name, a, b, secs = 3) {
+    const OA = window.OfflineAudioContext || window.webkitOfflineAudioContext, sr = 44100;
+    const oc = new OA(2, Math.floor(sr * secs), sr), g = oc.createGain(); g.gain.value = .9; g.connect(oc.destination);
+    const x = { ac: oc, dest: g, nz: noiseBuf(oc) };
+    S[name](x, .02, a, b);
+    return measure(await oc.startRendering());
+  }
+  async function analyzeLoop(kind, level = 1, secs = 1.5) {
+    const OA = window.OfflineAudioContext || window.webkitOfflineAudioContext, sr = 44100;
+    const oc = new OA(2, Math.floor(sr * secs), sr), g = oc.createGain(); g.gain.value = .9; g.connect(oc.destination);
+    const h = LOOPS[kind]({ ac: oc, dest: g, nz: noiseBuf(oc) }); h.level(level);
+    const r = measure(await oc.startRendering()); try { h.stop(); } catch (e) {} return r;
+  }
+
+  /** ?sfx=demo — 모든 소리를 눌러 들어 보는 패널 */
+  function demoPanel() {
+    const box = document.createElement('div');
+    box.style.cssText = 'position:fixed;left:12px;top:12px;z-index:200;max-width:340px;max-height:92vh;overflow:auto;background:rgba(29,29,31,.94);color:#f5f5f7;border-radius:14px;padding:14px;font:600 13px/1.3 system-ui,sans-serif';
+    const btn = (t, fn) => { const b = document.createElement('button'); b.textContent = t; b.style.cssText = 'margin:3px;padding:6px 10px;border-radius:9999px;border:0;background:#0066cc;color:#fff;font:600 13px system-ui'; b.onclick = () => { unlock(); fn(); }; return b; };
+    box.appendChild(Object.assign(document.createElement('div'), { textContent: '효과음 듣기 (F2 로 닫기)', style: 'margin-bottom:8px;font-size:14px' }));
+    Object.keys(S).forEach(k => box.appendChild(btn(k, () => { if (!on) toggle(true); play(k, k === 'kick' ? true : undefined, 1); })));
+    let fan = null;
+    box.appendChild(btn('fan 0→1→0', () => { if (!on) toggle(true); if (fan) fan.stop(); fan = loop('fan'); let v = 0, dir = 1; const id = setInterval(() => { v += dir * .05; if (v >= 1) dir = -1; fan.level(clamp(v)); if (v <= 0 && dir < 0) { clearInterval(id); fan.stop(); fan = null; } }, 60); }));
+    box.appendChild(btn('boil', () => { if (!on) toggle(true); const h = loop('boil'); h.level(1); setTimeout(() => h.stop(), 4000); }));
+    box.appendChild(btn('hum', () => { if (!on) toggle(true); const h = loop('hum'); h.level(1); setTimeout(() => h.stop(), 3000); }));
+    document.body.appendChild(box);
+    document.addEventListener('keydown', e => { if (e.key === 'F2') box.remove(); });
+  }
+  if (Q.get('sfx') === 'demo') { const go = () => demoPanel(); if (document.body) go(); else document.addEventListener('DOMContentLoaded', go); }
+
+  return { play, loop, toggle, unlock, analyze, analyzeLoop, names: () => Object.keys(S), isOn: () => on, isOff: () => OFF, S, debug: () => ({ pendingLoops: pending.size, unlocked, state: ac ? ac.state : 'none' }) };
+})();
+
+}catch(e){console.error("[object 03_sfx.js]",e)}
+
+</script><script>const __D={};{const __sc=Deck.scene;Deck.scene=(id,d)=>{__D[id]=d;__sc(id,d);};}
+'use strict';
+/* ── 에너지 효율 덱 · 그림 도우미 ── */
+const COL={elec:'var(--elec)',light:'var(--light)',heat:'var(--heat)',sound:'var(--sound)',kin:'var(--kin)',chem:'var(--chem)'};
+const NAME={elec:'전기',light:'빛',heat:'열',sound:'소리',kin:'운동',chem:'화학'};
+function txt(x,y,s,size=28,color='var(--t2)',anchor='middle',extra=''){return `<text x="${x}" y="${y}" text-anchor="${anchor}" font-size="${size}" fill="${color}" ${extra}>${s}</text>`;}
+function line(x1,y1,x2,y2,color='var(--hl)',width=2,extra=''){return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="${width}" ${extra}/>`;}
+const f1=v=>Math.round(v*10)/10;
+const fmt=v=>(Math.round(v*10)/10).toLocaleString('ko-KR');
+
+/* 가리개(clipPath) 안에 그림을 넣고, wipe(c,id)로 왼쪽→오른쪽 드러냄. shown=true면 처음부터 보임 */
+function clipWrap(id,inner,x,y,w,h,shown=false){
+  return `<defs><clipPath id="${id}-c"><rect x="${x}" y="${y}" width="${shown?w:0}" height="${h}" data-full="${w}"/></clipPath></defs><g clip-path="url(#${id}-c)">${inner}</g>`;
+}
+function wipe(c,id,dur=1400,o={}){
+  const r=c.$('#'+id+'-c rect');if(!r)return Promise.resolve();
+  const W=+r.dataset.full;return c.tween(c.reduced?0:dur,p=>r.setAttribute('width',(W*p).toFixed(1)),Object.assign({ease:'inOut'},o));
+}
+
+/* 에너지 흐름도(띠 그림). 띠의 굵기 = 에너지의 양 */
+function sankey(id,{x,y,w,H,inp,parts,gap=30,split=.3,unit='',inLabel,shown=false,lab=30}){
+  const thin=H<lab+16;
+  const total=inp.v,k=H/total,xs=x+w*split,xe=x+w,xm=(xs+xe)/2;
+  let body=`<rect x="${x}" y="${y}" width="${f1(xs-x+1)}" height="${f1(H)}" fill="${COL[inp.e]}" fill-opacity=".92"/>`;
+  body+=thin?`<text x="${x}" y="${f1(y-14)}" font-size="${lab}" font-weight="600" fill="${COL[inp.e]}">${inLabel||NAME[inp.e]+' '+fmt(inp.v)+unit}</text>`
+    :`<text class="sk-in" x="${x+22}" y="${f1(y+H/2)}" dominant-baseline="central" font-size="${lab}" font-weight="600">${inLabel||NAME[inp.e]+' '+fmt(inp.v)+unit}</text>`;
+  let a=y,b=y,labs='';
+  parts.forEach(p=>{
+    const h=Math.max(3,p.v*k);
+    body+=`<path d="M${f1(xs)} ${f1(a)} C${f1(xm)} ${f1(a)} ${f1(xm)} ${f1(b)} ${f1(xe)} ${f1(b)} L${f1(xe)} ${f1(b+h)} C${f1(xm)} ${f1(b+h)} ${f1(xm)} ${f1(a+h)} ${f1(xs)} ${f1(a+h)} Z" fill="${COL[p.e]}" fill-opacity=".82"/>`;
+    labs+=`<text x="${xe+20}" y="${f1(b+h/2)}" dominant-baseline="central" font-size="${lab}" font-weight="600"><tspan fill="${COL[p.e]}">${p.name||NAME[p.e]}</tspan><tspan fill="var(--t2)" font-weight="400"> ${fmt(p.v)}${unit}</tspan></text>`;
+    a+=p.v*k;b+=h+gap;
+  });
+  const hh=b-y+60;
+  return clipWrap(id,body+labs,x-4,y-60,w+420,hh+30,shown);
+}
+
+/* 전구: kind = 'inc'(백열) | 'led' */
+function bulb(cx,cy,r,kind,glow=1){
+  const neckW=r*.62,baseY=cy+r*.95;
+  let s=`<circle cx="${cx}" cy="${cy}" r="${r*1.9}" fill="var(--light)" opacity="${.13*glow}"/><circle cx="${cx}" cy="${cy}" r="${r*1.35}" fill="var(--light)" opacity="${.16*glow}"/>`;
+  s+=`<path d="M${cx-neckW/2} ${baseY} C${cx-neckW/2} ${cy+r*.6} ${cx-r} ${cy+r*.35} ${cx-r} ${cy-r*.1} A${r} ${r} 0 1 1 ${cx+r} ${cy-r*.1} C${cx+r} ${cy+r*.35} ${cx+neckW/2} ${cy+r*.6} ${cx+neckW/2} ${baseY} Z" fill="var(--light)" fill-opacity="${.18*glow}" stroke="var(--t2)" stroke-width="4"/>`;
+  if(kind==='inc'){
+    s+=`<path d="M${cx-18} ${baseY-6} L${cx-18} ${cy+8} M${cx+18} ${baseY-6} L${cx+18} ${cy+8}" stroke="var(--t2)" stroke-width="3"/>`;
+    s+=`<path d="M${cx-18} ${cy+8} l6 -18 l6 18 l6 -18 l6 18 l6 -18 l6 18" fill="none" stroke="var(--light)" stroke-width="5" stroke-linejoin="round"/>`;
+  }else{
+    s+=`<rect x="${cx-r*.42}" y="${cy+r*.18}" width="${r*.84}" height="${r*.16}" rx="4" fill="var(--t2)"/>`;
+    for(let i=-1;i<=1;i++)s+=`<rect x="${cx+i*r*.26-9}" y="${cy+r*.1}" width="18" height="10" rx="2" fill="var(--light)"/>`;
+  }
+  for(let i=0;i<3;i++)s+=`<rect x="${cx-neckW/2}" y="${baseY+i*22}" width="${neckW}" height="18" rx="6" fill="var(--t3)"/>`;
+  s+=`<path d="M${cx-neckW*.3} ${baseY+66} H${cx+neckW*.3} L${cx+10} ${baseY+84} H${cx-10} Z" fill="var(--t2)"/>`;
+  return s;
+}
+function heatWave(x,y,h=110,w=6,op=1){return `<path d="M${x} ${y} q-22 ${-h/4} 0 ${-h/2} q22 ${-h/4} 0 ${-h/2}" fill="none" stroke="var(--heat)" stroke-width="${w}" stroke-linecap="round" opacity="${op}"/>`;}
+/* 굵은 화살표(가로/세로) */
+function arrowH(x1,x2,y,t,color){const hd=Math.max(26,t*.9);return `<path d="M${x1} ${y-t/2} H${x2-hd} V${y-t/2-hd*.45} L${x2} ${y} L${x2-hd} ${y+t/2+hd*.45} V${y+t/2} H${x1} Z" fill="${color}" fill-opacity=".85"/>`;}
+function arrowV(x,y1,y2,t,color){const hd=Math.max(26,t*.6),d=Math.sign(y2-y1)||1;return `<path d="M${x-t/2} ${y1} V${y2-d*hd} H${x-t/2-hd*.45} L${x} ${y2} L${x+t/2+hd*.45} ${y2-d*hd} H${x+t/2} V${y1} Z" fill="${color}" fill-opacity=".85"/>`;}
+
+/* ═════════ 장면 ═════════ */
+Deck.scene('cover',{steps:0,
+  build(root){root.querySelector('#hero-flow').innerHTML=sankey('hero',{x:400,y:250,w:960,H:300,inp:{e:'elec',v:100},parts:[{e:'light',v:5},{e:'heat',v:95}],gap:44,lab:34});},
+  async enter(c){await c.wait(300);await wipe(c,'hero',2200);}
+});
+
+Deck.scene('question',{steps:2,
+  build(root){root.querySelector('#q-bulbs').innerHTML=bulb(620,455,120,'inc')+bulb(1300,455,120,'led')+
+    `<g data-step="2" data-fx="fade">${heatWave(440,520)+heatWave(800,520)+heatWave(475,380,90,5,.8)+heatWave(765,380,90,5,.8)}</g>`+
+    `<g data-step="2" data-fx="fade" data-delay="300">${heatWave(1130,520,70,4,.45)+heatWave(1470,520,70,4,.45)}</g>`;}
+});
+
+Deck.scene('conserve',{steps:2,
+  build(root){
+    root.querySelector('#cons-bulb').innerHTML=bulb(1660,440,88,'inc');
+    const X=120,S=16.8,Y=740,BH=80;let h='';
+    h+=txt(X,Y-24,'공급한 전기 에너지 100 J',32,'var(--elec)','start','font-weight="600"');
+    h+=`<rect x="${X}" y="${Y}" width="${5*S}" height="${BH}" fill="var(--light)" fill-opacity=".9"/><rect x="${X+5*S}" y="${Y}" width="${95*S}" height="${BH}" fill="var(--heat)" fill-opacity=".8"/>`;
+    h+=txt(X+2.5*S,Y+BH+44,'빛 5 J',32,'var(--light)','start','font-weight="600"');
+    h+=txt(X+52*S,Y+BH+44,'열 95 J',32,'var(--heat)','middle','font-weight="600"');
+    h+=txt(X+5*S+24,Y+BH/2+11,'5 + 95 = 100',30,'#fff','start','font-weight="600"');
+    root.querySelector('#cons-bar').innerHTML=`<g data-step="2" data-fx="fade" data-delay="300">${h}</g>`;
+  }
+});
+
+/* 흩어지는 열: 알갱이가 전구 둘레에 모여 있다가 방 전체로 퍼짐 */
+const SPREAD_N=64;
+function spreadPts(){
+  const R=U.rng(7),src=[],dst=[];
+  for(let i=0;i<SPREAD_N;i++){
+    const a=R()*Math.PI*2,r=Math.sqrt(R())*80;src.push([560+Math.cos(a)*r,630+Math.sin(a)*r]);
+    const col=i%11,row=Math.floor(i/11);dst.push([190+col*80+(R()-.5)*36,390+row*96+(R()-.5)*36]);
+  }
+  return {src,dst};
+}
+Deck.scene('spread',{steps:2,
+  build(root){
+    const {src}=spreadPts();let h=`<rect x="150" y="310" width="900" height="600" rx="18" fill="none" stroke="var(--hl)" stroke-width="2"/>`+txt(176,350,'방(주변)',26,'var(--t3)','start');
+    h+=`<circle id="sp-glow" cx="560" cy="630" r="120" fill="var(--heat)" opacity=".22"/>`;
+    src.forEach((p,i)=>h+=`<g class="sp" data-i="${i}" transform="translate(${f1(p[0])} ${f1(p[1])})"><circle class="spd" r="11" fill="var(--heat)"/></g>`);
+    root.querySelector('#spread-g').innerHTML=h;
+  },
+  enter(c){if(c.still||c.reduced)return;c.loop(t=>c.$$('#spread-g .spd').forEach((e,i)=>e.setAttribute('transform',`translate(${(Math.sin(t*1.3+i*2.1)*3).toFixed(1)} ${(Math.cos(t*1.1+i*1.7)*3).toFixed(1)})`)));},
+  async go(c,k){
+    if(k!==1)return;
+    const {src,dst}=spreadPts(),els=c.$$('#spread-g .sp'),glow=c.$('#sp-glow');
+    await c.tween(2200,p=>{els.forEach((e,i)=>e.setAttribute('transform',`translate(${f1(src[i][0]+(dst[i][0]-src[i][0])*p)} ${f1(src[i][1]+(dst[i][1]-src[i][1])*p)})`));
+      glow.setAttribute('opacity',(.22*(1-p)).toFixed(3));els.forEach(e=>e.firstChild.setAttribute('fill-opacity',(1-.55*p).toFixed(2)));},{ease:'inOut'});
+  }
+});
+
+Deck.scene('flowread',{steps:3,
+  build(root){
+    root.querySelector('#fr-a').innerHTML=sankey('frA',{x:120,y:360,w:1100,H:220,inp:{e:'elec',v:100},parts:[{e:'light',v:5},{e:'heat',v:95}]});
+    root.querySelector('#fr-b').innerHTML=sankey('frB',{x:120,y:705,w:1100,H:220,inp:{e:'elec',v:100},parts:[{e:'light',v:33},{e:'heat',v:67}]});
+  },
+  async go(c,k){if(k===1)await wipe(c,'frA');if(k===3)await wipe(c,'frB');}
+});
+
+/* 직접 조작: 기기별 흐름도 */
+const DEV={
+  bulb:{name:'백열전구',inp:'elec',parts:[['light',5],['heat',95]]},
+  led:{name:'LED 전구',inp:'elec',parts:[['light',33],['heat',67]]},
+  motor:{name:'전기 모터',inp:'elec',parts:[['kin',80],['heat',17],['sound',3]]},
+  engine:{name:'자동차 엔진',inp:'chem',parts:[['kin',25],['heat',75]]},
+  plant:{name:'화력 발전소',inp:'chem',parts:[['elec',40],['heat',60]]},
+  kettle:{name:'전기 주전자',inp:'elec',parts:[['heat',84,'물이 얻은 열'],['heat',16,'주변으로 나간 열']]},
+  solar:{name:'태양광 패널',inp:'light',parts:[['elec',20],['heat',80,'열·반사']]},
+};
+function setLab(root,dev,E){
+  const slot=root.querySelector('#lab-flow');if(!slot)return;
+  dev=DEV[dev]?dev:(slot.dataset.dev||'bulb');E=Math.max(100,Math.min(1000,Math.round((E??+(slot.dataset.e||100))/100)*100));
+  slot.dataset.dev=dev;slot.dataset.e=E;
+  const D=DEV[dev],parts=D.parts.map(([e,p,name])=>({e,v:E*p/100,name}));
+  const useful=parts[0].v,waste=E-useful;
+  slot.innerHTML=txt(120,330,D.name,36,'currentColor','start','font-weight="600"')+txt(880,330,'띠 굵기 ∝ 공급 에너지',24,'var(--t2)','end')+sankey('labS',{x:120,y:400,w:760,H:380*E/1000,inp:{e:D.inp,v:E},parts,unit:' J',gap:34,shown:true,inLabel:NAME[D.inp]+' '+E+' J'});
+  root.querySelector('#supply').value=E;root.querySelector('#supplyOut').textContent=E+' J';
+  root.querySelector('#usefulOut').textContent=fmt(useful)+' J ('+(D.parts[0][2]||NAME[D.parts[0][0]])+')';
+  root.querySelector('#wasteOut').textContent=fmt(waste)+' J';
+  root.querySelector('#effOut').textContent=D.parts[0][1]+' %';
+  root.querySelectorAll('[data-dev]').forEach(b=>b.classList.toggle('on',b.dataset.dev===dev));
+}
+Deck.scene('lab',{steps:0,build(root){setLab(root,'bulb',500);}});
+
+Deck.scene('example',{steps:2,
+  build(root){
+    let h='';
+    h+=line(120,880,800,880,'var(--t2)',3);
+    h+=`<rect x="150" y="740" width="190" height="140" rx="14" fill="none" stroke="var(--t2)" stroke-width="4"/>`+txt(245,822,'전동기',32,'currentColor','middle','font-weight="600"');
+    h+=`<circle cx="245" cy="740" r="0"/>`;
+    h+=line(520,340,520,880,'var(--t3)',6)+line(514,340,700,340,'var(--t3)',6)+line(640,340,640,358,'var(--t3)',4);
+    h+=`<circle cx="640" cy="370" r="30" fill="none" stroke="var(--t2)" stroke-width="4"/>`;
+    h+=`<path d="M340 790 L610 370" stroke="var(--t2)" stroke-width="3" fill="none"/>`;
+    h+=`<g id="ex-load" transform="translate(0 0)"><line x1="670" y1="370" x2="670" y2="760" stroke="var(--t2)" stroke-width="3"/><rect x="610" y="760" width="120" height="110" rx="10" fill="var(--kin)" fill-opacity=".28" stroke="var(--kin)" stroke-width="4"/>${txt(670,826,'물체',30,'currentColor','middle','font-weight="600"')}</g>`;
+    h+=`${heatWave(205,720,70,5,.75)}${heatWave(285,720,70,5,.75)}`;
+    h+=txt(245,945,'전기 에너지 2000 J',30,'var(--elec)','middle','font-weight="600"');
+    h+=`<g id="ex-up" opacity="0">${arrowV(780,600,470,16,'var(--kin)')}${txt(780,440,'+1500 J',30,'var(--kin)','middle','font-weight="600"')}</g>`;
+    root.querySelector('#ex-crane').innerHTML=h;
+  },
+  async enter(c){
+    const g=c.$('#ex-load'),rope=g.querySelector('line');
+    await c.tween(1800,p=>{const dy=-260*p;g.setAttribute('transform',`translate(0 ${f1(dy)})`);rope.setAttribute('y1',f1(370+260*p));},{ease:'inOut',delay:400});
+    c.a('#ex-up',[{opacity:0},{opacity:1}],{dur:500});
+  }
+});
+
+Deck.scene('samelight',{steps:3,
+  build(root){
+    const X=470,S=19,BH=96;let h='';
+    [[400,'백열전구',60,'5 %','sl1'],[600,'LED 전구',9,'약 33 %','sl2']].forEach(([y,nm,E,ef,id])=>{
+      const bar=`<rect x="${X}" y="${y}" width="${3*S}" height="${BH}" fill="var(--light)" fill-opacity=".95"/><rect x="${X+3*S}" y="${y}" width="${(E-3)*S}" height="${BH}" fill="var(--heat)" fill-opacity=".75"/>`+
+        txt(X+E*S+22,y+BH/2+14,E+' J',44,'var(--elec)','start','font-weight="600"');
+      h+=`<g data-step="${id==='sl1'?1:2}" data-fx="fade">${txt(120,y+42,nm,36,'currentColor','start','font-weight="600"')}${txt(120,y+84,'효율 '+ef,28,'var(--t2)','start')}</g>`;
+      h+=clipWrap(id,bar,X,y-10,E*S+200,BH+20);
+    });
+    h+=txt(X,350,'얻으려는 빛 3 J',30,'var(--light)','start','font-weight="600"');
+    root.querySelector('#sl-bars').innerHTML=h;
+  },
+  async go(c,k){if(k===1)await wipe(c,'sl1',1500);if(k===2)await wipe(c,'sl2',700);}
+});
+
+Deck.scene('engine',{steps:3,
+  build(root){
+    let h='';
+    h+=`<rect x="300" y="300" width="420" height="110" rx="16" fill="var(--heat)" fill-opacity=".18" stroke="var(--heat)" stroke-width="3"/>`+txt(510,366,'고열원 · 연료 연소',32,'var(--heat)','middle','font-weight="600"');
+    h+=`<rect x="300" y="770" width="420" height="110" rx="16" fill="var(--elec)" fill-opacity=".10" stroke="var(--elec)" stroke-width="3"/>`+txt(510,836,'저열원 · 바깥 공기',32,'var(--elec)','middle','font-weight="600"');
+    h+=`<circle cx="510" cy="590" r="92" fill="var(--c-white)" stroke="var(--t2)" stroke-width="4"/>`+txt(510,601,'엔진',36,'currentColor','middle','font-weight="600"');
+    h+=`<g data-step="1" data-fx="fade">${arrowV(510,412,498,120,'var(--heat)')}${txt(360,465,'Q₁ = 100',34,'var(--heat)','end','font-weight="600"')}</g>`;
+    h+=`<g data-step="2" data-fx="fade">${arrowH(602,960,590,30,'var(--kin)')}${txt(780,560,'W = 25',34,'var(--kin)','middle','font-weight="600"')}</g>`;
+    h+=`<g data-step="2" data-fx="fade" data-delay="300">${arrowV(510,682,768,90,'var(--heat)')}${txt(360,735,'Q₂ = 75',34,'var(--heat)','end','font-weight="600"')}</g>`;
+    root.querySelector('#eng-g').innerHTML=h;
+  }
+});
+
+Deck.scene('chain',{steps:4,
+  build(root){
+    const B=840,S=4.6,W=250,xs=[190,610,1030,1450];
+    const data=[[100,'연료 에너지','chem','100'],[40,'발전소에서 나온 전기','elec','40'],[38.4,'집에 도착한 전기','elec','38.4'],[12.7,'전구의 빛','light','약 13']];
+    const arr=[['발전','40 %'],['송전·배전','96 %'],['LED 전구','33 %']];
+    let h='';
+    data.forEach(([v,nm,e,lab],i)=>{
+      const top=B-v*S,attr=i===0?'data-in="200"':`data-step="${i}"`;
+      h+=`<g ${attr} data-fx="up"><rect x="${xs[i]}" y="${f1(top)}" width="${W}" height="${f1(v*S)}" rx="10" fill="${COL[e]}" fill-opacity=".85"/>${txt(xs[i]+W/2,f1(top-24),lab,48,COL[e],'middle','font-weight="600"')}${txt(xs[i]+W/2,B+44,nm,28,'var(--t2)')}</g>`;
+      if(i>0){const ax=(xs[i-1]+W+xs[i])/2;h+=`<g data-step="${i}" data-fx="fade">${txt(ax,650,arr[i-1][0],26,'var(--t2)')}${txt(ax,694,'× '+arr[i-1][1],34,'currentColor','middle','font-weight="600"')}${txt(ax,740,'→',40,'var(--t3)')}</g>`;}
+    });
+    h+=`<g data-step="3" data-fx="fade" data-delay="500">${txt(xs[3]+W/2,560,'백열전구라면 약 2',28,'var(--t2)')}</g>`;
+    root.querySelector('#chain-g').innerHTML=h;
+  }
+});
+
+Deck.scene('label',{steps:3,
+  build(root){
+    const C=['#2BA84A','#8CC63F','#E9B800','#F08A00','#E2382B'];
+    root.querySelector('#grades').innerHTML=C.map((c,i)=>`<div class="grade-row"><b>${i+1}</b><i style="width:${240+i*80}px;background:${c};opacity:${i===0?1:.55}"></i>${i===0?'<span class="t-cap mute" style="white-space:nowrap">효율 높음</span>':i===4?'<span class="t-cap mute" style="white-space:nowrap">효율 낮음</span>':''}</div>`).join('');
+  }
+});
+
+Deck.scene('carbon',{steps:3,
+  build(root){
+    const B=860,S=8,W=240;let h='';
+    [[300,52,'백열전구','약 52','data-in="200"'],[700,8,'LED 전구','약 8','data-step="1"']].forEach(([x,v,nm,lab,attr])=>{
+      h+=`<g ${attr} data-fx="up"><rect x="${x}" y="${B-v*S}" width="${W}" height="${v*S}" rx="10" fill="var(--chem)" fill-opacity=".85"/>${txt(x+W/2,B-v*S-24,lab,52,'var(--chem)','middle','font-weight="600"')}${txt(x+W/2,B+46,nm,32,'var(--t2)')}</g>`;
+    });
+    h+=line(260,B,980,B,'var(--t2)',2)+txt(260,320,'빛 1을 얻는 데 태우는 연료 에너지',28,'var(--t2)','start');
+    root.querySelector('#cb-bars').innerHTML=h;
+  }
+});
+
+document.addEventListener('input',e=>{const root=e.target.closest('.slide');if(!root)return;if(e.target.id==='supply')setLab(root,null,+e.target.value);});
+document.addEventListener('click',e=>{const b=e.target.closest('button[data-dev]');if(!b)return;const root=b.closest('.slide');if(root)setLab(root,b.dataset.dev);});
+
+
+/* ═════════ 보강 장면 (1부 효율 · 2부 신재생 에너지) ═════════ */
+const GRADE_C=['#2BA84A','#8CC63F','#E9B800','#F08A00','#E2382B'];
+const kfmt=v=>{const r=Math.round(v*10)/10;return r.toLocaleString('ko-KR',{maximumFractionDigits:1});};
+
+/* 전기 주전자 */
+Deck.scene('power',{steps:4,
+  build(root){
+    let h='';
+    h+=`<defs><clipPath id="kt-clip"><path d="M1360 740 L1395 470 Q1400 440 1430 440 H1570 Q1600 440 1605 470 L1640 740 Z"/></clipPath></defs>`;
+    h+=`<rect x="1340" y="745" width="320" height="44" rx="14" fill="var(--t3)"/>`;
+    h+=`<path d="M1660 770 C1730 770 1740 840 1800 840" fill="none" stroke="var(--t3)" stroke-width="6"/><rect x="1796" y="826" width="40" height="28" rx="6" fill="var(--t3)"/>`;
+    h+=`<g clip-path="url(#kt-clip)"><rect x="1340" y="560" width="320" height="200" fill="var(--elec)" fill-opacity=".16"/><line x1="1340" y1="560" x2="1660" y2="560" stroke="var(--elec)" stroke-width="3" opacity=".6"/></g>`;
+    h+=`<path d="M1360 740 L1395 470 Q1400 440 1430 440 H1570 Q1600 440 1605 470 L1640 740 Z" fill="none" stroke="var(--t2)" stroke-width="5" stroke-linejoin="round"/>`;
+    h+=`<path d="M1388 520 L1290 466 L1302 450 L1394 494" fill="none" stroke="var(--t2)" stroke-width="5" stroke-linejoin="round"/>`;
+    h+=`<path d="M1606 490 C1730 490 1730 700 1628 700" fill="none" stroke="var(--t2)" stroke-width="16" stroke-linecap="round"/>`;
+    h+=`<rect x="1440" y="414" width="120" height="28" rx="10" fill="var(--t3)"/><rect x="1484" y="398" width="32" height="18" rx="6" fill="var(--t3)"/>`;
+    h+=`<g data-step="2" data-fx="fade">${heatWave(1470,390,90,5,.8)}${heatWave(1530,390,90,5,.8)}${heatWave(1280,445,80,5,.7)}</g>`;
+    h+=txt(1500,840,'소비 전력 2000 W',32,'var(--elec)','middle','font-weight="600"');
+    h+=txt(1380,900,'사용 시간',26,'var(--t2)')+txt(1380,952,'0 s',46,'currentColor','middle','id="kt-time" font-weight="600" class="num"');
+    h+=txt(1630,900,'물의 온도',26,'var(--t2)')+txt(1630,952,'20 °C',46,'var(--heat)','middle','id="kt-temp" font-weight="600" class="num"');
+    root.querySelector('#kettle-g').innerHTML=h;
+  },
+  go(c,k){
+    if(k===1)return c.count('#kt-time',0,200,{dur:1600,fmt:v=>Math.round(v)+' s'});
+    if(k===2)return c.count('#kt-temp',20,100,{dur:1800,fmt:v=>Math.round(v)+' °C'});
+  }
+});
+
+/* 엔진의 에너지 흐름 */
+Deck.scene('engineflow',{steps:3,
+  build(root){root.querySelector('#ef-g').innerHTML=sankey('efS',{x:120,y:330,w:900,H:440,inp:{e:'chem',v:100},inLabel:'연료 100',
+    parts:[{e:'kin',v:25,name:'바퀴를 돌리는 일'},{e:'heat',v:33,name:'배기가스의 열'},{e:'heat',v:30,name:'냉각수의 열'},{e:'sound',v:12,name:'마찰열·소리 등'}],gap:34});},
+  async go(c,k){if(k===1)await wipe(c,'efS',1600);}
+});
+
+/* 발전 방식별 효율 */
+Deck.scene('plants',{steps:3,
+  build(root){
+    const rows=[['석탄 화력',40,'heat',1],['LNG 복합 화력',55,'heat',1],['원자력',33,'heat',1],['수력',90,'kin',2],['풍력',40,'kin',2],['태양광',20,'kin',2]];
+    const X0=560,S=9,Y0=320,DY=88,BH=54;let h='';
+    h+=line(X0,Y0-14,X0,Y0+5*DY+BH+10,'var(--t2)',2);
+    rows.forEach(([nm,v,e,st],i)=>{
+      const y=Y0+i*DY;
+      let g=txt(X0-24,y+BH/2+12,nm,34,'currentColor','end','font-weight="600"')+`<rect x="${X0}" y="${y}" width="${v*S}" height="${BH}" rx="8" fill="${COL[e]}" fill-opacity=".85"/>`+txt(X0+v*S+18,y+BH/2+13,'약 '+v+' %',36,COL[e],'start','font-weight="600"');
+      if(nm==='풍력'){const bx=X0+59*S;g+=line(bx,y-8,bx,y+BH+8,'var(--t2)',3,'stroke-dasharray="6 6"')+txt(bx+10,y+BH+26,'이론 최대 약 59 %',23,'var(--t2)','start');}
+      h+=`<g data-step="${st}" data-fx="left" data-delay="${(i%3)*180}">${g}</g>`;
+    });
+    h+=`<g data-step="1" data-fx="fade" data-delay="700">${txt(1640,Y0+DY+BH/2+10,'열로 터빈을 돌리는 발전',26,'var(--heat)','end')}</g>`;
+    h+=`<g data-step="2" data-fx="fade" data-delay="700">${txt(1640,Y0+4*DY+BH/2+10,'재생 에너지 발전',26,'var(--kin)','end')}</g>`;
+    root.querySelector('#pl-g').innerHTML=h;
+  }
+});
+
+/* 전력량: 1년 동안 쓰는 전기 */
+function setKwh(root,hrs,n){
+  const slot=root.querySelector('#kw-g');if(!slot)return;
+  hrs=Math.max(1,Math.min(12,Math.round(hrs??+(slot.dataset.h||5))));n=Math.max(1,Math.min(10,Math.round(n??+(slot.dataset.n||1))));
+  slot.dataset.h=hrs;slot.dataset.n=n;
+  const a=60*hrs*365*n/1000,b=9*hrs*365*n/1000,X=400,W=460;
+  let h='';
+  [[470,'백열전구',`60 W × ${n}개`,a,'var(--heat)'],[650,'LED 전구',`9 W × ${n}개`,b,'var(--light)']].forEach(([y,nm,sub,v,col])=>{
+    h+=txt(120,y+40,nm,34,'currentColor','start','font-weight="600"')+txt(120,y+82,sub,26,'var(--t2)','start');
+    h+=`<rect x="${X}" y="${y}" width="${f1(W*v/a)}" height="96" rx="10" fill="${col}" fill-opacity=".85"/>`;
+    h+=txt(X+W*v/a+18,y+62,kfmt(v)+' kWh',40,col,'start','font-weight="600"');
+  });
+  h+=txt(120,430,`하루 ${hrs}시간 × 365일 · 막대 길이는 백열전구를 기준으로 한 비율`,28,'var(--t2)','start');
+  slot.innerHTML=h;
+  root.querySelector('#hours').value=hrs;root.querySelector('#bulbs').value=n;
+  root.querySelector('#hOut').textContent=hrs+'시간';root.querySelector('#nOut').textContent=n+'개';
+  root.querySelector('#kw1').textContent=kfmt(a)+' kWh';root.querySelector('#kw2').textContent=kfmt(b)+' kWh';root.querySelector('#kwd').textContent=kfmt(a-b)+' kWh';
+}
+Deck.scene('kwh',{steps:1,build(root){setKwh(root,5,1);}});
+
+/* 효율 등급 라벨(모형) */
+function elabel(name,g,kwh){
+  return `<div class="eh">${name} · 모형</div><div class="eg"><b style="color:${GRADE_C[g-1]}">${g}</b><span>등급</span></div><div class="ebars">${GRADE_C.map((c,i)=>`<i class="${i===g-1?'on':''}" style="width:${150+i*34}px;background:${c}"></i>`).join('')}</div><div class="em">월간 소비 전력량<b>${kwh} kWh</b></div>`;
+}
+Deck.scene('label',{steps:3,
+  build(root){
+    root.querySelector('#grades').innerHTML=GRADE_C.map((c,i)=>`<div class="grade-row"><b>${i+1}</b><i style="width:${240+i*80}px;background:${c};opacity:${i===0?1:.55}"></i>${i===0?'<span class="t-cap mute" style="white-space:nowrap">효율 높음</span>':i===4?'<span class="t-cap mute" style="white-space:nowrap">효율 낮음</span>':''}</div>`).join('');
+    root.querySelector('#lbA').innerHTML=elabel('냉장고 A',1,25);
+    root.querySelector('#lbB').innerHTML=elabel('냉장고 B',4,40);
+  }
+});
+
+/* 2부 표지: 해 · 태양광 패널 · 풍력 발전기 */
+Deck.scene('part2',{steps:0,
+  build(root){
+    let h='';
+    const sx=960,sy=330;
+    for(let i=0;i<12;i++){const a=i*Math.PI/6;h+=line(f1(sx+Math.cos(a)*140),f1(sy+Math.sin(a)*140),f1(sx+Math.cos(a)*200),f1(sy+Math.sin(a)*200),'var(--light)',8,'stroke-linecap="round"');}
+    h+=`<circle cx="${sx}" cy="${sy}" r="110" fill="var(--light)" fill-opacity=".9"/>`;
+    h+=`<g transform="translate(420 470)"><path d="M0 120 L60 0 H330 L270 120 Z" fill="var(--elec)" fill-opacity=".25" stroke="var(--elec)" stroke-width="4"/>`;
+    for(let i=1;i<4;i++)h+=line(f1(60*(1-i/4)),f1(120*i/4),f1(330-60*i/4),f1(120*i/4),'var(--elec)',2,'opacity=".7"');
+    for(let i=1;i<5;i++)h+=line(f1(60+54*i),0,f1(54*i),120,'var(--elec)',2,'opacity=".7"');
+    h+=line(160,120,160,180,'var(--t2)',6)+line(110,180,210,180,'var(--t2)',6)+`</g>`;
+    h+=line(1440,300,1440,640,'var(--t2)',8,'stroke-linecap="round"');
+    h+=`<g id="p2-blades" transform="translate(1440 300)">${[0,120,240].map(r=>`<path transform="rotate(${r})" d="M0 0 L-12 -22 L-4 -180 L4 -180 L12 -22 Z" fill="var(--kin)" fill-opacity=".9"/>`).join('')}<circle r="16" fill="var(--t2)"/></g>`;
+    root.querySelector('#p2-hero').innerHTML=h;
+  },
+  enter(c){if(c.still||c.reduced)return;const b=c.$('#p2-blades');c.loop(t=>b.setAttribute('transform',`translate(1440 300) rotate(${(t*45).toFixed(1)})`));}
+});
+
+/* 태양 전지 */
+const SOL_X=[280,410,540,670,800];
+function solParticle(kind,x,y){
+  return kind==='e'?`<g class="sol-e" transform="translate(${x} ${y})"><circle r="18" fill="var(--elec)"/><text text-anchor="middle" dominant-baseline="central" font-size="30" font-weight="700" fill="#fff">−</text></g>`
+    :`<g class="sol-h" transform="translate(${x} ${y})"><circle r="18" fill="none" stroke="var(--chem)" stroke-width="3.5"/><text text-anchor="middle" dominant-baseline="central" font-size="28" font-weight="700" fill="var(--chem)">+</text></g>`;
+}
+Deck.scene('solar',{steps:3,
+  build(root){
+    let h='';
+    h+=`<circle cx="190" cy="300" r="44" fill="var(--light)"/>`;
+    for(let i=0;i<5;i++){const x=320+i*150;h+=`<path d="M${x-50} 300 L${x} 392" stroke="var(--light)" stroke-width="6" stroke-linecap="round"/><path d="M${x-14} 378 L${x} 394 L${x+4} 372" fill="none" stroke="var(--light)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>`;}
+    h+=`<rect x="200" y="402" width="800" height="16" fill="var(--t3)"/>`;
+    h+=`<rect x="200" y="418" width="800" height="122" fill="var(--elec)" fill-opacity=".14"/>`;
+    h+=`<rect x="200" y="540" width="800" height="220" fill="var(--chem)" fill-opacity=".10"/>`;
+    h+=line(200,540,1000,540,'var(--t2)',2,'stroke-dasharray="8 8"');
+    h+=`<rect x="200" y="760" width="800" height="16" fill="var(--t3)"/>`;
+    h+=txt(980,450,'n형 반도체',30,'var(--elec)','end','font-weight="600"')+txt(980,745,'p형 반도체',30,'var(--chem)','end','font-weight="600"');
+    h+=`<g data-step="1" data-fx="fade" id="sol-pairs">${SOL_X.map(x=>solParticle('e',x-22,540)+solParticle('h',x+22,540)).join('')}</g>`;
+    h+=`<path id="sol-wire" d="M1000 410 H1090 V768 H1000" fill="none" stroke="var(--t2)" stroke-width="5" opacity="0"/>`;
+    h+=`<g id="sol-bulb" opacity="0"><circle cx="1090" cy="590" r="34" fill="var(--light)" fill-opacity=".35" stroke="var(--t2)" stroke-width="4"/>${txt(1090,600,'전구',22,'currentColor')}</g>`;
+    h+=`<g id="sol-flow" opacity="0">${[0,1,2,3,4].map(i=>`<circle class="sol-d" r="9" fill="var(--elec)"/>`).join('')}</g>`;
+    h+=`<g id="sol-flowlab" opacity="0">${txt(1010,392,'전자 →',24,'var(--elec)','start')}</g>`;
+    root.querySelector('#sol-g').innerHTML=h;
+  },
+  async go(c,k){
+    if(k===2){
+      const es=c.$$('.sol-e'),hs=c.$$('.sol-h');
+      await c.tween(1400,p=>{es.forEach((e,i)=>e.setAttribute('transform',`translate(${SOL_X[i]-22} ${f1(540-(540-470)*p)})`));hs.forEach((e,i)=>e.setAttribute('transform',`translate(${SOL_X[i]+22} ${f1(540+(690-540)*p)})`));},{ease:'inOut'});
+    }
+    if(k===3){
+      const es=c.$$('.sol-e'),hs=c.$$('.sol-h');
+      es.forEach((e,i)=>e.setAttribute('transform',`translate(${SOL_X[i]-22} 470)`));hs.forEach((e,i)=>e.setAttribute('transform',`translate(${SOL_X[i]+22} 690)`));
+      ['#sol-wire','#sol-bulb','#sol-flow','#sol-flowlab'].forEach(s=>c.a(s,[{opacity:0},{opacity:1}],{dur:600}));
+      const wire=c.$('#sol-wire'),L=wire.getTotalLength(),ds=c.$$('.sol-d');
+      const place=t=>ds.forEach((d,i)=>{const pt=wire.getPointAtLength(((t*150+i*L/5)%L));d.setAttribute('cx',f1(pt.x));d.setAttribute('cy',f1(pt.y));});
+      place(0);
+      if(!c.still&&!c.reduced)c.loop(t=>place(t));
+    }
+  }
+});
+
+/* 태양광 패널 조작 */
+function setPV(root,o={}){
+  const slot=root.querySelector('#pv-flow');if(!slot)return;
+  const G=o.G??+(slot.dataset.g??1000),eff=Math.round(o.eff??+(slot.dataset.eff||20)),A=Math.round(o.A??+(slot.dataset.a||10));
+  slot.dataset.g=G;slot.dataset.eff=eff;slot.dataset.a=A;
+  const inW=G*A,outW=inW*eff/100;
+  slot.innerHTML=txt(880,330,'띠 굵기 ∝ 들어오는 빛의 전력',24,'var(--t2)','end')+txt(120,330,G===1000?'맑은 한낮 · 1000 W/m²':G===0?'밤 · 0 W/m²':'흐린 날 · '+G+' W/m²',34,'currentColor','start','font-weight="600"')+
+    (inW>0?sankey('pvS',{x:120,y:400,w:760,H:380*inW/30000,inp:{e:'light',v:inW},inLabel:'햇빛 '+kfmt(inW)+' W',parts:[{e:'elec',v:outW,name:'전기'},{e:'heat',v:inW-outW,name:'열·반사'}],unit:' W',gap:34,shown:true})
+      :txt(500,580,'햇빛이 없으면 발전량은 0 W',44,'var(--t2)','middle','font-weight="600"'));
+  root.querySelector('#peff').value=eff;root.querySelector('#parea').value=A;
+  root.querySelector('#pvEffOut').textContent=eff+' %';root.querySelector('#pvAreaOut').textContent=A+' m²';
+  root.querySelector('#pvIn').textContent=kfmt(inW)+' W';root.querySelector('#pvOut').textContent=kfmt(outW)+' W';
+  root.querySelectorAll('[data-sun]').forEach(b=>b.classList.toggle('on',+b.dataset.sun===G));
+}
+Deck.scene('solarlab',{steps:0,build(root){setPV(root,{G:1000,eff:20,A:10});}});
+
+/* 수소 연료 전지 */
+Deck.scene('hydrogen',{steps:4,
+  build(root){
+    let h='';
+    h+=`<rect x="200" y="420" width="240" height="380" rx="14" fill="var(--chem)" fill-opacity=".14" stroke="var(--chem)" stroke-width="3"/>`;
+    h+=`<rect x="520" y="420" width="120" height="380" rx="10" fill="var(--t3)" fill-opacity=".35"/>`;
+    h+=`<rect x="720" y="420" width="240" height="380" rx="14" fill="var(--elec)" fill-opacity=".12" stroke="var(--elec)" stroke-width="3"/>`;
+    h+=txt(320,470,'(−)극',30,'var(--chem)','middle','font-weight="600"')+txt(580,470,'전해질',26,'var(--t2)')+txt(840,470,'(+)극',30,'var(--elec)','middle','font-weight="600"');
+    h+=arrowH(110,250,530,22,'var(--chem)')+txt(100,500,'H₂',36,'var(--chem)','start','font-weight="700"');
+    h+=`<path d="M1070 530 H910" stroke="var(--elec)" stroke-width="22" fill="none" opacity=".85"/><path d="M936 504 L900 530 L936 556 Z" fill="var(--elec)" opacity=".85"/>`+txt(1070,500,'O₂',36,'var(--elec)','end','font-weight="700"');
+    h+=arrowV(880,800,890,22,'var(--elec)')+txt(910,880,'H₂O',34,'currentColor','start','font-weight="700"');
+    for(const y of [600,690]){h+=`<path d="M470 ${y} H676" stroke="var(--t2)" stroke-width="4"/><path d="M664 ${y-10} L682 ${y} L664 ${y+10}" fill="none" stroke="var(--t2)" stroke-width="4"/>`+txt(580,y-14,'H⁺',28,'currentColor','middle','font-weight="600"');}
+    h+=`<path d="M320 420 V310 H840 V420" fill="none" stroke="var(--t2)" stroke-width="5"/>`;
+    h+=`<circle cx="580" cy="310" r="30" fill="var(--light)" fill-opacity=".4" stroke="var(--t2)" stroke-width="4"/>`;
+    h+=txt(440,292,'e⁻ →',30,'var(--elec)','middle','font-weight="600"')+txt(720,292,'e⁻ →',30,'var(--elec)','middle','font-weight="600"');
+    root.querySelector('#fc-g').innerHTML=`<g data-in="200" data-fx="fade">${h}</g>`;
+  }
+});
+
+/* 하루 발전량과 수요 */
+const solarCurve=h=>(h>6&&h<18)?.92*Math.pow(Math.sin(Math.PI*(h-6)/12),1.5):0;
+const demandCurve=h=>.40+.14*Math.exp(-(((h-10)/3)**2))+.30*Math.exp(-(((h-19.5)/2.4)**2))+.06*Math.exp(-(((h-14)/2)**2));
+Deck.scene('storage',{steps:4,
+  build(root){
+    const X=hh=>160+hh*38,Y=v=>840-v*480;let h='';
+    for(const v of [0,.25,.5,.75,1])h+=line(X(0),f1(Y(v)),X(24),f1(Y(v)),'var(--hl)',1);
+    for(const t of [0,6,12,18,24])h+=txt(X(t),884,t+'시',26);
+    h+=line(X(0),Y(0),X(24),Y(0),'var(--t2)',2.5)+txt(X(0),330,'발전량·수요 (상대값)',26,'var(--t2)','start');
+    const pts=(f,a=0,b=24)=>{const r=[];for(let t=a;t<=b+1e-9;t+=.25)r.push([X(t),Y(f(t))]);return r;};
+    const pd=p=>'M'+p.map(q=>f1(q[0])+' '+f1(q[1])).join(' L');
+    /* 남는 구간·부족한 구간 */
+    const roots=[];let prev=solarCurve(0)-demandCurve(0);
+    for(let t=.05;t<=24;t+=.05){const d=solarCurve(t)-demandCurve(t);if(Math.sign(d)!==Math.sign(prev))roots.push(t);prev=d;}
+    const a=roots[0],b=roots[1];
+    const surplus=pd(pts(solarCurve,a,b))+' L'+pts(demandCurve,a,b).reverse().map(q=>f1(q[0])+' '+f1(q[1])).join(' L')+' Z';
+    const deficit=pd(pts(demandCurve,b,24))+' L'+pts(solarCurve,b,24).reverse().map(q=>f1(q[0])+' '+f1(q[1])).join(' L')+' Z';
+    h+=`<g data-step="3" data-fx="fade"><path d="${surplus}" fill="var(--kin)" fill-opacity=".28"/><path d="${deficit}" fill="var(--heat)" fill-opacity=".25"/>${txt(X(12),Y(.66),'남는 전기',30,'var(--kin)','middle','font-weight="600"')}${txt(X(20.4),Y(.30),'부족한 전기',30,'var(--heat)','middle','font-weight="600"')}</g>`;
+    h+=`<g data-step="1" data-fx="draw"><path d="${pd(pts(solarCurve))}" fill="none" stroke="var(--light)" stroke-width="7" stroke-linejoin="round"/></g>`;
+    h+=`<g data-step="1" data-fx="fade" data-delay="900">${txt(X(12),Y(.92)-22,'태양광 발전량',30,'var(--light)','middle','font-weight="600"')}</g>`;
+    h+=`<g data-step="2" data-fx="draw"><path d="${pd(pts(demandCurve))}" fill="none" stroke="var(--elec)" stroke-width="6" stroke-dasharray="1 0" stroke-linejoin="round"/></g>`;
+    h+=`<g data-step="2" data-fx="fade" data-delay="900">${txt(X(19.5),Y(demandCurve(19.5))-22,'전력 수요',30,'var(--elec)','middle','font-weight="600"')}</g>`;
+    root.querySelector('#st-g').innerHTML=h;
+  }
+});
+
+document.addEventListener('input',e=>{const root=e.target.closest('.slide');if(!root)return;
+  if(e.target.id==='hours')setKwh(root,+e.target.value,null);
+  if(e.target.id==='bulbs')setKwh(root,null,+e.target.value);
+  if(e.target.id==='peff')setPV(root,{eff:+e.target.value});
+  if(e.target.id==='parea')setPV(root,{A:+e.target.value});});
+document.addEventListener('click',e=>{const b=e.target.closest('button[data-sun]');if(!b)return;const root=b.closest('.slide');if(root)setPV(root,{G:+b.dataset.sun});});
+window.lesson={setLab,DEV,sankey,setKwh,setPV,solarCurve,demandCurve};
+
+/* ═════════ 효과음 붙이기 ═════════
+   · 빈칸 답(띠링)·pop/up 등장(톡)·장 넘김·단계·숫자 굴리기는 엔진이 저절로 소리를 낸다
+   · 여기서는 장면마다 어울리는 소리를 단계(k)에 맞춰 더한다. c.sfx 는 되돌리기·순간 재생 때 조용하다 */
+function withSfx(id,o){
+  let d=__D[id];if(!d){d={};Deck.scene(id,d);}
+  const e0=d.enter,g0=d.go;
+  if(o.enter)d.enter=c=>{o.enter(c);return e0?e0(c):undefined;};
+  if(o.go)d.go=(c,k)=>{o.go(c,k);return g0?g0(c,k):undefined;};
+}
+const at=(map)=>(c,k)=>{const f=map[k];if(f)f(c);};
+const dings=(c,k)=>c.sfx('ding',0,1+k*.06);
+
+withSfx('cover',{enter:c=>c.sfx('whoosh',300,2200,.6)});
+withSfx('question',{go:at({1:c=>c.sfx('ding'),2:c=>c.sfx('sizzle',0,1200)})});
+withSfx('convert',{go:at({1:c=>{c.sfx('pop');c.sfx('pop',200);},2:c=>{c.sfx('pop');c.sfx('pop',200);c.sfx('pop',400);},3:c=>{c.sfx('pop');c.sfx('pop',200);}})});
+withSfx('conserve',{go:at({2:c=>c.sfx('zip',300,600)})});
+withSfx('spread',{go:at({1:c=>{c.sfx('puff');c.sfx('whoosh',100,2200,.5);}})});
+withSfx('define',{go:at({3:c=>c.sfx('ding')})});
+withSfx('flowread',{go:at({1:c=>c.sfx('zip',0,1400),2:c=>c.sfx('ding'),3:c=>{c.sfx('zip',0,1400);c.sfx('ding',1300,1.12);}})});
+withSfx('power',{go:at({2:c=>{if(c.instant||c.still)return;const h=c.sfxLoop('boil');if(h){h.level(.7);c.timer(()=>h.stop(),2400);}},4:c=>c.sfx('puff')})});
+withSfx('example',{enter:c=>{c.sfx('lever',400);c.sfx('rise',450,1700);c.sfx('ding',2300);}});
+withSfx('samelight',{go:at({1:c=>c.sfx('zip',0,1500),2:c=>c.sfx('zip',0,700)})});
+withSfx('limit',{go:at({2:c=>c.sfx('thunk'),3:c=>c.sfx('ding')})});
+withSfx('engine',{go:at({1:c=>c.sfx('puff'),2:c=>{c.sfx('kick',0,true);c.sfx('puff',300);}})});
+withSfx('engineflow',{go:at({1:c=>c.sfx('whoosh',0,1600,.6),2:c=>c.sfx('ding')})});
+withSfx('plants',{go:at({1:c=>{c.sfx('pop');c.sfx('pop',180);c.sfx('pop',360);},2:c=>{c.sfx('pop');c.sfx('pop',180);c.sfx('pop',360);},3:c=>c.sfx('chime')})});
+withSfx('label',{go:at({2:c=>{c.sfx('flip');c.sfx('flip',250);},3:c=>c.sfx('ding')})});
+withSfx('reuse',{go:at({1:c=>c.sfx('pop'),2:c=>c.sfx('pop'),3:c=>c.sfx('pop')})});
+withSfx('life',{go:at({1:c=>c.sfx('pop'),2:c=>c.sfx('pop'),3:c=>c.sfx('chime')})});
+withSfx('carbon',{go:at({2:c=>c.sfx('puff'),3:c=>c.sfx('chime')})});
+withSfx('check',{go:dings});
+withSfx('part2',{enter:c=>{c.sfx('whoosh',100,1200,.5);c.sfx('chime',600);}});
+withSfx('fossil',{go:at({1:c=>c.sfx('thunk'),2:c=>c.sfx('puff'),3:c=>c.sfx('puff'),4:c=>c.sfx('ding')})});
+withSfx('renewdef',{go:at({2:c=>{for(let i=0;i<7;i++)c.sfx('pop',i*70);},3:c=>{c.sfx('pop');c.sfx('pop',150);}})});
+withSfx('origin',{go:at({1:c=>c.sfx('pop'),2:c=>c.sfx('pop'),3:c=>c.sfx('pop')})});
+withSfx('solar',{go:at({1:c=>c.sfx('spark'),2:c=>c.sfx('scan',0,1400),3:c=>c.sfx('ledOn')})});
+withSfx('turbine',{go:at({1:c=>c.sfx('whoosh',0,900,.7),2:c=>c.sfx('whoosh',0,900,.7),3:c=>c.sfx('whoosh',0,900,.7)})});
+withSfx('hydrogen',{go:at({1:c=>c.sfx('pop'),2:c=>c.sfx('zap',0,1200),4:c=>c.sfx('puff')})});
+withSfx('proscons',{go:at({1:c=>c.sfx('pop'),2:c=>c.sfx('pop')})});
+withSfx('storage',{go:at({1:c=>c.sfx('rise',0,1200),2:c=>c.sfx('scan',0,1200),3:c=>c.sfx('chime'),4:c=>c.sfx('pop')})});
+withSfx('check2',{go:dings});
+withSfx('summary',{go:at({1:c=>c.sfx('pop'),2:c=>c.sfx('pop'),3:c=>c.sfx('pop'),4:c=>c.sfx('chime')})});
+
+/* 직접 조작 장: 단추·슬라이더 소리 */
+const uiSfx=(n,a,b)=>{if(window.SFX&&!Deck.STILL)SFX.play(n,a,b);};
+document.addEventListener('input',e=>{if(e.target.matches&&e.target.matches('.lab-controls input[type=range]'))uiSfx('tick',1+(+e.target.value-+e.target.min)/(+e.target.max-+e.target.min||1)*.6);});
+document.addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  if(b.hasAttribute('data-dev'))uiSfx('clock');
+  if(b.hasAttribute('data-sun')){const g=+b.dataset.sun;uiSfx(g===1000?'ledOn':'sweepDown',g===1000?undefined:700);}
+});
+</script></body></html>

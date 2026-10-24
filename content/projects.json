@@ -539,6 +539,27 @@
           }
         ],
         "subject": "chemistry"
+      },
+      {
+        "kind": "lesson",
+        "title": "에너지 효율과 신재생 에너지",
+        "date": "2026-10-24",
+        "poster": "power",
+        "words": "에너지 효율과\n신재생 에너지",
+        "tag": "에너지 · 수업 슬라이드",
+        "level": "고등학교 통합과학2",
+        "desc": "에너지 보존과 효율 계산, 열기관과 발전에서 시작해 태양광·풍력·수소 연료 전지와 에너지 저장까지 살펴보는 34장 수업 슬라이드. 단계별 애니메이션, 확인 문제와 교사용 수업 메모가 있습니다.",
+        "links": [
+          {
+            "label": "슬라이드 열기",
+            "url": "/lectures/energy-efficiency.html"
+          },
+          {
+            "label": "학생용 화면",
+            "url": "/lectures/energy-efficiency.html?s=1"
+          }
+        ],
+        "subject": "physics"
       }
     ]
   },
