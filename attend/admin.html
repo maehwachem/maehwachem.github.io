@@ -152,6 +152,7 @@
     <div class="grid2">
       <div class="card">
         <h2>출석 시간</h2>
+        <div class="field"><label>화면에 표시할 이름 (비워도 됨)</label><input id="sSchool" maxlength="40" placeholder="예: OO고 3학년, 자습실"></div>
         <div class="field"><label>출석 접수 시작</label><input type="time" id="sOpen"></div>
         <div class="field"><label>출석 마감 (이후는 지각)</label><input type="time" id="sDeadline"></div>
         <div class="field"><label>출석 접수 종료</label><input type="time" id="sClose"></div>
@@ -219,7 +220,7 @@ const STATUS = { present:['출석','t-present'], late:['지각','t-late'], excus
 function toast(m) { const t = $('toast'); t.textContent = m; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), 2600); }
 function newCode() { const a = new Uint32Array(1); crypto.getRandomValues(a); return String(a[0] % 1000000).padStart(6, '0'); }
 
-let students = [], attendance = {}, refreshTimer = null;
+let students = [], attendance = {}, refreshTimer = null, schoolName = '';
 
 // ---------- 로그인 ----------
 async function enterApp() {
@@ -410,12 +411,14 @@ $('rosterBody').addEventListener('click', async e => {
   if (error) { toast('실패: ' + error.message); return; }
   toast('처리했어요'); await loadStudents(); renderRoster();
 });
-$('btnPrint').onclick = () => {
+$('btnPrint').onclick = async () => {
+  const { data: cfg } = await sb.from('settings').select('school_name').eq('id', 1).single();
+  schoolName = cfg?.school_name || '';
   const list = filterStudents($('rClass').value, $('rSearch').value);
   if (!list.length) { toast('인쇄할 학생이 없어요'); return; }
   const url = nfcUrl();
   $('printArea').innerHTML = list.map(s => `<div class="slip">
-    <div>${esc(CFG.SCHOOL_NAME || '')} NFC 출석 등록 안내</div>
+    <div>${esc(schoolName ? schoolName + ' ' : '')}NFC 출석 등록 안내</div>
     <div style="margin-top:6px"><b>${esc(seat(s))} ${esc(s.name)}</b> (학번 ${esc(s.student_id)})</div>
     <div class="code">${esc(s.reg_code)}</div>
     <div>① 본인 휴대폰을 책상의 NFC 스티커에 대세요.<br>② 학번·이름·위 등록코드를 입력하면 끝!<br>③ 다음부터는 대기만 하면 출석됩니다.</div>
@@ -430,6 +433,7 @@ async function loadSettings() {
   const { data, error } = await sb.from('settings').select('*').eq('id', 1).single();
   if (error) { toast('설정을 불러오지 못했어요'); return; }
   $('sOpen').value = data.open_time.slice(0, 5); $('sDeadline').value = data.deadline.slice(0, 5); $('sClose').value = data.close_time.slice(0, 5);
+  schoolName = data.school_name || ''; $('sSchool').value = schoolName;
   $('sSelf').checked = data.allow_self_signup; $('sSignupCode').value = data.signup_code ?? '';
   $('sGeo').checked = data.geo_required; $('sLat').value = data.school_lat ?? ''; $('sLng').value = data.school_lng ?? ''; $('sRadius').value = data.radius_m;
   const { data: t } = await sb.from('teachers').select('email');
@@ -443,9 +447,10 @@ $('btnSaveSettings').onclick = async () => {
   if (!($('sOpen').value < $('sDeadline').value && $('sDeadline').value < $('sClose').value)) { toast('시작 < 마감 < 종료 순서인지 확인해 주세요'); return; }
   const { error } = await sb.from('settings').update({
     open_time:$('sOpen').value, deadline:$('sDeadline').value, close_time:$('sClose').value,
-    allow_self_signup:$('sSelf').checked, signup_code:signupCode || null,
+    school_name:$('sSchool').value.trim(), allow_self_signup:$('sSelf').checked, signup_code:signupCode || null,
     geo_required:$('sGeo').checked, school_lat:isNaN(lat) ? null : lat, school_lng:isNaN(lng) ? null : lng,
     radius_m:parseInt($('sRadius').value) || 300, updated_at:new Date().toISOString() }).eq('id', 1);
+  if (!error) schoolName = $('sSchool').value.trim();
   toast(error ? '저장 실패: ' + error.message : '설정을 저장했어요');
 };
 $('btnGenSignup').onclick = () => { $('sSignupCode').value = newCode(); toast('코드를 만들었어요. 설정 저장을 눌러 주세요'); };
