@@ -285,6 +285,23 @@
       },
       {
         "kind": "tool",
+        "title": "NFC 출석",
+        "date": "2026-10-24",
+        "poster": "note",
+        "words": "NFC\n출석",
+        "tag": "학급 운영 · 출석 확인",
+        "level": "고등학교 학생",
+        "desc": "책상의 NFC 스티커에 휴대폰을 대면 출석이 기록되는 도구. 처음 한 번만 선생님께 받은 등록코드로 본인 휴대폰을 등록하면, 다음부터는 대기만 해도 출석·지각이 바로 표시됩니다. 출석 명단에 등록된 학생만 사용할 수 있습니다.",
+        "links": [
+          {
+            "label": "출석하기",
+            "url": "/attend/index.html"
+          }
+        ],
+        "subject": "tools"
+      },
+      {
+        "kind": "tool",
         "title": "마이크로비트 센서 기록기",
         "poster": "sensor",
         "words": "마이크로비트\n센서 기록기",
