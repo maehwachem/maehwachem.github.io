@@ -4,48 +4,50 @@
   "groups": {
     "lab": [
       {
-        "kind": "lab",
         "title": "첫 실험 교실",
+        "move_to": "lab",
+        "subject": "tools",
         "date": "2026-10-13",
-        "poster": "glass",
-        "words": "첫 실험\n교실",
+        "desc": "실험도구 31가지의 이름과 쓰임, 사용 순서를 그림과 동작 모션으로 익히고, 저울·피펫 조작과 실험 준비 과정을 화면에서 연습합니다.",
         "tag": "실험 기초 · 실험도구",
         "level": "중학교 과학, 고등학교 과학탐구실험",
-        "desc": "실험도구 31가지의 이름과 쓰임, 사용 순서를 그림과 동작 모션으로 익히고, 저울·피펫 조작과 실험 준비 과정을 화면에서 연습합니다.",
-        "cover": "assets/uploads/cover-series-1-v3.webp",
+        "cover": "/assets/uploads/cover-series-1-v3.webp",
+        "poster": "glass",
+        "words": "첫 실험\n교실",
         "links": [
           {
             "label": "실험 열기",
             "url": "https://maehwachem.github.io/science-tools/lab-tools/"
           }
-        ],
-        "subject": "tools"
+        ]
       },
       {
-        "kind": "lab",
         "title": "산화·환원 가상 실험실",
-        "poster": "lab",
-        "words": "산화·환원\n가상 실험실",
+        "move_to": "lab",
+        "subject": "chemistry",
+        "desc": "금속의 반응성, 산화 환원 적정, 화학 전지, 전기분해, 연료 전지를 화면 속 회로판 하나로 실험합니다. 연습·평가 모드와 교사 화면이 있습니다.",
         "tag": "산화와 환원 · 전기화학",
         "level": "고등학교 통합과학, 화학",
-        "desc": "금속의 반응성, 산화 환원 적정, 화학 전지, 전기분해, 연료 전지를 화면 속 회로판 하나로 실험합니다. 연습·평가 모드와 교사 화면이 있습니다.",
-        "cover": "assets/uploads/cover-series-2-v3.webp",
+        "cover": "/assets/uploads/cover-series-2-v3.webp",
+        "poster": "lab",
+        "words": "산화·환원\n가상 실험실",
         "links": [
           {
             "label": "실험 열기",
             "url": "https://maehwachem.github.io/science-tools/redox/"
           }
-        ],
-        "subject": "chemistry"
+        ]
       },
       {
-        "kind": "lab",
         "title": "배터리 가상 시험동",
-        "poster": "battery",
-        "words": "배터리\n가상 시험동",
+        "move_to": "lab",
+        "subject": "chemistry",
+        "desc": "화면 속 실험대에서 거름종이, 전극판, 집게와 다이얼을 조작하며 측정 절차를 익힙니다. 연습·평가 모드와 조별·개별 참여, 서술 답안에 클릭으로 주는 교사 피드백, 중간 저장과 이어 하기가 있습니다.",
         "tag": "전기화학 · 배터리",
         "level": "고등학교 통합과학, 화학",
-        "desc": "화면 속 실험대에서 거름종이, 전극판, 집게와 다이얼을 조작하며 측정 절차를 익힙니다. 연습·평가 모드와 조별·개별 참여, 서술 답안에 클릭으로 주는 교사 피드백, 중간 저장과 이어 하기가 있습니다.",
+        "cover": "/assets/uploads/cover-series-3-v3.webp",
+        "poster": "battery",
+        "words": "배터리\n가상 시험동",
         "links": [
           {
             "label": "수업방 열기",
@@ -55,123 +57,123 @@
             "label": "실험 열기",
             "url": "https://maehwachem.github.io/science-tools/battery/virtual.html"
           }
-        ],
-        "cover": "assets/uploads/cover-series-3-v3.webp",
-        "subject": "chemistry"
+        ]
       },
       {
-        "kind": "lab",
         "title": "산·염기 가상 실험실",
-        "poster": "acid",
-        "words": "산·염기\n가상 실험실",
+        "move_to": "lab",
+        "subject": "chemistry",
+        "desc": "중학교는 지시약으로 시료의 액성을 가리고 중화 반응의 변화를 재며, 고등학교는 뷰렛으로 중화 적정해 산의 몰 농도를 구합니다. 학생 화면은 다섯 가지 언어로 볼 수 있습니다. 연습·평가 모드와 교사 화면이 있습니다.",
         "tag": "산과 염기 · 중화 적정",
         "level": "중학교 과학, 고등학교 화학",
-        "desc": "중학교는 지시약으로 시료의 액성을 가리고 중화 반응의 변화를 재며, 고등학교는 뷰렛으로 중화 적정해 산의 몰 농도를 구합니다. 학생 화면은 다섯 가지 언어로 볼 수 있습니다. 연습·평가 모드와 교사 화면이 있습니다.",
-        "cover": "assets/uploads/cover-series-4-v3.webp",
+        "cover": "/assets/uploads/cover-series-4-v3.webp",
+        "poster": "acid",
+        "words": "산·염기\n가상 실험실",
         "links": [
           {
             "label": "실험 열기",
             "url": "https://maehwachem.github.io/science-tools/acid-base/virtual.html"
           }
-        ],
-        "subject": "chemistry"
+        ]
       },
       {
-        "kind": "lab",
         "title": "기체 가상 실험실",
-        "poster": "gas",
-        "words": "기체\n가상 실험실",
+        "move_to": "lab",
+        "subject": "chemistry",
+        "desc": "보일 법칙과 샤를 법칙을 주사기·압력 센서·물중탕으로 재고, 수상 치환으로 모은 뷰테인과 수소로 분자량과 몰 부피를 구합니다. 연습·평가 모드와 교사 화면이 있습니다.",
         "tag": "기체 · 기체 법칙",
         "level": "고등학교 물질과 에너지",
-        "desc": "보일 법칙과 샤를 법칙을 주사기·압력 센서·물중탕으로 재고, 수상 치환으로 모은 뷰테인과 수소로 분자량과 몰 부피를 구합니다. 연습·평가 모드와 교사 화면이 있습니다.",
-        "cover": "assets/uploads/cover-series-5-v3.webp",
+        "cover": "/assets/uploads/cover-series-5-v3.webp",
+        "poster": "gas",
+        "words": "기체\n가상 실험실",
         "links": [
           {
             "label": "실험 열기",
             "url": "https://maehwachem.github.io/science-tools/gas/"
           }
-        ],
-        "subject": "chemistry"
+        ]
       },
       {
-        "kind": "lab",
         "title": "열화학 가상 실험실",
-        "poster": "heat",
-        "words": "열화학\n가상 실험실",
+        "move_to": "lab",
+        "subject": "chemistry",
+        "desc": "스타이로폼 컵 열량계로 용해 엔탈피와 중화 엔탈피를 재고, 세 반응의 ΔH로 헤스 법칙을 확인합니다. 연습·평가 모드와 교사 화면이 있습니다.",
         "tag": "열화학 · 반응 엔탈피",
         "level": "고등학교 물질과 에너지",
-        "desc": "스타이로폼 컵 열량계로 용해 엔탈피와 중화 엔탈피를 재고, 세 반응의 ΔH로 헤스 법칙을 확인합니다. 연습·평가 모드와 교사 화면이 있습니다.",
-        "cover": "assets/uploads/cover-series-6-v3.webp",
+        "cover": "/assets/uploads/cover-series-6-v3.webp",
+        "poster": "heat",
+        "words": "열화학\n가상 실험실",
         "links": [
           {
             "label": "실험 열기",
             "url": "https://maehwachem.github.io/science-tools/thermochem/"
           }
-        ],
-        "subject": "chemistry"
+        ]
       },
       {
-        "kind": "lab",
         "title": "반응 속도 가상 실험실",
-        "poster": "rate",
-        "words": "반응 속도\n가상 실험실",
+        "move_to": "lab",
+        "subject": "chemistry",
+        "desc": "기체 발생, 질량 감소, 앙금 생성 실험으로 농도·온도·촉매·표면적이 반응 속도에 주는 영향을 비교합니다. 연습·평가 모드와 교사 화면이 있습니다.",
         "tag": "반응 속도 · 촉매",
         "level": "고등학교 화학 반응의 세계",
-        "desc": "기체 발생, 질량 감소, 앙금 생성 실험으로 농도·온도·촉매·표면적이 반응 속도에 주는 영향을 비교합니다. 연습·평가 모드와 교사 화면이 있습니다.",
-        "cover": "assets/uploads/cover-series-7-v3.webp",
+        "cover": "/assets/uploads/cover-series-7-v3.webp",
+        "poster": "rate",
+        "words": "반응 속도\n가상 실험실",
         "links": [
           {
             "label": "실험 열기",
             "url": "https://maehwachem.github.io/science-tools/kinetics/"
           }
-        ],
-        "subject": "chemistry"
+        ]
       },
       {
-        "kind": "lab",
         "title": "화학 평형 가상 실험실",
-        "poster": "equil",
-        "words": "화학 평형\n가상 실험실",
+        "move_to": "lab",
+        "subject": "chemistry",
+        "desc": "흡광도 검량선으로 평형 상수를 구하고, 코발트 착이온과 NO₂ 주사기로 온도와 압력에 따른 평형 이동을 잽니다. 연습·평가 모드와 교사 화면이 있습니다.",
         "tag": "화학 평형 · 평형 이동",
         "level": "고등학교 화학 반응의 세계",
-        "desc": "흡광도 검량선으로 평형 상수를 구하고, 코발트 착이온과 NO₂ 주사기로 온도와 압력에 따른 평형 이동을 잽니다. 연습·평가 모드와 교사 화면이 있습니다.",
-        "cover": "assets/uploads/lab-equilibrium-illustrated.webp",
+        "cover": "/assets/uploads/lab-equilibrium-illustrated.webp",
+        "poster": "equil",
+        "words": "화학 평형\n가상 실험실",
         "links": [
           {
             "label": "실험 열기",
             "url": "https://maehwachem.github.io/science-tools/equilibrium/"
           }
-        ],
-        "subject": "chemistry"
+        ]
       },
       {
-        "kind": "lab",
         "title": "전자기 유도 가상 실험실",
+        "move_to": "lab",
+        "subject": "physics",
         "date": "2026-10-23",
-        "poster": "power",
-        "words": "전자기 유도\n가상 실험실",
+        "desc": "수업 중 교사가 화면에 띄워 시연하는 설명용 가상 실험실. 자석과 코일, 코일을 통과해 떨어지는 자석의 전류 그래프, 관 속 자석 낙하, 손발전기의 전압과 돌리는 힘을 실험하고 기록표와 그래프로 정리합니다. 학생 제출·평가 기능은 없습니다.",
         "tag": "전자기 유도 · 교사 설명용",
         "level": "고등학교 통합과학",
-        "desc": "수업 중 교사가 화면에 띄워 시연하는 설명용 가상 실험실. 자석과 코일, 코일을 통과해 떨어지는 자석의 전류 그래프, 관 속 자석 낙하, 손발전기의 전압과 돌리는 힘을 실험하고 기록표와 그래프로 정리합니다. 학생 제출·평가 기능은 없습니다.",
-        "cover": "assets/uploads/cover-series-22-v3.webp",
+        "cover": "/assets/uploads/cover-series-22-v3.webp",
+        "poster": "power",
+        "words": "전자기 유도\n가상 실험실",
         "links": [
           {
             "label": "실험 열기",
             "url": "https://maehwachem.github.io/science-tools/physics/virtual-lab.html"
           }
-        ],
-        "subject": "physics"
+        ]
       }
     ],
     "real": [
       {
-        "kind": "real",
         "title": "배터리 시험팀",
-        "poster": "battery",
-        "words": "배터리\n시험팀",
+        "move_to": "real",
+        "subject": "chemistry",
+        "desc": "라벨이 섞인 전극판을 전압으로 식별하고, 실험 기록을 근거로 판정해 성적서를 쓰는 조별 실험 수업. 결석생은 개별로 할 수 있고, 교사는 서술 답안에 클릭으로 피드백을 보냅니다.",
         "tag": "전기화학 · 조별 실험",
         "level": "고등학교 통합과학, 화학",
-        "desc": "라벨이 섞인 전극판을 전압으로 식별하고, 실험 기록을 근거로 판정해 성적서를 쓰는 조별 실험 수업. 결석생은 개별로 할 수 있고, 교사는 서술 답안에 클릭으로 피드백을 보냅니다.",
+        "cover": "/assets/uploads/cover-series-8-v3.webp",
+        "poster": "battery",
+        "words": "배터리\n시험팀",
         "links": [
           {
             "label": "수업방 열기",
@@ -181,38 +183,37 @@
             "label": "실험 열기",
             "url": "https://maehwachem.github.io/science-tools/battery/"
           }
-        ],
-        "cover": "assets/uploads/cover-series-8-v3.webp",
-        "subject": "chemistry"
+        ]
       },
       {
-        "kind": "real",
         "title": "환경 대응팀",
-        "poster": "acid",
-        "words": "환경\n대응팀",
+        "move_to": "real",
+        "subject": "chemistry",
+        "desc": "하천 오염 사고에 출동한 대응팀이 되어 시료 여섯 가지의 액성을 가리고, 산성·염기성 폐수를 섞어 중화 반응을 분석하는 조별 실험 수업.",
         "tag": "산과 염기 · 조별 실험",
         "level": "고등학교 통합과학, 화학",
-        "desc": "하천 오염 사고에 출동한 대응팀이 되어 시료 여섯 가지의 액성을 가리고, 산성·염기성 폐수를 섞어 중화 반응을 분석하는 조별 실험 수업.",
-        "cover": "assets/uploads/cover-series-9-v3.webp",
+        "cover": "/assets/uploads/cover-series-9-v3.webp",
+        "poster": "acid",
+        "words": "환경\n대응팀",
         "links": [
           {
             "label": "수업 열기",
             "url": "https://maehwachem.github.io/science-tools/acid-base/"
           }
-        ],
-        "subject": "chemistry"
+        ]
       }
     ],
     "game": [
       {
-        "kind": "game",
         "title": "화학자의 섬",
-        "poster": "island",
-        "words": "화학자의\n섬",
+        "move_to": "game",
+        "subject": "chemistry",
+        "desc": "무인도에서 재료를 모으고 장치를 만들며 다섯 장을 풀어 가는 화학 이야기 게임. 증류와 전기분해, 금속 제련, 산성비와 중화, 연소열, 화학 평형을 다룹니다.",
         "tag": "이야기 게임 · 탐험",
         "level": "고등학교 통합과학, 화학",
-        "desc": "무인도에서 재료를 모으고 장치를 만들며 다섯 장을 풀어 가는 화학 이야기 게임. 증류와 전기분해, 금속 제련, 산성비와 중화, 연소열, 화학 평형을 다룹니다.",
-        "cover": "assets/uploads/chemists-island-gameplay.webp",
+        "cover": "/assets/uploads/chemists-island-gameplay.webp",
+        "poster": "island",
+        "words": "화학자의\n섬",
         "links": [
           {
             "label": "게임 열기",
@@ -222,18 +223,18 @@
             "label": "교사용 매뉴얼",
             "url": "https://maehwachem.github.io/science-tools/chemists-island/manual.html"
           }
-        ],
-        "subject": "chemistry"
+        ]
       },
       {
-        "kind": "game",
         "title": "화학자의 항해",
-        "poster": "island",
-        "words": "화학자의\n항해",
+        "move_to": "game",
+        "subject": "chemistry",
+        "desc": "화학자의 섬 뒷이야기. 몰 농도와 희석, 어는점 내림, 삼투압으로 선원과 연구 기지를 구하는 세 장의 이야기 게임. 같은 조 최대 5명이 함께하는 모둠판도 있습니다.",
         "tag": "이야기 게임 · 모둠",
         "level": "고등학교 화학, 물질과 에너지",
-        "desc": "화학자의 섬 뒷이야기. 몰 농도와 희석, 어는점 내림, 삼투압으로 선원과 연구 기지를 구하는 세 장의 이야기 게임. 같은 조 최대 5명이 함께하는 모둠판도 있습니다.",
-        "cover": "assets/uploads/chemists-voyage-gameplay.webp",
+        "cover": "/assets/uploads/chemists-voyage-gameplay.webp",
+        "poster": "island",
+        "words": "화학자의\n항해",
         "links": [
           {
             "label": "게임 열기",
@@ -243,72 +244,72 @@
             "label": "모둠판",
             "url": "https://maehwachem.github.io/science-tools/chem-voyage/team.html"
           }
-        ],
-        "subject": "chemistry"
+        ]
       },
       {
-        "kind": "game",
         "title": "전기요금 챌린지",
-        "poster": "power",
-        "words": "전기요금\n챌린지",
+        "move_to": "game",
+        "subject": "physics",
+        "desc": "가전제품을 선택하고 배치하며 전기 사용과 비용을 생각하는 게임.",
         "tag": "에너지 · 생활 속 과학",
         "level": "중학교 과학",
-        "desc": "가전제품을 선택하고 배치하며 전기 사용과 비용을 생각하는 게임.",
-        "cover": "assets/uploads/electricity-room-gameplay.webp",
+        "cover": "/assets/uploads/electricity-room-gameplay.webp",
+        "poster": "power",
+        "words": "전기요금\n챌린지",
         "links": [
           {
             "label": "게임 열기",
             "url": "https://my-first-room-energy.kjeung.chatgpt.site/"
           }
-        ],
-        "subject": "physics"
+        ]
       }
     ],
     "tool": [
       {
-        "kind": "tool",
         "title": "우리 반의 하루",
+        "move_to": "tool",
+        "subject": "tools",
         "date": "2026-10-22",
-        "poster": "note",
-        "words": "우리 반의\n하루",
+        "desc": "시간표·급식·학사일정과 날씨·대기질을 한 화면에 모아 보는 학급 게시판. 날짜 선택, 크게 보기, 이 브라우저에 저장하는 알림 메모를 제공합니다. 예시 화면을 먼저 둘러보고 학교를 선택해 실제 자료를 조회할 수 있습니다. 기상청 날씨와 에어코리아 대기질을 연동했으며, 지역과 가까운 측정소를 선택할 수 있습니다.",
         "tag": "학급 운영 · 공공데이터",
         "level": "초·중·고 교사와 학생",
-        "desc": "시간표·급식·학사일정과 날씨·대기질을 한 화면에 모아 보는 학급 게시판. 날짜 선택, 크게 보기, 이 브라우저에 저장하는 알림 메모를 제공합니다. 예시 화면을 먼저 둘러보고 학교를 선택해 실제 자료를 조회할 수 있습니다. 기상청 날씨와 에어코리아 대기질을 연동했으며, 지역과 가까운 측정소를 선택할 수 있습니다.",
+        "cover": "/assets/uploads/cover-watercolor-classroom-day.webp",
+        "poster": "note",
+        "words": "우리 반의\n하루",
         "links": [
           {
             "label": "게시판 열기",
             "url": "/classroom-day/"
           }
-        ],
-        "subject": "tools",
-        "cover": "assets/uploads/cover-watercolor-classroom-day.webp"
+        ]
       },
       {
-        "kind": "tool",
         "title": "NFC 출석",
+        "move_to": "tool",
+        "subject": "tools",
         "date": "2026-10-24",
+        "desc": "책상의 NFC 스티커에 휴대폰을 대면 출석이 기록되는 도구. 처음 한 번만 선생님께 받은 등록코드로 본인 휴대폰을 등록하면, 다음부터는 대기만 해도 출석·지각이 바로 표시됩니다. 출석 명단에 등록된 학생만 사용할 수 있습니다.",
+        "tag": "학급 운영 · 출석 확인",
+        "level": "학생 등",
+        "cover": "/assets/uploads/cover-watercolor-nfc-attendance-v1.webp",
         "poster": "note",
         "words": "NFC\n출석",
-        "tag": "학급 운영 · 출석 확인",
-        "level": "고등학교 학생",
-        "desc": "책상의 NFC 스티커에 휴대폰을 대면 출석이 기록되는 도구. 처음 한 번만 선생님께 받은 등록코드로 본인 휴대폰을 등록하면, 다음부터는 대기만 해도 출석·지각이 바로 표시됩니다. 출석 명단에 등록된 학생만 사용할 수 있습니다.",
         "links": [
           {
             "label": "출석하기",
             "url": "/attend/index.html"
           }
-        ],
-        "subject": "tools",
-        "cover": "assets/uploads/cover-watercolor-nfc-attendance-v1.webp"
+        ]
       },
       {
-        "kind": "tool",
         "title": "마이크로비트 센서 기록기",
+        "move_to": "tool",
+        "subject": "tools",
+        "desc": "전압과 온도 값을 받아 그래프로 살펴보고, 실험 조건별 기록을 CSV로 저장하는 도구.",
+        "tag": "센서 · 웹 블루투스",
+        "cover": "/assets/uploads/cover-watercolor-sensor-recorder-v2.webp",
         "poster": "sensor",
         "words": "마이크로비트\n센서 기록기",
-        "tag": "센서 · 웹 블루투스",
-        "level": "",
-        "desc": "전압과 온도 값을 받아 그래프로 살펴보고, 실험 조건별 기록을 CSV로 저장하는 도구.",
         "links": [
           {
             "label": "전압 기록기",
@@ -322,19 +323,17 @@
             "label": "이전 프로젝트 (GitHub)",
             "url": "https://github.com/maehwachem/microbit-web-visualizer"
           }
-        ],
-        "cover": "assets/uploads/cover-watercolor-sensor-recorder-v2.webp",
-        "subject": "tools"
+        ]
       },
       {
-        "kind": "tool",
         "title": "마이크로비트 처음 시작하기",
+        "move_to": "tool",
+        "subject": "tools",
+        "desc": "마이크로비트를 처음 쓰는 학생과 교사를 위한 안내와 새 기기의 첫 연결 점검 자료.",
+        "tag": "마이크로비트 · 입문",
+        "cover": "/assets/uploads/cover-watercolor-microbit-start.webp",
         "poster": "note",
         "words": "마이크로비트\n처음 시작하기",
-        "tag": "마이크로비트 · 입문",
-        "level": "",
-        "desc": "마이크로비트를 처음 쓰는 학생과 교사를 위한 안내와 새 기기의 첫 연결 점검 자료.",
-        "cover": "assets/uploads/cover-watercolor-microbit-start.webp",
         "links": [
           {
             "label": "시작 안내",
@@ -344,47 +343,43 @@
             "label": "첫 연결 점검",
             "url": "https://maehwachem.github.io/science-tools/sensor/check.html"
           }
-        ],
-        "subject": "tools"
+        ]
       },
       {
-        "kind": "tool",
         "title": "영상 운동 분석기",
-        "poster": "note",
-        "words": "영상 운동\n분석기",
-        "tag": "물리 · 태블릿",
-        "level": "",
+        "move_to": "tool",
+        "subject": "physics",
         "desc": "영상 속 물체의 위치를 짚어 운동을 분석하고, 실제 길이로 보정한 데이터를 CSV로 저장하는 도구.",
-        "cover": "assets/uploads/cover-series-10-v3.webp",
-        "links": [],
-        "subject": "physics"
+        "tag": "물리 · 태블릿",
+        "cover": "/assets/uploads/cover-series-10-v3.webp",
+        "poster": "note",
+        "words": "영상 운동\n분석기"
       },
       {
-        "kind": "tool",
         "title": "AR 포토",
+        "move_to": "tool",
+        "subject": "tools",
+        "desc": "직접 만든 3D 하트나 내가 고른 사진(액자, 배경을 지운 투명 PNG)을 AR로 현실 공간에 놓아 보고, 카메라 화면에 띄워 같이 사진을 찍어 저장하는 도구. 고른 사진은 휴대폰 밖으로 보내지 않습니다.",
+        "tag": "AR · 사진",
+        "cover": "/assets/uploads/cover-series-11-v3.webp",
         "poster": "heart",
         "words": "AR\n포토",
-        "tag": "AR · 사진",
-        "level": "",
-        "desc": "직접 만든 3D 하트나 내가 고른 사진(액자, 배경을 지운 투명 PNG)을 AR로 현실 공간에 놓아 보고, 카메라 화면에 띄워 같이 사진을 찍어 저장하는 도구. 고른 사진은 휴대폰 밖으로 보내지 않습니다.",
         "links": [
           {
             "label": "AR 열기",
             "url": "https://maehwachem.github.io/science-tools/ar-photo/"
           }
-        ],
-        "cover": "assets/uploads/cover-series-11-v3.webp",
-        "subject": "tools"
+        ]
       },
       {
-        "kind": "tool",
         "title": "AR 전시관",
+        "move_to": "tool",
+        "subject": "tools",
+        "desc": "사진과 이름, 설명으로 전시물을 만들면 실제 공간에 전시대가 세워지고, 걸어 다니며 보는 도구. 아무것도 붙이거나 세우지 않아 훼손하면 안 되는 곳에서도 전시할 수 있고, 학생들이 만든 전시 파일을 합쳐 하나의 전시로 엮습니다.",
+        "tag": "AR · 공간 전시",
+        "cover": "/assets/uploads/cover-series-12-v3.webp",
         "poster": "exhibit",
         "words": "AR\n전시관",
-        "tag": "AR · 공간 전시",
-        "level": "",
-        "desc": "사진과 이름, 설명으로 전시물을 만들면 실제 공간에 전시대가 세워지고, 걸어 다니며 보는 도구. 아무것도 붙이거나 세우지 않아 훼손하면 안 되는 곳에서도 전시할 수 있고, 학생들이 만든 전시 파일을 합쳐 하나의 전시로 엮습니다.",
-        "cover": "assets/uploads/cover-series-12-v3.webp",
         "links": [
           {
             "label": "전시관 열기",
@@ -398,154 +393,152 @@
             "label": "사용법",
             "url": "https://maehwachem.github.io/science-tools/ar-photo/exhibit-guide.html"
           }
-        ],
-        "subject": "tools"
+        ]
       },
       {
-        "kind": "tool",
         "title": "적도의 정렬 매트와 별자리판",
-        "poster": "star",
-        "words": "적도의 정렬\n별자리판",
-        "tag": "천문 · 인쇄 자료",
-        "level": "",
+        "move_to": "tool",
+        "subject": "earth",
         "desc": "망원경 정렬을 위한 바닥 매트와 항성시 계산판, 밝은 별 18개를 담은 회전 별자리판.",
-        "cover": "assets/uploads/cover-series-13-v3.webp",
-        "links": [],
-        "subject": "earth"
+        "tag": "천문 · 인쇄 자료",
+        "cover": "/assets/uploads/cover-series-13-v3.webp",
+        "poster": "star",
+        "words": "적도의 정렬\n별자리판"
       },
       {
-        "kind": "tool",
         "title": "나의 면접 연습노트",
-        "poster": "note",
-        "words": "나의 면접\n연습노트",
+        "move_to": "tool",
+        "subject": "tools",
+        "desc": "자신의 경험을 정리하고 답변을 연습하는 웹 도구.",
         "tag": "면접",
         "level": "고등학교 진로 지도",
-        "desc": "자신의 경험을 정리하고 답변을 연습하는 웹 도구.",
+        "cover": "/assets/uploads/cover-series-14-v3.webp",
+        "poster": "note",
+        "words": "나의 면접\n연습노트",
         "links": [
           {
             "label": "도구 열기",
             "url": "https://maehwachem.github.io/interview-note/"
           }
-        ],
-        "cover": "assets/uploads/cover-series-14-v3.webp",
-        "subject": "tools"
+        ]
       },
       {
-        "kind": "tool",
         "title": "수학책 편집 노트",
+        "move_to": "tool",
+        "subject": "tools",
         "date": "2026-10-16",
-        "poster": "note",
-        "words": "수학책\n편집 노트",
+        "desc": "수학 문제 사진을 바탕으로 수식과 문장을 편집하고, 필요한 도형을 골라 문제지로 구성해 인쇄·PDF 저장하는 웹 도구.",
         "tag": "수학 · 문제 편집",
         "level": "교사 · 수학 학습자료 제작",
-        "desc": "수학 문제 사진을 바탕으로 수식과 문장을 편집하고, 필요한 도형을 골라 문제지로 구성해 인쇄·PDF 저장하는 웹 도구.",
-        "cover": "assets/uploads/cover-series-15-v3.webp",
+        "cover": "/assets/uploads/cover-series-15-v3.webp",
+        "poster": "note",
+        "words": "수학책\n편집 노트",
         "links": [
           {
             "label": "도구 열기 (접근 제한)",
             "url": "https://math-book-notebook.kjeung.chatgpt.site/"
           }
-        ],
-        "subject": "tools"
+        ]
       }
     ],
     "lesson": [
       {
-        "kind": "lesson",
         "title": "엘니뇨와 라니냐",
-        "poster": "earth",
-        "words": "엘니뇨와\n라니냐",
+        "move_to": "lesson",
+        "subject": "earth",
+        "desc": "무역풍과 표층 해수, 용승, 워커 순환을 적도 태평양 단면에서 연결해 엘니뇨와 라니냐를 비교하는 인터랙티브 자료. 무역풍 세기를 바꿔 보는 실험과 확인 문제가 있습니다.",
         "tag": "지구과학 · 기후",
         "level": "고등학교 통합과학, 지구과학",
-        "desc": "무역풍과 표층 해수, 용승, 워커 순환을 적도 태평양 단면에서 연결해 엘니뇨와 라니냐를 비교하는 인터랙티브 자료. 무역풍 세기를 바꿔 보는 실험과 확인 문제가 있습니다.",
-        "cover": "assets/uploads/cover-series-16-v3.webp",
+        "cover": "/assets/uploads/cover-series-16-v3.webp",
+        "poster": "earth",
+        "words": "엘니뇨와\n라니냐",
         "links": [
           {
             "label": "자료 열기",
             "url": "https://maehwachem.github.io/science-tools/earth/el-nino.html"
           }
-        ],
-        "subject": "earth"
+        ]
       },
       {
-        "kind": "lesson",
         "title": "대기 대순환",
-        "poster": "earth",
-        "words": "대기\n대순환",
+        "move_to": "lesson",
+        "subject": "earth",
+        "desc": "위도별 에너지 불균형, 전향력, 세 순환과 바람·기압대, 사막과 열대 우림의 분포를 장면을 넘기며 살펴보는 인터랙티브 자료.",
         "tag": "지구과학 · 기후",
         "level": "고등학교 통합과학, 지구과학",
-        "desc": "위도별 에너지 불균형, 전향력, 세 순환과 바람·기압대, 사막과 열대 우림의 분포를 장면을 넘기며 살펴보는 인터랙티브 자료.",
-        "cover": "assets/uploads/cover-series-17-v3.webp",
+        "cover": "/assets/uploads/cover-series-17-v3.webp",
+        "poster": "earth",
+        "words": "대기\n대순환",
         "links": [
           {
             "label": "자료 열기",
             "url": "https://maehwachem.github.io/science-tools/earth/general-circulation.html"
           }
-        ],
-        "subject": "earth"
+        ]
       },
       {
-        "kind": "lesson",
         "title": "지구의 열수지",
+        "move_to": "lesson",
+        "subject": "earth",
         "date": "2026-10-16",
-        "poster": "earth",
-        "words": "지구의\n열수지",
+        "desc": "태양 복사 100의 행방을 따라 지표·대기·지구 전체의 열수지를 확인하고, 복사 평형과 비교하며 온실 효과와 지구 온난화를 살펴보는 인터랙티브 자료. 이산화 탄소·기온·북극 해빙 자료, 온실 기체와 반사율을 바꿔 보는 실험, 확인 문제가 있습니다.",
         "tag": "지구과학 · 기후",
         "level": "고등학교 통합과학, 지구과학",
-        "desc": "태양 복사 100의 행방을 따라 지표·대기·지구 전체의 열수지를 확인하고, 복사 평형과 비교하며 온실 효과와 지구 온난화를 살펴보는 인터랙티브 자료. 이산화 탄소·기온·북극 해빙 자료, 온실 기체와 반사율을 바꿔 보는 실험, 확인 문제가 있습니다.",
-        "cover": "assets/uploads/cover-series-18-v3.webp",
+        "cover": "/assets/uploads/cover-series-18-v3.webp",
+        "poster": "earth",
+        "words": "지구의\n열수지",
         "links": [
           {
             "label": "자료 열기",
             "url": "https://maehwachem.github.io/science-tools/earth/heat-budget.html"
           }
-        ],
-        "subject": "earth"
+        ]
       },
       {
-        "kind": "lesson",
         "title": "전자기 유도",
+        "move_to": "lesson",
+        "subject": "physics",
         "date": "2026-10-23",
-        "poster": "power",
-        "words": "전자기\n유도",
+        "desc": "자석과 코일, 검류계로 유도 전류가 언제, 어느 방향으로 흐르는지 장면을 넘기며 살펴보는 인터랙티브 자료. 자석이 코일을 통과할 때의 그래프, 렌츠 법칙, 발전기와 발전소, 생활 속 이용을 다루고, 자석을 직접 끌어 보는 실험과 확인 문제가 있습니다.",
         "tag": "전기와 자기 · 발전",
         "level": "고등학교 통합과학",
-        "desc": "자석과 코일, 검류계로 유도 전류가 언제, 어느 방향으로 흐르는지 장면을 넘기며 살펴보는 인터랙티브 자료. 자석이 코일을 통과할 때의 그래프, 렌츠 법칙, 발전기와 발전소, 생활 속 이용을 다루고, 자석을 직접 끌어 보는 실험과 확인 문제가 있습니다.",
-        "cover": "assets/uploads/cover-series-induction-v4.webp",
+        "cover": "/assets/uploads/cover-series-induction-v4.webp",
+        "poster": "power",
+        "words": "전자기\n유도",
         "links": [
           {
             "label": "자료 열기",
             "url": "https://maehwachem.github.io/science-tools/physics/electromagnetic-induction.html"
           }
-        ],
-        "subject": "physics"
+        ]
       },
       {
-        "kind": "lesson",
         "title": "산·염기 중화 반응",
-        "poster": "acid",
-        "words": "산·염기\n중화 반응",
+        "move_to": "lesson",
+        "subject": "chemistry",
+        "desc": "같은 부피로 섞으면 중성일까? 염산과 수산화 나트륨 수용액 속 이온을 모형으로 보고, 넣는 양을 바꿔 가며 이온 수와 액성의 변화를 따라가는 18장 수업 슬라이드. 중화열, 지시약, 산의 종류까지 다룹니다.",
         "tag": "산과 염기 · 수업 슬라이드",
         "level": "고등학교 통합과학, 화학",
-        "desc": "같은 부피로 섞으면 중성일까? 염산과 수산화 나트륨 수용액 속 이온을 모형으로 보고, 넣는 양을 바꿔 가며 이온 수와 액성의 변화를 따라가는 18장 수업 슬라이드. 중화열, 지시약, 산의 종류까지 다룹니다.",
-        "cover": "assets/uploads/cover-series-19-v3.webp",
+        "cover": "/assets/uploads/cover-series-19-v3.webp",
+        "poster": "acid",
+        "words": "산·염기\n중화 반응",
         "links": [
           {
             "label": "슬라이드 열기",
             "url": "https://maehwachem.github.io/science-tools/lectures/neutralization.html"
           }
-        ],
-        "subject": "chemistry"
+        ]
       },
       {
-        "kind": "lesson",
         "title": "몰 농도",
-        "poster": "solution",
-        "words": "몰 농도\n슬라이드·학습지",
+        "move_to": "lesson",
+        "subject": "chemistry",
+        "desc": "질량이 같아도 입자 수가 다른 까닭에서 시작해 몰 농도의 정의, 질량에서 몰 농도 구하기, 용액 만들기와 묽히기까지 다루는 19장 수업 슬라이드와 짝 학습지. 학습지의 빈칸 번호는 슬라이드와 같고, 인쇄해서 쓸 수 있습니다.",
         "tag": "용액과 농도 · 수업 슬라이드와 학습지",
         "level": "고등학교 화학",
-        "desc": "질량이 같아도 입자 수가 다른 까닭에서 시작해 몰 농도의 정의, 질량에서 몰 농도 구하기, 용액 만들기와 묽히기까지 다루는 19장 수업 슬라이드와 짝 학습지. 학습지의 빈칸 번호는 슬라이드와 같고, 인쇄해서 쓸 수 있습니다.",
-        "cover": "assets/uploads/cover-series-20-v3.webp",
+        "cover": "/assets/uploads/cover-series-20-v3.webp",
+        "poster": "solution",
+        "words": "몰 농도\n슬라이드·학습지",
         "links": [
           {
             "label": "슬라이드 열기",
@@ -555,18 +548,19 @@
             "label": "학습지 열기",
             "url": "https://maehwachem.github.io/science-tools/worksheets/molarity.html"
           }
-        ],
-        "subject": "chemistry"
+        ]
       },
       {
-        "kind": "lesson",
         "title": "에너지 효율과 신재생 에너지",
+        "move_to": "lesson",
+        "subject": "physics",
         "date": "2026-10-24",
-        "poster": "power",
-        "words": "에너지 효율과\n신재생 에너지",
+        "desc": "에너지 보존과 효율 계산, 열기관과 발전에서 시작해 태양광·풍력·수소 연료 전지와 에너지 저장까지 살펴보는 34장 수업 슬라이드. 단계별 애니메이션, 확인 문제와 교사용 수업 메모가 있습니다.",
         "tag": "에너지 · 수업 슬라이드",
         "level": "고등학교 통합과학2",
-        "desc": "에너지 보존과 효율 계산, 열기관과 발전에서 시작해 태양광·풍력·수소 연료 전지와 에너지 저장까지 살펴보는 34장 수업 슬라이드. 단계별 애니메이션, 확인 문제와 교사용 수업 메모가 있습니다.",
+        "cover": "/assets/uploads/cover-series-energy-efficiency-v1.webp",
+        "poster": "power",
+        "words": "에너지 효율과\n신재생 에너지",
         "links": [
           {
             "label": "슬라이드 열기",
@@ -576,31 +570,28 @@
             "label": "학생용 화면",
             "url": "/lectures/energy-efficiency.html?s=1"
           }
-        ],
-        "subject": "physics",
-        "cover": "assets/uploads/cover-series-energy-efficiency-v1.webp"
+        ]
       }
     ]
   },
   "hobbies": {
     "astronomy": [
       {
-        "kind": "hobby",
         "title": "하늘 관측실",
+        "subject": "earth",
         "date": "2026-10-17",
-        "poster": "star",
-        "words": "하늘\n관측실",
+        "desc": "관측 날짜와 장소를 골라 낮의 태양과 달, 밤의 행성과 밝은 별, 해·달 출몰 시각과 월별 천문현상을 확인하는 도구.",
         "tag": "천문 · 관측 안내",
         "level": "학생 · 교사 · 일반 관측자",
-        "desc": "관측 날짜와 장소를 골라 낮의 태양과 달, 밤의 행성과 밝은 별, 해·달 출몰 시각과 월별 천문현상을 확인하는 도구.",
-        "cover": "assets/uploads/cover-sky-observatory.webp",
+        "cover": "/assets/uploads/cover-sky-observatory.webp",
+        "poster": "star",
+        "words": "하늘\n관측실",
         "links": [
           {
             "label": "관측실 열기",
             "url": "/sky/"
           }
-        ],
-        "subject": "earth"
+        ]
       }
     ]
   }
