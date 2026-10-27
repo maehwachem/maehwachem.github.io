@@ -353,13 +353,40 @@
         max-height: 350px;
         overflow: auto;
       }
+      .dashboard-heading { display:flex; justify-content:space-between; gap:12px; align-items:center; margin:8px 0 18px; }
+      .dashboard-heading h2 { font-size:24px; margin-bottom:4px; }
+      .dashboard-heading p { margin:0; }
+      button.kpi { font:inherit; text-align:left; cursor:pointer; color:var(--ink); }
+      button.kpi:hover, button.kpi[aria-pressed="true"] { border-color:var(--brand); background:#eef2ff; }
+      button:focus-visible, a:focus-visible { outline:3px solid var(--brand); outline-offset:3px; }
+      .kpi small { display:block; color:var(--sub); margin-top:5px; font-size:11px; }
+      .dashboard-panels { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+      .dashboard-panels .card { min-width:0; }
+      .dashboard-alert { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:12px 0; border-bottom:1px solid var(--line); }
+      .dashboard-alert small.error { color:var(--bad); }
+      .dashboard-alert:last-child { border-bottom:0; }
+      .dashboard-alert strong, .dashboard-alert small { display:block; }
+      .dashboard-alert small { color:var(--sub); margin-top:4px; }
+      .dashboard-meter { width:100%; accent-color:var(--brand); height:12px; margin:12px 0; }
+      #dLoadState { margin:0 0 14px; }
+      #dLoadState:empty { display:none; }
+      #dayContent[aria-busy="true"] { opacity:.5; pointer-events:none; }
+      #listHeading { scroll-margin-top:110px; }
+      @media (max-width:720px) {
+        .dashboard-panels { grid-template-columns:1fr; gap:0; }
+        .dashboard-heading { align-items:flex-start; }
+        .dashboard-heading h2 { font-size:21px; }
+        nav { max-width:100%; overflow-x:auto; }
+        nav button { white-space:nowrap; padding:7px 9px; }
+        #dSearch { flex:1; min-width:130px; }
+      }
     </style>
   </head>
   <body>
     <header>
       <h1>NFC 출석 관리</h1>
       <nav id="nav" class="hidden">
-        <button data-tab="today" class="on">출석 현황</button
+        <button data-tab="today" class="on">대시보드</button
         ><button data-tab="roster">학생 명단</button
         ><button data-tab="calendar">출석 대상일</button
         ><button data-tab="settings">설정</button>
@@ -385,6 +412,10 @@
     </div>
     <main id="app" class="hidden">
       <section id="tab-today">
+        <div class="dashboard-heading">
+          <div><h2>출석 대시보드</h2><p class="sub" id="dashboardDate">날짜와 반을 선택해 출석을 확인하세요.</p></div>
+          <button class="btn" id="btnToday">오늘 보기</button>
+        </div>
         <div class="card">
           <div class="row">
             <label>날짜 <input type="date" id="dDate" /></label
@@ -399,7 +430,7 @@
               <option value="out">외출 중</option>
               <option value="early">조퇴</option>
               <option value="overdue">복귀 지연</option></select
-            ><input id="dSearch" placeholder="이름·학번 검색" /><button
+            ><input id="dSearch" placeholder="이름·학번 검색" aria-label="이름·학번 검색" /><button
               class="btn"
               id="btnRefresh"
             >
@@ -407,8 +438,26 @@
             ><span class="sub" id="dUpdated"></span>
           </div>
         </div>
-        <div id="kpis" class="kpis"></div>
+        <p id="dLoadState" class="error" role="status"></p>
+        <div id="dayContent">
+        <div id="kpis" class="kpis" aria-label="상태별 학생 보기"></div>
+        <div class="dashboard-panels">
+          <div class="card">
+            <h2>출석 확인 진행</h2>
+            <div id="dashboardProgress"></div>
+            <p class="sub">선택한 날짜·반의 출석 대상 기준입니다. 이름 검색과 목록 필터는 위 집계에 영향을 주지 않습니다. 외출·조퇴는 등교 기록과 별도입니다.</p>
+          </div>
+          <div class="card">
+            <h2>먼저 확인할 학생</h2>
+            <div id="dashboardAlerts"></div>
+          </div>
+        </div>
         <div class="card">
+          <div class="row" style="justify-content:space-between;margin-bottom:12px">
+            <h2 id="listHeading" tabindex="-1" style="margin:0">학생별 출석 현황</h2>
+            <button class="btn" id="btnManual">휴대폰 없이 출석 처리</button>
+          </div>
+          <p class="sub" id="listSummary"></p>
           <div class="tbl">
             <table>
               <thead>
@@ -430,6 +479,7 @@
             바뀌지 않습니다. 수동 출석은 태그 시각이 공란입니다.
           </p>
           <p id="eligibilityNote" class="sub"></p>
+        </div>
         </div>
         <div class="card">
           <h2>기간 내보내기</h2>
@@ -736,6 +786,6 @@
     <div id="toast" role="status"></div>
     <script src="config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-    <script src="admin.js?v=2"></script>
+    <script src="admin.js?v=20261027-dashboard"></script>
   </body>
 </html>

@@ -169,12 +169,34 @@ async function loadStudents() {
 async function loadToday() {
   const seq = ++loadSequence,
     date = $("dDate").value;
-  const rows = await rpc("nfc_day", { p_date: date });
-  if (seq !== loadSequence) return;
-  dayRows = rows;
-  fillClasses("dClass", rows);
-  renderToday();
-  $("dUpdated").textContent = "갱신 " + seoulTime(new Date().toISOString());
+  if (!date) {
+    dayRows = [];
+    $("dayContent").classList.add("hidden");
+    $("dayContent").setAttribute("aria-busy", "false");
+    $("dLoadState").textContent = "조회할 날짜를 선택하세요.";
+    return;
+  }
+  $("dayContent").setAttribute("aria-busy", "true");
+  $("dLoadState").textContent = "출석 현황을 불러오는 중입니다…";
+  try {
+    const rows = await rpc("nfc_day", { p_date: date });
+    if (seq !== loadSequence) return;
+    dayRows = rows;
+    fillClasses("dClass", rows);
+    renderToday();
+    $("dayContent").classList.remove("hidden");
+    $("dLoadState").textContent = "";
+    $("dUpdated").textContent = "갱신 " + seoulTime(new Date().toISOString());
+  } catch (error) {
+    if (seq !== loadSequence) return;
+    dayRows = [];
+    $("dayContent").classList.add("hidden");
+    $("dUpdated").textContent = "갱신 실패";
+    $("dLoadState").textContent = "현황을 불러오지 못했습니다. 새로고침을 눌러 다시 시도하세요.";
+    throw error;
+  } finally {
+    if (seq === loadSequence) $("dayContent").setAttribute("aria-busy", "false");
+  }
 }
 function startAutoRefresh() {
   clearInterval(refreshTimer);
@@ -188,26 +210,59 @@ function startAutoRefresh() {
       run(null, loadToday);
   }, 20000);
 }
+function selectDayFilter(filter, clearSearch = true) {
+  $("dStatus").value = filter;
+  if (clearSearch) $("dSearch").value = "";
+  renderToday();
+  $("listHeading").focus();
+}
+$("kpis").onclick = (e) => {
+  const b = e.target.closest("button[data-filter]");
+  if (b) selectDayFilter(b.dataset.filter);
+};
+$("btnManual").onclick = () => {
+  selectDayFilter("unconfirmed");
+  $("dSearch").focus();
+  toast("이름·학번을 검색한 뒤 ‘교사 출석 확인’을 누르세요. 출석·지각을 선택하고 사유를 저장합니다.");
+};
+bind("btnToday", async () => {
+  $("dDate").value = seoulDate();
+  await loadToday();
+});
 function renderToday() {
-  const candidates = dayRows.filter((s) =>
-    matches(s, $("dClass").value, $("dSearch").value.trim()),
-  );
+  const scope = dayRows.filter((s) => matches(s, $("dClass").value, ""));
+  const eligible = scope.filter((s) => s.eligible);
+  const records = scope.filter((s) => s.eligible || s.version > 0);
+  const candidates = scope.filter((s) => matches(s, "", $("dSearch").value.trim()));
   const list = candidates.filter((s) => s.eligible || s.version > 0);
-  const eligible = list.filter((s) => s.eligible);
   const count = (k) => eligible.filter((s) => s.status === k).length;
+  const current = $("dStatus").value;
   const kpis = [
-    ["대상", eligible.length],
-    ["출석", count("present")],
-    ["지각", count("late")],
-    ["인정", count("excused")],
-    ["결석 확정", count("absent")],
-    ["미확인", count("unconfirmed")],
-    ["외출 중", list.filter((s) => s.whereabouts === "out").length],
-    ["조퇴", list.filter((s) => s.whereabouts === "early").length],
+    ["대상", eligible.length, "", "출석 대상 학생"],
+    ["출석", count("present"), "present", "정상 등교"],
+    ["지각", count("late"), "late", "지각 등교"],
+    ["미확인", count("unconfirmed"), "unconfirmed", "교사 확인 필요"],
+    ["인정", count("excused"), "excused", "교사가 인정 처리"],
+    ["결석 확정", count("absent"), "absent", "교사가 확정한 결석"],
+    ["외출 중", records.filter((s) => s.whereabouts === "out").length, "out", "이동 기록 기준"],
+    ["조퇴", records.filter((s) => s.whereabouts === "early").length, "early", "이동 기록 기준"],
   ];
   $("kpis").innerHTML = kpis
-    .map(([l, n]) => `<div class="kpi"><b>${n}</b><span>${l}</span></div>`)
+    .map(([l, n, f, hint]) => `<button type="button" class="kpi" data-filter="${f}" aria-pressed="${current === f}" aria-label="${l} ${n}명 · 학생 보기"><b>${n}<span> 명</span></b><span>${l}</span><small>${hint}</small></button>`)
     .join("");
+  const confirmed = eligible.length - count("unconfirmed");
+  $("dashboardDate").textContent = `${$("dDate").value} · ${$("dClass").selectedOptions[0]?.textContent || "전체 반"} · ${$("dDate").value === seoulDate() ? "20초마다 자동 갱신" : "선택한 날짜의 기록"}`;
+  $("dashboardProgress").innerHTML = eligible.length
+    ? `<strong>${confirmed} / ${eligible.length}명 확인 완료</strong><progress class="dashboard-meter" value="${confirmed}" max="${eligible.length}" aria-label="출석 상태 확인 진행"></progress><div class="row"><span class="sub">미확인 ${count("unconfirmed")}명 · 출석·지각·인정·결석 확정 포함</span><button class="btn s" data-filter="unconfirmed">미확인 보기</button></div>`
+    : '<p class="sub">선택한 날짜·반에 출석 대상 학생이 없습니다. 학생 명단의 재적 기간과 출석 대상일을 확인하세요.</p>';
+  const attention = records.filter((s) => s.whereabouts === "out" || (s.eligible && s.status === "unconfirmed"))
+    .sort((a,b) => (b.whereabouts === "out" ? (b.overdue ? 3 : 2) : 1) - (a.whereabouts === "out" ? (a.overdue ? 3 : 2) : 1));
+  $("dashboardAlerts").innerHTML = attention.slice(0, 5).map((s) => {
+    const out = s.whereabouts === "out";
+    const actionable = out && ["present", "late"].includes(s.status);
+    const detail = out ? `${s.overdue ? "복귀 지연 · " : "외출 중 · "}예정 ${seoulTime(s.expected_return_at) || "미입력"}` : "미확인 · 교사 확인 필요";
+    return `<div class="dashboard-alert"><div><strong>${esc(s.student_id)} · ${esc(s.name)}</strong><small class="${s.overdue ? "error" : ""}">${esc(detail)}</small></div><button class="btn s" data-action="${actionable ? "move" : s.eligible ? (s.status === "unconfirmed" ? "manual" : "correct") : "history"}" data-uid="${esc(s.student_uid)}">${actionable ? "이동 처리" : s.eligible ? "교사 확인" : "이력"}</button></div>`;
+  }).join("") + (attention.length ? `<p class="sub">확인할 학생 ${attention.length}명${attention.length > 5 ? " 중 5명 표시" : ""} · 복귀 지연 → 외출 → 미확인 순</p><div class="row"><button class="btn s" data-filter="overdue">복귀 지연 보기</button><button class="btn s" data-filter="unconfirmed">미확인 보기</button></div>` : '<p class="sub">미확인 학생과 외출 중인 학생이 없습니다.</p>');
   const f = $("dStatus").value;
   const shown = list.filter(
     (s) =>
@@ -218,6 +273,7 @@ function renderToday() {
           ? s.whereabouts === f
           : s.status === f),
   );
+  $("listSummary").textContent = `목록 ${shown.length}명 · ${$("dStatus").selectedOptions[0]?.textContent || "전체 상태"}${$("dSearch").value.trim() ? " · 검색 결과" : ""}`;
   $("todayBody").innerHTML =
     shown
       .map((s) => {
@@ -229,7 +285,7 @@ function renderToday() {
               : ["present", "late"].includes(s.status)
                 ? "교내"
                 : "—";
-        return `<tr><td>${esc(seat(s))}</td><td>${esc(s.student_id)} · <b>${esc(s.name)}</b>${!s.eligible ? "<br><small>대상 외 기록</small>" : ""}${s.last_pending_tag ? '<br><small>승인 전 태그 시도 · 출석 미확정 ' + esc(seoulTime(s.last_pending_tag)) + "</small>" : ""}${s.last_exception_tag ? '<br><small class="error">재태그 확인 ' + esc(seoulTime(s.last_exception_tag)) + "</small>" : ""}</td><td><span class="tag t-${s.status}">${STATUS[s.status]}</span>${s.source === "manual" ? "<br><small>교사 확인</small>" : ""}</td><td><span class="tag t-${s.whereabouts}">${wh}</span></td><td class="mono">${esc(seoulTime(s.checked_at) || "—")}</td><td><button class="btn s" data-action="correct" data-uid="${s.student_uid}" ${!s.eligible ? "disabled" : ""}>출석 정정</button> <button class="btn s" data-action="move" data-uid="${s.student_uid}" ${!["present", "late"].includes(s.status) ? "disabled" : ""}>이동 처리</button> <button class="btn s" data-action="history" data-uid="${s.student_uid}">이력</button></td></tr>`;
+        return `<tr><td>${esc(seat(s))}</td><td>${esc(s.student_id)} · <b>${esc(s.name)}</b>${!s.eligible ? "<br><small>대상 외 기록</small>" : ""}${s.last_pending_tag ? '<br><small>승인 전 태그 시도 · 출석 미확정 ' + esc(seoulTime(s.last_pending_tag)) + "</small>" : ""}${s.last_exception_tag ? '<br><small class="error">재태그 확인 ' + esc(seoulTime(s.last_exception_tag)) + "</small>" : ""}</td><td><span class="tag t-${s.status}">${STATUS[s.status]}</span>${s.source === "manual" ? "<br><small>교사 확인</small>" : ""}</td><td><span class="tag t-${s.whereabouts}">${wh}</span></td><td class="mono">${esc(seoulTime(s.checked_at) || "—")}</td><td><button class="btn s" data-action="${s.status === "unconfirmed" ? "manual" : "correct"}" data-uid="${s.student_uid}" ${!s.eligible ? "disabled" : ""}>${s.status === "unconfirmed" ? "교사 출석 확인" : "출석 정정"}</button> <button class="btn s" data-action="move" data-uid="${s.student_uid}" ${!["present", "late"].includes(s.status) ? "disabled" : ""}>이동 처리</button> <button class="btn s" data-action="history" data-uid="${s.student_uid}">이력</button></td></tr>`;
       })
       .join("") ||
     '<tr><td colspan="6" style="padding:24px;text-align:center">해당하는 학생이 없습니다.</td></tr>';
@@ -266,20 +322,30 @@ $("editForm").onsubmit = async (e) => {
     $("editSave").disabled = false;
   }
 };
-$("todayBody").onclick = (e) => {
+["dashboardProgress", "dashboardAlerts"].forEach((id) => {
+  $(id).onclick = (e) => {
+    const filter = e.target.closest("button[data-filter]");
+    if (filter) selectDayFilter(filter.dataset.filter);
+    else handleDayAction(e);
+  };
+});
+$("todayBody").onclick = handleDayAction;
+function handleDayAction(e) {
   const b = e.target.closest("button[data-action]");
-  if (!b) return;
+  if (!b || b.disabled || $("dayContent").getAttribute("aria-busy") === "true") return;
   const s = dayRows.find((x) => x.student_uid === b.dataset.uid),
     date = $("dDate").value;
-  if (b.dataset.action === "correct")
+  if (!s) return;
+  const manual = b.dataset.action === "manual";
+  if (b.dataset.action === "correct" || manual)
     openEditor(
-      `${s.name} · 출석 정정`,
+      `${s.name} · ${manual ? "교사 출석 확인" : "출석 정정"}`,
       field(
         "상태",
         `<select id="xStatus">${Object.entries(STATUS)
           .map(
             ([k, v]) =>
-              `<option value="${k}" ${s.status === k ? "selected" : ""}>${v}</option>`,
+              `<option value="${k}" ${(manual ? "present" : s.status) === k ? "selected" : ""}>${v}</option>`,
           )
           .join("")}</select>`,
       ) +
@@ -287,7 +353,7 @@ $("todayBody").onclick = (e) => {
           "정정 사유",
           '<textarea id="xReason" required maxlength="200" placeholder="예: 휴대폰 미지참으로 교사가 확인"></textarea>',
         ) +
-        '<p class="sub">기존 태그 시각은 보존됩니다. 미확인으로 되돌려도 정정 이력은 남습니다.</p>',
+        '<p class="sub">휴대폰 없이도 교사가 출석을 확인할 수 있습니다. 지각한 학생은 지각을 선택하세요. 기존 태그 시각은 보존됩니다. 미확인으로 되돌려도 정정 이력은 남습니다.</p>',
       async () => {
         await rpc("nfc_correct", {
           p_uid: s.student_uid,
