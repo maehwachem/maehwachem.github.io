@@ -229,7 +229,7 @@ function renderToday() {
               : ["present", "late"].includes(s.status)
                 ? "교내"
                 : "—";
-        return `<tr><td>${esc(seat(s))}</td><td>${esc(s.student_id)} · <b>${esc(s.name)}</b>${!s.eligible ? "<br><small>대상 외 기록</small>" : ""}${s.last_exception_tag ? '<br><small class="error">재태그 확인 ' + esc(seoulTime(s.last_exception_tag)) + "</small>" : ""}</td><td><span class="tag t-${s.status}">${STATUS[s.status]}</span>${s.source === "manual" ? "<br><small>교사 확인</small>" : ""}</td><td><span class="tag t-${s.whereabouts}">${wh}</span></td><td class="mono">${esc(seoulTime(s.checked_at) || "—")}</td><td><button class="btn s" data-action="correct" data-uid="${s.student_uid}" ${!s.eligible ? "disabled" : ""}>출석 정정</button> <button class="btn s" data-action="move" data-uid="${s.student_uid}" ${!["present", "late"].includes(s.status) ? "disabled" : ""}>이동 처리</button> <button class="btn s" data-action="history" data-uid="${s.student_uid}">이력</button></td></tr>`;
+        return `<tr><td>${esc(seat(s))}</td><td>${esc(s.student_id)} · <b>${esc(s.name)}</b>${!s.eligible ? "<br><small>대상 외 기록</small>" : ""}${s.last_pending_tag ? '<br><small>승인 전 태그 시도 · 출석 미확정 ' + esc(seoulTime(s.last_pending_tag)) + "</small>" : ""}${s.last_exception_tag ? '<br><small class="error">재태그 확인 ' + esc(seoulTime(s.last_exception_tag)) + "</small>" : ""}</td><td><span class="tag t-${s.status}">${STATUS[s.status]}</span>${s.source === "manual" ? "<br><small>교사 확인</small>" : ""}</td><td><span class="tag t-${s.whereabouts}">${wh}</span></td><td class="mono">${esc(seoulTime(s.checked_at) || "—")}</td><td><button class="btn s" data-action="correct" data-uid="${s.student_uid}" ${!s.eligible ? "disabled" : ""}>출석 정정</button> <button class="btn s" data-action="move" data-uid="${s.student_uid}" ${!["present", "late"].includes(s.status) ? "disabled" : ""}>이동 처리</button> <button class="btn s" data-action="history" data-uid="${s.student_uid}">이력</button></td></tr>`;
       })
       .join("") ||
     '<tr><td colspan="6" style="padding:24px;text-align:center">해당하는 학생이 없습니다.</td></tr>';
@@ -326,7 +326,7 @@ $("todayBody").onclick = (e) => {
           "사유",
           '<textarea id="xReason" required maxlength="200" placeholder="예: 병원 진료"></textarea>',
         ) +
-        '<p class="sub">교사가 확인한 이동을 기록합니다. 조퇴는 출석·지각을 덮어쓰지 않습니다. 잘못 누른 이동은 직전 이동 취소로 되돌리세요. 이전 상태로 복원되며 취소 이력이 남습니다.</p>',
+        '<p class="sub">교사가 확인한 이동을 기록합니다. 조퇴는 출석·지각을 덮어쓰지 않습니다. 잘못 누른 이동은 직전 이동 취소로 되돌리세요. 이전 상태로 복원되며 취소 이력이 남습니다. 취소 후 실제 시각으로 다시 입력할 수 있습니다.</p>',
       async () => {
         const kind = $("xKind").value;
         await rpc("nfc_move", {
@@ -439,7 +439,7 @@ function renderRoster() {
     list
       .map(
         (s) =>
-          `<tr><td>${esc(s.student_id)} · <b>${esc(s.name)}</b></td><td>${esc(s.starts_on)} ~ ${esc(s.ends_on)}<br>${STATE[s.state]}</td><td class="mono">${esc(s.reg_code)} ${s.failed_attempts >= 5 ? "(잠김)" : ""}</td><td>${s.device_bound_at ? "등록됨" : "미등록"}</td><td><button class="btn s" data-act="edit" data-uid="${s.student_uid}">수정</button> ${s.state === "pending" ? `<button class="btn s p" data-act="confirm" data-uid="${s.student_uid}">명단 확정</button>` : ""} <button class="btn s" data-act="reset" data-uid="${s.student_uid}">기기 초기화</button> <button class="btn s" data-act="code" data-uid="${s.student_uid}">코드 재발급</button></td></tr>`,
+          `<tr><td>${esc(s.student_id)} · <b>${esc(s.name)}</b></td><td>${esc(s.starts_on)} ~ ${esc(s.ends_on)}<br>${STATE[s.state]}${s.last_pending_tag ? `<br><small>승인 전 태그 시도 ${esc(seoulDate(new Date(s.last_pending_tag)))} ${esc(seoulTime(s.last_pending_tag))} · 출석 미확정</small>` : ""}</td><td class="mono">${esc(s.reg_code)} ${s.failed_attempts >= 5 ? "(잠김)" : ""}</td><td>${s.device_bound_at ? "등록됨" : "미등록"}</td><td><button class="btn s" data-act="edit" data-uid="${s.student_uid}">수정</button> ${s.state === "pending" ? `<button class="btn s p" data-act="confirm" data-uid="${s.student_uid}">명단 확정</button> ${s.self_registered ? `<button class="btn s" data-act="reject" data-uid="${s.student_uid}">가입 거절</button>` : ""}` : ""} <button class="btn s" data-act="reset" data-uid="${s.student_uid}">기기 초기화</button> <button class="btn s" data-act="code" data-uid="${s.student_uid}">코드 재발급</button></td></tr>`,
       )
       .join("") ||
     '<tr><td colspan="5" style="padding:24px">등록된 명단이 없습니다.</td></tr>';
@@ -456,7 +456,7 @@ function previewText(c) {
     return `${a.student_id} ${a.name}: 신규 · ${STATE[a.state]} (${a.starts_on} ~ ${a.ends_on})`;
   return `${b.student_id} ${b.name} → ${a.student_id} ${a.name} · ${STATE[b.state]} → ${STATE[a.state]} · 기간 ${b.starts_on}~${b.ends_on} → ${a.starts_on}~${a.ends_on}`;
 }
-async function makePreview(rows) {
+async function makePreview(rows, single = false) {
   preview = await rpc("nfc_roster_preview", {
     p_year: Number($("rYear").value),
     p_rows: rows,
@@ -464,7 +464,8 @@ async function makePreview(rows) {
   $("previewBox").classList.remove("hidden");
   $("previewBox").innerHTML =
     '<h3>명단 변경 미리보기</h3><p class="sub">30분 동안 유효합니다. 누락은 유지되며 삭제되지 않습니다.</p>' +
-    preview.changes.map((c) => `<p>${esc(previewText(c))}</p>`).join("");
+    (preview.warnings || []).map((v) => `<p class="notice">${esc(v)}</p>`).join("") +
+    preview.changes.filter(c => !single || c.type !== "missing").map((c) => `<p>${esc(previewText(c))}</p>`).join("");
   $("btnApplyRoster").classList.remove("hidden");
 }
 function invalidatePreview() {
@@ -481,7 +482,7 @@ bind("btnImport", async () => {
     const p = l.trim().split(/[\t,]+|\s+/);
     if (p.length < 2 || !/^\d{3,10}$/.test(p[0]))
       throw new Error(`${i + 1}번째 줄의 학번과 이름을 확인하세요`);
-    return { student_id: p[0], name: p.slice(1).join(" ") };
+    return { student_id: p[0], name: p.slice(1).join(" ").normalize("NFC") };
   });
   await makePreview(rows);
 });
@@ -527,20 +528,36 @@ $("rosterBody").onclick = (e) => {
           "종료일 (포함)",
           `<input type="date" id="xEnd" value="${s.ends_on}" required>`,
         ) +
-        '<p class="sub">시트에도 같은 내용을 반영하세요. 학번이 5자리면 학년·반·번호를 다시 계산합니다.</p>',
+        '<p class="sub">시트에도 같은 내용을 반영하세요. 전출·졸업은 종료일까지 출석 대상입니다. 마지막 대상일을 꼭 확인하세요. 학번이 5자리면 학년·반·번호를 다시 계산합니다.</p>',
       async () => {
         await makePreview([
           {
             student_uid: s.student_uid,
             revision: s.revision,
             student_id: $("xId").value.trim(),
-            name: $("xName").value.trim(),
+            name: $("xName").value.trim().normalize("NFC"),
             state: $("xState").value,
             starts_on: $("xStart").value,
             ends_on: $("xEnd").value,
           },
-        ]);
+        ], true);
         toast("미리보기를 확인한 뒤 적용하세요");
+      },
+    );
+  } else if (b.dataset.act === "confirm" || b.dataset.act === "reject") {
+    const approving = b.dataset.act === "confirm";
+    openEditor(
+      `${s.name} · ${approving ? "명단 확정" : "가입 거절"}`,
+      (approving ? field("출석 시작일 (포함)", `<input type="date" id="xStart" required value="${seoulDate()}" min="${s.school_year}-03-01" max="${s.ends_on}">`) : "") +
+      field("사유", '<textarea id="xReason" required maxlength="200"></textarea>') +
+      `<p class="sub">${approving ? "시작일 전은 출석 대상에서 제외합니다. 승인 전 태그는 시도 기록일 뿐 자동으로 출석 처리되지 않습니다. 과거 날짜를 포함하면 해당 날짜의 출석을 따로 확인하세요." : "잘못된 자가가입만 거절합니다. 학번과 기기 연결을 해제하고 가입·태그 시도·거절 이력을 보존합니다. 정식 학생 명단은 다시 미리보기 후 적용하세요."}</p>`,
+      async () => {
+        const args = {p_uid:s.student_uid,p_year:Number($("rYear").value),p_reason:$("xReason").value.trim(),p_revision:s.revision};
+        if (approving) args.p_start = $("xStart").value;
+        await rpc(approving ? "nfc_confirm_signup" : "nfc_reject_signup", args);
+        invalidatePreview();
+        await Promise.all([loadStudents(), loadToday()]);
+        toast(approving ? "출석 시작일을 확인해 명단을 확정했습니다" : "가입 거절 이력을 남기고 학번·기기 연결을 해제했습니다");
       },
     );
   } else
@@ -560,6 +577,11 @@ $("rosterBody").onclick = (e) => {
       toast("처리했습니다");
     });
 };
+bind("btnRejectedHistory", async () => {
+  const {data,error} = await sb.from("attendance_audit").select("before_value,reason,created_at").eq("action","student_reject").order("id",{ascending:false}).limit(200);
+  if(error) throw error;
+  openEditor("최근 가입 거절 이력", data.map(x=>`<div class="history"><b>${esc(x.before_value?.student_id)} ${esc(x.before_value?.name)}</b> · ${esc(x.before_value?.school_year)}학년도<br>${esc(seoulDate(new Date(x.created_at)))} ${esc(seoulTime(x.created_at))}<br>${esc(x.reason)}</div><hr>`).join("") || "<p>가입 거절 이력이 없습니다.</p>",null);
+});
 bind("btnRosterExport", async () => {
   downloadCSV(`명단_${$("rYear").value}.csv`, [
     [

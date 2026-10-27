@@ -31,6 +31,7 @@ try {
       "../../supabase/migrations/20261027051543_attendance_roster_movements.sql",
     ),
   );
+  await db.exec(await file("../../supabase/migrations/20261027070831_attendance_review_fixes.sql"));
   const uid = await one(
     "select student_uid from students where student_id='30101'",
   );
@@ -283,7 +284,7 @@ try {
     const s = (await call("nfc_roster", [year])).find(
       (x) => x.student_id === "30199",
     );
-    await call("nfc_student_action", [s.student_uid, year, "confirm"]);
+    await call("nfc_confirm_signup", [s.student_uid, year, today, "가입 확인", s.revision]);
     assert.equal((await call("check_in", ["b".repeat(64)])).ok, true);
   });
   await test("stale sheet row version cannot overwrite a newer web edit", async () => {

@@ -496,7 +496,7 @@
           try {
             const { data, error } = await sb.rpc("register_device", {
               p_student_id: document.getElementById("fId").value.trim(),
-              p_name: document.getElementById("fName").value.trim(),
+              p_name: document.getElementById("fName").value.trim().normalize("NFC"),
               p_code: document.getElementById("fCode").value.trim(),
               p_token: token,
             });

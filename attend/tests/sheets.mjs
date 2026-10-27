@@ -1,0 +1,33 @@
+import vm from 'node:vm';
+import {readFile} from 'node:fs/promises';
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+const source=await readFile(new URL('../sheets/Code.gs',import.meta.url),'utf8');
+const context=vm.createContext({console,Date,Utilities:{DigestAlgorithm:{SHA_256:'sha256'},computeDigest:(_,s)=>createHash('sha256').update(s).digest(),base64Encode:b=>Buffer.from(b).toString('base64'),formatDate:d=>d.toISOString().slice(0,10)}});
+vm.runInContext(source,context);
+const props=new Map([['NFC_YEAR','2026'],['NFC_SECRET','not-a-real-secret']]);
+context.nfcProps_=()=>({getProperty:k=>props.get(k),setProperties:o=>Object.entries(o).forEach(([k,v])=>props.set(k,v)),deleteProperty:k=>props.delete(k)});
+let values=[['30101','가학생'.normalize('NFD'),'','','','', '',2026,'재적','2026-10-01','2027-02-28','']];
+let wrote=[]; const alerts=[];
+const sh={getLastRow:()=>values.length+1,getRange:(row,col,n,width)=>({getValues:()=>values,setValues:rows=>{assert.equal(col,7);values[row-2].splice(6,6,...rows[0]);}})};
+context.SpreadsheetApp={getActive:()=>({getSheetByName:()=>sh,setActiveSheet:()=>{}})};
+context.nfcRun_=fn=>fn();context.nfcReacquire_=()=>{};
+context.nfcWrite_=(name,headers,rows)=>{wrote.push({name,headers,rows});return sh;};
+context.nfcUi_=()=>({Button:{YES:'yes'},ButtonSet:{YES_NO:'yn'},alert:(...a)=>{alerts.push(a[0]);return 'yes';}});
+let requestRows,version=0;
+context.nfcRpc_=(name,args)=>{
+ if(name==='nfc_roster_preview') {requestRows=args.p_rows;return {preview_id:'plan',changes:[{type:'new',after:args.p_rows[0]}],warnings:['마지막 출석 대상일은 2027-02-28입니다.']};}
+ if(name==='nfc_roster_apply')return {count:1,rows:[{student_uid:'fixed-id',school_year:2026,state:'active',starts_on:'2026-10-01',ends_on:'2027-02-28',revision:++version}]};
+ throw Error(name);
+};
+context.nfcPreview();
+assert.equal(requestRows[0].name,'가학생');
+assert.equal(wrote.at(-1).rows.at(-1)[0],'확인 필요');
+assert(alerts.at(-1).includes('변경 1건'));
+assert(alerts.at(-1).includes('마지막 출석 대상일'));
+context.nfcApply();assert.equal(values[0][6],'fixed-id');assert.equal(values[0][11],1);
+values[0][1]='이름변경';context.nfcPreview();assert.equal(requestRows[0].revision,1);context.nfcApply();assert.equal(values[0][11],2);
+context.nfcPreview();values[0][1]='다른변경';assert.throws(()=>context.nfcApply(),/미리보기 후 시트가 바뀌/);
+context.nfcPreview();context.nfcUi_=()=>({Button:{YES:'yes'},ButtonSet:{YES_NO:'yn'},alert:()=>{values[0][1]='확인중변경';return 'yes';}});
+assert.throws(()=>context.nfcApply(),/확인 중 시트가 바뀌/);
+console.log('PASS sheet warning visibility, NFC name, revision round trip and pre/post-confirmation conflict checks');

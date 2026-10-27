@@ -218,7 +218,7 @@ function nfcInput_() {
       String(r[8] || "");
     rows.push({
       student_id: String(r[0]).trim(),
-      name: String(r[1]).trim(),
+      name: String(r[1]).trim().normalize("NFC"),
       student_uid: String(r[6] || "").trim(),
       state: state,
       starts_on: nfcDateCell_(r[9]),
@@ -299,6 +299,7 @@ function nfcPreview() {
         a.ends_on || "",
       ];
     });
+    (data.warnings || []).forEach(w => rows.push(["확인 필요", "", "", "", w, "", "", "", "", "", ""]));
     const sh = nfcWrite_(
       "동기화 미리보기",
       [
@@ -323,10 +324,10 @@ function nfcPreview() {
     SpreadsheetApp.getActive().setActiveSheet(sh);
     nfcUi_().alert(
       "변경 " +
-        rows.filter((r) => r[0] !== "누락 · 유지").length +
+        rows.filter((r) => r[0] === "신규" || r[0] === "변경").length +
         "건, 누락 " +
         rows.filter((r) => r[0] === "누락 · 유지").length +
-        "건입니다.\n누락된 학생은 유지됩니다. 내용을 확인한 뒤 30분 안에 “미리본 명단 적용”을 실행하세요.",
+        "건입니다.\n" + (data.warnings || []).join("\n") + "\n누락된 학생은 유지됩니다. 내용을 확인한 뒤 30분 안에 “미리본 명단 적용”을 실행하세요.",
     );
   });
 }

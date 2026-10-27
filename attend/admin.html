@@ -461,12 +461,12 @@
                 max="2100"
                 style="width: 100px" /></label
             ><button class="btn" id="btnRosterRefresh">불러오기</button
-            ><button class="btn" id="btnRosterExport">시트용 명단 CSV</button>
+            ><button class="btn" id="btnRosterExport">시트용 명단 CSV</button><button class="btn" id="btnRejectedHistory">가입 거절 이력</button>
           </div>
           <p class="notice">
             구글 시트를 명단 원본으로 사용하세요. 학번은 학년도별로 관리하고,
             학생 식별자는 진급 때도 유지합니다. 누락된 학생은 자동 삭제되지
-            않습니다.
+            않습니다. 새 학년도 명단은 2월 중 미리 적용하세요. 3월 1일부터 해당 학년도 명단이 있어야 출석할 수 있습니다.
           </p>
           <details>
             <summary>명단 붙여넣기 또는 개별 수정</summary>
@@ -631,7 +631,7 @@
             코드로 남의 학번을 가로챌 수는 없어요.<br />
             추가로 들어온 학생은 명단에
             <span class="tag t-late">추가</span> 표시가 붙어요. 확인 후
-            <b>명단 확정</b>을 누르세요. 필요한 기간에만 켜 두고 끄는 걸 권해요.
+            <b>명단 확정</b>에서 출석 시작일을 확인하세요. 잘못된 자가가입은 <b>가입 거절</b>로 학번과 기기 연결을 해제할 수 있습니다. 필요한 기간에만 켜 두고 끄는 걸 권해요.
           </p>
         </div>
         <div class="card">
