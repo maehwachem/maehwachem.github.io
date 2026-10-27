@@ -240,9 +240,12 @@ declare answer jsonb; begin
 end $$;
 
 create function public._nfc_session_event(p_session uuid,p_uid uuid,p_result text) returns void language plpgsql set search_path=public as $$
-begin
- if not exists(select 1 from public.class_tag_events where session_id=p_session and student_uid=p_uid and result=p_result and tagged_at>now()-interval '30 seconds') then
-  insert into public.class_tag_events(session_id,student_uid,result) values(p_session,p_uid,p_result);
+declare previous public.class_tag_events%rowtype; begin
+ select * into previous from public.class_tag_events where session_id=p_session and student_uid=p_uid order by id desc limit 1;
+ if previous.result=p_result and previous.tagged_at>now()-interval '30 seconds' then
+  update public.class_tag_events set tagged_at=clock_timestamp() where id=previous.id;
+ else
+  insert into public.class_tag_events(session_id,student_uid,result,tagged_at) values(p_session,p_uid,p_result,clock_timestamp());
  end if;
 end $$;
 
@@ -312,8 +315,7 @@ begin
   insert into public.class_audit(session_id,student_uid,action,before_value,after_value,reason) values(p_session,uid,'check_in',before_r,to_jsonb(r),'학생 수업 출석 확인');
  end if;
  select r.status in ('present','late') and exists(select 1 from public.class_records z join public.class_sessions k on k.id=z.session_id where z.student_uid=uid and z.session_id<>p_session and z.enrolled and z.status in ('present','late') and k.state<>'cancelled' and k.att_date=d and k.opens_at<s.closes_at and s.opens_at<k.closes_at) into overlapping;
- perform public._nfc_session_event(p_session,uid,case when was and r.source='manual' then 'after_manual' when was then 'duplicate' else 'accepted' end);
- if overlapping then perform public._nfc_session_event(p_session,uid,'overlap'); end if;
+ perform public._nfc_session_event(p_session,uid,case when was and r.source='manual' then 'after_manual' when overlapping then 'overlap' when was then 'duplicate' else 'accepted' end);
  return jsonb_build_object('ok',true,'already',was,'name',e.name,'student_id',e.student_id,'status',r.status,'time',to_char(r.first_tag_at at time zone 'Asia/Seoul','HH24:MI:SS'),'title',s.title,'period_label',s.period_label,'daily_unconfirmed',daily is null or daily='unconfirmed','source',r.source,'overlap',overlapping);
 end $$;
 
