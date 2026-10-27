@@ -468,7 +468,7 @@
           if (!r.ok && r.error === "unknown_device") {clearToken();showRegister();return;}
           if (session && r.ok) {
             const status = {present:"출석 완료",late:"지각 처리",excused:"출석 인정",absent:"결석 확정",unconfirmed:"선생님 확인 필요"}[r.status] || "확인 필요";
-            result(r.status === "present" ? "ok" : "warn", r.status === "present" ? "✅" : "📋", `${r.period_label || ""} ${r.title} · ${status}`, `${r.name} (${r.student_id})`, r.time || "", (r.already ? "이 수업의 기존 기록을 보여드려요. 첫 태그 시각과 교사 확인은 그대로 유지돼요." : "이 수업의 출석을 기록했어요.") + (r.daily_unconfirmed ? "<br>오늘 등교는 아직 미확인이에요. 등교를 따로 확인하거나 선생님께 알려 주세요." : ""));
+            result(r.status === "present" ? "ok" : "warn", r.status === "present" ? "✅" : "📋", `${r.period_label || ""} ${r.title} · ${status}`, `${r.name} (${r.student_id})`, r.time || "", (r.already ? "이 수업의 기존 기록을 보여드려요. 첫 태그 시각과 교사 확인은 그대로 유지돼요." : "이 수업의 출석을 기록했어요.") + (r.overlap ? "<br>시간이 겹치는 다른 수업에도 출석 기록이 있어요. 수업 선택이 맞는지 선생님과 확인해 주세요." : "") + (r.daily_unconfirmed ? "<br>오늘 등교는 아직 미확인이에요. 등교를 따로 확인하거나 선생님께 알려 주세요." : ""));
           } else showCheckIn(r);
         } catch(e) {
           result("bad","📶","연결이 불안정해요","","","인터넷 연결을 확인한 뒤 다시 선택해 주세요. 저장된 출석은 중복 기록되지 않아요.",true);

@@ -62,6 +62,7 @@ try {
  await test('remove/readd roster retains attendance and audits; nonmembers rejected',async()=>{
   await call('nfc_session_member',[session,a,false,4,'수강 대상 제외']);
   assert.equal((await call('nfc_session_check_in',['a'.repeat(64),session])).error,'not_enrolled');
+  assert.equal((await call('nfc_session_detail',[session])).rows.find(x=>x.student_uid===a).last_attempt.result,'not_enrolled');
   assert.equal((await call('nfc_session_detail',[session])).rows.find(x=>x.student_uid===a).status,'absent');
   await call('nfc_session_member',[session,a,true,5,'대상 복원']);
   assert.equal((await call('nfc_session_detail',[session])).rows.find(x=>x.student_uid===a).status,'absent');
@@ -91,12 +92,31 @@ try {
   await q("update class_sessions set closes_at=now()-interval '1 second',late_at=opens_at where id=$1",[second]);
   assert.equal((await call('nfc_session_check_in',['a'.repeat(64),second])).error,'session_closed');
  });
+ await test('overlapping attendance warns both rows; manual reset retag remains visible',async()=>{
+  await db.exec('begin;');
+  await q("update class_sessions set closes_at=(att_date+time '23:59:59') at time zone 'Asia/Seoul' where id=$1",[second]);
+  await call('nfc_session_correct',[session,a,'present','교사 확인',2,6]);
+  const r=await call('nfc_session_check_in',['a'.repeat(64),second]);assert.equal(r.overlap,true);
+  for(const id of [session,second])assert.equal((await call('nfc_session_detail',[id])).rows.find(x=>x.student_uid===a).overlap_attendance,true);
+  await call('nfc_session_correct',[session,a,'unconfirmed','재확인',3,6]);
+  const reset=await call('nfc_session_check_in',['a'.repeat(64),session]);assert.equal(reset.status,'unconfirmed');assert.equal(reset.already,true);
+  assert.equal((await call('nfc_session_detail',[session])).rows.find(x=>x.student_uid===a).last_attempt.result,'after_manual');
+  await db.exec('rollback;');
+ });
  await test('holiday and pending enrollment prevent automatic sessions; no past generation',async()=>{
   await call('nfc_calendar',[today,today,0,false,'휴업']);
   const temp2={...template,id:crypto.randomUUID(),title:'휴업일 수업'};await call('nfc_class_save',[temp2,0,'휴업일 검증']);
   await call('nfc_session_day',[today]);assert.equal(await one('select count(*)::int from class_sessions where template_id=$1',[temp2.id]),0);
   const prev=await one("select ((now() at time zone 'Asia/Seoul')::date-1)::text");await call('nfc_session_day',[prev]);assert.equal(await one('select count(*)::int from class_sessions where att_date=$1',[prev]),0);
   assert.equal((await call('nfc_session_check_in',['a'.repeat(64),session])).error,'not_school_day');
+ });
+ await test('pausing an invalid old roster preserves sessions and rejects stale edits',async()=>{
+  await q("update enrollments set state='rejected' where student_uid=$1",[c]);
+  await call('nfc_class_pause',[template.id,2,'수강 종료']);
+  assert.equal(await one('select enabled from class_templates where id=$1',[template.id]),false);
+  assert.equal(await one('select count(*)::int from class_records where session_id=$1',[session]),2);
+  await assert.rejects(()=>call('nfc_class_pause',[template.id,2,'충돌']),/바뀌었/);
+  await q("update enrollments set state='active' where student_uid=$1",[c]);
  });
  await test('reports retain removed/cancelled rows, bounded range, read-only sheet access',async()=>{
   const rows=await call('nfc_session_report',[today,today]);assert.equal(rows.length,3);
@@ -108,6 +128,7 @@ try {
   for (const f of ['nfc_session_day','nfc_class_list']) await assert.rejects(()=>call(f,[f==='nfc_class_list'?year:today]),/permission denied/);
   await assert.rejects(()=>q('select * from class_records'),/permission denied/);
   await assert.rejects(()=>call('_nfc_sessions_ensure',[today]),/permission denied/);
+  await assert.rejects(()=>call('nfc_class_pause',[template.id,3,'권한']),/permission denied/);
   await db.exec('reset role;set role authenticated;');await assert.rejects(()=>call('nfc_session_day',[today]),/교사 권한/);
   assert.equal(await one('select count(*)::int from class_records'),0);
   await assert.rejects(()=>q("update class_records set status='present'"),/permission denied/);

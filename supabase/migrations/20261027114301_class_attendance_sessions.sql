@@ -102,6 +102,18 @@ begin
  return jsonb_build_object('ok',true,'id',v_id);
 end $$;
 
+-- Pausing must remain possible even when the previous roster is no longer valid.
+create function public.nfc_class_pause(p_template uuid,p_revision integer,p_reason text) returns jsonb language plpgsql security definer set search_path=public as $$
+declare t public.class_templates%rowtype; begin
+ perform public._nfc_teacher(); perform pg_advisory_xact_lock(7212026);
+ if length(trim(coalesce(p_reason,''))) not between 1 and 200 then raise exception '사유를 입력하세요'; end if;
+ select * into t from public.class_templates where id=p_template;
+ if not found or t.revision is distinct from p_revision then raise exception '시간표가 바뀌었습니다. 다시 불러오세요'; end if;
+ update public.class_templates set enabled=false,revision=revision+1 where id=p_template;
+ insert into public.class_audit(template_id,action,before_value,after_value,reason,actor) values(p_template,'template_pause',to_jsonb(t),jsonb_build_object('enabled',false),trim(p_reason),auth.uid());
+ return jsonb_build_object('ok',true);
+end $$;
+
 -- Only today is materialized implicitly. No retrospective phantom attendance.
 create function public._nfc_sessions_ensure(p_date date,p_uid uuid default null) returns void language plpgsql set search_path=public as $$
 declare t public.class_templates%rowtype; sid uuid;
@@ -135,6 +147,7 @@ declare s public.class_sessions%rowtype; rows jsonb; begin
  perform public._nfc_teacher(); select * into s from public.class_sessions where id=p_session;
  if not found then raise exception '수업 회차가 없습니다'; end if;
  select coalesce(jsonb_agg(to_jsonb(r)||jsonb_build_object('daily_status',coalesce(a.status,'unconfirmed'),'whereabouts',case when m.kind in ('out','early') then m.kind else 'inside' end,'movement_time',m.happened_at,
+ 'overlap_attendance',r.enrolled and r.status in ('present','late') and s.state<>'cancelled' and exists(select 1 from public.class_records z join public.class_sessions k on k.id=z.session_id where z.student_uid=r.student_uid and z.session_id<>s.id and z.enrolled and z.status in ('present','late') and k.state<>'cancelled' and k.att_date=s.att_date and k.opens_at<s.closes_at and s.opens_at<k.closes_at),
  'roster_warning',not coalesce(e.state not in ('pending','rejected') and s.att_date between e.starts_on and e.ends_on and (s.allow_non_school_day or public._nfc_school_day(s.att_date,e.grade)),false),
  'last_attempt',(select jsonb_build_object('result',ev.result,'at',ev.tagged_at) from public.class_tag_events ev where ev.session_id=s.id and ev.student_uid=r.student_uid and ev.result not in ('accepted','duplicate') order by ev.id desc limit 1)) order by r.student_id),'[]') into rows
  from public.class_records r left join public.enrollments e on e.student_uid=r.student_uid and e.school_year=public.nfc_year(s.att_date)
@@ -255,7 +268,7 @@ declare uid uuid; e public.enrollments%rowtype; d date:=(now() at time zone 'Asi
 end $$;
 
 create function public.nfc_session_check_in(p_token text,p_session uuid,p_lat double precision default null,p_lng double precision default null,p_acc double precision default null) returns jsonb language plpgsql security definer set search_path=public as $$
-declare uid uuid; e public.enrollments%rowtype; s public.class_sessions%rowtype; r public.class_records%rowtype; before_r jsonb; cfg public.settings%rowtype; m public.movements%rowtype; daily text; failure text; dist double precision; was boolean;
+declare uid uuid; e public.enrollments%rowtype; s public.class_sessions%rowtype; r public.class_records%rowtype; before_r jsonb; cfg public.settings%rowtype; m public.movements%rowtype; daily text; failure text; dist double precision; was boolean; overlapping boolean;
  d date:=(now() at time zone 'Asia/Seoul')::date;
 begin
  perform pg_advisory_xact_lock(7212026);
@@ -267,7 +280,8 @@ begin
  if e.state='pending' then return jsonb_build_object('ok',false,'error','pending'); end if;
  select * into s from public.class_sessions where id=p_session;
  select * into r from public.class_records where session_id=p_session and student_uid=uid;
- if s.id is null or r.session_id is null or not r.enrolled then return jsonb_build_object('ok',false,'error','not_enrolled'); end if;
+ if s.id is null or r.session_id is null then return jsonb_build_object('ok',false,'error','not_enrolled'); end if;
+ if not r.enrolled then perform public._nfc_session_event(p_session,uid,'not_enrolled'); return jsonb_build_object('ok',false,'error','not_enrolled'); end if;
  before_r:=to_jsonb(r);
  if s.att_date<>d or s.state<>'open' or now()<s.opens_at or now()>=s.closes_at then failure:='session_closed';
  elsif not s.allow_non_school_day and not public._nfc_school_day(d,e.grade) then failure:='not_school_day';
@@ -297,8 +311,10 @@ begin
   update public.class_records set status=case when now()<s.late_at then 'present' else 'late' end,first_tag_at=now(),source='nfc',version=1 where session_id=p_session and student_uid=uid returning * into r;
   insert into public.class_audit(session_id,student_uid,action,before_value,after_value,reason) values(p_session,uid,'check_in',before_r,to_jsonb(r),'학생 수업 출석 확인');
  end if;
- perform public._nfc_session_event(p_session,uid,case when was then 'duplicate' else 'accepted' end);
- return jsonb_build_object('ok',true,'already',was,'name',e.name,'student_id',e.student_id,'status',r.status,'time',to_char(r.first_tag_at at time zone 'Asia/Seoul','HH24:MI:SS'),'title',s.title,'period_label',s.period_label,'daily_unconfirmed',daily is null or daily='unconfirmed','source',r.source);
+ select r.status in ('present','late') and exists(select 1 from public.class_records z join public.class_sessions k on k.id=z.session_id where z.student_uid=uid and z.session_id<>p_session and z.enrolled and z.status in ('present','late') and k.state<>'cancelled' and k.att_date=d and k.opens_at<s.closes_at and s.opens_at<k.closes_at) into overlapping;
+ perform public._nfc_session_event(p_session,uid,case when was and r.source='manual' then 'after_manual' when was then 'duplicate' else 'accepted' end);
+ if overlapping then perform public._nfc_session_event(p_session,uid,'overlap'); end if;
+ return jsonb_build_object('ok',true,'already',was,'name',e.name,'student_id',e.student_id,'status',r.status,'time',to_char(r.first_tag_at at time zone 'Asia/Seoul','HH24:MI:SS'),'title',s.title,'period_label',s.period_label,'daily_unconfirmed',daily is null or daily='unconfirmed','source',r.source,'overlap',overlapping);
 end $$;
 
 create function public._nfc_session_report(p_from date,p_to date) returns jsonb language plpgsql stable set search_path=public as $$
@@ -319,7 +335,7 @@ end $$;
 
 -- Explicit grants: helpers inaccessible, teacher actions guarded, student endpoints token-scoped.
 do $$ declare p record; begin
- for p in select oid::regprocedure signature,proname from pg_proc where pronamespace='public'::regnamespace and proname in ('nfc_class_list','nfc_class_save','_nfc_sessions_ensure','nfc_session_day','nfc_session_detail','nfc_session_save','nfc_session_state','nfc_session_member','nfc_session_correct','nfc_session_history','_nfc_session_event','nfc_attendance_options','nfc_session_check_in','_nfc_session_report','nfc_session_report','sync_pull_sessions') loop
+ for p in select oid::regprocedure signature,proname from pg_proc where pronamespace='public'::regnamespace and proname in ('nfc_class_list','nfc_class_save','nfc_class_pause','_nfc_sessions_ensure','nfc_session_day','nfc_session_detail','nfc_session_save','nfc_session_state','nfc_session_member','nfc_session_correct','nfc_session_history','_nfc_session_event','nfc_attendance_options','nfc_session_check_in','_nfc_session_report','nfc_session_report','sync_pull_sessions') loop
   execute format('revoke all on function %s from public,anon,authenticated',p.signature);
   if left(p.proname,1)<>'_' then
    execute format('grant execute on function %s to authenticated',p.signature);
