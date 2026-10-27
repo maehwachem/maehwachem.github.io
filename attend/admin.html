@@ -349,6 +349,23 @@
       .kpis {
         margin-bottom: 14px;
       }
+      .session-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:10px; margin:14px 0; }
+      .session-card { text-align:left; padding:16px; font:inherit; border:1px solid var(--line); border-radius:12px; background:white; cursor:pointer; }
+      .session-card[aria-pressed="true"] { border-color:var(--brand); background:#eef2ff; }
+      .session-card strong,.session-card small { display:block; margin-bottom:7px; }
+      .session-card small { color:var(--sub); }
+      .member-picker { max-height:280px; overflow:auto; border:1px solid var(--line); border-radius:10px; }
+      .member-picker label { display:flex; align-items:center; gap:8px; padding:8px; margin:0; font-weight:400; }
+      .member-picker input[type=checkbox], .weekday-picker input { width:auto; }
+      .member-picker input[type=date] { width:135px; padding:4px; font-size:12px; }
+      .weekday-picker { display:flex; gap:10px; flex-wrap:wrap; }
+      .weekday-picker label { display:flex; align-items:center; gap:4px; }
+      .session-roster { display:grid; gap:8px; }
+      .session-student { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:12px; border:1px solid var(--line); border-radius:10px; flex-wrap:wrap; }
+      .session-student .sub { display:block; margin-top:4px; }
+      .session-roster .row { gap:5px; }
+      #sContent[aria-busy="true"] { opacity:.5; pointer-events:none; }
+      #sDetail { scroll-margin-top:110px; }
       #previewBox {
         max-height: 350px;
         overflow: auto;
@@ -387,6 +404,7 @@
       <h1>NFC 출석 관리</h1>
       <nav id="nav" class="hidden">
         <button data-tab="today" class="on">대시보드</button
+        ><button data-tab="sessions">수업 출석</button
         ><button data-tab="roster">학생 명단</button
         ><button data-tab="calendar">출석 대상일</button
         ><button data-tab="settings">설정</button>
@@ -422,6 +440,7 @@
             ><select id="dClass" aria-label="반"></select
             ><select id="dStatus" aria-label="출석 상태">
               <option value="">전체 상태</option>
+              <option value="eligible">출석 대상만</option>
               <option value="unconfirmed">미확인</option>
               <option value="present">출석</option>
               <option value="late">지각</option>
@@ -497,6 +516,27 @@
             기록과 이동 상태를 별도 열로 저장합니다.
           </p>
         </div>
+      </section>
+      <section id="tab-sessions" class="hidden">
+        <div class="dashboard-heading"><div><h2>수업·교시별 출석</h2><p class="sub">등교 출석과 따로, 하루에도 여러 번 확인합니다.</p></div></div>
+        <div class="card"><div class="row">
+          <label>날짜 <input type="date" id="sDate"></label>
+          <button class="btn" id="sToday">오늘</button><button class="btn" id="sRefresh">새로고침</button>
+          <button class="btn p" id="sExtra">이 날짜만 수업 추가</button><span class="sub" id="sUpdated"></span>
+        </div><p class="sub">시간표에 등록한 오늘 수업은 화면을 열면 자동으로 준비됩니다. 과거의 미생성 회차는 자동으로 만들지 않습니다.</p></div>
+        <p id="sMessage" role="status"></p>
+        <div id="sContent">
+          <div id="sCards" class="session-cards" aria-label="수업 선택"></div>
+          <div id="sDetail" class="card hidden" tabindex="-1">
+            <h2 id="sTitle"></h2><p id="sInfo" class="sub"></p>
+            <div class="row" id="sTools"><button class="btn" id="sEdit">이 회차 설정</button><button class="btn" id="sState">마감·휴강</button><button class="btn" id="sAddMember">이 회차 학생 추가</button><button class="btn" id="sHistory">회차 이력</button></div>
+            <div class="row" style="margin:14px 0"><input id="sSearch" placeholder="이름·학번 검색" aria-label="수업 학생 검색"><select id="sFilter" aria-label="수업 출석 상태"><option value="">대상 전체</option><option value="unconfirmed">미확인</option><option value="present">출석</option><option value="late">지각</option><option value="excused">인정</option><option value="absent">결석 확정</option><option value="removed">대상 제외 기록</option></select></div>
+            <p id="sCount" class="sub"></p><div id="sRows" class="session-roster"></div>
+            <p class="sub">휴대폰 없는 학생은 ‘교사 확인’에서 상태와 사유를 저장하세요. 등교·외출·조퇴 표시는 참고 정보이며 수업 출석을 자동 변경하지 않습니다.</p>
+          </div>
+          <details class="card" id="sTemplates"><summary><strong>반복 시간표 설정</strong></summary><p class="sub">수업명·교시·요일·시간·수강생·수강 기간을 설정합니다. 수정은 아직 만들어지지 않은 회차에만 적용됩니다.</p><button class="btn p" id="sNewTemplate">시간표 추가</button><div id="sTemplateList"></div></details>
+        </div>
+        <div class="card"><h2>수업 기록 내보내기</h2><div class="row"><input type="date" id="sFrom" aria-label="수업 기록 시작일"> ~ <input type="date" id="sTo" aria-label="수업 기록 종료일"><button class="btn" id="sExport">수업 기록 CSV 받기</button></div><p class="sub">최대 62일. 등교 기록과 별도이며 휴강·대상 제외 기록도 구분하여 보존합니다.</p></div>
       </section>
       <section id="tab-roster" class="hidden">
         <div class="card">
@@ -786,6 +826,7 @@
     <div id="toast" role="status"></div>
     <script src="config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-    <script src="admin.js?v=20261027-dashboard"></script>
+    <script src="admin.js?v=20261027-sessions"></script>
+    <script src="sessions.js?v=20261027-sessions"></script>
   </body>
 </html>

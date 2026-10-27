@@ -184,6 +184,13 @@
         <div class="hint" id="loadingHint">잠시만 기다려 주세요</div>
       </div>
 
+      <div id="vChoices" class="hidden">
+        <h1>어떤 출석을 확인할까요?</h1><p id="choiceWho" class="who"></p>
+        <div class="hint">등교 또는 수업을 하나 선택해 주세요.<br>버튼을 눌러야 해당 출석이 기록돼요.</div>
+        <button id="btnArrival" type="button">등교 출석 확인</button>
+        <div id="classChoices"></div><p id="choiceHint" class="hint"></p>
+        <button type="button" class="ghost" onclick="start()">수업 목록 새로고침</button>
+      </div>
       <!-- 결과 -->
       <div id="vResult" class="hidden">
         <div id="resultBox" class="box">
@@ -196,6 +203,7 @@
         <button class="ghost hidden" id="btnRetry" onclick="start()">
           다시 시도
         </button>
+        <button class="ghost" onclick="start()">등교·수업 다시 선택</button>
       </div>
 
       <!-- 최초 등록 -->
@@ -203,7 +211,7 @@
         <h1>처음 한 번만 등록해 주세요</h1>
         <div class="hint" style="margin-top: -8px">
           선생님께 받은 <b>등록코드</b>로 이 휴대폰을 본인 기기로 등록합니다.<br />다음부터는
-          NFC를 대기만 하면 바로 출석돼요.
+          NFC를 대고 등교 또는 수업을 선택하면 출석돼요.
         </div>
         <form id="regForm">
           <label for="fId">학번</label>
@@ -233,7 +241,7 @@
             📝 명단에 없는 학생은 선생님이 알려주신 <b>추가 등록 코드</b>를 넣어
             주세요.
           </div>
-          <button type="submit" id="btnReg">등록하고 출석하기</button>
+          <button type="submit" id="btnReg">등록하고 출석 선택</button>
         </form>
         <div class="hint">
           ⚠️ 친구 휴대폰으로 등록하면 내 출석이 그 폰에 묶여요. 꼭 본인
@@ -288,7 +296,7 @@
 
       // ---------- 화면 전환 ----------
       function show(id) {
-        ["vLoading", "vResult", "vRegister"].forEach((v) =>
+        ["vLoading", "vResult", "vRegister", "vChoices"].forEach((v) =>
           document.getElementById(v).classList.toggle("hidden", v !== id),
         );
       }
@@ -333,7 +341,7 @@
       }
 
       // ---------- 출석 ----------
-      async function doCheckIn(token) {
+      async function doCheckIn(token, session = null) {
         const s = await loadSettings();
         let loc = null;
         if (s.geo_required) {
@@ -341,7 +349,8 @@
             "학교 안에 있는지 위치를 확인하고 있어요";
           loc = await getLocation();
         }
-        const { data, error } = await sb.rpc("check_in", {
+        const { data, error } = await sb.rpc(session ? "nfc_session_check_in" : "check_in", {
+          ...(session ? {p_session:session} : {}),
           p_token: token,
           p_lat: loc ? loc.lat : null,
           p_lng: loc ? loc.lng : null,
@@ -400,6 +409,11 @@
           return;
         }
         const map = {
+          not_enrolled: ["📋", "이 수업 명단을 확인해 주세요", "선생님께 이 회차의 수강생 명단을 확인해 달라고 알려 주세요."],
+          session_closed: ["🔒", "수업 출석 접수가 닫혀 있어요", "수업의 날짜·접수시간·휴강 여부를 확인해 주세요. 목록에서 다시 선택할 수 있어요."],
+          movement_out: ["🚶", "외출 중으로 기록되어 있어요", "수업 출석은 변경하지 않았어요. 돌아왔다면 선생님께 복귀 확인을 요청하세요."],
+          movement_early: ["🏠", "조퇴 처리되어 있어요", "수업 출석은 변경하지 않았어요. 선생님께 확인을 요청하세요."],
+          daily_confirmed: ["📋", "등교 기록을 먼저 확인해 주세요", "오늘 등교가 결석 또는 인정으로 처리되어 있어요. 선생님께 확인을 요청하세요."],
           pending: [
             "📋",
             "선생님 승인 대기 중이에요",
@@ -444,34 +458,46 @@
         result("bad", m[0], m[1], who, "", m[2], true);
       }
 
-      async function start() {
-        show("vLoading");
-        document.getElementById("loadingHint").textContent =
-          "잠시만 기다려 주세요";
-        const token = getToken();
-        if (!token) {
-          showRegister();
-          return;
-        }
+      let attendanceBusy = false;
+      const studentTime = iso => iso ? new Intl.DateTimeFormat("ko-KR", {timeZone:"Asia/Seoul",hour:"2-digit",minute:"2-digit",hour12:false}).format(new Date(iso)) : "";
+      async function chooseAttendance(session = null) {
+        if (attendanceBusy) return;
+        attendanceBusy = true;show("vLoading");
         try {
-          const r = await doCheckIn(token);
-          if (!r.ok && r.error === "unknown_device") {
-            clearToken();
-            showRegister();
-            return;
+          const r = await doCheckIn(getToken(), session);
+          if (!r.ok && r.error === "unknown_device") {clearToken();showRegister();return;}
+          if (session && r.ok) {
+            const status = {present:"출석 완료",late:"지각 처리",excused:"출석 인정",absent:"결석 확정",unconfirmed:"선생님 확인 필요"}[r.status] || "확인 필요";
+            result(r.status === "present" ? "ok" : "warn", r.status === "present" ? "✅" : "📋", `${r.period_label || ""} ${r.title} · ${status}`, `${r.name} (${r.student_id})`, r.time || "", (r.already ? "이 수업의 기존 기록을 보여드려요. 첫 태그 시각과 교사 확인은 그대로 유지돼요." : "이 수업의 출석을 기록했어요.") + (r.daily_unconfirmed ? "<br>오늘 등교는 아직 미확인이에요. 등교를 따로 확인하거나 선생님께 알려 주세요." : ""));
+          } else showCheckIn(r);
+        } catch(e) {
+          result("bad","📶","연결이 불안정해요","","","인터넷 연결을 확인한 뒤 다시 선택해 주세요. 저장된 출석은 중복 기록되지 않아요.",true);
+        } finally {attendanceBusy=false;}
+      }
+      document.getElementById("btnArrival").onclick=()=>chooseAttendance();
+      async function start() {
+        if(attendanceBusy)return;
+        attendanceBusy=true;show("vLoading");
+        document.getElementById("loadingHint").textContent="출석할 등교·수업을 찾고 있어요";
+        const token=getToken();
+        if(!token){attendanceBusy=false;showRegister();return;}
+        try {
+          await loadSettings();
+          const {data:r,error}=await sb.rpc("nfc_attendance_options",{p_token:token});
+          if(error)throw error;
+          if(!r.ok){if(r.error==="unknown_device"){clearToken();showRegister();}else showCheckIn(r);return;}
+          document.getElementById("choiceWho").textContent=`${r.name} (${r.student_id})`;
+          const container=document.getElementById("classChoices");container.replaceChildren();
+          for(const item of r.sessions){
+            const b=document.createElement("button");b.type="button";b.className="ghost";
+            const state=item.state==="cancelled"?"휴강":item.state==="closed"?"마감":item.available?"선택 가능":"접수시간 아님";
+            b.textContent=`${item.period_label || ""} ${item.title} · ${studentTime(item.opens_at)}~${studentTime(item.closes_at)} · ${state}`;
+            b.disabled=!item.available;b.onclick=()=>chooseAttendance(item.id);container.append(b);
           }
-          showCheckIn(r);
-        } catch (e) {
-          result(
-            "bad",
-            "📶",
-            "연결이 불안정해요",
-            "",
-            "",
-            "인터넷 연결을 확인하고 다시 시도해 주세요.",
-            true,
-          );
-        }
+          document.getElementById("choiceHint").textContent=r.sessions.length?"수업 출석은 등교 출석과 별도로 기록돼요. 외출·조퇴 기록은 자동으로 바뀌지 않아요.":"오늘 내 명단에 준비된 수업이 없어요. 수업 출석이 필요하면 선생님께 시간표와 수강생 명단을 확인해 달라고 알려 주세요.";
+          show("vChoices");
+        } catch(e){result("bad","📶","목록을 불러오지 못했어요","","","인터넷 연결을 확인하고 다시 시도해 주세요. 아직 출석은 처리하지 않았어요.",true);}
+        finally{attendanceBusy=false;}
       }
 
       // ---------- 최초 등록 ----------
@@ -525,9 +551,7 @@
               return;
             }
             saveToken(token);
-            show("vLoading");
-            const r = await doCheckIn(token);
-            showCheckIn(r);
+            await start();
           } catch (e) {
             result(
               "bad",
@@ -540,7 +564,7 @@
             );
           } finally {
             btn.disabled = false;
-            btn.textContent = "등록하고 출석하기";
+            btn.textContent = "등록하고 출석 선택";
           }
         });
 

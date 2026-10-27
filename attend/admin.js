@@ -124,6 +124,9 @@ async function enterApp() {
   $("rYear").value = yearOf(today);
   $("cFrom").value = today;
   $("cTo").value = today;
+  $("sDate").value = today;
+  $("sFrom").value = today.slice(0,8) + "01";
+  $("sTo").value = today;
   await Promise.all([loadStudents(), loadToday()]);
   startAutoRefresh();
 }
@@ -153,9 +156,10 @@ document.querySelectorAll("#nav button").forEach(
         document
           .querySelectorAll("#nav button")
           .forEach((x) => x.classList.toggle("on", x === b));
-        ["today", "roster", "calendar", "settings"].forEach((t) =>
+        ["today", "sessions", "roster", "calendar", "settings"].forEach((t) =>
           $("tab-" + t).classList.toggle("hidden", t !== b.dataset.tab),
         );
+        if (b.dataset.tab === "sessions") await window.loadClassDashboard();
         if (b.dataset.tab === "settings") await loadSettings();
         if (b.dataset.tab === "roster") await loadStudents();
         if (b.dataset.tab === "calendar") await loadCalendar();
@@ -208,6 +212,7 @@ function startAutoRefresh() {
       $("dDate").value === seoulDate()
     )
       run(null, loadToday);
+    if (!document.hidden && !$("editor").open && !$("tab-sessions").classList.contains("hidden") && $("sDate").value === seoulDate()) run(null, window.loadClassDashboard);
   }, 20000);
 }
 function selectDayFilter(filter, clearSearch = true) {
@@ -238,7 +243,7 @@ function renderToday() {
   const count = (k) => eligible.filter((s) => s.status === k).length;
   const current = $("dStatus").value;
   const kpis = [
-    ["대상", eligible.length, "", "출석 대상 학생"],
+    ["대상", eligible.length, "eligible", "출석 대상 학생"],
     ["출석", count("present"), "present", "정상 등교"],
     ["지각", count("late"), "late", "지각 등교"],
     ["미확인", count("unconfirmed"), "unconfirmed", "교사 확인 필요"],
@@ -267,7 +272,9 @@ function renderToday() {
   const shown = list.filter(
     (s) =>
       !f ||
-      (f === "overdue"
+      (f === "eligible"
+        ? s.eligible
+        : f === "overdue"
         ? s.overdue
         : f === "out" || f === "early"
           ? s.whereabouts === f
@@ -285,7 +292,7 @@ function renderToday() {
               : ["present", "late"].includes(s.status)
                 ? "교내"
                 : "—";
-        return `<tr><td>${esc(seat(s))}</td><td>${esc(s.student_id)} · <b>${esc(s.name)}</b>${!s.eligible ? "<br><small>대상 외 기록</small>" : ""}${s.last_pending_tag ? '<br><small>승인 전 태그 시도 · 출석 미확정 ' + esc(seoulTime(s.last_pending_tag)) + "</small>" : ""}${s.last_exception_tag ? '<br><small class="error">재태그 확인 ' + esc(seoulTime(s.last_exception_tag)) + "</small>" : ""}</td><td><span class="tag t-${s.status}">${STATUS[s.status]}</span>${s.source === "manual" ? "<br><small>교사 확인</small>" : ""}</td><td><span class="tag t-${s.whereabouts}">${wh}</span></td><td class="mono">${esc(seoulTime(s.checked_at) || "—")}</td><td><button class="btn s" data-action="${s.status === "unconfirmed" ? "manual" : "correct"}" data-uid="${s.student_uid}" ${!s.eligible ? "disabled" : ""}>${s.status === "unconfirmed" ? "교사 출석 확인" : "출석 정정"}</button> <button class="btn s" data-action="move" data-uid="${s.student_uid}" ${!["present", "late"].includes(s.status) ? "disabled" : ""}>이동 처리</button> <button class="btn s" data-action="history" data-uid="${s.student_uid}">이력</button></td></tr>`;
+        return `<tr><td>${esc(seat(s))}</td><td>${esc(s.student_id)} · <b>${esc(s.name)}</b>${!s.eligible ? "<br><small>대상 외 기록</small>" : ""}${s.last_pending_tag ? '<br><small>승인 전 태그 시도 · 출석 미확정 ' + esc(seoulTime(s.last_pending_tag)) + "</small>" : ""}${s.last_exception_tag ? '<br><small class="error">재태그 확인 ' + esc(seoulTime(s.last_exception_tag)) + "</small>" : ""}</td><td><span class="tag t-${s.status}">${STATUS[s.status]}</span>${s.source === "manual" ? `<br><small>교사 확인 ${esc(seoulTime(s.corrected_at))}</small>` : ""}</td><td><span class="tag t-${s.whereabouts}">${wh}</span></td><td class="mono">${esc(seoulTime(s.checked_at) || "—")}</td><td><button class="btn s" data-action="${s.status === "unconfirmed" ? "manual" : "correct"}" data-uid="${s.student_uid}" ${!s.eligible ? "disabled" : ""}>${s.status === "unconfirmed" ? "교사 출석 확인" : "출석 정정"}</button> <button class="btn s" data-action="move" data-uid="${s.student_uid}" ${!["present", "late"].includes(s.status) ? "disabled" : ""}>이동 처리</button> <button class="btn s" data-action="history" data-uid="${s.student_uid}">이력</button></td></tr>`;
       })
       .join("") ||
     '<tr><td colspan="6" style="padding:24px;text-align:center">해당하는 학생이 없습니다.</td></tr>';

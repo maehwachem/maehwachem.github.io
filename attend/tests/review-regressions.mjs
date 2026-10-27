@@ -10,7 +10,7 @@ const call=(f,a=[])=>one(`select public.${f}(${a.map((_,i)=>'$'+(i+1)).join(',')
 let passed=0;
 async function test(name,fn){await fn();console.log('PASS',name);passed++;}
 try {
- for(const p of ['baseline.sql','baseline-functions.sql','../../supabase/migrations/20261027051543_attendance_roster_movements.sql','../../supabase/migrations/20261027070831_attendance_review_fixes.sql']) await db.exec(await file(p));
+ for(const p of ['baseline.sql','baseline-functions.sql','../../supabase/migrations/20261027051543_attendance_roster_movements.sql','../../supabase/migrations/20261027070831_attendance_review_fixes.sql','../../supabase/migrations/20261027114301_class_attendance_sessions.sql']) await db.exec(await file(p));
  const teacher=crypto.randomUUID();
  await q('insert into auth.users values($1,$2)',[teacher,'teacher@example.invalid']);
  await q('insert into teachers(user_id,email) values($1,$2)',[teacher,'teacher@example.invalid']);

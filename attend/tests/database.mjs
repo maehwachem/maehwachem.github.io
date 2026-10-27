@@ -32,6 +32,7 @@ try {
     ),
   );
   await db.exec(await file("../../supabase/migrations/20261027070831_attendance_review_fixes.sql"));
+  await db.exec(await file("../../supabase/migrations/20261027114301_class_attendance_sessions.sql"));
   const uid = await one(
     "select student_uid from students where student_id='30101'",
   );

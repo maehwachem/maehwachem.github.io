@@ -31,3 +31,12 @@ context.nfcPreview();values[0][1]='다른변경';assert.throws(()=>context.nfcAp
 context.nfcPreview();context.nfcUi_=()=>({Button:{YES:'yes'},ButtonSet:{YES_NO:'yn'},alert:()=>{values[0][1]='확인중변경';return 'yes';}});
 assert.throws(()=>context.nfcApply(),/확인 중 시트가 바뀌/);
 console.log('PASS sheet warning visibility, NFC name, revision round trip and pre/post-confirmation conflict checks');
+
+context.nfcPrompt_=()=>"2026-10-01,2026-10-27";
+let sessionWrite;
+context.nfcMergePeriod_=(...args)=>sessionWrite=args;
+context.nfcUi_=()=>({alert:()=>{}});
+context.nfcRpc_=(name,args)=>{assert.equal(name,'sync_pull_sessions');assert.equal(args.p_from,'2026-10-01');return {rows:[{att_date:'2026-10-27',session_id:'s',title:'화학',period_label:'1교시',session_state:'cancelled',student_id:'30101',name:'가학생',student_uid:'u',enrolled:false,status:'present'}]};};
+context.nfcPullSessions();assert.equal(sessionWrite[0],'수업 출석');assert.equal(sessionWrite[4][0][4],'휴강');assert.equal(sessionWrite[4][0][8],'제외');
+context.nfcPrompt_=()=>"2026-01-01,2026-12-31";assert.throws(()=>context.nfcPullSessions(),/62일/);
+console.log('PASS separate session sheet, date range and cancelled/removed record retention');

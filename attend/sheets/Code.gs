@@ -45,6 +45,7 @@ function onOpen() {
     .addItem("서버 명단 확인용 사본 받기", "nfcServerRoster")
     .addSeparator()
     .addItem("기간별 출석·이동 가져오기", "nfcPull")
+    .addItem("기간별 수업 출석 가져오기", "nfcPullSessions")
     .addToUi();
 }
 function nfcProps_() {
@@ -570,4 +571,21 @@ function nfcSummary_() {
     ],
     Object.values(map),
   );
+}
+
+
+/** 수업 출석은 별도 탭에만 기록하며 명단과 등교·이동 기록을 수정하지 않습니다. */
+function nfcPullSessions() {
+  nfcRun_(() => {
+    const today = nfcToday_();
+    const text = nfcPrompt_("수업 출석 가져오기", "시작일,종료일을 입력하세요. 최대 62일. 휴강·대상 제외 기록도 구분하여 보존합니다.", today.slice(0, 8) + "01," + today);
+    if (text === null) return;
+    const parts = text.split(",").map(s => s.trim()), from=parts[0], to=parts[1];
+    if (parts.length !== 2 || !/^\d{4}-\d{2}-\d{2}$/.test(from) || !/^\d{4}-\d{2}-\d{2}$/.test(to) || !Number.isFinite(Date.parse(from)) || !Number.isFinite(Date.parse(to)) || to < from || new Date(to)-new Date(from)>61*86400000) throw new Error("yyyy-mm-dd,yyyy-mm-dd 형식과 62일 이하 기간을 확인하세요.");
+    const data=nfcRpc_("sync_pull_sessions",{p_from:from,p_to:to});
+    const headers=["날짜","회차 식별자","수업","교시","회차 상태","학번","이름","학생 식별자","대상 여부","수업 출석","첫 태그","교사 확인","처리 방식","사유"];
+    const states={open:"출석 접수",closed:"마감",cancelled:"휴강"};
+    nfcMergePeriod_("수업 출석",headers,from,to,data.rows.map(r=>[r.att_date,r.session_id,r.title,r.period_label,states[r.session_state],r.student_id,r.name,r.student_uid,r.enrolled?"대상":"제외",NFC.status[r.status],nfcTime_(r.first_tag_at),nfcTime_(r.corrected_at),r.source||"",r.note||""]));
+    nfcUi_().alert("수업 출석 "+data.rows.length+"건을 가져왔습니다. 등교·이동과 별도 기록입니다.");
+  });
 }
