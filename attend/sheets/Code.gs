@@ -118,8 +118,8 @@ function nfcSheet_(name, headers) {
     );
   sh.getRange(1, 1, 1, headers.length)
     .setValues([headers])
-    .setBackground("#163d35")
-    .setFontColor("#ffffff")
+    .setBackground("#edf1ff")
+    .setFontColor("#000000")
     .setFontWeight("bold");
   sh.setFrozenRows(1);
   return sh;
