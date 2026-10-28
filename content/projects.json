@@ -266,6 +266,24 @@
     ],
     "tool": [
       {
+        "title": "이미지 변환기",
+        "subject": "tools",
+        "date": "2026-10-28",
+        "desc": "사진을 서버로 보내지 않고 JPG·PNG·WebP로 변환합니다. 가로·세로와 비율, 품질을 조절하고 여러 장을 ZIP으로 저장할 수 있습니다.",
+        "tag": "이미지 · 형식·크기 변환",
+        "level": "교사·학생 누구나",
+        "cover": "/assets/uploads/cover-series-image-converter-v1.webp",
+        "poster": "note",
+        "words": "이미지\n변환기",
+        "links": [
+          {
+            "label": "변환기 열기",
+            "url": "/image-converter/"
+          }
+        ],
+        "kind": "tool"
+      },
+      {
         "title": "QR코드 만들기",
         "subject": "tools",
         "date": "2026-10-28",
