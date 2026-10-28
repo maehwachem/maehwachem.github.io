@@ -266,6 +266,24 @@
     ],
     "tool": [
       {
+        "title": "QR코드 만들기",
+        "subject": "tools",
+        "date": "2026-10-28",
+        "desc": "참고 자료·영상·설문 링크를 QR코드로 만들고 PNG·SVG로 저장합니다. 자료 제목과 함께 교실 화면에 크게 띄우거나 인쇄할 수 있습니다.",
+        "tag": "자료 공유 · QR코드",
+        "level": "교사·학생 누구나",
+        "cover": "/qr/cover.svg",
+        "poster": "note",
+        "words": "QR코드\n만들기",
+        "links": [
+          {
+            "label": "QR코드 만들기",
+            "url": "/qr/"
+          }
+        ],
+        "kind": "tool"
+      },
+      {
         "title": "우리 반의 하루",
         "subject": "tools",
         "date": "2026-10-22",
