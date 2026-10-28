@@ -188,6 +188,7 @@
 
       <div id="vChoices" class="hidden">
         <h1>어떤 출석을 확인할까요?</h1><p id="choiceWho" class="who"></p>
+        <p id="registrationDone" class="hint hidden">휴대폰 등록이 끝났어요. 지금 책상 NFC를 한 번 태그해 이름이 유지되는지 확인해 주세요. QR 등록과 NFC는 같은 브라우저에서 열어야 해요.</p>
         <div class="hint">수업마다 따로 출석해 주세요.<br>아래에서 수업 이름을 눌러야 그 수업에 기록돼요.</div>
         <h2 style="font-size:18px;margin-top:24px">수업·교시별 출석</h2>
         <div id="classChoices"></div><p id="choiceHint" class="hint"></p>
@@ -481,12 +482,13 @@
         result("bad", m[0], m[1], who, "", m[2], true);
       }
 
-      let attendanceBusy = false;
+      let attendanceBusy = false, choicesBusy = false, choiceSequence = 0, autoRefreshUntil = 0;
       const studentStatus = value => ({present:"출석",late:"지각",excused:"인정",absent:"결석 확정",unconfirmed:"미확인"}[value] || "미확인");
       const studentTime = iso => iso ? new Intl.DateTimeFormat("ko-KR", {timeZone:"Asia/Seoul",hour:"2-digit",minute:"2-digit",hour12:false}).format(new Date(iso)) : "";
       async function chooseAttendance(session = null) {
         if (attendanceBusy) return;
-        attendanceBusy = true;show("vLoading");
+        attendanceBusy = true;
+        ++choiceSequence;choicesBusy=false;show("vLoading");
         try {
           const r = await doCheckIn(getToken(), session);
           if (!r.ok && r.error === "unknown_device") {clearToken();showRegister();return;}
@@ -500,14 +502,16 @@
       }
       document.getElementById("btnArrival").onclick=()=>chooseAttendance();
       async function start(silent = false) {
-        if(attendanceBusy)return;
-        attendanceBusy=true;if(!silent)show("vLoading");
+        if(attendanceBusy || choicesBusy)return;
+        const seq=++choiceSequence;choicesBusy=true;
+        if(!silent){autoRefreshUntil=Date.now()+120000;show("vLoading");}
         document.getElementById("loadingHint").textContent="출석할 등교·수업을 찾고 있어요";
         const token=getToken();
-        if(!token){attendanceBusy=false;showRegister();return;}
+        if(!token){choicesBusy=false;showRegister();return;}
         try {
           await loadSettings();
           const {data:r,error}=await sb.rpc("nfc_attendance_options",{p_token:token});
+          if(seq!==choiceSequence)return;
           if(error)throw error;
           if(!r.ok){if(r.error==="unknown_device"){clearToken();showRegister();}else showCheckIn(r);return;}
           if (registrationQR?.student && (registrationQR.student.id !== r.student_id || registrationQR.student.name !== r.name)) {
@@ -530,13 +534,15 @@
             time.textContent=`접수 ${studentTime(item.opens_at)}~${studentTime(item.closes_at)} · 지각 시작 ${studentTime(item.late_at)}`;
             b.disabled=!item.available;b.onclick=()=>chooseAttendance(item.id);card.append(b,summary,time);container.append(card);
           }
-          document.getElementById("choiceHint").textContent=r.sessions.length?"15초마다 목록과 기록을 새로 확인해요. 수업별 출석·지각은 각 수업의 시간 기준으로 따로 기록돼요.":"오늘 내 명단에 준비된 수업이 없어요. 수업 출석이 필요하면 선생님께 시간표와 수강생 명단을 확인해 달라고 알려 주세요.";
+          document.getElementById("choiceHint").textContent=r.sessions.length?"2분 동안 15초마다 목록과 기록을 새로 확인해요. 수업별 출석·지각은 각 수업의 시간 기준으로 따로 기록돼요.":"오늘 내 명단에 준비된 수업이 없어요. 수업 출석이 필요하면 선생님께 시간표와 수강생 명단을 확인해 달라고 알려 주세요.";
           show("vChoices");
-        } catch(e){if(silent)document.getElementById("choiceHint").textContent="자동 갱신에 실패했어요. 표시된 기록이 최신이 아닐 수 있어요. 목록 새로고침을 눌러 주세요.";else result("bad","📶","목록을 불러오지 못했어요","","","인터넷 연결을 확인하고 다시 시도해 주세요. 아직 출석은 처리하지 않았어요.",true);}
-        finally{attendanceBusy=false;}
+        } catch(e){if(seq!==choiceSequence)return;if(silent)document.getElementById("choiceHint").textContent="자동 갱신에 실패했어요. 표시된 기록이 최신이 아닐 수 있어요. 목록 새로고침을 눌러 주세요.";else result("bad","📶","목록을 불러오지 못했어요","","","인터넷 연결을 확인하고 다시 시도해 주세요. 아직 출석은 처리하지 않았어요.",true);}
+        finally{if(seq===choiceSequence)choicesBusy=false;}
       }
       const refreshChoices = () => {
-        if (!document.hidden && !document.getElementById("vChoices").classList.contains("hidden")) start(true);
+        if (document.hidden || document.getElementById("vChoices").classList.contains("hidden")) return;
+        if (Date.now() < autoRefreshUntil) start(true);
+        else document.getElementById("choiceHint").textContent="자동 갱신을 잠시 멈췄어요. 최신 접수시간과 기록은 ‘수업 목록 새로고침’으로 확인해 주세요.";
       };
       setInterval(refreshChoices, 15000);
       document.addEventListener("visibilitychange", refreshChoices);
@@ -546,7 +552,7 @@
         show("vRegister");
         const student = registrationQR?.student;
         const info = document.getElementById("qrInfo");
-        info.textContent = student ? `${student.year}학년도 · ${student.id} ${student.name}\n본인 정보와 본인 휴대폰이 맞는지 확인하고 아래 버튼을 눌러 주세요.` : registrationQR?.error || "";
+        info.textContent = student ? `${student.year}학년도 · ${student.id} ${student.name}\n본인 정보와 본인 휴대폰을 확인해 주세요. NFC가 열리는 기본 브라우저에서 등록해 주세요.` : registrationQR?.error || "";
         info.style.whiteSpace = "pre-line";
         info.classList.toggle("hidden", !info.textContent);
         document.getElementById("manualFields").classList.toggle("hidden", !!student);
@@ -605,6 +611,7 @@
               return;
             }
             saveToken(token);
+            document.getElementById("registrationDone").classList.remove("hidden");
             clearRegistrationQR();
             await start();
           } catch (e) {

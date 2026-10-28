@@ -699,7 +699,7 @@ function registrationSlip(s) {
   qr.addData(url, "Byte");
   qr.make();
   const svg = qr.createSvgTag({cellSize:4, margin:16, scalable:true});
-  return `<div class="slip"><b>${esc(s.student_id)} ${esc(s.name)}</b><div class="sub">${year}학년도 · 본인 휴대폰 최초 등록</div><div class="registration-qr" role="img" aria-label="학생 개인 등록 QR">${svg}</div><p>휴대폰 카메라로 QR을 열고<br><b>이 휴대폰 등록</b>을 누르세요.</p><div>직접 입력할 때 등록코드: <span class="code">${esc(s.reg_code)}</span></div><p class="sub">본인에게만 전달하세요. 코드 재발급 시 이 QR도 바뀝니다.</p><small>${esc(nfcUrl())}</small></div>`;
+  return `<div class="slip"><b>${esc(s.student_id)} ${esc(s.name)}</b><div class="sub">${year}학년도 · 본인 휴대폰 최초 등록</div><div class="registration-qr" role="img" aria-label="학생 개인 등록 QR">${svg}</div><p>기본 카메라로 QR을 읽고<br>NFC가 열리는 기본 브라우저에서<br><b>이 휴대폰 등록</b>을 누르세요.</p><div>직접 입력할 때 등록코드: <span class="code">${esc(s.reg_code)}</span></div><p class="sub">본인에게만 전달하세요. 코드 재발급 시 이 QR도 바뀝니다.</p><small>${esc(nfcUrl())}</small></div>`;
 }
 bind("btnPrint", async () => {
   const list = rosterList();
