@@ -257,11 +257,19 @@
           grid-template-columns: 1fr;
         }
       }
-      /* 등록코드 안내문 인쇄 */
+      .registration-qr {width: 200px; max-width: 100%; margin: 12px auto; background: white;}
+      .registration-qr svg {display: block; width: 100%; height: auto;}
+      #editFields .slip {text-align: center;}
+      @page {size: A4; margin: 10mm;}
+      /* 등록 QR 안내문 인쇄 */
       #printArea {
         display: none;
       }
       @media print {
+        .registration-qr {width: 40mm; margin: 3mm auto;}
+        .slip {text-align: center;}
+        .slip p {margin: 2mm 0;}
+        .slip small {overflow-wrap: anywhere;}
         body > *:not(#printArea) {
           display: none !important;
         }
@@ -273,7 +281,10 @@
         .slip {
           border: 1px dashed #999;
           padding: 14px;
-          height: 62mm;
+          min-height: 88mm;
+          box-sizing: border-box;
+          color: #111;
+          background: white;
           page-break-inside: avoid;
           font-size: 12px;
         }
@@ -281,9 +292,9 @@
           font-size: 15px;
         }
         .slip .code {
-          font-size: 26px;
+          font-size: 16px;
           font-family: monospace;
-          letter-spacing: 4px;
+          letter-spacing: 2px;
           margin: 6px 0;
         }
       }
@@ -403,7 +414,7 @@
     <header>
       <h1>NFC 출석 관리</h1>
       <nav id="nav" class="hidden">
-        <button data-tab="today" class="on">대시보드</button
+        <button data-tab="today" class="on">등교 대시보드</button
         ><button data-tab="sessions">수업 출석</button
         ><button data-tab="roster">학생 명단</button
         ><button data-tab="calendar">출석 대상일</button
@@ -431,7 +442,7 @@
     <main id="app" class="hidden">
       <section id="tab-today">
         <div class="dashboard-heading">
-          <div><h2>출석 대시보드</h2><p class="sub" id="dashboardDate">날짜와 반을 선택해 출석을 확인하세요.</p></div>
+          <div><h2>등교 출석 대시보드</h2><p class="sub" id="dashboardDate">날짜와 반을 선택해 출석을 확인하세요.</p></div>
           <button class="btn" id="btnToday">오늘 보기</button>
         </div>
         <div class="card">
@@ -464,7 +475,7 @@
           <div class="card">
             <h2>출석 확인 진행</h2>
             <div id="dashboardProgress"></div>
-            <p class="sub">선택한 날짜·반의 출석 대상 기준입니다. 이름 검색과 목록 필터는 위 집계에 영향을 주지 않습니다. 외출·조퇴는 등교 기록과 별도입니다.</p>
+            <p class="sub">이 집계는 등교 출석입니다. 교시·시간별 출석은 상단 ‘수업 출석’에서 수업을 선택해 확인하세요. 등교 지각이어도 수업 출석은 해당 수업 시간으로 따로 판정합니다. 이름 검색과 목록 필터는 위 집계에 영향을 주지 않습니다.</p>
           </div>
           <div class="card">
             <h2>먼저 확인할 학생</h2>
@@ -584,7 +595,7 @@
             ><input id="rSearch" placeholder="이름·학번 검색" /><label
               ><input type="checkbox" id="rSelfOnly" /> 승인 대기만</label
             ><span id="rCount" class="sub"></span
-            ><button class="btn" id="btnPrint">등록코드 안내문 인쇄</button>
+            ><button class="btn" id="btnPrint">등록 QR 안내문 인쇄</button>
           </div>
           <div class="tbl">
             <table>
@@ -826,7 +837,9 @@
     <div id="toast" role="status"></div>
     <script src="config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-    <script src="admin.js?v=20261027-sessions"></script>
+    <script src="registration.js?v=20261028-qr"></script>
+    <script src="vendor/qrcode-2.0.4.js"></script>
+    <script src="admin.js?v=20261028-qr"></script>
     <script src="sessions.js?v=20261028-reason-labels"></script>
   </body>
 </html>

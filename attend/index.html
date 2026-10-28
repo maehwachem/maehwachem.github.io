@@ -8,6 +8,8 @@
     />
     <meta name="robots" content="noindex" />
     <title>NFC 출석</title>
+    <meta name="referrer" content="no-referrer" />
+    <script src="registration.js?v=20261028-qr"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;800&display=swap"
       rel="stylesheet"
@@ -186,9 +188,15 @@
 
       <div id="vChoices" class="hidden">
         <h1>어떤 출석을 확인할까요?</h1><p id="choiceWho" class="who"></p>
-        <div class="hint">등교 또는 수업을 하나 선택해 주세요.<br>버튼을 눌러야 해당 출석이 기록돼요.</div>
-        <button id="btnArrival" type="button">등교 출석 확인</button>
+        <div class="hint">수업마다 따로 출석해 주세요.<br>아래에서 수업 이름을 눌러야 그 수업에 기록돼요.</div>
+        <h2 style="font-size:18px;margin-top:24px">수업·교시별 출석</h2>
         <div id="classChoices"></div><p id="choiceHint" class="hint"></p>
+        <div style="border-top:1px solid var(--line);padding-top:16px;margin-top:24px">
+          <h2 style="font-size:18px">오늘 등교 기록</h2>
+          <p id="arrivalStatus" class="hint"></p>
+          <button id="btnArrival" class="ghost" type="button">등교 출석 확인·등록</button>
+          <p class="hint">이 버튼은 등교만 처리해요. 수업 출석은 위의 수업을 선택해 주세요.</p>
+        </div>
         <button type="button" class="ghost" onclick="start()">수업 목록 새로고침</button>
       </div>
       <!-- 결과 -->
@@ -214,6 +222,8 @@
           NFC를 대고 등교 또는 수업을 선택하면 출석돼요.
         </div>
         <form id="regForm">
+          <div id="qrInfo" class="hint hidden" role="status"></div>
+          <div id="manualFields">
           <label for="fId">학번</label>
           <input
             id="fId"
@@ -241,7 +251,9 @@
             📝 명단에 없는 학생은 선생님이 알려주신 <b>추가 등록 코드</b>를 넣어
             주세요.
           </div>
+          </div>
           <button type="submit" id="btnReg">등록하고 출석 선택</button>
+          <button type="button" id="btnManual" class="ghost hidden">직접 입력하기</button>
         </form>
         <div class="hint">
           ⚠️ 친구 휴대폰으로 등록하면 내 출석이 그 폰에 묶여요. 꼭 본인
@@ -259,6 +271,17 @@
         auth: { persistSession: false },
       });
       const TOKEN_KEY = "nfc_attend_token_v1";
+      let registrationQR = window.NFCRegistration?.take() || null;
+      function clearRegistrationQR() {
+        registrationQR = null;
+        document.getElementById("fCode").value = "";
+      }
+      document.getElementById("btnManual").onclick = () => {
+        clearRegistrationQR();
+        document.getElementById("fId").value = "";
+        document.getElementById("fName").value = "";
+        showRegister();
+      };
 
       // ---------- 기기 토큰 (localStorage + 쿠키 이중 보관) ----------
       function readCookie(k) {
@@ -397,14 +420,14 @@
           result(
             late ? "warn" : "ok",
             late ? "⏰" : "✅",
-            label,
+            `등교 · ${label}`,
             who,
             r.time,
             r.already
-              ? "오늘은 이미 출석이 기록되어 있어요."
+              ? "오늘 등교의 기존 기록이에요. 수업 출석은 ‘등교·수업 다시 선택’에서 수업 이름을 눌러 주세요."
               : late
-                ? `출석 마감(${r.deadline}) 이후에 태그했어요.`
-                : "좋은 하루 보내세요!",
+                ? `등교 출석 마감(${r.deadline}) 이후에 태그했어요. 수업 출석과 별도예요.`
+                : "등교 출석을 기록했어요. 수업 출석은 수업별로 따로 확인해 주세요.",
           );
           return;
         }
@@ -459,6 +482,7 @@
       }
 
       let attendanceBusy = false;
+      const studentStatus = value => ({present:"출석",late:"지각",excused:"인정",absent:"결석 확정",unconfirmed:"미확인"}[value] || "미확인");
       const studentTime = iso => iso ? new Intl.DateTimeFormat("ko-KR", {timeZone:"Asia/Seoul",hour:"2-digit",minute:"2-digit",hour12:false}).format(new Date(iso)) : "";
       async function chooseAttendance(session = null) {
         if (attendanceBusy) return;
@@ -475,9 +499,9 @@
         } finally {attendanceBusy=false;}
       }
       document.getElementById("btnArrival").onclick=()=>chooseAttendance();
-      async function start() {
+      async function start(silent = false) {
         if(attendanceBusy)return;
-        attendanceBusy=true;show("vLoading");
+        attendanceBusy=true;if(!silent)show("vLoading");
         document.getElementById("loadingHint").textContent="출석할 등교·수업을 찾고 있어요";
         const token=getToken();
         if(!token){attendanceBusy=false;showRegister();return;}
@@ -486,23 +510,53 @@
           const {data:r,error}=await sb.rpc("nfc_attendance_options",{p_token:token});
           if(error)throw error;
           if(!r.ok){if(r.error==="unknown_device"){clearToken();showRegister();}else showCheckIn(r);return;}
+          if (registrationQR?.student && (registrationQR.student.id !== r.student_id || registrationQR.student.name !== r.name)) {
+            clearRegistrationQR();
+            result("bad", "📱", "이미 다른 학생으로 등록된 휴대폰이에요", `${r.name} (${r.student_id})`, "등록 유지", "기존 등록은 바꾸지 않았어요. QR은 학생 본인의 휴대폰에서 열어 주세요. 다시 확인하면 기존 학생의 출석 화면으로 이동합니다.", true);
+            return;
+          }
+          clearRegistrationQR();
           document.getElementById("choiceWho").textContent=`${r.name} (${r.student_id})`;
+          document.getElementById("arrivalStatus").textContent = r.daily ? `등교: ${studentStatus(r.daily.status)}${r.daily.checked_at && r.daily.status !== "unconfirmed" ? " · " + studentTime(r.daily.checked_at) : ""} · 수업 출석과 별도` : "등교 기록은 아래 버튼에서 확인할 수 있어요.";
           const container=document.getElementById("classChoices");container.replaceChildren();
           for(const item of r.sessions){
-            const b=document.createElement("button");b.type="button";b.className="ghost";
+            const card=document.createElement("div");card.style.cssText="border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px;text-align:left";
+            const b=document.createElement("button");b.type="button";b.className=item.available?"":"ghost";
             const state=item.state==="cancelled"?"휴강":item.state==="closed"?"마감":item.available?"선택 가능":"접수시간 아님";
-            b.textContent=`${item.period_label || ""} ${item.title} · ${studentTime(item.opens_at)}~${studentTime(item.closes_at)} · ${state}`;
-            b.disabled=!item.available;b.onclick=()=>chooseAttendance(item.id);container.append(b);
+            b.textContent=`${item.period_label || ""} ${item.title} · ${item.available ? "출석 확인" : state}`;
+            const summary=document.createElement("p");summary.style.cssText="margin:10px 0 0;font-weight:600";
+            summary.textContent=`이 수업: ${studentStatus(item.status)}${item.first_tag_at?" · 첫 태그 "+studentTime(item.first_tag_at):""}`;
+            const time=document.createElement("p");time.className="hint";time.style.cssText="text-align:left;margin:6px 0 0";
+            time.textContent=`접수 ${studentTime(item.opens_at)}~${studentTime(item.closes_at)} · 지각 시작 ${studentTime(item.late_at)}`;
+            b.disabled=!item.available;b.onclick=()=>chooseAttendance(item.id);card.append(b,summary,time);container.append(card);
           }
-          document.getElementById("choiceHint").textContent=r.sessions.length?"수업 출석은 등교 출석과 별도로 기록돼요. 외출·조퇴 기록은 자동으로 바뀌지 않아요.":"오늘 내 명단에 준비된 수업이 없어요. 수업 출석이 필요하면 선생님께 시간표와 수강생 명단을 확인해 달라고 알려 주세요.";
+          document.getElementById("choiceHint").textContent=r.sessions.length?"15초마다 목록과 기록을 새로 확인해요. 수업별 출석·지각은 각 수업의 시간 기준으로 따로 기록돼요.":"오늘 내 명단에 준비된 수업이 없어요. 수업 출석이 필요하면 선생님께 시간표와 수강생 명단을 확인해 달라고 알려 주세요.";
           show("vChoices");
-        } catch(e){result("bad","📶","목록을 불러오지 못했어요","","","인터넷 연결을 확인하고 다시 시도해 주세요. 아직 출석은 처리하지 않았어요.",true);}
+        } catch(e){if(silent)document.getElementById("choiceHint").textContent="자동 갱신에 실패했어요. 표시된 기록이 최신이 아닐 수 있어요. 목록 새로고침을 눌러 주세요.";else result("bad","📶","목록을 불러오지 못했어요","","","인터넷 연결을 확인하고 다시 시도해 주세요. 아직 출석은 처리하지 않았어요.",true);}
         finally{attendanceBusy=false;}
       }
+      const refreshChoices = () => {
+        if (!document.hidden && !document.getElementById("vChoices").classList.contains("hidden")) start(true);
+      };
+      setInterval(refreshChoices, 15000);
+      document.addEventListener("visibilitychange", refreshChoices);
 
       // ---------- 최초 등록 ----------
       async function showRegister() {
         show("vRegister");
+        const student = registrationQR?.student;
+        const info = document.getElementById("qrInfo");
+        info.textContent = student ? `${student.year}학년도 · ${student.id} ${student.name}\n본인 정보와 본인 휴대폰이 맞는지 확인하고 아래 버튼을 눌러 주세요.` : registrationQR?.error || "";
+        info.style.whiteSpace = "pre-line";
+        info.classList.toggle("hidden", !info.textContent);
+        document.getElementById("manualFields").classList.toggle("hidden", !!student);
+        document.getElementById("btnManual").classList.toggle("hidden", !student);
+        document.getElementById("btnReg").textContent = student ? "이 휴대폰 등록" : "등록하고 출석 선택";
+        if (student) {
+          document.getElementById("fId").value = student.id;
+          document.getElementById("fName").value = student.name;
+          document.getElementById("fCode").value = student.code;
+        }
         try {
           settings = null;
           const s = await loadSettings();
@@ -551,6 +605,7 @@
               return;
             }
             saveToken(token);
+            clearRegistrationQR();
             await start();
           } catch (e) {
             result(
@@ -564,7 +619,7 @@
             );
           } finally {
             btn.disabled = false;
-            btn.textContent = "등록하고 출석 선택";
+            btn.textContent = registrationQR?.student ? "이 휴대폰 등록" : "등록하고 출석 선택";
           }
         });
 

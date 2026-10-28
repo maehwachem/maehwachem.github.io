@@ -512,7 +512,7 @@ function renderRoster() {
     list
       .map(
         (s) =>
-          `<tr><td>${esc(s.student_id)} · <b>${esc(s.name)}</b></td><td>${esc(s.starts_on)} ~ ${esc(s.ends_on)}<br>${STATE[s.state]}${s.last_pending_tag ? `<br><small>승인 전 태그 시도 ${esc(seoulDate(new Date(s.last_pending_tag)))} ${esc(seoulTime(s.last_pending_tag))} · 출석 미확정</small>` : ""}</td><td class="mono">${esc(s.reg_code)} ${s.failed_attempts >= 5 ? "(잠김)" : ""}</td><td>${s.device_bound_at ? "등록됨" : "미등록"}</td><td><button class="btn s" data-act="edit" data-uid="${s.student_uid}">수정</button> ${s.state === "pending" ? `<button class="btn s p" data-act="confirm" data-uid="${s.student_uid}">명단 확정</button> ${s.self_registered ? `<button class="btn s" data-act="reject" data-uid="${s.student_uid}">가입 거절</button>` : ""}` : ""} <button class="btn s" data-act="reset" data-uid="${s.student_uid}">기기 초기화</button> <button class="btn s" data-act="code" data-uid="${s.student_uid}">코드 재발급</button></td></tr>`,
+          `<tr><td>${esc(s.student_id)} · <b>${esc(s.name)}</b></td><td>${esc(s.starts_on)} ~ ${esc(s.ends_on)}<br>${STATE[s.state]}${s.last_pending_tag ? `<br><small>승인 전 태그 시도 ${esc(seoulDate(new Date(s.last_pending_tag)))} ${esc(seoulTime(s.last_pending_tag))} · 출석 미확정</small>` : ""}</td><td class="mono">${esc(s.reg_code)} ${s.failed_attempts >= 5 ? "(잠김)" : ""}</td><td>${s.device_bound_at ? "등록됨" : "미등록"}</td><td><button class="btn s" data-act="edit" data-uid="${s.student_uid}">수정</button> ${s.state === "pending" ? `<button class="btn s p" data-act="confirm" data-uid="${s.student_uid}">명단 확정</button> ${s.self_registered ? `<button class="btn s" data-act="reject" data-uid="${s.student_uid}">가입 거절</button>` : ""}` : ""} <button class="btn s" data-act="qr" data-uid="${s.student_uid}">등록 QR</button> <button class="btn s" data-act="reset" data-uid="${s.student_uid}">기기 초기화</button> <button class="btn s" data-act="code" data-uid="${s.student_uid}">코드 재발급</button></td></tr>`,
       )
       .join("") ||
     '<tr><td colspan="5" style="padding:24px">등록된 명단이 없습니다.</td></tr>';
@@ -573,7 +573,10 @@ $("rosterBody").onclick = (e) => {
   const b = e.target.closest("button[data-act]");
   if (!b) return;
   const s = students.find((x) => x.student_uid === b.dataset.uid);
-  if (b.dataset.act === "edit") {
+  if (!s) return;
+  if (b.dataset.act === "qr") {
+    run(b, async () => openEditor("학생 휴대폰 등록 QR", registrationSlip(s), null));
+  } else if (b.dataset.act === "edit") {
     openEditor(
       `${s.name} · 명단 수정`,
       field(
@@ -687,17 +690,25 @@ bind("btnRosterExport", async () => {
     ]),
   ]);
 });
+function registrationSlip(s) {
+  const year = Number(s.school_year || $("rYear").value);
+  const url = window.NFCRegistration.url(nfcUrl(), {
+    id:s.student_id, name:s.name, code:s.reg_code, year,
+  });
+  const qr = qrcode(0, "M");
+  qr.addData(url, "Byte");
+  qr.make();
+  const svg = qr.createSvgTag({cellSize:4, margin:16, scalable:true});
+  return `<div class="slip"><b>${esc(s.student_id)} ${esc(s.name)}</b><div class="sub">${year}학년도 · 본인 휴대폰 최초 등록</div><div class="registration-qr" role="img" aria-label="학생 개인 등록 QR">${svg}</div><p>휴대폰 카메라로 QR을 열고<br><b>이 휴대폰 등록</b>을 누르세요.</p><div>직접 입력할 때 등록코드: <span class="code">${esc(s.reg_code)}</span></div><p class="sub">본인에게만 전달하세요. 코드 재발급 시 이 QR도 바뀝니다.</p><small>${esc(nfcUrl())}</small></div>`;
+}
 bind("btnPrint", async () => {
   const list = rosterList();
   if (!list.length) throw new Error("인쇄할 학생이 없습니다");
-  $("printArea").innerHTML = list
-    .map(
-      (s) =>
-        `<div class="slip"><b>${esc(s.student_id)} ${esc(s.name)}</b><div class="code">${esc(s.reg_code)}</div><p>본인 휴대폰으로 NFC 스티커를 찍고 학번·이름·등록코드를 입력하세요.</p><p>친구에게 코드를 보여주지 마세요.</p><small>${esc(nfcUrl())}</small></div>`,
-    )
-    .join("");
+  $("printArea").innerHTML = list.map(registrationSlip).join("");
   window.print();
 });
+window.addEventListener("afterprint", () => $("printArea").replaceChildren());
+$("editor").addEventListener("close", () => $("editFields").replaceChildren());
 async function loadCalendar() {
   const from = $("cFrom").value.slice(0, 4) + "-01-01",
     to = $("cFrom").value.slice(0, 4) + "-12-31";

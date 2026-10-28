@@ -41,6 +41,20 @@ try {
   assert.equal((await call('nfc_session_detail',[second])).rows[0].status,'unconfirmed');
   assert.equal(await one('select count(*)::int from attendance'),0);
  });
+ await test('late arrival does not carry into on-time class; overview, dashboard and sheet report agree',async()=>{
+  await db.exec('begin');
+  await q("insert into attendance(student_uid,student_id,att_date,status,checked_at,source) values($1,'30101',$2,'late',now()-interval '1 hour','nfc')",[a,today]);
+  const before=await call('nfc_attendance_options',['a'.repeat(64)]);
+  assert.equal(before.daily.status,'late');
+  assert.equal(before.sessions.find(s=>s.id===second).status,'unconfirmed');
+  const result=await call('nfc_session_check_in',['a'.repeat(64),second]);assert.equal(result.status,'present');
+  const after=await call('nfc_attendance_options',['a'.repeat(64)]);
+  assert.equal(after.daily.status,'late');assert.equal(after.daily.checked_at,before.daily.checked_at);
+  assert.equal(after.sessions.find(s=>s.id===second).status,'present');
+  assert.equal((await call('nfc_session_detail',[second])).rows[0].status,'present');
+  assert.equal((await call('nfc_session_report',[today,today])).find(r=>r.session_id===second).status,'present');
+  await db.exec('rollback');
+ });
  await test('retag preserves first time; manual decisions and version conflicts preserved',async()=>{
   const before=(await call('nfc_session_detail',[session])).rows.find(x=>x.student_uid===a);
   assert.equal((await call('nfc_session_check_in',['a'.repeat(64),session])).already,true);
