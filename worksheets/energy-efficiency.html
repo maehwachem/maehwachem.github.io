@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>에너지 효율과 신재생 에너지 학습지 · KJE</title>
+<meta name="description" content="에너지 보존, 에너지 효율의 계산, 열기관, 발전 효율, 전력량, 효율 등급, 신재생 에너지의 종류와 원리를 익히는 고등학교 통합과학2 학습지">
+<style>
+:root{--bg:#EEF1F2;--paper:#FBFCFC;--ink:#1A1F23;--ink2:#4A555D;--line:#D3D9DD;--accent:#A9531F;--tag:#F3E3D7;--head:#E6ECEE;color-scheme:light}
+@media (prefers-color-scheme: dark){:root{--bg:#14181B;--paper:#1C2227;--ink:#E5EAED;--ink2:#A3AFB7;--line:#2F383F;--accent:#E08A55;--tag:#3A2A20;--head:#252D33;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif;font-size:16px;line-height:1.75;word-break:keep-all}
+.bar{max-width:860px;margin:0 auto;padding:18px 20px 0;display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:14px}
+.bar a{color:var(--ink2);text-underline-offset:3px}
+.bar button{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:8px;padding:6px 14px;cursor:pointer;min-height:40px}
+main{max-width:860px;margin:12px auto 48px;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:36px clamp(18px,5vw,48px) 44px}
+h1{font-size:clamp(28px,5vw,36px);line-height:1.25;margin:0 0 6px}
+h2{font-size:22px;margin:38px 0 12px;padding-top:18px;border-top:1px solid var(--line)}
+h3{font-size:18px;margin:26px 0 8px}
+.meta{color:var(--ink2);font-size:14px;margin:0 0 22px}
+p{margin:10px 0}
+ul,ol{padding-left:1.4em} li{margin:4px 0}
+a{color:var(--accent);text-underline-offset:3px}
+.tbl{overflow-x:auto;margin:14px 0}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--head);font-weight:700;white-space:nowrap}
+td:empty::after{content:'\00a0'}
+pre{background:var(--head);border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:15px;line-height:1.6}
+code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.93em}
+.formula{background:var(--tag);border-radius:10px;padding:12px 16px;font-weight:700;text-align:center}
+.name-box{max-width:460px} .name-box td{height:40px}
+.answer-line{border-bottom:1px solid var(--ink2);padding-bottom:28px}
+.checklist{list-style:none;padding-left:0} .checklist input{width:18px;height:18px;margin-right:8px;vertical-align:-3px}
+@media (max-width:600px){table{font-size:14px} th{white-space:normal} th,td{padding:6px 7px} main{border-radius:0;border-left:0;border-right:0}}
+.key{margin-top:36px;border:1px dashed var(--line);border-radius:10px;padding:10px 16px}.key summary{cursor:pointer;font-weight:700;color:var(--ink2)}
+h1.part{font-size:clamp(22px,4vw,28px);margin:48px 0 0;padding:14px 18px;border-radius:10px;background:var(--head)}
+.note{font-size:14px;color:var(--ink2)}
+@media print{.key{display:none!important}}
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 .2em;line-height:1.35}.frac>span{display:block;padding:0 .3em;white-space:nowrap}.frac>span:first-child{border-bottom:2px solid currentColor;padding-bottom:2px}.frac>span:last-child{padding-top:3px}
+footer{max-width:860px;margin:0 auto 40px;padding:0 20px;color:var(--ink2);font-size:13px}
+@media print{
+  :root{--bg:#fff;--paper:#fff;--ink:#000;--ink2:#333;--line:#999;--head:#eee;--tag:#f2f2f2}
+  .bar,footer{display:none} main{border:0;margin:0;padding:0;max-width:none}
+  h2{break-after:avoid} table,pre,.formula{break-inside:avoid} a{color:#000;text-decoration:none}
+}
+</style>
+</head>
+<body>
+<nav class="bar"><a href="../">← KJE 포트폴리오</a><a href="../lectures/energy-efficiency.html">슬라이드 열기</a><button type="button" onclick="window.print()">인쇄하기</button></nav>
+
+<main>
+<h1>에너지 효율과 신재생 에너지 학습지</h1>
+<p class="meta">2026. 10. 24. · 수정 2026. 10. 28. · KJE · 고등학교 통합과학2</p>
+
+<table class="name-box"><tr><th>학년 · 반</th><th>번호</th><th>이름</th></tr><tr><td></td><td></td><td></td></tr></table>
+
+<h2>학습 목표</h2>
+<ol>
+<li>에너지가 전환될 때 에너지의 총량은 보존되지만 일부는 다시 쓰기 어려운 열로 흩어짐을 설명할 수 있다.</li>
+<li>에너지 효율의 뜻을 알고, 기기·열기관·발전 과정의 효율과 전력량을 구할 수 있다.</li>
+<li>효율 높이기와 에너지 절약을 구분하고, 이것이 탄소 배출 감소에 기여함을 설명할 수 있다.</li>
+<li>신재생 에너지의 종류와 발전 원리, 장점과 과제를 설명할 수 있다.</li>
+</ol>
+<p>수업 화면과 학습지의 수치는 개념 이해를 위한 예시 값이며, 실제 값은 기기와 사용 조건에 따라 다르다. 번호 빈칸 ①~⑳는 수업 화면의 번호와 같다.</p>
+
+<h2>도입 — 밝기가 같은 두 전구</h2>
+<p>밝기가 비슷한 백열전구와 LED 전구가 1초 동안 내는 빛 에너지는 모두 3 J이라고 가정하자. (밝기(lm)는 눈의 감도를 반영한 양이라, 밝기가 같다고 빛 에너지까지 정확히 같지는 않다.) 전력은 단위 시간당 쓰는 에너지이다(1 W = 1 J/s).</p>
+<div class="tbl"><table>
+<thead><tr><th>구분</th><th>백열전구</th><th>LED 전구</th></tr></thead>
+<tbody>
+<tr><td>1초 동안 공급한 전기 에너지</td><td>60 J</td><td>9 J</td></tr>
+<tr><td>1초 동안 내는 빛 에너지</td><td>3 J</td><td>3 J</td></tr>
+<tr><td>1초 동안 열로 버려진 에너지</td><td>(가　　　) J</td><td>(나　　　) J</td></tr>
+<tr><td>에너지 효율</td><td>(다　　　) %</td><td>약 (라　　　) %</td></tr>
+</tbody>
+</table></div>
+<ul><li>켜 둔 백열전구가 LED 전구보다 훨씬 뜨거운 까닭을 에너지로 설명해 보자.</li></ul>
+<p class="answer-line">답:</p>
+
+<h1 class="part">1부 · 에너지 효율</h1>
+
+<h2>1. 에너지 전환과 에너지 보존</h2>
+<div class="tbl"><table>
+<thead><tr><th>기기</th><th>공급한 에너지</th><th>전환된 에너지</th><th>쓰려는(유용한) 에너지</th></tr></thead>
+<tbody>
+<tr><td>전구</td><td>전기 에너지</td><td>빛, 열</td><td>(마　　　) 에너지</td></tr>
+<tr><td>선풍기</td><td>전기 에너지</td><td>운동, 소리, 열</td><td>(바　　　) 에너지</td></tr>
+<tr><td>휴대 전화 충전</td><td>전기 에너지</td><td>(사　　　), 열</td><td>전지에 저장되는 에너지</td></tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>에너지 보존 법칙</strong>: 에너지는 형태가 바뀌어도 그 총량은 (①　　　　)하다.</li>
+<li>공급한 에너지 = 유용한 에너지 + (②　　　　　　　　)</li>
+<li>전환 과정에서 에너지의 일부는 (③　　　　) 에너지로 주변에 흩어진다. 넓게 흩어진 열은 다시 모아 쓰기 어렵기 때문에, 에너지가 보존되어도 에너지를 아껴 써야 한다.</li>
+</ul>
+
+<h2>2. 에너지 효율</h2>
+<p class="formula">에너지 효율(%) = <span class="frac"><span>(④　　　　　　　　　　　　)</span><span>(⑤　　　　　　　　)</span></span> × 100</p>
+<ul>
+<li>효율이 높다는 것은 공급한 에너지 중 버려지는 에너지의 (아　　　)이 작다는 뜻이다. 효율은 양이 아니라 비율이므로, 공급량이 많으면 효율이 높아도 버려지는 양은 더 클 수 있다.</li>
+<li>에너지 흐름도(띠 그림)에서 띠의 굵기는 (자　　　　　　　)을 나타낸다. 들어간 띠의 굵기는 나온 띠 굵기의 (차　　　)과 같다.</li>
+<li>전력은 단위 시간당 쓰는 에너지(1 W = 1 J/s)이므로, 공급한 전기 에너지(J) = 소비 전력(W) × 사용 시간(s)이다. 같은 시간 동안의 (평균) 전력의 비로 효율을 구해도 결과가 같다.</li>
+</ul>
+<h3>예제 ① — 전기 주전자로 물 데우기</h3>
+<p>소비 전력 2000 W인 전기 주전자로 물 1 kg을 200초 동안 데웠더니 온도가 20 °C에서 100 °C가 되었다. 물이 얻은 열은 336 000 J이다. (물 1 kg의 온도를 1 °C 높이는 데 약 4200 J)</p>
+<ol>
+<li>공급한 전기 에너지 = 소비 전력 × (⑥　　　　) = 2000 W × 200 s = 　　　　　 J</li>
+<li>이때 유용한 에너지는 　　　　 에너지이다.</li>
+<li>효율 = <span class="frac"><span>336 000</span><span>400 000</span></span> × 100 = (⑦　　　　) %</li>
+<li>버려진 에너지 = 　　　　　 J</li>
+</ol>
+<h3>예제 ② — 전동기로 물체 들어 올리기</h3>
+<p>전동기에 전기 에너지 2000 J을 공급하여 정지해 있던 물체를 들어 올려 다시 멈추게 했더니, 물체의 위치 에너지가 1500 J 늘었다.</p>
+<ol>
+<li>효율: <span class="frac"><span>1500</span><span>2000</span></span> × 100 = (⑧　　　　) %</li>
+<li>버려진 에너지: 2000 − 1500 = (⑨　　　　) J (열·소리 등)</li>
+</ol>
+<h3>기기마다 다른 효율 (예시 값)</h3>
+<p>공급 에너지가 100 J일 때 표를 완성해 보자. (기기마다 효율이 일정하다고 가정한다.)</p>
+<div class="tbl"><table>
+<thead><tr><th>기기</th><th>공급한 에너지</th><th>유용한 에너지</th><th>버려진 에너지</th><th>효율</th></tr></thead>
+<tbody>
+<tr><td>전기 모터</td><td>전기 100 J</td><td>운동 80 J</td><td>(카　　　) J</td><td>(타　　　) %</td></tr>
+<tr><td>자동차 엔진</td><td>화학 100 J</td><td>운동 25 J</td><td>75 J</td><td>(파　　　) %</td></tr>
+<tr><td>화력 발전소</td><td>화학 100 J</td><td>전기 (하　　　) J</td><td>60 J</td><td>40 %</td></tr>
+<tr><td>태양광 패널</td><td>빛 100 J</td><td>전기 20 J</td><td>(거　　　) J</td><td>20 %</td></tr>
+</tbody>
+</table></div>
+<h3>같은 빛을 얻으려면</h3>
+<ul>
+<li>빛 3 J을 얻으려면 백열전구(효율 5 %)는 전기 에너지 60 J, LED 전구(효율 약 33 %)는 약 9 J이 필요하다.</li>
+<li>에너지 효율이 높을수록 같은 일을 하는 데 필요한 에너지가 (⑩　　　　).</li>
+</ul>
+<h3>효율의 한계</h3>
+<ul>
+<li>에너지 효율은 (⑪　　　　) %를 넘을 수 없다. 실제 기기는 마찰, 전기 저항 등으로 쓰려는 에너지 외의 에너지가 함께 생겨 대부분 100 %보다 작다.</li>
+<li>전기난로처럼 열이 목적인 기기는 쓰는 곳에서 전기 → 열 전환이 거의 100 %이다. 열이 생긴다고 효율이 무조건 낮은 것은 아니다.</li>
+<li>공급한 것보다 많은 에너지를 내는 장치는 (너　　　　　　　) 법칙에 어긋나므로 만들 수 없다.</li>
+</ul>
+
+<h2>3. 열기관의 열효율</h2>
+<p>열기관은 열을 받아 일을 하는 장치이다. 자동차 엔진에서 연료가 타며 공급한 열을 Q₁, 엔진이 한 일을 W, 바깥으로 버린 열을 Q₂라고 하자. 열기관은 공급받은 열을 모두 일로 바꿀 수 없으므로 열효율 e는 항상 1보다 작다.</p>
+<p class="formula">W = Q₁ − Q₂ 　　 열효율 e = <span class="frac"><span>W</span><span>Q₁</span></span> = 1 − <span class="frac"><span>Q₂</span><span>Q₁</span></span> 　 (0 ≤ e &lt; 1)</p>
+<p class="note">에너지 효율은 주로 %로, 열효율은 주로 0과 1 사이의 수로 나타낸다. 열효율에 100을 곱하면 %가 된다 (예: 0.25 → 25 %).</p>
+<ul>
+<li>Q₁ = 100, W = 25이면 Q₂ = (더　　　)이고, 열효율 e는 (⑫　　　　　)이다. 이를 %로 나타내면 25 %이다.</li>
+</ul>
+<h3>엔진에서 버려지는 에너지 (예시 값)</h3>
+<div class="tbl"><table>
+<thead><tr><th>연료 에너지 100의 행방</th><th>양</th></tr></thead>
+<tbody>
+<tr><td>바퀴를 돌리는 일(유용)</td><td>25</td></tr>
+<tr><td>배기가스의 열</td><td>33</td></tr>
+<tr><td>냉각수의 열</td><td>30</td></tr>
+<tr><td>마찰열·소리 등</td><td>(러　　　)</td></tr>
+</tbody>
+</table></div>
+<p>버려지는 에너지의 대부분은 어떤 형태인가? 　　　　　</p>
+
+<h2>4. 발전과 전달 과정의 효율</h2>
+<h3>발전 방식별 효율 (대략적인 값)</h3>
+<div class="tbl"><table>
+<thead><tr><th>발전 방식</th><th>효율</th><th>특징</th></tr></thead>
+<tbody>
+<tr><td>석탄 화력</td><td>약 40 %</td><td>연료를 태운 열로 증기 터빈을 돌린다.</td></tr>
+<tr><td>LNG 복합 화력</td><td>약 55 %</td><td>가스 터빈의 뜨거운 배기가스로 증기 터빈을 한 번 더 돌린다.</td></tr>
+<tr><td>원자력</td><td>약 33 %</td><td>핵분열의 열로 증기 터빈을 돌린다.</td></tr>
+<tr><td>수력</td><td>약 90 %</td><td>물의 위치 에너지로 터빈을 돌린다.</td></tr>
+<tr><td>풍력</td><td>약 40 %</td><td>바람의 운동 에너지 중 이론적으로 최대 약 59 %까지만 얻을 수 있다.</td></tr>
+<tr><td>태양광</td><td>약 20 %</td><td>빛을 바로 전기로 바꾼다.</td></tr>
+</tbody>
+</table></div>
+<p class="note">발전 방식마다 효율을 따지는 처음 에너지(연료의 화학 에너지, 바람의 운동 에너지, 햇빛 등)가 달라, 효율 수치만으로 발전 방식의 우열을 정하지 않는다.</p>
+<ul><li>생각해 보기: 태양광 발전은 효율이 낮은데도 왜 늘려 가려고 할까?</li></ul>
+<p class="answer-line">답:</p>
+<h3>단계마다 생기는 손실</h3>
+<p>연료 에너지 100이 발전소 → 송전·배전 → 전구를 거쳐 빛이 될 때까지 남는 양을 구해 보자. (단계별 효율: 발전 40 %, 송전·배전 96 %, LED 전구 33 %, 백열전구 5 %)</p>
+<div class="tbl"><table>
+<thead><tr><th>단계</th><th>LED 전구를 쓸 때</th><th>백열전구를 쓸 때</th></tr></thead>
+<tbody>
+<tr><td>연료 에너지</td><td>100</td><td>100</td></tr>
+<tr><td>발전소에서 나온 전기 에너지</td><td>40</td><td>40</td></tr>
+<tr><td>집에 도착한 전기 에너지</td><td>(머　　　　　)</td><td>왼쪽과 같음</td></tr>
+<tr><td>전구의 빛 에너지</td><td>약 13</td><td>약 (버　　　)</td></tr>
+</tbody>
+</table></div>
+<ul><li>전체 효율 = 각 단계 효율의 (⑬　　　　)이다. 손실이 생기는 단계가 추가되면 전체 효율은 작아진다.</li></ul>
+
+<h2>5. 전력량과 에너지 소비 효율 등급</h2>
+<p class="formula">전력량(Wh) = 전력(W) × 사용 시간(h) 　 단위: (⑭　　　　) (1 kWh = 1000 W × 1시간 = 3 600 000 J)</p>
+<ul>
+<li>60 W 백열전구를 하루 5시간씩 1년(365일) 켜면 60 × 5 × 365 = 109 500 Wh = (서　　　　　　) kWh이다.</li>
+<li>9 W LED 전구를 같은 시간 켜면 약 (어　　　　　) kWh이므로, 1년에 약 93 kWh를 줄일 수 있다.</li>
+</ul>
+<h3>효율 등급 라벨 읽기</h3>
+<ul>
+<li>가전제품의 에너지 소비 효율 등급은 (⑮　　　　)등급에 가까울수록 효율이 높다.</li>
+<li>라벨에는 등급과 함께 소비 전력량, 이산화 탄소 배출량, 연간 에너지 비용 등이 적혀 있다. 표시 항목과 기준 시간(월간·1시간 등)은 제품군마다 다르다.</li>
+<li>월간 소비 전력량이 25 kWh인 냉장고 A와 40 kWh인 냉장고 B를 1년 동안 쓰면 소비 전력량의 차이는 (저　　　　) kWh이다.</li>
+<li>같은 종류, 비슷한 크기의 제품끼리 비교해야 하는 까닭을 써 보자.</li>
+</ul>
+<p class="answer-line">답:</p>
+
+<h2>6. 효율 높이기와 에너지 절약</h2>
+<h3>버려지던 에너지 다시 쓰기</h3>
+<ul>
+<li><strong>열병합 발전</strong>: 전기를 만들고 남은 열로 지역 난방과 온수를 공급한다.</li>
+<li><strong>회생 제동</strong>: 하이브리드 자동차·전기 자동차가 멈출 때 운동 에너지 일부를 (처　　　) 에너지로 바꾸어 전지에 저장한다.</li>
+<li><strong>폐열 회수</strong>: 공장에서 버리던 뜨거운 공기나 물의 열을 다시 쓴다.</li>
+</ul>
+<h3>효율 높이기일까, 절약일까?</h3>
+<p>효율 높이기는 같은 일을 더 적은 에너지로 하는 것, 절약은 필요 없는 사용을 줄이는 것이다. 다음을 분류하여 기호를 써 보자.</p>
+<p>ㄱ. LED 조명으로 바꾸기 　ㄴ. 쓰지 않는 기기의 플러그 뽑기 　ㄷ. 이중창·단열재 쓰기 　ㄹ. 빈방 불 끄기 　ㅁ. 1등급에 가까운 냉장고 고르기 　ㅂ. 냉난방 지나치게 하지 않기</p>
+<div class="tbl"><table>
+<thead><tr><th>효율 높이기</th><th>절약</th></tr></thead>
+<tbody><tr><td></td><td></td></tr></tbody>
+</table></div>
+<ul><li>생각해 보기: 같은 빛을 얻을 때 백열전구 대신 LED 전구를 쓰면 발전소에서 태우는 연료와 이산화 탄소 배출은 어떻게 달라질까?</li></ul>
+<p class="answer-line">답:</p>
+
+<h1 class="part">2부 · 신재생 에너지</h1>
+
+<h2>7. 화석 연료의 한계와 신재생 에너지</h2>
+<ul>
+<li>화석 연료는 땅속에서 아주 오랜 시간에 걸쳐 만들어져 쓰는 만큼 다시 생기지 않는다. 태울 때 나오는 (커　　　　　　　)는 지구 온난화를 강화하고, 미세 먼지 같은 대기 오염 물질도 나온다.</li>
+<li><strong>신재생 에너지</strong> = 재생 에너지 + 신에너지</li>
+<li><strong>재생 에너지</strong>: 자연에서 계속 다시 얻을 수 있어 (⑯　　　　)될 걱정이 적은 에너지 (태양광, 태양열, 풍력, 수력, 해양(조력·파력), 지열, 바이오 에너지)</li>
+<li><strong>신에너지</strong>: 기존 화석 연료를 변환하거나 수소·산소 등의 화학 반응을 이용하는 에너지 (예: 수소 에너지, 연료 전지)</li>
+</ul>
+<p class="note">참고: 2026년 2월 국회를 통과한 개정법에서는 법 이름에서 ‘신에너지’를 빼고, 수소·연료 전지 관련 규정을 「수소법」으로 옮겼다(2026년 9월 18일 시행). 이 학습지는 교과서의 분류를 따른다.</p>
+<h3>에너지의 근원</h3>
+<div class="tbl"><table>
+<thead><tr><th>근원</th><th>에너지원</th></tr></thead>
+<tbody>
+<tr><td>태양</td><td>태양광, 태양열, 풍력, 수력, 파력, 바이오</td></tr>
+<tr><td>달과 태양의 인력</td><td>(터　　　)</td></tr>
+<tr><td>지구 내부의 열</td><td>(퍼　　　)</td></tr>
+</tbody>
+</table></div>
+<ul><li>대부분의 신재생 에너지는 (⑰　　　　) 에너지에서 온다. 태양 에너지는 태양 중심부의 수소 핵융합 반응에서 나온다.</li></ul>
+
+<h2>8. 신재생 에너지의 발전 원리</h2>
+<h3>태양광 발전</h3>
+<ul>
+<li>태양 전지는 p형 반도체와 n형 반도체를 붙여 만든다. 빛을 받으면 전자와 양공이 생기고, 전자는 (허　　　)형 쪽으로, 양공은 p형 쪽으로 이동한다. 도선을 연결하면 전류가 흐른다.</li>
+<li>태양 전지에서는 빛 에너지가 (⑱　　　　) 에너지로 바로 전환된다. 태양열 발전은 햇빛의 열로 물을 끓여 터빈을 돌리는 방식이다.</li>
+<li>패널 면에 들어오는 햇빛을 1 m²당 1000 W(표준 시험 조건)로 가정할 때, 효율 20 %인 패널 10 m²가 만드는 전력은 1000 × 10 × 0.20 = (고　　　　　) W이다.</li>
+</ul>
+<h3>풍력·수력·조력 발전</h3>
+<div class="tbl"><table>
+<thead><tr><th>발전</th><th>이용하는 에너지</th><th>전환 과정</th></tr></thead>
+<tbody>
+<tr><td>풍력</td><td>바람의 (노　　　) 에너지</td><td rowspan="3">터빈·발전기 회전 → 전기 에너지</td></tr>
+<tr><td>수력</td><td>높은 곳에 있는 물의 (도　　　) 에너지</td></tr>
+<tr><td>조력</td><td>밀물과 썰물의 바닷물 높이 차</td></tr>
+</tbody>
+</table></div>
+<ul><li>발전기 속 자석과 코일이 상대적으로 움직이면 (⑲　　　　　　　)로 전류가 생긴다.</li></ul>
+<h3>수소 연료 전지</h3>
+<p class="formula">2H₂ + O₂ → 2H₂O 　 화학 에너지 → 전기 에너지 (+ 열)</p>
+<ul>
+<li>(−)극: H₂ → 2H⁺ + 2e⁻ 　 (+)극: O₂ + 4H⁺ + 4e⁻ → 2H₂O (고분자 전해질형의 예)</li>
+<li>수소와 산소의 반응으로 생성되는 물질은 (⑳　　　　)이다(열도 함께 나온다). 그러나 수소는 자연에 홀로 거의 없어 만들어 써야 한다. 재생 에너지로 만든 전기로 물을 (로　　　　　　)하면 탄소 배출이 거의 없이 수소를 만들 수 있다.</li>
+</ul>
+
+<h2>9. 신재생 에너지의 장점과 과제</h2>
+<div class="tbl"><table>
+<thead><tr><th>장점</th><th>과제</th></tr></thead>
+<tbody>
+<tr><td>고갈될 걱정이 적다.</td><td>태양광·풍력은 날씨·시간에 따라 발전량이 달라진다.</td></tr>
+<tr><td>태양광·풍력·수력은 발전할 때 이산화 탄소를 직접 배출하지 않는다. (바이오 연료는 태울 때 이산화 탄소가 나온다.)</td><td>넓은 공간과 알맞은 지역 조건이 필요하다.</td></tr>
+<tr><td>국내의 햇빛·바람 등을 활용해 수입 연료 의존도를 줄일 수 있다.</td><td>설치 비용이 들고, 변동성을 보완할 저장 장치나 전력망 연계 등이 필요하다.</td></tr>
+</tbody>
+</table></div>
+<ul>
+<li>수업 모형에서는 맑은 날 한낮에 태양광 발전 전력이 전력 수요보다 커서 전기가 남고, 해 뜨기 전과 해가 진 뒤에는 부족하다. 남는 전기는 에너지 저장 장치(ESS)에 저장하거나, 물을 높은 곳으로 퍼 올리는 (모　　　) 발전으로 위치 에너지로 저장하거나, 수소로 바꾸어 저장한다. 그러나 저장할 때도 손실이 생기고, 남는 전기보다 부족한 전기가 많을 때도 있어 다른 발전원·전력망과 함께 써야 한다.</li>
+</ul>
+
+<h2>확인 문제</h2>
+<p>풀이 과정을 쓰고, 답에는 단위를 붙인다.</p>
+<ol>
+<li>전기 에너지 500 J을 공급한 전구에서 빛 에너지 100 J을 얻었다. 이 전구의 에너지 효율과 버려진 에너지를 구하시오.</li>
+<li>효율이 80 %인 전기 모터에 전기 에너지 400 J을 공급하였다. 모터가 한 유용한 일은 몇 J인지 구하시오.</li>
+<li>소비 전력 1000 W인 전기 주전자를 5분 동안 사용하였더니 물이 얻은 열이 240 000 J이었다. 이 주전자의 효율을 구하시오.</li>
+<li>열효율이 0.25인 엔진이 일 50 J을 하려면 공급해야 할 열(Q₁)과 버려지는 열(Q₂)을 각각 구하시오.</li>
+<li>어떤 발전소의 효율이 40 %이고 송전 효율이 90 %일 때, 연료 에너지 1000 J 중 집에 도착하는 전기 에너지는 몇 J인지 구하시오.</li>
+<li>소비 전력 2 kW인 에어컨을 하루 3시간씩 30일 동안 사용하였을 때의 전력량을 kWh로 구하시오.</li>
+<li>에너지 효율에 대한 설명으로 옳은 것을 모두 고르시오. (단, 각 기기의 효율은 일정하다.)<ul>
+<li>ㄱ. 효율이 높은 기기는 에너지를 새로 만들어 낸다.</li>
+<li>ㄴ. 효율이 높을수록 같은 일을 하는 데 필요한 에너지가 적다.</li>
+<li>ㄷ. 공급 에너지를 2배로 늘리면 효율도 2배가 된다.</li>
+</ul></li>
+<li>햇빛이 1 m²당 1000 W일 때, 효율 20 %인 태양광 패널로 2000 W의 전력을 얻으려면 패널 면적이 몇 m² 필요한지 구하시오.</li>
+<li>신재생 에너지에 대한 설명으로 옳은 것을 모두 고르시오.<ul>
+<li>ㄱ. 풍력, 수력, 조력 발전은 모두 발전기에서 전자기 유도로 전기를 만든다.</li>
+<li>ㄴ. 지열의 근원은 태양 에너지이다.</li>
+<li>ㄷ. 수소 연료 전지에서 수소와 산소가 반응할 때 이산화 탄소가 생성되지 않는다.</li>
+</ul></li>
+<li>에너지는 보존되는데 왜 에너지를 아껴 써야 하는지 ‘열’이라는 낱말을 넣어 설명하시오.</li>
+</ol>
+<p class="answer-line">답:</p>
+
+<details class="key">
+<summary>정답 보기 (교사용)</summary>
+<p><strong>번호 빈칸</strong> ① 일정 ② 버려진 에너지 ③ 열 ④ 유용하게 쓰인 에너지 ⑤ 공급한 에너지 ⑥ 시간 ⑦ 84 ⑧ 75 ⑨ 500 ⑩ 적다 ⑪ 100 ⑫ 0.25 ⑬ 곱 ⑭ kWh ⑮ 1 ⑯ 고갈 ⑰ 태양 ⑱ 전기 ⑲ 전자기 유도 ⑳ 물</p>
+<p><strong>글자 빈칸</strong> (가) 57 (나) 6 (다) 5 (라) 33 (마) 빛 (바) 운동 (사) 화학 (아) 비율 (자) 에너지의 양 (차) 합 (카) 20 (타) 80 (파) 25 (하) 40 (거) 80 (너) 에너지 보존 (더) 75 (러) 12 (머) 38.4 (버) 2 (서) 109.5 (어) 16.4 (저) 180 (처) 전기 (커) 이산화 탄소 (터) 조력 (퍼) 지열 (허) n (고) 2000 (노) 운동 (도) 위치 (로) 전기 분해 (모) 양수</p>
+<p><strong>도입</strong> 백열전구는 공급한 전기 에너지의 대부분(60 J 중 57 J)을 열로 바꾸기 때문이다.</p>
+<p><strong>예제 ①</strong> 400 000 J, 열 에너지, 64 000 J 　<strong>엔진</strong> 열</p>
+<p><strong>효율 높이기 / 절약</strong> 효율 높이기: ㄱ, ㄷ, ㅁ 　절약: ㄴ, ㄹ, ㅂ (대기 전력을 줄이도록 설계한 제품처럼 겹치는 경우도 있어, 분류한 이유를 들어 보면 좋다.)</p>
+<p><strong>생각해 보기</strong> 태양광: 연료비가 들지 않고 햇빛이 고갈되지 않으며 발전할 때 이산화 탄소를 직접 배출하지 않는다. 　등급 라벨: 등급 기준이 제품 종류와 크기마다 다르기 때문이다. 　LED: 같은 빛에 필요한 전기 에너지가 약 1/7로 줄어 발전소에서 태우는 연료와 이산화 탄소 배출도 줄어든다(발전 40 %, 송전 96 % 가정 시 빛 1에 연료 약 52 → 약 8).</p>
+<p><strong>확인 문제</strong> 1. 20 %, 400 J 　2. 320 J 　3. 공급 1000 × 300 = 300 000 J, 효율 80 % 　4. Q₁ = 200 J, Q₂ = 150 J 　5. 1000 × 0.40 × 0.90 = 360 J 　6. 2 kW × 3 h × 30 = 180 kWh 　7. ㄴ (ㄷ: 효율이 일정한 기기라면 유용한 에너지도 같은 비율로 늘어 효율은 그대로) 　8. <span class="frac"><span>2000</span><span>1000 × 0.20</span></span> = 10 m² 　9. ㄱ, ㄷ (ㄴ: 지열은 지구 내부의 열) 　10. 예: 에너지가 전환될 때 일부가 열로 주변에 흩어지고, 흩어진 열은 다시 모아 쓰기 어려워 쓸모 있는 에너지가 줄어들기 때문이다.</p>
+</details>
+</main>
+<footer>KJE · 수업 자료</footer>
+</body>
+</html>
