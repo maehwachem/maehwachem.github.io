@@ -266,6 +266,27 @@
     ],
     "tool": [
       {
+        "title": "콩 영상 작업실",
+        "subject": "tools",
+        "date": "2026-10-30",
+        "desc": "파일을 서버로 보내지 않고 영상·자막·소리를 같은 시간축에서 편집합니다. 다중 레이어, 투명도, 페이드와 장면 전환, 소리만 WAV 저장을 지원합니다. 영상 저장은 실시간 녹화 시험판입니다.",
+        "tag": "영상·소리 · 로컬 편집",
+        "level": "교사·학생 누구나",
+        "poster": "note",
+        "words": "콩 영상\n작업실",
+        "links": [
+          {
+            "label": "편집기 열기",
+            "url": "/video-editor/"
+          },
+          {
+            "label": "단일 HTML 열기",
+            "url": "/video-editor/kong-video-editor.html"
+          }
+        ],
+        "kind": "tool"
+      },
+      {
         "title": "이미지 변환기",
         "subject": "tools",
         "date": "2026-10-28",
