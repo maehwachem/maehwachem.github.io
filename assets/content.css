@@ -69,3 +69,29 @@
 #kje-portfolio .kje-hobby-copy .kje-project-tag{margin-top:0}
 #kje-portfolio .kje-hobby-copy .kje-project-links{margin-top:18px}
 @media(max-width:650px){#kje-portfolio .kje-hobby-group{margin-top:25px;padding-top:22px}#kje-portfolio .kje-project.kje-hobby-card{grid-template-columns:minmax(0,1fr);gap:20px;padding:18px}}
+
+/* Selected-project previews keep the existing covers as the resting view. */
+#kje-portfolio .kje-preview-image{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;background:#f7f8f6;opacity:0;transition:opacity .28s ease;pointer-events:none}
+#kje-portfolio .kje-poster.is-preview .kje-preview-image{opacity:1}
+#kje-portfolio .kje-poster.is-preview>.kje-poster-cap,#kje-portfolio .kje-poster.is-preview>.kje-poster-word{opacity:0}
+#kje-portfolio .kje-preview-caption{position:absolute;left:10px;bottom:9px;padding:4px 8px;background:#fff;color:#294b40;font-size:10px;line-height:1.5;border:1px solid #d6ded5;opacity:0;pointer-events:none;transition:opacity .28s ease}
+#kje-portfolio .kje-poster.is-preview .kje-preview-caption{opacity:1}
+#kje-portfolio .kje-preview-controls{position:absolute;z-index:2;right:8px;bottom:8px;display:flex;align-items:center}
+#kje-portfolio .kje-preview-toggle{background:var(--kje-white);border:1px solid var(--kje-line);border-radius:3px;padding:8px 10px;min-height:44px;color:var(--kje-green);font:inherit;font-size:12px;line-height:1.5;cursor:pointer}
+#kje-portfolio .kje-preview-toggle:focus-visible{outline:2px solid var(--kje-green);outline-offset:3px}
+#kje-portfolio .kje-preview-toggle:disabled{color:var(--kje-muted);cursor:default}
+#kje-portfolio .kje-category-count{display:inline-block;margin-left:7px;font-size:11px;opacity:.8;font-variant-numeric:tabular-nums}
+@media(max-width:650px){
+ #kje-portfolio .kje-category-picker{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+ #kje-portfolio .kje-category{grid-column:span 2;min-height:48px;padding:10px 5px;display:flex;justify-content:center;align-items:center;text-align:center}
+ #kje-portfolio .kje-category:nth-child(4),#kje-portfolio .kje-category:nth-child(5){grid-column:span 3}
+ #kje-portfolio .kje-category:last-child{grid-column:span 3}
+ #kje-portfolio .kje-category-hint{display:none}
+ #kje-portfolio .kje-category-name{font-size:12px;line-height:1.6;white-space:normal;word-break:keep-all}
+ #kje-portfolio .kje-category-count{font-size:10px;margin-left:5px}
+}
+@media(prefers-reduced-motion:reduce){#kje-portfolio .kje-preview-image,#kje-portfolio .kje-preview-caption{transition:none}}
+
+#kje-portfolio .is-preview.kje-game-cover:after{opacity:0}
+#kje-portfolio .kje-preview-toggle[aria-pressed="true"]{background:var(--kje-button);color:var(--kje-button-text);border-color:var(--kje-button)}
+#kje-portfolio .kje-preview-status:not(:empty){position:absolute;right:0;bottom:48px;min-width:130px;padding:6px 9px;font-size:11px;line-height:1.5;color:var(--kje-ink);background:var(--kje-white);border:1px solid var(--kje-line)}
