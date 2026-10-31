@@ -61,54 +61,9 @@
     setText('#hobbies-title',site.interests_title);setText('.kje-about-copy',site.interests_text);
     if(Array.isArray(site.interests)){const list=root.querySelector('.kje-interests');list.replaceChildren(...site.interests.map(value=>{const link=value==='천문관측';const item=node(link?'a':'span','',value);if(link)item.href='#hobby-astronomy';return item;}));}
   }
-  let activePreview=null;
-  let previewSerial=0;
-  const previewScenes=[
-    {url:'https://maehwachem.github.io/science-tools/battery/virtual.html',src:'assets/previews/battery-student.webp',alt:'배터리 가상 시험동의 학생용 실험대와 멀티미터 시연 화면'},
-    {url:'https://maehwachem.github.io/science-tools/redox/',src:'assets/previews/redox-student.webp',alt:'산화·환원 가상 실험실에서 다니엘 전지를 연결한 학생용 회로판 시연 화면'},
-    {url:'https://my-first-room-energy.kjeung.chatgpt.site/',src:'assets/previews/energy-student.webp',alt:'전기요금 챌린지에서 침실과 주방, 거실의 가구를 배치하는 시연 화면'}
-  ];
-  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&activePreview)activePreview.hide();});
-  function addProjectPreview(card,poster,item) {
-    const scene=previewScenes.find(scene=>(item.links||[]).some(link=>link&&link.url===scene.url));if(!scene)return;
-    poster.removeAttribute('aria-hidden');poster.id='kje-preview-'+(++previewSerial);
-    poster.querySelectorAll('.kje-poster-cap,.kje-poster-word').forEach(el=>el.setAttribute('aria-hidden','true'));
-    const image=node('img','kje-preview-image');image.alt=scene.alt;image.width=820;image.height=560;
-    image.setAttribute('aria-hidden','true');image.decoding='async';
-    const caption=node('span','kje-preview-caption','실제 화면 · 시연');caption.setAttribute('aria-hidden','true');
-    poster.append(image,caption);
-    const controls=node('div','kje-preview-controls');
-    const button=node('button','kje-preview-toggle','화면 미리보기');button.type='button';
-    button.setAttribute('aria-controls',poster.id);button.setAttribute('aria-pressed','false');
-    button.setAttribute('aria-label',item.title+' 화면 미리보기');button.title='한 번 더 누르면 표지로 돌아갑니다';
-    const status=node('span','kje-preview-status');status.setAttribute('role','status');
-    controls.append(status,button);poster.append(controls);
-    let pinned=false,active=false,failed=false;
-    const controller={hide:()=>hide(),isPinned:()=>pinned};
-    function hide(){active=false;pinned=false;poster.classList.remove('is-preview');image.setAttribute('aria-hidden','true');button.setAttribute('aria-pressed','false');button.removeAttribute('aria-busy');status.textContent='';if(activePreview===controller)activePreview=null;}
-    function reveal(){
-      if(!active||failed||!image.naturalWidth)return;
-      poster.classList.add('is-preview');image.removeAttribute('aria-hidden');button.removeAttribute('aria-busy');status.textContent='';
-    }
-    function show(pin=false){
-      if(failed||card.hidden)return;
-      if(!pin&&activePreview&&activePreview!==controller&&activePreview.isPinned())return;
-      if(activePreview&&activePreview!==controller)activePreview.hide();
-      activePreview=controller;active=true;if(pin)pinned=true;
-      button.setAttribute('aria-pressed',String(pinned));
-      if(!image.getAttribute('src'))image.src=scene.src;
-      if(image.complete&&image.naturalWidth)reveal();else{button.setAttribute('aria-busy','true');status.textContent='불러오는 중…';}
-    }
-    image.addEventListener('load',reveal);
-    image.addEventListener('error',()=>{failed=true;hide();button.disabled=true;button.textContent='미리보기 오류';button.setAttribute('aria-label',item.title+' 미리보기를 불러오지 못했습니다');status.textContent='미리보기를 불러오지 못했습니다';});
-    button.addEventListener('click',()=>{if(pinned)hide();else show(true);});
-    poster.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'&&matchMedia('(hover:hover) and (pointer:fine)').matches)show();});
-    poster.addEventListener('pointerleave',()=>{if(!pinned)hide();});
-  }
   let selectedCategory='lab';
   function selectCategory(key,writeHash=false) {
     if(!own(formats,key))return;
-    if(activePreview)activePreview.hide();
     selectedCategory=key;
     root.querySelectorAll('[data-category]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.category===key)));
     let count=0;
@@ -157,7 +112,7 @@
       const cover=safeURL(item.cover,true);
       if(cover){if(/\/cover-(?:watercolor|series)-/.test(cover))poster.classList.add('kje-watercolor-cover');if(item.kind!=='lab'&&item.kind!=='game'&&/-illustrated(?:-v\d+)?\.webp$/.test(cover))poster.classList.add('kje-editorial-illustrated');if(item.kind==='lab'&&/lab-[a-z-]+-illustrated\.webp$/.test(cover))poster.classList.add('kje-lab-illustrated');const img=node('img','kje-project-cover');img.src=cover;img.alt='';img.loading='lazy';poster.append(img);if(item.kind==='game'){poster.classList.add('kje-game-cover');poster.append(node('span','kje-poster-cap',/gameplay\.webp$/.test(cover)?'실제 플레이 화면':categories[card.dataset.subject][0]+' · '+formats[item.kind][0]),node('span','kje-poster-word',item.title));}}
       else{poster.innerHTML=art[posterName];poster.prepend(node('span','kje-poster-cap',hobby?'취미 · 천문관측':categories[card.dataset.subject][0]+' · '+formats[item.kind][0]));poster.append(node('span','kje-poster-word',item.words||item.title));}
-      card.append(poster);if(!hobby)addProjectPreview(card,poster,item);const copy=hobby?node('div','kje-hobby-copy'):card;
+      card.append(poster);const copy=hobby?node('div','kje-hobby-copy'):card;
       copy.append(node('p','kje-project-tag',item.tag),node(hobby?'h4':'h3','kje-project-title',item.title),node('p','kje-project-desc',item.desc));
       if(text(item.level).trim()){const level=node('p','kje-project-level');level.append(node('span','kje-project-level-label','대상'),document.createTextNode(item.level));copy.append(level);}
       if(data.show_dates!==false && dateKey(item.date))copy.append(postMeta(item,false));
