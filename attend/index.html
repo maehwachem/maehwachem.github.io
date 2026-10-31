@@ -16,12 +16,15 @@
     />
     <style>
       :root {
-        --bg: #f4f6fb;
+        color-scheme: only light;
+        --accent: #f28c28;
+        --soft: #eeebe7;
+        --bg: #f7f3eb;
         --card: #fff;
-        --ink: #0f172a;
-        --sub: #64748b;
-        --line: #e2e8f0;
-        --brand: #4f46e5;
+        --ink: #352a35;
+        --sub: #70636d;
+        --line: #ded5d7;
+        --brand: #553d50;
         --ok: #059669;
         --okbg: #ecfdf5;
         --warn: #d97706;
@@ -146,7 +149,7 @@
         opacity: 0.6;
       }
       button.ghost {
-        background: #eef2ff;
+        background: var(--soft);
         color: var(--brand);
         margin-top: 12px;
       }
@@ -159,7 +162,7 @@
       .spinner {
         width: 40px;
         height: 40px;
-        border: 4px solid #e0e7ff;
+        border: 4px solid var(--line);
         border-top-color: var(--brand);
         border-radius: 50%;
         margin: 20px auto;
@@ -173,7 +176,8 @@
       .hidden {
         display: none;
       }
-    </style>
+    button:not(.ghost){background:var(--accent);color:var(--ink)}
+</style>
   </head>
   <body>
     <div class="card">
