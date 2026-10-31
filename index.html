@@ -15,10 +15,10 @@
   <style>
     #kje-portfolio{--kje-student-image:url('assets/student-character.png')}
     #kje-portfolio .kje-student-image{display:block;background-image:var(--kje-student-image);background-size:contain;background-position:center;background-repeat:no-repeat;background-origin:content-box}
-    #kje-portfolio .kje-brand-drawing{width:48px;height:52px;flex:0 0 auto;background-color:#f6f3e9;border-radius:14px;padding:5px}
+    #kje-portfolio .kje-brand-drawing{width:48px;height:52px;flex:0 0 auto;background-color:var(--kje-paper);border-radius:14px;padding:5px}
     @media(max-width:650px){#kje-portfolio .kje-brand-drawing{width:38px;height:42px;border-radius:10px;padding:4px}}
     
-    #kje-portfolio{--kje-paper:light-dark(#faf9f5,#192522);--kje-ink:light-dark(#233a38,#f2eee2);--kje-muted:light-dark(#68736c,#b5c0b9);--kje-line:light-dark(#dcded4,#3c4b46);--kje-green:light-dark(#315b4b,#b1ccad);--kje-wash:light-dark(#e9eddf,#263b32);--kje-white:light-dark(#fffefa,#21312c);--kje-button:light-dark(#294d40,#b1ccad);--kje-button-text:light-dark(#fffefa,#203629);color:var(--kje-ink);background:var(--kje-paper);font-family:'Noto Sans KR',sans-serif;font-size:14px;line-height:1.6;position:relative;isolation:isolate;text-align:left;overflow:hidden}
+    #kje-portfolio{--kje-paper:light-dark(#f7f3eb,#211b22);--kje-ink:light-dark(#352a35,#f3ebe3);--kje-muted:light-dark(#746772,#c5b7c2);--kje-line:light-dark(#ded5d7,#4e404e);--kje-green:light-dark(#553d50,#d9b7d0);--kje-wash:light-dark(#eeebe7,#2d2530);--kje-white:light-dark(#fcfaf5,#29222b);--kje-button:light-dark(#e59a68,#e59a68);--kje-button-text:light-dark(#352a35,#352a35);color:var(--kje-ink);background:var(--kje-paper);font-family:'Noto Sans KR',sans-serif;font-size:14px;line-height:1.6;position:relative;isolation:isolate;text-align:left;overflow:hidden}
     #kje-portfolio *{box-sizing:border-box}
     #kje-portfolio button,#kje-portfolio a{-webkit-tap-highlight-color:transparent;font:inherit;color:inherit}
     #kje-portfolio button{background:none;border:0;padding:0;text-align:inherit}
@@ -101,7 +101,7 @@
     #kje-portfolio .kje-footer{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px 20px;padding:27px 0;font-size:10px;color:var(--kje-muted)}
     #kje-portfolio .kje-contact-email{font-size:12px;color:var(--kje-green);overflow-wrap:anywhere;text-decoration:underline;text-underline-offset:4px;padding:8px 0}
     #kje-portfolio .kje-footer strong{color:var(--kje-ink);font-weight:500;font-size:12px}
-    #kje-portfolio .kje-overlay{position:absolute;inset:0;z-index:10;background:light-dark(#faf9f5,#192522);padding:35px 7%;overflow:auto}
+    #kje-portfolio .kje-overlay{position:absolute;inset:0;z-index:10;background:light-dark(#f7f3eb,#211b22);padding:35px 7%;overflow:auto}
     #kje-portfolio .kje-overlay[hidden]{display:none}
     #kje-portfolio .kje-detail-top{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--kje-line);padding-bottom:20px;margin-bottom:38px}
     #kje-portfolio .kje-close{display:inline-flex;align-items:center;gap:9px;font-size:12px;padding:7px 0}
@@ -184,7 +184,7 @@
     @media(prefers-reduced-motion:reduce){#kje-portfolio *{transition:none!important;scroll-behavior:auto!important}}
   
 
-html{color-scheme:light dark;scroll-behavior:smooth}body{margin:0;background:light-dark(#faf9f5,#192522)}
+html{color-scheme:light dark;scroll-behavior:smooth}body{margin:0;background:light-dark(#f7f3eb,#211b22)}
 [hidden]{display:none!important}button,a{touch-action:manipulation}button{cursor:pointer}
 #kje-portfolio{min-height:100vh;overflow:clip;font-family:'Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif}
 #kje-portfolio .kje-brand{padding:0}#kje-portfolio .kje-menu{flex-wrap:wrap}
@@ -214,7 +214,7 @@ html{color-scheme:light dark;scroll-behavior:smooth}body{margin:0;background:lig
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 
     #kje-portfolio .kje-project[data-subject] .kje-poster{background:var(--kje-category-bg);color:var(--kje-category-ink)}
-    #kje-portfolio .kje-project[data-subject] .kje-project-tag{color:var(--kje-category-ink)}
+    #kje-portfolio .kje-project[data-subject] .kje-project-tag{color:var(--kje-green)}
     #kje-portfolio .kje-project .kje-lab-ring{border-color:currentColor;background:color-mix(in srgb,currentColor 12%,var(--kje-category-bg));box-shadow:inset 0 0 0 12px var(--kje-category-bg),inset 0 0 0 13px currentColor}
     #kje-portfolio .kje-project .kje-contour,#kje-portfolio .kje-project .kje-contour:before,#kje-portfolio .kje-project .kje-contour:after{border-color:currentColor}
     #kje-portfolio .kje-project .kje-contour:after{background:color-mix(in srgb,currentColor 16%,var(--kje-category-bg))}
