@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>감염병 진단 실험실</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* 활동별 화면 전환. 좁은 화면에서는 현재 활동 안에서만 스크롤한다. */
+:root{
+  --bg:#eef3f4; --surface:#ffffff; --ink:#14232b; --muted:#566a72; --line:#d3dfe2;
+  --accent:#0d7480; --accent-soft:#dcefF1; --blue:#2c63c9; --violet:#7a5cc4;
+  --warn:#a8501c; --warn-soft:#fbeee4; --good:#2b7a4b; --good-soft:#e3f3e9;
+  --well:#e9eff1; --well-rim:#c3d1d5;
+  --f-display:"Do Hyeon","IBM Plex Sans KR",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",var(--f-body),monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e161a; --surface:#152128; --ink:#e3edf0; --muted:#94a8af; --line:#283a42;
+  --accent:#41b6c0; --accent-soft:#17343a; --blue:#6f9fff; --violet:#a98cf0;
+  --warn:#f0a070; --warn-soft:#3a261a; --good:#6fd39a; --good-soft:#163526;
+  --well:#1d2c34; --well-rim:#34474f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e161a; --surface:#152128; --ink:#e3edf0; --muted:#94a8af; --line:#283a42;
+  --accent:#41b6c0; --accent-soft:#17343a; --blue:#6f9fff; --violet:#a98cf0;
+  --warn:#f0a070; --warn-soft:#3a261a; --good:#6fd39a; --good-soft:#163526;
+  --well:#1d2c34; --well-rim:#34474f; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15.5px;line-height:1.65;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+h1,h2,h3{font-family:var(--f-display);font-weight:400;text-wrap:balance;margin:0;line-height:1.25}
+h1{font-size:2rem}
+h2{font-size:1.55rem}
+h3{font-size:1.15rem}
+p{margin:0}
+.eyebrow{font-size:.78rem;letter-spacing:.06em;color:var(--accent);font-weight:700}
+.lede{color:var(--muted);max-width:62ch}
+header{display:flex;flex-direction:column;gap:8px}
+nav{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+nav a{font-size:.85rem;color:var(--ink);text-decoration:none;border:1px solid var(--line);background:var(--surface);padding:5px 12px;border-radius:999px}
+nav a:hover{border-color:var(--accent)}
+section{display:flex;flex-direction:column;gap:14px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:14px}
+.stepbar{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.stepbar div{font-size:.8rem;padding:8px;border-radius:8px;background:var(--well);color:var(--muted);line-height:1.35}
+.stepbar div b{display:block;font-family:var(--f-mono);font-size:.75rem}
+.stepbar div.on{background:var(--accent-soft);color:var(--ink);outline:1.5px solid var(--accent)}
+.stepbar div.done{color:var(--ink)}
+.stepbar div.done b::after{content:" ✓";color:var(--good)}
+.tools{display:flex;flex-wrap:wrap;gap:6px}
+.tool{font:inherit;font-size:.85rem;display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.tool i{width:11px;height:14px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;display:inline-block}
+.tool[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--surface)}
+.tool:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.plate-box{overflow-x:auto}
+.plate{min-width:320px;background:var(--well);border:1px solid var(--well-rim);border-radius:18px;padding:12px 10px 10px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px 6px}
+.colhead{text-align:center;font-size:.75rem;color:var(--muted);line-height:1.3}
+.colhead b{display:block;font-family:var(--f-mono);color:var(--ink);font-size:.85rem}
+.colhead.ctrl b{color:var(--warn)}
+.well{aspect-ratio:1;max-width:100%;border-radius:50%;border:2px solid var(--well-rim);background:var(--surface);position:relative;cursor:pointer;overflow:hidden;padding:0;font:inherit}
+.well .liq{position:absolute;inset:0;border-radius:50%;transform:scale(0);background:var(--accent-soft);transition:transform .35s}
+.well .dev{position:absolute;inset:0;border-radius:50%;background:var(--blue);opacity:0;transition:opacity 2.2s ease-in}
+.well .cnt{position:absolute;left:0;right:0;bottom:12%;text-align:center;font-family:var(--f-mono);font-size:.62rem;color:var(--muted);line-height:1.2}
+.well.dev-on .dev{opacity:.85}
+.well.dev-on .cnt{color:#fff}
+.well[disabled]{cursor:not-allowed;opacity:.45}
+.well.flash{animation:fl .4s}
+@keyframes fl{50%{border-color:var(--ink)}}
+.rowlabel{grid-column:1/-1;font-size:.72rem;color:var(--muted);text-align:center;margin-top:-2px}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px}
+.btn{font:inherit;font-size:.88rem;padding:8px 14px;border-radius:10px;border:1px solid var(--accent);background:var(--accent);color:var(--surface);cursor:pointer;font-weight:500}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.msg{font-size:.88rem;padding:10px 12px;border-radius:10px;background:var(--well);min-height:2.6em}
+.msg.warn{background:var(--warn-soft);color:var(--warn)}
+.msg.good{background:var(--good-soft);color:var(--good)}
+.quiz{display:flex;flex-direction:column;gap:8px;border-top:1px dashed var(--line);padding-top:12px}
+.quiz .opts{display:flex;flex-wrap:wrap;gap:6px}
+.small{font-size:.82rem;color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:.78rem;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:5px}
+.legend i{width:12px;height:12px;border-radius:50%;display:inline-block}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.card ol{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:4px}
+.map{display:grid;grid-template-columns:1fr auto 1fr;gap:6px 10px;align-items:center;font-size:.88rem}
+.map .arr{color:var(--muted);font-family:var(--f-mono)}
+.map .k{background:var(--well);padding:6px 10px;border-radius:8px}
+.cyclebox{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.cyc{padding:8px;border-radius:8px;background:var(--well);font-size:.8rem;text-align:center;line-height:1.35;color:var(--muted)}
+.cyc b{display:block;font-family:var(--f-mono);font-size:1rem;color:var(--ink)}
+.cyc.on{background:var(--accent-soft);outline:1.5px solid var(--accent);color:var(--ink)}
+.readout{display:flex;flex-wrap:wrap;gap:16px;font-size:.85rem}
+.readout div{display:flex;flex-direction:column}
+.readout b{font-family:var(--f-mono);font-size:1.15rem;font-variant-numeric:tabular-nums}
+canvas{width:100%;height:260px;display:block}
+.ctrl{display:flex;flex-direction:column;gap:6px;font-size:.88rem}
+.ctrl input[type=range]{width:100%;accent-color:var(--accent)}
+.checks{display:flex;flex-wrap:wrap;gap:12px;font-size:.85rem}
+.dots{display:flex;flex-wrap:wrap;gap:3px;min-height:20px}
+.dots i{width:7px;height:7px;border-radius:2px;background:var(--accent);display:block}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:480px;font-size:.88rem}
+th,td{border-bottom:1px solid var(--line);padding:9px 8px;text-align:left;vertical-align:top}
+th{font-weight:700;color:var(--muted);font-size:.8rem}
+td:first-child{font-weight:500;white-space:nowrap}
+.discuss{display:flex;flex-direction:column;gap:10px}
+.discuss li{margin-bottom:6px}
+.note{font-size:.82rem;color:var(--muted);border-left:3px solid var(--line);padding-left:10px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+html{height:100%}body{margin:0;height:100dvh;padding:12px max(12px,env(safe-area-inset-right)) 0;overflow:hidden}
+.wrap{max-width:1040px;height:100%;gap:10px}header{gap:5px;flex-shrink:0}h1{font-size:1.65rem}.lede{font-size:.86rem;max-width:none}
+nav{gap:5px;margin:0;display:grid;grid-template-columns:repeat(5,1fr)}nav button{font:inherit;font-size:.82rem;border:1px solid var(--line);border-radius:9px;padding:8px 3px;background:var(--surface);color:var(--ink);cursor:pointer}nav button[aria-current=step]{background:var(--accent);color:var(--surface);border-color:var(--accent)}
+.workspace{min-height:0;flex:1;overflow:hidden}.view{height:100%;overflow-y:auto;overscroll-behavior:contain;gap:10px;padding:4px 4px 14px}.view:focus{outline:none}.view h2{font-size:1.3rem}.panel{gap:10px;padding:12px}
+.pager{flex-shrink:0;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0 max(10px,env(safe-area-inset-bottom));border-top:1px solid var(--line);background:var(--bg)}.pager span{font-size:.82rem;color:var(--muted)}
+.lab-layout{display:grid;grid-template-columns:minmax(190px,1fr) minmax(260px,360px);gap:12px;align-items:center}.lab-controls{display:flex;flex-direction:column;gap:12px}.plate{min-width:0;width:100%;max-width:360px;margin:auto;gap:5px;padding:8px}.tools{gap:5px}.tool{font-size:.8rem;padding:7px 8px}.stepbar div{font-size:.75rem;padding:7px}.msg{min-height:0}.well .cnt{font-size:.6rem}
+.btn.danger{border-color:var(--warn);color:var(--warn);background:var(--warn-soft)}.fault{border:2px solid var(--warn)}.outcomes{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.outcome{padding:12px 6px;border:1px solid var(--line);border-radius:10px;text-align:center;font-size:.85rem}.spots{display:flex;justify-content:center;gap:8px;margin:12px 0}.spot{width:28px;height:28px;border:2px solid var(--well-rim);border-radius:50%;background:var(--surface)}.spot.positive{background:var(--blue)}.outcome b{display:block}.state-tag{font-size:.8rem;color:var(--muted)}
+canvas{height:230px}.chart-legend{font-size:.78rem;display:flex;flex-wrap:wrap;gap:12px}.chart-legend span:before{content:'━ ';color:var(--blue)}.chart-legend .pos:before{color:var(--muted)}.chart-legend .neg:before{color:var(--violet)}.chart-legend .previous:before{content:'┄ ';color:var(--warn)}
+.source-links{font-size:.8rem}.source-links a{color:var(--accent)}.kit-read{display:flex;gap:10px;flex-wrap:wrap}.kit-read span{background:var(--well);border-radius:8px;padding:8px 12px}.note{margin-top:2px}
+@media(max-width:600px){body{padding-top:8px}.eyebrow{font-size:.65rem}h1{font-size:1.35rem}.lede{display:none}nav button{font-size:.72rem;padding:9px 2px}.lab-layout{display:flex;flex-direction:column;gap:8px}.lab-controls{width:100%;gap:6px}.plate-box{width:min(100%,270px);overflow:visible}.tools{justify-content:center}.tool{padding:6px 8px;font-size:.76rem}.stepbar div b{font-size:.65rem}.stepbar div{font-size:.67rem;padding:6px}.view h2{font-size:1.15rem}.outcomes{grid-template-columns:repeat(2,1fr)}.btn{padding:8px 10px;font-size:.8rem}.cards{grid-template-columns:1fr}.panel{padding:10px}.small,.msg{font-size:.8rem}.readout{gap:12px}.readout b{font-size:1rem}canvas{height:205px}.pager span{font-size:.72rem}table{min-width:0;font-size:.77rem}th,td{padding:7px 5px}td:first-child{white-space:normal}}
+
+/* 조작 버튼이 화면 안에 머물도록 실험판과 안내를 압축 */
+.lab-layout{grid-template-columns:1fr 280px}.plate{max-width:280px}.lab-hint{margin-top:8px}details{flex-shrink:0}summary{cursor:pointer;color:var(--accent);padding:3px 0}details[open]{padding-bottom:8px}#pcr .panel{gap:7px}#pcr .dots{display:none}#pcr canvas{height:190px}#pcr>.small{line-height:1.5}
+@media(max-width:600px){.lab-hint{display:none}.plate-box{width:230px}.plate{padding:6px}.colhead{font-size:.65rem}.colhead b{font-size:.75rem}.rowlabel{font-size:.65rem}.view{gap:7px}.panel{gap:8px}.legend{gap:4px 8px;font-size:.66rem}.btnrow{gap:5px}.btn{font-size:.75rem;padding:7px 9px}#pcr canvas{height:155px}#pcr .cyc{font-size:.7rem;padding:5px}#pcr .cyc b{font-size:.9rem}#pcr .checks{gap:3px 9px;font-size:.72rem}#pcr .chart-legend{font-size:.68rem;gap:7px}#pcr .readout{gap:10px}#pcr .readout .small{font-size:.68rem}#pcr .msg{font-size:.72rem;padding:7px 9px}#pcr .ctrl{font-size:.78rem;gap:2px}#pcr .panel{gap:6px}#pcr .readout b{font-size:.93rem}}
+
+.pcr-settings{display:flex;flex-direction:column;gap:12px}.pcr-graph{min-width:0}.pcr-graph .chart-legend{margin-top:6px}
+@media(min-width:601px){.lede{display:none}.lab-layout{grid-template-columns:1fr 240px}.plate{max-width:240px}#pcr .panel{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);column-gap:20px}#pcr .cyclebox{grid-column:1/-1}#pcr .readout{grid-column:1;grid-row:2}#pcr .pcr-graph{grid-column:1;grid-row:3}#pcr .pcr-settings{grid-column:2;grid-row:2/4;justify-content:center}#pcr #pmsg{grid-column:1/-1}#pcr canvas{height:210px}}
+@media(max-width:600px){.pcr-settings{gap:6px}}
+
+.colhead.ctrl{display:block;font-size:.72rem;line-height:1.3}.lab-controls .tools{max-width:420px}.lab-hint{max-width:430px}nav button{white-space:nowrap}
+@media(max-width:600px){.colhead.ctrl{font-size:.65rem}nav button{font-size:.68rem}}
+</style>
+</head><body>
+
+<div class="wrap">
+<header>
+  <span class="eyebrow"><a href="/" style="color:inherit;text-decoration:none">KJE의 작업실</a> · 통합과학2 · Ⅲ. 과학과 미래 사회 · 탐구 「감염병 진단 기술 체험하기」</span>
+  <h1>감염병 진단 실험실</h1>
+  <p class="lede">교과서의 신속 항원 검사 모의실험을 화면에서 해 보고, PCR 검사가 어떻게 아주 적은 바이러스 유전자를 찾아내는지 증폭 과정을 직접 돌려 봐요.</p>
+  <nav aria-label="활동 선택"><button data-view="lab" aria-current="step">① 모의실험</button><button data-view="results">② 결과 해석</button><button data-view="principle">③ 검사 원리</button><button data-view="pcr">④ PCR 실험</button><button data-view="compare">⑤ 비교정리</button></nav>
+</header>
+<main class="workspace">
+
+<!-- ① 모의실험 -->
+<section id="lab" class="view" tabindex="-1">
+  <h2>① 홈판 모의실험</h2>
+  
+  <div class="panel">
+    <div class="stepbar" id="stepbar">
+      <div data-s="1"><b>STEP 1</b>8개 홈에 모의 항체 10방울</div>
+      <div data-s="2"><b>STEP 2</b>검체 ⓐ~ⓓ를 2개 홈에 5방울씩</div>
+      <div data-s="3"><b>STEP 3</b>8개 홈에 검출 시약 2방울</div>
+    </div>
+    <div class="lab-layout"><div class="lab-controls"><div class="tools" id="tools" role="group" aria-label="스포이트 도구"></div><p class="small lab-hint">도구를 고르고 홈을 누르세요. 검체마다 같은 세로줄의 두 홈을 사용해요.</p></div><div class="plate-box"><div class="plate" id="plate"></div></div></div>
+    <div class="legend">
+      <span><i style="background:var(--accent-soft);border:1px solid var(--well-rim)"></i>액체가 들어 있음</span>
+      <span><i style="background:var(--blue)"></i>색 변화(항원 검출)</span>
+      <span>숫자: 항체·검체·검출 시약 방울 수</span>
+    </div>
+    <div class="msg" id="msg" aria-live="polite">STEP 1부터 시작해요. 「모의 항체」를 고르고 위쪽 두 줄 홈을 눌러 보세요.</div>
+    <div class="btnrow">
+      <button class="btn ghost" id="autoStep">이번 단계 한 번에 넣기</button>
+      <button class="btn danger" id="dispose">폐액 처리 후 다시 하기</button><button class="btn ghost" id="reset">새 환자로 시작</button><button class="btn" id="seeResult" disabled>결과 해석하기 →</button>
+    </div>
+
+  </div>
+  <details class="small"><summary>실험 방법 · 폐액 처리 안내</summary><p><a href="/lectures/infection-diagnosis.html" style="color:var(--accent)">발표 슬라이드 열기 →</a></p><p>도구를 고르고 홈을 한 번 누르면 정해진 양이 들어갑니다. 각 검체는 같은 세로줄의 두 홈에 넣고 맨 아래 줄은 사용하지 않습니다. ‘폐액 처리 후 다시 하기’는 같은 환자 조건을 유지하고, ‘새 환자로 시작’은 조건을 새로 정합니다. 실제 폐액은 교사의 안내에 따라 지정된 용기에 모읍니다.</p></details>
+</section>
+
+<section id="results" class="view" tabindex="-1" hidden><h2>② 결과 해석</h2><div class="msg" id="resultStatus" aria-live="polite">먼저 모의실험을 완료하세요.</div><div class="outcomes" id="outcomes" hidden></div><div class="panel"><h3>대조군부터 확인해요</h3><p>양성 대조군은 색이 변하고, 음성 대조군은 색이 변하지 않아야 해요. 같은 검체를 넣은 두 홈의 결과도 일치하는지 살펴보세요.</p>    <div class="quiz" id="quiz" hidden>
+      <h3>양성으로 판정되는 모의 환자 검체는 무엇인가요?</h3>
+      <div class="opts" id="opts"></div>
+      <div class="msg" id="qmsg" hidden></div>
+    </div></div><div class="btnrow"><button class="btn ghost" id="returnLab">실험판으로 돌아가기</button><button class="btn danger" id="resultDispose">폐액 처리 후 다시 하기</button></div><details class="small"><summary>모의실험 결과와 실제 검사의 차이</summary><p class="note">이 모형에서는 표적 항원이 있으면 색이 변한다고 가정해요. 실제 검사는 검체 채취와 표적의 양 등에 영향을 받으므로 음성이라고 감염이 없다고 단정할 수 없어요.</p></details></section>
+<!-- ③ 원리 -->
+<section id="principle" class="view" tabindex="-1" hidden>
+  <h2>③ 신속 항원 검사는 무엇을 찾을까</h2>
+  <p>항원은 면역계가 인식하는 물질이고, 항체는 특정 항원의 구조를 인식해 결합하는 단백질이에요. 신속 항원 검사는 이 <b>특이적 결합</b>을 이용해 바이러스의 단백질을 찾아요.</p>
+  <div class="cards">
+    <div class="card">
+      <h3>실제 검사 키트에서</h3>
+      <ol>
+        <li>콧속에서 검체를 채취해 용액 통에 넣으면 바이러스 단백질이 용액으로 나와요.</li>
+        <li>용액을 키트에 떨어뜨리면 액체가 띠를 따라 이동해요.</li>
+        <li>바이러스 단백질이 있으면 키트 속 항체와 결합하고, 실험선(T)에서 색이 나타나요.</li>
+        <li>대조선(C)은 액체 이동과 시약 반응을 확인하는 표시예요. C선이 없으면 결과는 무효예요. 검체가 충분히 채취되었는지까지 보장하지는 않아요.</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h3>모의실험에서 표현한 것</h3>
+      <div class="map">
+        <span class="k">모의 항체</span><span class="arr">→</span><span>키트 속 항체</span>
+        <span class="k">모의 환자 검체</span><span class="arr">→</span><span>콧속 검체 용액</span>
+        <span class="k">검출 시약</span><span class="arr">→</span><span>색을 내는 물질</span>
+        <span class="k">양성 대조군</span><span class="arr">→</span><span>반드시 색이 나야 하는 기준</span>
+        <span class="k">음성 대조군</span><span class="arr">→</span><span>색이 나면 안 되는 기준</span>
+      </div>
+    </div>
+  </div>
+  <details class="small"><summary>대조군과 이 모형의 한계</summary><p class="note">대조군 두 개가 기대대로 나와야 환자 검체의 결과를 믿을 수 있어요. 양성 대조군에 색이 안 나오면 시약이나 과정에 문제가 있었다고 볼 수 있어요. 홈판은 검출 결과를 비교하는 과정을 단순화한 모형이며, 실제 키트의 구조나 반응을 그대로 재현하지는 않아요. 시약 성분은 제품마다 다를 수 있어요. 대조선(C)과 별도의 양성·음성 대조군은 확인하는 범위가 같지 않아요.</p></details>
+</section>
+
+<!-- ④ PCR -->
+<section id="pcr" class="view" tabindex="-1" hidden>
+  <h2>④ PCR은 어떻게 적은 양을 찾아낼까</h2>
+  <details class="small"><summary>PCR과 역전사 알아보기</summary><p>PCR은 바이러스의 특정 유전자 조각을 반복해서 복제해 양을 늘리는 방법이에요. 한 번의 주기마다 이론적으로 2배가 되니, 30주기면 처음보다 약 10억 배가 돼요. 코로나19 바이러스는 유전 물질이 RNA라서, 먼저 DNA로 바꾸는 역전사 과정을 거친 뒤 증폭해요(RT-PCR).</p></details>
+  <div class="panel">
+    <div class="cyclebox" id="cyclebox">
+      <div class="cyc" data-p="0"><b>95°C</b>변성<br>두 가닥이 떨어짐</div>
+      <div class="cyc" data-p="1"><b>약 55~60°C</b>결합<br>프라이머가 붙음</div>
+      <div class="cyc" data-p="2"><b>72°C</b>신장<br>새 가닥이 만들어짐</div>
+    </div>
+    <div class="readout">
+      <div><span class="small">주기</span><b id="rCycle">0</b></div>
+      <div><span class="small">1개에서 시작한 이론값</span><b id="rCopies">1개</b></div>
+      <div><span class="small">환자 검체 Ct</span><b id="rCt">–</b></div>
+    </div>
+    <div class="dots" id="dots" aria-hidden="true"></div>
+    <div class="pcr-graph"><canvas id="chart" role="img" aria-label="주기에 따른 형광 세기 그래프"></canvas><div class="chart-legend"><span>환자</span><span class="pos">양성 대조군</span><span class="neg">음성 대조군</span><span class="previous">이전</span></div></div><div class="pcr-settings">
+    <div class="ctrl">
+      <label for="load">환자 검체 속 바이러스 유전자 수: <b id="loadVal">1,000개</b></label>
+      <input type="range" id="load" min="0" max="6" step="0.5" value="3">
+    </div>
+    <p class="small" id="previousInfo">조건을 바꿔 다시 실행하면 이전 곡선을 함께 볼 수 있어요.</p><div class="checks"><label><input type="checkbox" id="zeroLoad">환자 검체 0개</label>
+      <label><input type="checkbox" id="showPos" checked> 양성 대조군(100만 개)</label>
+      <label><input type="checkbox" id="showNeg" checked> 음성 대조군(0개)</label>
+    </div>
+    <div class="btnrow">
+      <button class="btn" id="play">증폭 시작</button>
+      <button class="btn ghost" id="step1">1주기씩</button>
+      <button class="btn ghost" id="pReset">처음으로</button>
+    </div>
+    </div><div class="msg" id="pmsg">「증폭 시작」을 누르면 40주기 동안 형광 신호가 어떻게 커지는지 보여 줘요. 점선은 형광 검출 문턱값이에요.</div>
+  </div>
+  <details class="small"><summary>Ct값과 이 모형의 가정</summary><p class="note">Ct값은 형광 신호가 문턱값을 처음 넘는 주기예요. 같은 검사 조건에서 초기 표적 유전자 수가 많을수록 Ct값이 작아져요. Ct값만으로 감염력이나 중증도를 판단할 수는 없어요. 위 복제 수는 1개에서 시작해 매 주기 2배가 되는 이상적 모형이고, 그래프는 아래에서 설정한 환자 검체의 초기 유전자 수를 사용해요. 실제 검사 수치와 판정 기준을 재현하지는 않아요.</p></details>
+</section>
+
+<!-- ④ 비교 -->
+<section id="compare" class="view" tabindex="-1" hidden>
+  <h2>⑤ 두 검사 비교와 정리</h2>
+  <div class="tbl">
+  <table>
+    <thead><tr><th></th><th>신속 항원 검사</th><th>PCR 검사</th></tr></thead>
+    <tbody>
+      <tr><td>찾는 것</td><td>바이러스의 단백질(항원)</td><td>바이러스의 유전 물질(핵산)</td></tr>
+      <tr><td>원리</td><td>항원–항체의 특이적 결합</td><td>특정 유전자 조각을 반복 복제해 증폭</td></tr>
+      <tr><td>걸리는 시간</td><td>일반적으로 15~30분, 제품별로 다름</td><td>검사 자체는 몇 시간, 결과 통보까지 더 걸리기도 함</td></tr>
+      <tr><td>장소·장비</td><td>현장이나 집에서 키트만으로 가능</td><td>실험실 장비와 전문 인력이 필요</td></tr>
+      <tr><td>검출 특성</td><td>표적 항원의 양이 적으면 놓칠 수 있음</td><td>증폭으로 적은 양의 표적 유전 물질을 검출할 수 있음</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="panel discuss">
+    <h3>정리하기 토의 거리</h3>
+    <ol>
+      <li>감염 초기라 몸속 바이러스 양이 적은 사람에게는 어떤 검사가 더 알맞을까요? ④의 그래프에서 유전자 수를 줄여 보며 생각해 봐요.</li>
+      <li>공항이나 학교처럼 많은 사람을 빨리 검사해야 할 때는 어떤 검사가 유리할까요? 그때 생기는 한계는 무엇일까요?</li>
+      <li>진단 기술이 빠르고 정확해지면 감염병 확산을 막는 데 어떤 도움이 될까요? 확진자 추적, 격리 결정과 연결해 이야기해 봐요.</li>
+    </ol>
+  </div>
+<p class="source-links">내용 확인: <a href="https://www.cdc.gov/covid/testing/" target="_blank" rel="noopener">CDC 검사 안내</a> · <a href="https://www.fda.gov/medical-devices/coronavirus-covid-19-and-medical-devices/understanding-home-otc-covid-19-antigen-diagnostic-test-results" target="_blank" rel="noopener">FDA 결과 해석</a></p></section></main><footer class="pager"><button class="btn ghost" id="prevView">← 이전</button><span id="viewCount" aria-live="polite">1 / 5 · 모의실험</span><button class="btn" id="nextView">다음 →</button></footer>
+</div>
+
+<script>
+(function(){
+/* ---------- ① 홈판 모의실험 ---------- */
+const COLS=[
+  {k:'a',name:'모의 양성 대조군',short:'ⓐ',ctrl:true},
+  {k:'b',name:'모의 음성 대조군',short:'ⓑ',ctrl:true},
+  {k:'c',name:'모의 환자1',short:'ⓒ'},
+  {k:'d',name:'모의 환자2',short:'ⓓ'}];
+const TOOLS=[
+  {id:'ab',label:'모의 항체',amt:10,color:'var(--accent)'},
+  {id:'a',label:'ⓐ 양성 대조군',amt:5,color:'var(--warn)'},
+  {id:'b',label:'ⓑ 음성 대조군',amt:5,color:'var(--muted)'},
+  {id:'c',label:'ⓒ 환자1',amt:5,color:'var(--good)'},
+  {id:'d',label:'ⓓ 환자2',amt:5,color:'var(--good)'},
+  {id:'det',label:'검출 시약',amt:2,color:'var(--violet)'}];
+let tool='ab', wells=[], infected={}, invalidReason='', completed=false, reacting=false, finishTimer=null;
+const plate=document.getElementById('plate'), msg=document.getElementById('msg');
+
+function pickInfection(){
+  const r=Math.random();
+  if(r<.4) infected={c:true,d:false};
+  else if(r<.8) infected={c:false,d:true};
+  else if(r<.9) infected={c:true,d:true};
+  else infected={c:false,d:false};
+}
+function setMsg(t,cls){msg.textContent=t;msg.className='msg'+(cls?' '+cls:'');}
+
+function build(){
+  plate.innerHTML='';
+  COLS.forEach(c=>{const h=document.createElement('div');h.className='colhead'+(c.ctrl?' ctrl':'');h.innerHTML='<b>'+c.short+'</b>'+(c.ctrl?(c.k==='a'?'양성<br>대조군':'음성<br>대조군'):'환자'+(c.k==='c'?'1':'2'));plate.appendChild(h);});
+  wells=[];
+  for(let r=0;r<3;r++){
+    for(let c=0;c<4;c++){
+      const b=document.createElement('button');b.className='well';b.type='button';
+      b.id='w'+r+c;
+      b.innerHTML='<span class="liq"></span><span class="dev"></span><span class="cnt"></span>';
+      if(r===2){b.disabled=true;b.setAttribute('aria-label','사용하지 않는 홈');}
+      else{
+        const w={el:b,row:r,col:c,ab:0,det:0,s:{a:0,b:0,c:0,d:0}};
+        wells.push(w);
+        b.setAttribute('aria-label',COLS[c].name+' 줄 '+(r+1)+'번째 홈');
+        b.addEventListener('click',()=>drop(w));
+      }
+      plate.appendChild(b);
+    }
+    if(r===1){const l=document.createElement('div');l.className='rowlabel';l.textContent='↓ 아래 줄은 사용하지 않음';plate.appendChild(l);}
+  }
+}
+function buildTools(){
+  const box=document.getElementById('tools');box.innerHTML='';
+  TOOLS.forEach(t=>{
+    const b=document.createElement('button');b.className='tool';b.type='button';
+    b.innerHTML='<i style="background:'+t.color+'"></i>'+t.label;
+    b.setAttribute('aria-pressed',t.id===tool);
+    b.addEventListener('click',()=>{tool=t.id;[...box.children].forEach((x,i)=>x.setAttribute('aria-pressed',TOOLS[i].id===tool));});
+    box.appendChild(b);
+  });
+}
+function sampleTotal(w){return w.s.a+w.s.b+w.s.c+w.s.d;}
+function hasAntigen(w){return w.s.a>0||(w.s.c>0&&infected.c)||(w.s.d>0&&infected.d);}
+
+function invalidate(reason){
+  invalidReason=reason;clearTimeout(finishTimer);finishTimer=null;reacting=false;
+  setMsg(reason+' 이 실험은 판정할 수 없어요. 「폐액 처리 후 다시 하기」를 눌러요.','warn');
+  document.getElementById('plate').classList.add('fault');
+  document.getElementById('autoStep').disabled=true;
+  document.getElementById('seeResult').disabled=true;
+  document.getElementById('quiz').hidden=true;
+  document.getElementById('resultStatus').textContent='판정 불가: '+reason+' 폐액 처리 후 같은 환자 검체로 다시 실험하세요.';
+  document.getElementById('outcomes').hidden=true;
+}
+function drop(w,silent=false){
+  if(invalidReason||completed||reacting)return;
+  let error='';
+  if(tool==='ab'){
+    if(w.ab>=10){if(!silent)setMsg('이 홈에는 모의 항체 10방울을 이미 넣었어요.','warn');return;}
+    if(sampleTotal(w)>0||w.det>0)error='모의 항체를 넣는 순서가 잘못되었어요.';
+    w.ab+=10;
+  }else if(tool==='det'){
+    if(w.det>=2){if(!silent)setMsg('검출 시약 2방울을 이미 넣었어요.','warn');return;}
+    if(w.ab!==10||sampleTotal(w)!==5)error='모의 항체와 검체를 넣기 전에 검출 시약을 넣었어요.';
+    w.det+=2;
+  }else{
+    if(w.ab!==10)error='모의 항체를 넣기 전에 검체를 넣었어요.';
+    else if(w.det>0)error='검출 시약을 넣은 뒤 검체를 추가했어요.';
+    else if(COLS[w.col].k!==tool)error='검체를 지정된 세로줄과 다른 홈에 넣었어요.';
+    else if(sampleTotal(w)>0)error='검체를 중복해서 넣어 정해진 양을 초과했어요.';
+    w.s[tool]+=5;
+  }
+  render(w);
+  if(error){invalidate(error);flash(w);return;}
+  if(!silent)progress();
+}
+function flash(w){w.el.classList.remove('flash');void w.el.offsetWidth;w.el.classList.add('flash');}
+function render(w){
+  const vol=w.ab+sampleTotal(w)+w.det;
+  w.el.querySelector('.liq').style.transform='scale('+Math.min(.88,vol? .35+vol/30:0)+')';
+  w.el.querySelector('.cnt').textContent=vol?(w.ab+'·'+sampleTotal(w)+'·'+w.det):'';
+  const on=w.ab>0&&w.det>0&&hasAntigen(w);
+  w.el.classList.toggle('dev-on',on);
+}
+function stage(){
+  const s1=wells.every(w=>w.ab===10);
+  const s2=s1&&wells.every(w=>w.s[COLS[w.col].k]===5&&sampleTotal(w)===5);
+  const s3=s2&&wells.every(w=>w.det===2);
+  return {s1,s2,s3};
+}
+function progress(){
+  if(invalidReason)return;
+  const s=stage(),cur=s.s3?4:s.s2?3:s.s1?2:1;
+  document.querySelectorAll('#stepbar div').forEach(d=>{const n=+d.dataset.s;d.classList.toggle('on',n===cur);d.classList.toggle('done',n<cur);});
+  setMsg(cur===1?'STEP 1: 모의 항체를 8개 홈에 넣어요.':cur===2?'STEP 2: 각 검체를 해당 세로줄의 두 홈에 넣어요.':cur===3?'STEP 3: 검출 시약을 8개 홈에 넣어요.':'색 변화를 관찰하고 있어요.');
+  if(s.s3&&!reacting&&!completed){reacting=true;document.getElementById('autoStep').disabled=true;finishTimer=setTimeout(finish,2300);}
+}
+function finish(){
+  finishTimer=null;if(invalidReason||!stage().s3)return;
+  reacting=false;completed=true;
+  setMsg('실험이 끝났어요. 「결과 해석하기」에서 대조군을 확인한 뒤 판정해 보세요.','good');
+  document.getElementById('seeResult').disabled=false;
+  document.getElementById('resultStatus').textContent='실험 완료 · 먼저 양성·음성 대조군과 두 홈의 결과를 확인하세요.';
+  const box=document.getElementById('outcomes');box.hidden=false;box.innerHTML='';
+  COLS.forEach(c=>{const pair=wells.filter(w=>COLS[w.col].k===c.k);const item=document.createElement('div');item.className='outcome';item.innerHTML='<b>'+c.short+' '+c.name+'</b><div class="spots">'+pair.map(w=>'<span class="spot'+(hasAntigen(w)?' positive':'')+'" aria-label="'+(hasAntigen(w)?'색 변화 있음':'색 변화 없음')+'"></span>').join('')+'</div><span>'+pair.map(w=>hasAntigen(w)?'색 변화':'변화 없음').join(' / ')+'</span>';box.appendChild(item);});
+  showQuiz();
+}
+function showQuiz(){
+  const q=document.getElementById('quiz');if(!q.hidden)return;q.hidden=false;
+  const o=document.getElementById('opts');o.innerHTML='';
+  [['c','환자1'],['d','환자2'],['cd','둘 다'],['none','둘 다 음성']].forEach(([v,l])=>{
+    const b=document.createElement('button');b.className='tool';b.type='button';b.textContent=l;
+    b.addEventListener('click',()=>answer(v));o.appendChild(b);
+  });
+}
+function answer(v){
+  if(!completed||invalidReason)return;
+  const truth=infected.c&&infected.d?'cd':infected.c?'c':infected.d?'d':'none';
+  const names={c:'모의 환자1',d:'모의 환자2',cd:'두 환자 모두',none:'두 환자 모두 음성'};
+  const m=document.getElementById('qmsg');m.hidden=false;
+  if(v===truth){m.className='msg good';m.textContent='맞아요. '+(truth==='none'?'두 환자 모두 색 변화가 없으니 음성이에요.':names[truth]+'의 홈에서 양성 대조군처럼 색이 나타났으니 바이러스 항원이 있다고 판단할 수 있어요.');}
+  else{m.className='msg warn';m.textContent='다시 홈판을 봐요. 양성 대조군(ⓐ)처럼 색이 변한 줄이 양성으로 판정되는 모의 검체예요.';}
+}
+function reset(newPatients=true){
+  clearTimeout(finishTimer);finishTimer=null;
+  if(newPatients||!Object.keys(infected).length)pickInfection();
+  invalidReason='';completed=false;reacting=false;tool='ab';buildTools();build();
+  plate.classList.remove('fault');document.getElementById('autoStep').disabled=false;
+  document.getElementById('seeResult').disabled=true;
+  document.getElementById('quiz').hidden=true;document.getElementById('qmsg').hidden=true;
+  document.getElementById('outcomes').hidden=true;
+  document.getElementById('resultStatus').textContent='먼저 모의실험을 완료하세요.';
+  progress();
+  if(!newPatients)setMsg('폐액 처리를 마쳤어요. 같은 환자 검체로 STEP 1부터 다시 실험해요.');
+}
+document.getElementById('reset').addEventListener('click',()=>reset(true));
+['dispose','resultDispose'].forEach(id=>document.getElementById(id).addEventListener('click',()=>{reset(false);showView('lab');}));
+document.getElementById('seeResult').addEventListener('click',()=>showView('results'));
+document.getElementById('returnLab').addEventListener('click',()=>showView('lab'));
+document.getElementById('autoStep').addEventListener('click',()=>{
+  if(invalidReason||reacting||completed)return;
+  const s=stage(),keep=tool;
+  if(!s.s1){tool='ab';wells.forEach(w=>{if(w.ab<10)drop(w,true);});}
+  else if(!s.s2){wells.forEach(w=>{const k=COLS[w.col].k;if(!w.s[k]){tool=k;drop(w,true);}});}
+  else if(!s.s3){tool='det';wells.forEach(w=>{if(w.det<2)drop(w,true);});}
+  tool=keep;progress();
+});
+reset();
+
+/* ---------- ④ PCR ---------- */
+
+const cv=document.getElementById('chart'),ctx=cv.getContext('2d');
+const MAXC=40,K=1e11,TH=0.1;
+let cycle=0,timer=false,phase=-1,pcrTimeout=null,busy=false,runToken=0,previous=null;
+const loadEl=document.getElementById('load');
+function N0(){return document.getElementById('zeroLoad').checked?0:Math.round(Math.pow(10,+loadEl.value));}
+let runN=N0();
+function F(n0,c){if(n0<=0)return 0.012;const n=n0*Math.pow(2,c);return 0.012+0.95*n/(n+K);}
+function ct(n0){if(n0<=0)return null;const v=Math.log2((TH-0.012)/0.95*K/(1-(TH-0.012)/0.95)/n0);return v>MAXC?null:Math.max(0,v);}
+function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
+function fmt(n){return n.toLocaleString('ko-KR');}
+function bigKo(n){
+  if(n<1e4)return fmt(n)+'개';
+  if(n<1e8)return (n/1e4).toFixed(n<1e5?1:0).replace(/\.0$/,'')+'만 개';
+  if(n<1e12)return (n/1e8).toFixed(n<1e9?1:0).replace(/\.0$/,'')+'억 개';
+  return (n/1e12).toFixed(1).replace(/\.0$/,'')+'조 개';
+}
+function draw(){
+  const dpr=window.devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight;
+  if(!w||!h)return;
+  cv.width=w*dpr;cv.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
+  const L=40,R=12,T=12,B=34,pw=w-L-R,ph=h-T-B;
+  const X=c=>L+c/MAXC*pw,Y=f=>T+(1-f)*ph;
+  ctx.clearRect(0,0,w,h);
+  ctx.font='11px '+css('--f-mono');ctx.fillStyle=css('--muted');ctx.strokeStyle=css('--line');ctx.lineWidth=1;
+  for(let c=0;c<=MAXC;c+=10){ctx.beginPath();ctx.moveTo(X(c),T);ctx.lineTo(X(c),T+ph);ctx.stroke();ctx.textAlign='center';ctx.fillText(c,X(c),T+ph+14);}
+  for(let f=0;f<=1;f+=.25){ctx.beginPath();ctx.moveTo(L,Y(f));ctx.lineTo(L+pw,Y(f));ctx.stroke();ctx.textAlign='right';ctx.fillText(f.toFixed(2),L-5,Y(f)+4);}
+  ctx.textAlign='center';ctx.font='11px '+css('--f-body');ctx.fillText('주기',L+pw/2,h-4);
+  ctx.save();ctx.translate(11,T+ph/2);ctx.rotate(-Math.PI/2);ctx.fillText('형광 세기(상대값)',0,0);ctx.restore();
+  // threshold
+  ctx.setLineDash([5,4]);ctx.strokeStyle=css('--warn');ctx.beginPath();ctx.moveTo(L,Y(TH));ctx.lineTo(L+pw,Y(TH));ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle=css('--warn');ctx.textAlign='left';ctx.fillText('문턱값',L+4,Y(TH)-5);
+  const series=[];
+  if(document.getElementById('showPos').checked)series.push({n:1e6,c:css('--muted'),label:'양성 대조군'});
+  if(document.getElementById('showNeg').checked)series.push({n:0,c:css('--violet'),label:'음성 대조군'});
+  series.push({n:runN,c:css('--blue'),label:'환자 검체',main:true});
+  if(previous)series.unshift({n:previous.n,c:css('--warn'),previous:true});
+  series.forEach(s=>{
+    ctx.setLineDash(s.previous?[4,4]:[]);
+    ctx.strokeStyle=s.c;ctx.lineWidth=s.main?3:2;ctx.beginPath();
+    for(let c=0;c<=(s.previous?previous.cycle:cycle);c+=.25){const x=X(c),y=Y(F(s.n,c));c===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+    ctx.stroke();
+    const k=ct(s.n);
+    if(!s.previous&&k!==null&&cycle>=k){ctx.fillStyle=s.c;ctx.beginPath();ctx.arc(X(k),Y(TH),s.main?5:3.5,0,7);ctx.fill();
+      if(s.main){ctx.fillStyle=css('--ink');ctx.textAlign=k>30?'right':'left';ctx.font='12px '+css('--f-mono');ctx.fillText('Ct '+k.toFixed(1),X(k)+(k>30?-7:7),Y(TH)+16);}}
+  });
+  ctx.setLineDash([]);
+}
+function updateRead(){
+  document.getElementById('rCycle').textContent=cycle;
+  document.getElementById('rCopies').textContent=bigKo(Math.pow(2,cycle));
+  const k=ct(runN);
+  document.getElementById('rCt').textContent=cycle>=MAXC||(k!==null&&cycle>=k)?(k===null?'검출 안 됨':k.toFixed(1)):'–';
+  const d=document.getElementById('dots');const n=Math.min(64,Math.pow(2,cycle));
+  d.innerHTML=cycle<=6?'<i></i>'.repeat(n):'<span class="small">6주기만 지나도 64개, 점으로 그리기 어려워질 만큼 빠르게 늘어나요.</span>';
+  document.querySelectorAll('.cyc').forEach(e=>e.classList.toggle('on',+e.dataset.p===phase));
+  const m=document.getElementById('pmsg');
+  if(cycle>=MAXC){
+    m.textContent=k===null?'40주기 동안 표적 신호가 검출되지 않았어요. 이 모형에서는 음성 결과예요.':'환자 검체는 '+k.toFixed(1)+'주기에 문턱값을 넘었어요. 유전자 수를 바꿔 다시 돌리면 Ct값이 어떻게 달라지는지 비교해 봐요.';
+  }
+  draw();
+}
+function syncPcrControls(){
+  document.getElementById('step1').disabled=busy||timer||cycle>=MAXC;
+  play.textContent=timer?'멈춤':cycle>=MAXC?'다시 시작':cycle>0?'계속':'증폭 시작';
+}
+function stopPcr(){
+  runToken++;clearTimeout(pcrTimeout);pcrTimeout=null;timer=false;busy=false;phase=-1;
+  syncPcrControls();updateRead();
+}
+function oneCycle(cb){
+  if(busy||cycle>=MAXC)return;
+  const token=runToken;let p=0;busy=true;phase=0;syncPcrControls();updateRead();
+  const delay=matchMedia('(prefers-reduced-motion:reduce)').matches?20:220;
+  function tick(){
+    if(token!==runToken)return;
+    p++;
+    if(p<3){phase=p;updateRead();pcrTimeout=setTimeout(tick,delay);}
+    else{phase=-1;cycle++;busy=false;pcrTimeout=null;updateRead();syncPcrControls();if(cb)cb();}
+  }
+  pcrTimeout=setTimeout(tick,delay);
+}
+const play=document.getElementById('play');
+function resetPcr(remember=false){
+  if(remember&&cycle>0)previous={n:runN,cycle};
+  stopPcr();cycle=0;phase=-1;runN=N0();
+  document.getElementById('loadVal').textContent=fmt(runN)+'개';
+  loadEl.disabled=document.getElementById('zeroLoad').checked;
+  document.getElementById('pmsg').textContent='초기 조건을 정하고 시작하세요. 조건 변경 시 0주기부터 재실험해요.';
+  document.getElementById('previousInfo').textContent=previous?'이전 조건: '+fmt(previous.n)+'개 · '+previous.cycle+'주기까지의 곡선(점선)':'조건을 바꿔 다시 실행하면 이전 곡선을 함께 볼 수 있어요.';
+  document.getElementById('previousInfo').hidden=!previous;
+  syncPcrControls();updateRead();
+}
+play.addEventListener('click',()=>{
+  if(timer){stopPcr();return;}
+  if(busy)return;
+  if(cycle>=MAXC)resetPcr(false);
+  timer=true;syncPcrControls();
+  const loop=()=>{if(!timer)return;if(cycle>=MAXC){timer=false;syncPcrControls();return;}oneCycle(loop);};loop();
+});
+document.getElementById('step1').addEventListener('click',()=>{if(!timer&&!busy)oneCycle();});
+document.getElementById('pReset').addEventListener('click',()=>{previous=null;resetPcr(false);});
+loadEl.addEventListener('input',()=>resetPcr(true));
+document.getElementById('zeroLoad').addEventListener('change',()=>resetPcr(true));
+['showPos','showNeg'].forEach(id=>document.getElementById(id).addEventListener('change',draw));
+window.addEventListener('resize',draw);
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',draw);
+new MutationObserver(draw).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+const viewIds=['lab','results','principle','pcr','compare'];
+const viewNames=['모의실험','결과 해석','검사 원리','PCR 실험','비교·정리'];let viewIndex=0;
+function showView(id,focus=true){
+  const next=viewIds.indexOf(id);if(next<0)return;
+  if(viewIds[viewIndex]==='pcr'&&id!=='pcr')stopPcr();
+  viewIndex=next;
+  viewIds.forEach(v=>document.getElementById(v).hidden=v!==id);
+  document.querySelectorAll('nav [data-view]').forEach(b=>{if(b.dataset.view===id)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');});
+  document.getElementById('prevView').disabled=next===0;document.getElementById('nextView').disabled=next===viewIds.length-1;
+  document.getElementById('viewCount').textContent=(next+1)+' / 5 · '+viewNames[next];
+  const section=document.getElementById(id);section.scrollTop=0;if(focus)section.focus();
+  if(id==='pcr')requestAnimationFrame(draw);
+}
+document.querySelectorAll('nav [data-view]').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
+document.getElementById('prevView').addEventListener('click',()=>showView(viewIds[viewIndex-1]));
+document.getElementById('nextView').addEventListener('click',()=>showView(viewIds[viewIndex+1]));
+document.addEventListener('visibilitychange',()=>{if(document.hidden)stopPcr();});
+resetPcr(false);showView('lab',false);
+if(document.fonts)document.fonts.ready.then(draw);
+})();
+</script>
+
+</body></html>

@@ -1,0 +1,583 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>감염병 진단 실험실 — 발표 슬라이드</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
+<style>
+html,body{margin:0;height:100%;background:#0b1114;overflow:hidden}
+#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#frame{position:relative;width:1920px;height:1080px;transform-origin:center;flex:none}
+.sl{position:absolute;inset:0;width:1920px;height:1080px;box-sizing:border-box;overflow:hidden;opacity:0;pointer-events:none;transition:opacity .4s}
+.sl.on{opacity:1;pointer-events:auto}
+.sl *{box-sizing:border-box}
+.sl h1,.sl h2,.sl h3,.sl p,.sl ul,.sl ol{margin:0}
+.sl table{border-collapse:collapse;width:100%}
+.sl th,.sl td{padding:.35em .6em;border-bottom:1px solid #D3DFE2;text-align:left;vertical-align:top}
+.sl th{font-weight:700}
+.sl a{color:#2C63C9}
+.xi svg{width:100%;height:100%;display:block}
+#bar{position:fixed;left:0;right:0;bottom:0;display:flex;gap:8px;align-items:center;justify-content:center;padding:10px;font:14px system-ui,sans-serif;color:#cfd8db;opacity:.25;transition:opacity .3s}
+#bar:hover{opacity:1}
+#bar button{font:inherit;background:#1d2a30;color:#e3edf0;border:1px solid #34474f;border-radius:8px;padding:6px 12px;cursor:pointer}
+</style></head><body>
+<div id="stage"><div id="frame">
+<section class="sl" id="cover" data-transition="fade" style="background:#14232B;color:#E3EDF0;font-family:'IBM Plex Sans KR', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:40px">
+<svg aria-label="12홈판 그림, 오른쪽 세로줄 두 홈이 파랗게 변함" width="520" height="400" viewBox="0 0 520 400" style="position:absolute;left:1200px;top:340px;width:520px;height:400px"><rect x="4" y="4" width="512" height="392" rx="40" fill="#1D2E36" stroke="#34474F" stroke-width="4"/><g fill="#26373F" stroke="#3E535C" stroke-width="4"><circle cx="85" cy="85" r="46"/><circle cx="200" cy="85" r="46"/><circle cx="315" cy="85" r="46"/><circle cx="85" cy="200" r="46"/><circle cx="200" cy="200" r="46"/><circle cx="315" cy="200" r="46"/><circle cx="85" cy="315" r="46"/><circle cx="200" cy="315" r="46"/><circle cx="315" cy="315" r="46"/><circle cx="430" cy="315" r="46"/></g><g fill="#3F7BE0" stroke="#6F9FFF" stroke-width="4"><circle cx="430" cy="85" r="46"/><circle cx="430" cy="200" r="46"/></g></svg>
+<p style="font-size:28px;font-weight:700;color:#41B6C0;letter-spacing:2px;width:980px">통합과학2 · Ⅲ. 과학과 미래 사회</p>
+<h1 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:132px;font-weight:400;line-height:1.1;width:1000px">감염병 진단 실험실</h1>
+<p style="font-size:36px;line-height:1.5;color:#BFD3D8;width:980px">신속 항원 검사 모의실험부터 PCR 증폭, 감염 경로 추적까지<br>과학이 미래 사회의 문제를 어떻게 푸는지 살펴봐요.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#94A8AF">천재교과서 통합과학2 132~136쪽 · 1. 과학과 미래 사회</p>
+
+</section>
+
+<section class="sl" id="role" data-transition="fade" style="background:#EEF3F4;color:#14232B;font-family:'IBM Plex Sans KR', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:700;color:#0D7480;letter-spacing:2px">도입 · 과학의 역할</p>
+<h2 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:64px;font-weight:400;line-height:1.15">과학은 인류에게 어떤 역할을 해 왔을까?</h2>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;background:#FBFDFD;border:1px solid #D3DFE2;border-radius:20px;padding:44px;display:flex;flex-direction:column;gap:18px">
+<p style="font-family:'Do Hyeon', Arial, sans-serif;font-size:96px;line-height:1;color:#0D7480">1970</p>
+<h3 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:40px;font-weight:400">노벨 평화상을 받은 과학자, 볼로그</h3>
+<p style="font-size:30px;line-height:1.5;color:#3E525A">수확량이 많고 병충해에 강한 밀 종자를 개발했어요. 이 밀로 세계의 식량 생산량이 크게 늘어 많은 사람이 굶주림에서 벗어났어요.</p>
+</div>
+<div style="flex:1;background:#FBFDFD;border:1px solid #D3DFE2;border-radius:20px;padding:44px;display:flex;flex-direction:column;gap:18px">
+<p style="font-family:'Do Hyeon', Arial, sans-serif;font-size:96px;line-height:1;color:#2C63C9">2020</p>
+<h3 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:40px;font-weight:400">코로나19를 극복한 진단 기술</h3>
+<p style="font-size:30px;line-height:1.5;color:#3E525A">신속 항원 검사와 PCR 검사로 감염 여부를 빠르게 진단하고 신속히 대응했어요. 오늘은 이 진단 기술을 직접 체험해 봐요.</p>
+</div>
+</div>
+<div style="display:flex;gap:24px;align-items:center">
+<p style="font-size:24px;font-weight:700;color:#FBFDFD;background:#0D7480;padding:8px 20px;border-radius:999px;white-space:nowrap">학습 목표</p>
+<p style="font-size:28px;line-height:1.45;color:#14232B">감염병 진단과 추적 사례로 과학의 유용성을 설명하고, 미래 사회 문제 해결에 과학이 필요함을 논증할 수 있다.</p>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#566A72">교과서 132쪽</p>
+
+</section>
+
+<section class="sl" id="spread" data-transition="fade" style="background:#EEF3F4;color:#14232B;font-family:'IBM Plex Sans KR', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:700;color:#0D7480;letter-spacing:2px">감염병과 과학</p>
+<h2 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:64px;font-weight:400;line-height:1.15">감염병 확산을 막는 데 과학은 어떤 역할을 할까?</h2>
+</div>
+<div style="display:flex;gap:40px">
+<div style="flex:3;display:flex;flex-direction:column;gap:28px">
+<div style="display:flex;flex-direction:column;gap:8px">
+<h3 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:40px;font-weight:400;color:#0D7480">감염병이란</h3>
+<p style="font-size:30px;line-height:1.5;color:#3E525A">세균이나 바이러스 같은 병원체가 몸에 침입해 생기는 질병으로, 빠르게 퍼지는 특성이 있어요.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<h3 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:40px;font-weight:400;color:#0D7480">더 빨라진 전파</h3>
+<p style="font-size:30px;line-height:1.5;color:#3E525A">교통수단이 발달해 사람들의 이동량과 이동 속도가 늘면서, 감염병은 과거보다 급속히 퍼져요.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<h3 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:40px;font-weight:400;color:#0D7480">그래서 필요한 것</h3>
+<p style="font-size:30px;line-height:1.5;color:#3E525A">치료 약이 나오기 전까지는 감염병을 <b>빠르게 진단</b>하고 <b>추적</b>해 감염 경로를 끊는 것이 중요해요.</p>
+</div>
+</div>
+<div style="flex:2;background:#14232B;border-radius:20px;padding:48px;display:flex;flex-direction:column;justify-content:center;gap:20px">
+<p style="font-size:24px;font-weight:700;color:#F0A070;letter-spacing:2px">역사 속 감염병</p>
+<p style="font-family:'Do Hyeon', Arial, sans-serif;font-size:160px;line-height:1;color:#F0A070">3/4</p>
+<p style="font-size:30px;line-height:1.5;color:#E3EDF0">1519년 스페인인이 옮긴 천연두로 아스테카 제국 전체 인구의 약 3/4이 사망했어요.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#566A72">교과서 134쪽</p>
+
+</section>
+
+<section class="sl" id="methods" data-transition="fade" style="background:#EEF3F4;color:#14232B;font-family:'IBM Plex Sans KR', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:700;color:#0D7480;letter-spacing:2px">Ⅲ-1 감염병의 진단 방법</p>
+<h2 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:64px;font-weight:400;line-height:1.15">무엇을 찾느냐에 따라 세 가지 검사가 있어요</h2>
+</div>
+<div style="display:flex;gap:28px">
+<div style="flex:1;background:#FBFDFD;border:1px solid #D3DFE2;border-radius:20px;padding:40px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:700;color:#566A72">우리 몸이 만든 것을 찾음</p>
+<h3 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:52px;font-weight:400">항체 검사</h3>
+<p style="font-size:28px;line-height:1.5;color:#3E525A">병원체에 감염되면 몸에서 그 병원체에 대응하는 항체가 생겨요. 혈액을 채취해 항체가 있는지 확인해요.</p>
+<p style="font-size:26px;line-height:1.45;color:#A8501C;background:#FBEEE4;padding:14px 18px;border-radius:12px">항체가 생기기까지 시간이 걸려서 급성 감염의 초기 진단에는 한계가 있어요.</p>
+</div>
+<div style="flex:1;background:#FBFDFD;border:1px solid #D3DFE2;border-radius:20px;padding:40px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:700;color:#566A72">병원체의 유전 물질을 찾음</p>
+<h3 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:52px;font-weight:400;color:#2C63C9">PCR 검사</h3>
+<p style="font-size:28px;line-height:1.5;color:#3E525A">병원체 내부의 핵산을 증폭해 병원체가 있는지 확인해요.</p>
+<p style="font-size:26px;line-height:1.45;color:#2B7A4B;background:#E3F3E9;padding:14px 18px;border-radius:12px">적은 양의 표적 유전 물질도 증폭해 검출할 수 있어요.</p>
+</div>
+<div style="flex:1;background:#FBFDFD;border:1px solid #D3DFE2;border-radius:20px;padding:40px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:700;color:#566A72">병원체의 단백질을 찾음</p>
+<h3 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:52px;font-weight:400;color:#0D7480">항원 검사</h3>
+<p style="font-size:28px;line-height:1.5;color:#3E525A">몸에 들어온 병원체(항원)의 단백질을 검출해요. 일반적으로 15~30분 안에 결과를 확인해요. 제품별로 차이가 있어요.</p>
+<p style="font-size:26px;line-height:1.45;color:#2B7A4B;background:#E3F3E9;padding:14px 18px;border-radius:12px">PCR보다 정확도는 낮지만 비교적 정확하고, 빠르게 확인할 수 있어요.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#566A72">교과서 134쪽</p>
+
+</section>
+
+<section class="sl" id="compare" data-transition="fade" style="background:#EEF3F4;color:#14232B;font-family:'IBM Plex Sans KR', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:700;color:#0D7480;letter-spacing:2px">한눈에 비교</p>
+<h2 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:64px;font-weight:400;line-height:1.15">세 검사는 어떻게 다를까?</h2>
+</div>
+<table style="font-size:28px;color:#14232B;background:#FBFDFD;border:1px solid #D3DFE2;border-radius:16px">
+<tr style="background:#DCEFF1"><th style="width:19%">구분</th><th style="width:27%">항체 검사</th><th style="width:27%">항원 검사</th><th style="width:27%">PCR 검사</th></tr>
+<tr><td>찾는 것</td><td>몸이 만든 항체</td><td>병원체의 단백질</td><td>병원체의 핵산</td></tr>
+<tr><td>검체</td><td>혈액</td><td>콧속 검체</td><td>콧속 검체</td></tr>
+<tr><td>검사 소요 시간</td><td>검사법·제품에 따라 다름</td><td>보통 15~30분</td><td>일반적으로 수 시간<br>장비·검사법에 따라 다름</td></tr>
+<tr><td>검출 특성</td><td>항체 형성까지 시간이 필요</td><td>항원량이 적으면 놓칠 수 있음</td><td>적은 양의 표적도 증폭해 검출</td></tr>
+<tr><td>잘 맞는 상황</td><td>과거 감염 여부 확인</td><td>많은 사람을 빨리 선별</td><td>확진</td></tr>
+</table>
+<p style="font-size:28px;line-height:1.5;color:#3E525A">빠른 검사와 정확한 검사를 상황에 맞게 함께 쓰면, 감염병을 신속하게 진단하면서도 놓치는 사람을 줄일 수 있어요.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#566A72">교과서 134쪽 내용을 표로 정리</p>
+
+</section>
+
+<section class="sl" id="kit" data-transition="fade" style="background:#EEF3F4;color:#14232B;font-family:'IBM Plex Sans KR', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:700;color:#0D7480;letter-spacing:2px">신속 항원 검사 원리</p>
+<h2 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:64px;font-weight:400;line-height:1.15">키트 속 항체가 바이러스 단백질을 붙잡아요</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;height:120px;background:#C9D5D9;border-radius:16px;overflow:hidden">
+<div style="flex:3;background:#AEBDC2;display:flex;align-items:center;justify-content:center"><p style="font-size:26px;font-weight:700;color:#14232B">검체 넣는 곳</p></div>
+<div style="flex:2;background:#F2B658;display:flex;align-items:center;justify-content:center"><p style="font-size:26px;font-weight:700;color:#14232B">항체</p></div>
+<div style="flex:2;background:#F4F7F8"></div>
+<div style="width:28px;background:#D9534F"></div>
+<div style="flex:2;background:#F4F7F8"></div>
+<div style="width:28px;background:#D9534F"></div>
+<div style="flex:2;background:#F4F7F8"></div>
+<div style="flex:2;background:#AEBDC2"></div>
+</div>
+<div style="display:flex">
+<p style="flex:7;font-size:26px;font-weight:700;color:#0D7480">진행 방향 →</p>
+<p style="flex:2;font-size:26px;font-weight:700;color:#14232B">실험선(T)</p>
+<p style="flex:4;font-size:26px;font-weight:700;color:#14232B">대조선(C)</p>
+</div>
+</div>
+<div style="display:flex;gap:24px">
+<div style="flex:1;background:#FBFDFD;border:1px solid #D3DFE2;border-radius:20px;padding:36px;display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'Do Hyeon', Arial, sans-serif;font-size:44px;color:#0D7480;line-height:1">1</p>
+<p style="font-size:28px;line-height:1.5;color:#3E525A">콧속에서 검체를 채취해 용액 통에 넣으면, 바이러스가 분리되고 바이러스를 이루는 단백질이 용액으로 나와요.</p>
+</div>
+<div style="flex:1;background:#FBFDFD;border:1px solid #D3DFE2;border-radius:20px;padding:36px;display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'Do Hyeon', Arial, sans-serif;font-size:44px;color:#0D7480;line-height:1">2</p>
+<p style="font-size:28px;line-height:1.5;color:#3E525A">용액을 키트에 떨어뜨리면 액체가 띠를 따라 이동해요. 바이러스 단백질이 있으면 키트 속 항체와 결합해요.</p>
+</div>
+<div style="flex:1;background:#FBFDFD;border:1px solid #D3DFE2;border-radius:20px;padding:36px;display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'Do Hyeon', Arial, sans-serif;font-size:44px;color:#0D7480;line-height:1">3</p>
+<p style="font-size:28px;line-height:1.5;color:#3E525A">표지된 항체와 항원이 실험선에 모이면서 색이 보여요. 표적을 선택적으로 인식하지만 교차 반응 가능성도 있어요.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#566A72">교과서 133쪽 「신속 항원 검사 원리」</p>
+
+</section>
+
+<section class="sl" id="readkit" data-transition="fade" style="background:#EEF3F4;color:#14232B;font-family:'IBM Plex Sans KR', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:700;color:#0D7480;letter-spacing:2px">결과 읽기</p>
+<h2 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:64px;font-weight:400;line-height:1.15">대조선은 키트가 제대로 작동했다는 표시예요</h2>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;background:#FBFDFD;border:1px solid #D3DFE2;border-radius:20px;padding:40px;display:flex;flex-direction:column;gap:20px;align-items:center">
+<div style="width:200px;height:300px;background:#F4F7F8;border:3px solid #AEBDC2;border-radius:16px;display:flex;flex-direction:column;justify-content:center;gap:56px;padding:24px">
+<div style="height:16px;background:#D9534F;border-radius:4px"></div>
+<div style="height:16px;border:2px dashed #C3D1D5;border-radius:4px"></div>
+</div>
+<p style="font-size:24px;color:#566A72">위: 대조선(C) · 아래: 실험선(T)</p>
+<h3 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:48px;font-weight:400;color:#0D7480">음성</h3>
+<p style="font-size:28px;line-height:1.45;color:#3E525A;text-align:center">대조선만 나타남</p>
+</div>
+<div style="flex:1;background:#FBFDFD;border:1px solid #D3DFE2;border-radius:20px;padding:40px;display:flex;flex-direction:column;gap:20px;align-items:center">
+<div style="width:200px;height:300px;background:#F4F7F8;border:3px solid #AEBDC2;border-radius:16px;display:flex;flex-direction:column;justify-content:center;gap:56px;padding:24px">
+<div style="height:16px;background:#D9534F;border-radius:4px"></div>
+<div style="height:16px;background:#D9534F;border-radius:4px"></div>
+</div>
+<p style="font-size:24px;color:#566A72">위: 대조선(C) · 아래: 실험선(T)</p>
+<h3 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:48px;font-weight:400;color:#2C63C9">양성</h3>
+<p style="font-size:28px;line-height:1.45;color:#3E525A;text-align:center">두 선이 모두 나타남</p>
+</div>
+<div style="flex:1;background:#FBFDFD;border:1px solid #D3DFE2;border-radius:20px;padding:40px;display:flex;flex-direction:column;gap:20px;align-items:center">
+<div style="width:200px;height:300px;background:#F4F7F8;border:3px solid #AEBDC2;border-radius:16px;display:flex;flex-direction:column;justify-content:center;gap:56px;padding:24px">
+<div style="height:16px;border:2px dashed #C3D1D5;border-radius:4px"></div>
+<div style="height:16px;background:#D9534F;border-radius:4px"></div>
+</div>
+<p style="font-size:24px;color:#566A72">위: 대조선(C) · 아래: 실험선(T)</p>
+<h3 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:48px;font-weight:400;color:#A8501C">무효</h3>
+<p style="font-size:28px;line-height:1.45;color:#3E525A;text-align:center">대조선이 없으면 다시 검사</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#566A72">C선은 액체 이동·시약 반응을 확인해요. 별도의 양성·음성 대조군과 확인 범위가 같지는 않아요.</p>
+
+</section>
+
+<section class="sl" id="inquiry" data-transition="fade" style="background:#0D5E68;color:#E8F4F5;font-family:'IBM Plex Sans KR', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:40px">
+<p style="font-size:28px;font-weight:700;color:#BFE6EA;letter-spacing:2px">탐구 · 정보 조사 | 결론 도출</p>
+<h1 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:120px;font-weight:400;line-height:1.1">감염병 진단 기술 체험하기</h1>
+<div style="display:flex;gap:28px;align-items:flex-start">
+<p style="font-size:24px;font-weight:700;color:#0D5E68;background:#E8F4F5;padding:8px 20px;border-radius:999px;white-space:nowrap">생각해 보기</p>
+<p style="font-size:40px;line-height:1.45;color:#E8F4F5;width:1300px">코로나19를 진단하기 위해 했던 PCR 검사와 신속 항원 검사의 차이점은 무엇일까?</p>
+</div>
+<div style="display:flex;gap:28px;align-items:flex-start">
+<p style="font-size:24px;font-weight:700;color:#0D5E68;background:#E8F4F5;padding:8px 20px;border-radius:999px;white-space:nowrap">목표</p>
+<p style="font-size:32px;line-height:1.5;color:#CFE8EB;width:1300px">모의실험을 하여 감염병 진단 기술을 체험하고 과학의 유용성을 설명할 수 있다.</p>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#BFE6EA">교과서 132~133쪽 · 실험 동영상 dtqr.kr/S1aX1Fi</p>
+
+</section>
+
+<section class="sl" id="setup" data-transition="fade" style="background:#EEF3F4;color:#14232B;font-family:'IBM Plex Sans KR', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:700;color:#0D7480;letter-spacing:2px">탐구 준비</p>
+<h2 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:64px;font-weight:400;line-height:1.15">대조군과 실험군을 나눠서 비교해요</h2>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px">
+<div style="background:#FBFDFD;border:1px solid #D3DFE2;border-radius:20px;padding:36px;display:flex;flex-direction:column;gap:12px">
+<h3 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:40px;font-weight:400;color:#0D7480">준비물</h3>
+<p style="font-size:28px;line-height:1.5;color:#3E525A">스포이트, 12홈판, 모의 항체, 모의 대조군(양성, 음성) 검체, 모의 환자 검체 두 개, 검출 시약, 실험복, 실험용 장갑, 보안경</p>
+</div>
+<div style="background:#FBEEE4;border-radius:20px;padding:36px;display:flex;flex-direction:column;gap:12px">
+<h3 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:40px;font-weight:400;color:#A8501C">안전</h3>
+<p style="font-size:28px;line-height:1.5;color:#5A3216">시약이 몸에 묻지 않도록 실험용 장갑과 보안경, 실험복을 착용해요. 사용한 약품은 선생님 안내에 따라 정해진 곳에 버려요.</p>
+</div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;gap:16px">
+<div style="flex:2;background:#FBEEE4;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:8px">
+<p style="font-size:26px;font-weight:700;color:#A8501C;text-align:center">대조군</p>
+<div style="display:flex;gap:12px">
+<p style="flex:1;font-size:26px;line-height:1.35;background:#FBFDFD;padding:16px;border-radius:12px;text-align:center"><b>ⓐ</b><br>양성<br>대조군</p>
+<p style="flex:1;font-size:26px;line-height:1.35;background:#FBFDFD;padding:16px;border-radius:12px;text-align:center"><b>ⓑ</b><br>음성<br>대조군</p>
+</div>
+</div>
+<div style="flex:2;background:#E3F3E9;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:8px">
+<p style="font-size:26px;font-weight:700;color:#2B7A4B;text-align:center">실험군</p>
+<div style="display:flex;gap:12px">
+<p style="flex:1;font-size:26px;line-height:1.35;background:#FBFDFD;padding:16px;border-radius:12px;text-align:center"><b>ⓒ</b><br>모의<br>환자1</p>
+<p style="flex:1;font-size:26px;line-height:1.35;background:#FBFDFD;padding:16px;border-radius:12px;text-align:center"><b>ⓓ</b><br>모의<br>환자2</p>
+</div>
+</div>
+</div>
+<div style="background:#FBFDFD;border:1px solid #D3DFE2;border-radius:20px;padding:32px;display:flex;flex-direction:column;gap:12px">
+<p style="font-size:28px;line-height:1.5;color:#3E525A"><b>양성 대조군</b>은 반드시 색이 나야 하는 기준, <b>음성 대조군</b>은 색이 나면 안 되는 기준이에요. 두 기준이 기대대로 나와야 환자 검체의 결과를 믿을 수 있어요.</p>
+</div>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#566A72">교과서 132~133쪽</p>
+
+</section>
+
+<section class="sl" id="process" data-transition="fade" style="background:#EEF3F4;color:#14232B;font-family:'IBM Plex Sans KR', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px;width:900px">
+<p style="font-size:24px;font-weight:700;color:#0D7480;letter-spacing:2px">탐구하기</p>
+<h2 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:64px;font-weight:400;line-height:1.15">홈판에 세 가지를 차례로 넣어요</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:20px;width:900px">
+<div style="display:flex;gap:24px;align-items:flex-start;background:#FBFDFD;border:1px solid #D3DFE2;border-radius:16px;padding:28px">
+<p style="font-family:'Do Hyeon', Arial, sans-serif;font-size:44px;color:#0D7480;line-height:1">1</p>
+<p style="font-size:28px;line-height:1.5;color:#3E525A">홈판의 8개 구멍에 <b>모의 항체</b>를 각각 10방울씩 넣는다.</p>
+</div>
+<div style="display:flex;gap:24px;align-items:flex-start;background:#FBFDFD;border:1px solid #D3DFE2;border-radius:16px;padding:28px">
+<p style="font-family:'Do Hyeon', Arial, sans-serif;font-size:44px;color:#0D7480;line-height:1">2</p>
+<p style="font-size:28px;line-height:1.5;color:#3E525A">ⓐ 양성 대조군, ⓑ 음성 대조군, ⓒ ⓓ 모의 환자 검체를 각각 2개 구멍에 5방울씩 떨어뜨린다.</p>
+</div>
+<div style="display:flex;gap:24px;align-items:flex-start;background:#FBFDFD;border:1px solid #D3DFE2;border-radius:16px;padding:28px">
+<p style="font-family:'Do Hyeon', Arial, sans-serif;font-size:44px;color:#0D7480;line-height:1">3</p>
+<p style="font-size:28px;line-height:1.5;color:#3E525A">8개의 구멍에 <b>검출 시약</b>을 각각 2방울씩 넣고 색 변화를 관찰한다.</p>
+</div>
+<p style="font-size:26px;line-height:1.5;color:#566A72">직접 해 보기: <a href="/infection-diagnosis/">홈판 모의실험 페이지</a>에서 학생이 순서대로 넣어 볼 수 있어요.</p>
+</div>
+<iframe class="emb" style="position:absolute;left:1092px;top:150px;width:700px;height:790px;border:0" sandbox="allow-scripts" srcdoc="&lt;!doctype html&gt;&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;style&gt;
+body{margin:0;font-family:system-ui,&quot;Apple SD Gothic Neo&quot;,&quot;Malgun Gothic&quot;,sans-serif;color:#14232B;background:transparent}
+.p{background:#DDE7EA;border:3px solid #C3D1D5;border-radius:32px;padding:24px;display:grid;grid-template-columns:repeat(4,1fr);gap:18px 16px}
+.h{text-align:center;font-size:24px;line-height:1.25;font-weight:700}
+.h small{display:block;font-size:24px;font-weight:400;color:#566A72}
+.w{aspect-ratio:1;border-radius:50%;background:#FBFDFD;border:4px solid #C3D1D5;position:relative;overflow:hidden}
+.w i{position:absolute;inset:0;border-radius:50%;transform:scale(0);background:#CFE6EA;transition:transform .7s,background 2s}
+.w.off{opacity:.35}
+.s{margin-top:22px;font-size:30px;font-weight:700;text-align:center;min-height:84px;line-height:1.4}
+.s span{display:block;font-size:24px;font-weight:400;color:#566A72}
+&lt;/style&gt;&lt;/head&gt;&lt;body&gt;
+&lt;div class=&quot;p&quot; id=&quot;p&quot;&gt;
+&lt;div class=&quot;h&quot;&gt;ⓐ&lt;small&gt;양성 대조군&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;h&quot;&gt;ⓑ&lt;small&gt;음성 대조군&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;h&quot;&gt;ⓒ&lt;small&gt;모의 환자1&lt;/small&gt;&lt;/div&gt;&lt;div class=&quot;h&quot;&gt;ⓓ&lt;small&gt;모의 환자2&lt;/small&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;s&quot; id=&quot;s&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+var p=document.getElementById(&#x27;p&#x27;),s=document.getElementById(&#x27;s&#x27;),W=[];
+for(var r=0;r&lt;3;r++)for(var c=0;c&lt;4;c++){var d=document.createElement(&#x27;div&#x27;);d.className=&#x27;w&#x27;+(r==2?&#x27; off&#x27;:&#x27;&#x27;);d.innerHTML=&#x27;&lt;i&gt;&lt;/i&gt;&#x27;;p.appendChild(d);if(r&lt;2)W.push({e:d.firstChild,c:c});}
+var pos=[0,3];
+var steps=[
+[&#x27;준비&#x27;,&#x27;12홈판의 위쪽 두 줄, 8개 구멍을 써요&#x27;,function(){W.forEach(function(w){w.e.style.transform=&#x27;scale(0)&#x27;;w.e.style.background=&#x27;#CFE6EA&#x27;;});}],
+[&#x27;1. 모의 항체 10방울&#x27;,&#x27;8개 구멍 모두&#x27;,function(){W.forEach(function(w){w.e.style.transform=&#x27;scale(.55)&#x27;;});}],
+[&#x27;2. 검체 5방울씩&#x27;,&#x27;각 검체를 같은 줄의 두 구멍에&#x27;,function(){W.forEach(function(w){w.e.style.transform=&#x27;scale(.75)&#x27;;w.e.style.background=&#x27;#BCDCE1&#x27;;});}],
+[&#x27;3. 검출 시약 2방울&#x27;,&#x27;8개 구멍 모두, 그리고 기다리기&#x27;,function(){W.forEach(function(w){w.e.style.transform=&#x27;scale(.9)&#x27;;});}],
+[&#x27;색 변화 관찰&#x27;,&#x27;어느 줄에서 색이 변했나요?&#x27;,function(){W.forEach(function(w){if(pos.indexOf(w.c)&gt;=0)w.e.style.background=&#x27;#2C63C9&#x27;;});}]];
+var i=0;function go(){var t=steps[i];s.innerHTML=t[0]+&#x27;&lt;span&gt;&#x27;+t[1]+&#x27;&lt;/span&gt;&#x27;;t[2]();var d=i==4?5000:2200;i=(i+1)%steps.length;setTimeout(go,d);}
+go();
+&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;"></iframe>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#566A72">교과서 133쪽 「탐구하기」 · 오른쪽 그림은 교과서 결과 예시를 따라 자동으로 재생돼요</p>
+
+</section>
+
+<section class="sl" id="result" data-transition="fade" style="background:#EEF3F4;color:#14232B;font-family:'IBM Plex Sans KR', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:700;color:#0D7480;letter-spacing:2px">결과 해석</p>
+<h2 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:64px;font-weight:400;line-height:1.15">모의 환자 1, 2 중 양성으로 판정되는 모의 검체는?</h2>
+</div>
+<div style="display:flex;gap:24px">
+<div style="flex:1;background:#FBFDFD;border:1px solid #D3DFE2;border-radius:20px;padding:32px;display:flex;flex-direction:column;gap:16px;align-items:center">
+<p style="font-size:28px;font-weight:700;color:#A8501C">ⓐ 양성 대조군</p>
+<div style="width:150px;height:150px;border-radius:50%;background:#2C63C9;border:4px solid #C3D1D5"></div>
+<p style="font-size:26px;line-height:1.45;color:#3E525A;text-align:center">색이 변함<br>항원이 있으면 이렇게 돼요</p>
+</div>
+<div style="flex:1;background:#FBFDFD;border:1px solid #D3DFE2;border-radius:20px;padding:32px;display:flex;flex-direction:column;gap:16px;align-items:center">
+<p style="font-size:28px;font-weight:700;color:#A8501C">ⓑ 음성 대조군</p>
+<div style="width:150px;height:150px;border-radius:50%;background:#DCEBEE;border:4px solid #C3D1D5"></div>
+<p style="font-size:26px;line-height:1.45;color:#3E525A;text-align:center">변화 없음<br>이 모형에서 항원이 없을 때</p>
+</div>
+<div style="flex:1;background:#FBFDFD;border:1px solid #D3DFE2;border-radius:20px;padding:32px;display:flex;flex-direction:column;gap:16px;align-items:center">
+<p style="font-size:28px;font-weight:700;color:#2B7A4B">ⓒ 모의 환자1</p>
+<div style="width:150px;height:150px;border-radius:50%;background:#DCEBEE;border:4px solid #C3D1D5"></div>
+<p style="font-size:26px;line-height:1.45;color:#3E525A;text-align:center">변화 없음<br>어느 대조군과 같나요?</p>
+</div>
+<div style="flex:1;background:#FBFDFD;border:1px solid #D3DFE2;border-radius:20px;padding:32px;display:flex;flex-direction:column;gap:16px;align-items:center">
+<p style="font-size:28px;font-weight:700;color:#2B7A4B">ⓓ 모의 환자2</p>
+<div style="width:150px;height:150px;border-radius:50%;background:#2C63C9;border:4px solid #C3D1D5"></div>
+<p style="font-size:26px;line-height:1.45;color:#3E525A;text-align:center">색이 변함<br>어느 대조군과 같나요?</p>
+</div>
+</div>
+<p style="font-size:30px;line-height:1.5;color:#14232B;background:#DCEFF1;padding:24px 32px;border-radius:16px">환자2의 검체는 양성 대조군처럼 색이 변했으므로, <b>환자2 검체에서 표적 항원이 검출되었다</b>고 판단할 수 있어요.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#566A72">교과서 133쪽 결과 그림 기준 · 모의 키트에 따라 색은 다를 수 있음</p>
+
+</section>
+
+<section class="sl" id="pcr" data-transition="fade" style="background:#EEF3F4;color:#14232B;font-family:'IBM Plex Sans KR', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:700;color:#2C63C9;letter-spacing:2px">PCR 검사 원리</p>
+<h2 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:64px;font-weight:400;line-height:1.15">온도를 바꿔 가며 유전자 조각을 복제해요</h2>
+</div>
+<div style="display:flex;gap:28px">
+<div style="flex:1;background:#FBFDFD;border:1px solid #D3DFE2;border-radius:20px;padding:36px;display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'Do Hyeon', Arial, sans-serif;font-size:72px;line-height:1;color:#A8501C">95°C</p>
+<h3 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:44px;font-weight:400">① 변성</h3>
+<svg aria-label="두 가닥 DNA가 떨어진 모습" width="420" height="110" viewBox="0 0 420 110" style="width:420px;height:110px"><rect x="10" y="20" width="400" height="10" rx="5" fill="#2C63C9"/><rect x="10" y="80" width="400" height="10" rx="5" fill="#0D7480"/></svg>
+<p style="font-size:28px;line-height:1.5;color:#3E525A">높은 온도에서 두 가닥 DNA가 한 가닥씩 떨어져요.</p>
+</div>
+<div style="flex:1;background:#FBFDFD;border:1px solid #D3DFE2;border-radius:20px;padding:36px;display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'Do Hyeon', Arial, sans-serif;font-size:72px;line-height:1;color:#0D7480">55~60°C</p>
+<h3 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:44px;font-weight:400">② 결합</h3>
+<svg aria-label="각 가닥에 짧은 프라이머가 붙은 모습" width="420" height="110" viewBox="0 0 420 110" style="width:420px;height:110px"><rect x="10" y="20" width="400" height="10" rx="5" fill="#2C63C9"/><rect x="10" y="80" width="400" height="10" rx="5" fill="#0D7480"/><rect x="330" y="38" width="80" height="10" rx="5" fill="#F2A33A"/><rect x="10" y="62" width="80" height="10" rx="5" fill="#F2A33A"/></svg>
+<p style="font-size:28px;line-height:1.5;color:#3E525A">온도를 낮추면 찾으려는 부분에 프라이머가 붙어요.</p>
+</div>
+<div style="flex:1;background:#FBFDFD;border:1px solid #D3DFE2;border-radius:20px;padding:36px;display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'Do Hyeon', Arial, sans-serif;font-size:72px;line-height:1;color:#2B7A4B">72°C</p>
+<h3 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:44px;font-weight:400">③ 신장</h3>
+<svg aria-label="프라이머에서 새 가닥이 길어져 두 쌍의 DNA가 된 모습" width="420" height="110" viewBox="0 0 420 110" style="width:420px;height:110px"><rect x="10" y="20" width="400" height="10" rx="5" fill="#2C63C9"/><rect x="10" y="38" width="400" height="10" rx="5" fill="#F2A33A"/><rect x="10" y="62" width="400" height="10" rx="5" fill="#F2A33A"/><rect x="10" y="80" width="400" height="10" rx="5" fill="#0D7480"/></svg>
+<p style="font-size:28px;line-height:1.5;color:#3E525A">효소가 프라이머에 이어 새 가닥을 만들어 DNA가 2배가 돼요.</p>
+</div>
+</div>
+<p style="font-size:28px;line-height:1.5;color:#3E525A">①~③이 한 주기예요. 코로나19 바이러스처럼 유전 물질이 RNA인 경우에는 먼저 RNA를 DNA로 바꾸는 역전사 과정을 거쳐요(RT-PCR).</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#566A72">교과서 134쪽 「PCR 검사」 보충 · 결합 온도는 프라이머에 따라 달라짐</p>
+
+</section>
+
+<section class="sl" id="amplify" data-transition="fade" style="background:#EEF3F4;color:#14232B;font-family:'IBM Plex Sans KR', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:12px;width:820px">
+<p style="font-size:24px;font-weight:700;color:#2C63C9;letter-spacing:2px">증폭</p>
+<h2 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:64px;font-weight:400;line-height:1.15">한 주기마다 2배, 30주기면 약 10억 배</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:28px;width:820px">
+<p style="font-size:30px;line-height:1.5;color:#3E525A">검체 속 바이러스 유전자는 아주 적어서 그대로는 찾기 어려워요. PCR은 이 조각을 계속 복제해서 장비가 알아챌 만큼 양을 늘려요.</p>
+<table style="font-size:28px;color:#14232B;background:#FBFDFD;border:1px solid #D3DFE2">
+<tr style="background:#DCE6F7"><th style="width:40%">주기</th><th style="width:60%">한 분자에서 시작하면</th></tr>
+<tr><td>1</td><td style="font-variant-numeric:tabular-nums">2개</td></tr>
+<tr><td>10</td><td style="font-variant-numeric:tabular-nums">1,024개</td></tr>
+<tr><td>20</td><td style="font-variant-numeric:tabular-nums">약 105만 개</td></tr>
+<tr><td>30</td><td style="font-variant-numeric:tabular-nums">약 10억 7천만 개</td></tr>
+</table>
+<p style="font-size:26px;line-height:1.5;color:#566A72">실제로는 재료가 줄어들면서 어느 순간 더 늘지 않고 일정해져요.</p>
+</div>
+<iframe class="emb" style="position:absolute;left:1032px;top:180px;width:760px;height:740px;border:0" sandbox="allow-scripts" srcdoc="&lt;!doctype html&gt;&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;style&gt;
+body{margin:0;font-family:system-ui,&quot;Apple SD Gothic Neo&quot;,&quot;Malgun Gothic&quot;,sans-serif;color:#14232B;background:transparent}
+.b{background:#14232B;border-radius:28px;padding:36px;height:668px;color:#E3EDF0;display:flex;flex-direction:column;gap:18px;box-sizing:border-box;height:740px}
+.l{font-size:26px;color:#94A8AF}
+.n{font-size:96px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.c{font-size:40px;font-weight:700;color:#41B6C0}
+.ph{display:flex;gap:10px}
+.ph div{flex:1;text-align:center;font-size:24px;padding:10px 0;border-radius:10px;background:#1D2E36;color:#94A8AF}
+.ph div.on{background:#41B6C0;color:#14232B;font-weight:700}
+.d{display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;flex:1}
+.d i{width:30px;height:30px;border-radius:7px;background:#6F9FFF;display:block}
+&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;div class=&quot;b&quot;&gt;
+&lt;div class=&quot;c&quot; id=&quot;c&quot;&gt;0주기&lt;/div&gt;
+&lt;div class=&quot;ph&quot; id=&quot;ph&quot;&gt;&lt;div&gt;변성&lt;/div&gt;&lt;div&gt;결합&lt;/div&gt;&lt;div&gt;신장&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;l&quot;&gt;만들어진 DNA 조각&lt;/div&gt;
+&lt;div class=&quot;n&quot; id=&quot;n&quot;&gt;1&lt;/div&gt;
+&lt;div class=&quot;d&quot; id=&quot;d&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;script&gt;
+var c=0,ph=document.getElementById(&#x27;ph&#x27;).children,N=document.getElementById(&#x27;n&#x27;),C=document.getElementById(&#x27;c&#x27;),D=document.getElementById(&#x27;d&#x27;);
+function fmt(v){if(v&lt;1e4)return v.toLocaleString(&#x27;ko-KR&#x27;)+&#x27;개&#x27;;if(v&lt;1e8)return &#x27;약 &#x27;+Math.round(v/1e4).toLocaleString(&#x27;ko-KR&#x27;)+&#x27;만 개&#x27;;return &#x27;약 &#x27;+(v/1e8).toFixed(1)+&#x27;억 개&#x27;;}
+function show(){var v=Math.pow(2,c);C.textContent=c+&#x27;주기&#x27;;N.textContent=fmt(v);var k=Math.min(v,128);D.innerHTML=c&lt;=7?new Array(k+1).join(&#x27;&lt;i&gt;&lt;/i&gt;&#x27;):&#x27;&lt;div style=&quot;font-size:28px;line-height:1.5;color:#BFD3D8&quot;&gt;점으로 그릴 수 없을 만큼 늘어났어요. 30주기면 처음의 약 10억 배예요.&lt;/div&gt;&#x27;;}
+function step(){var p=0;function t(){for(var j=0;j&lt;3;j++)ph[j].className=j==p?&#x27;on&#x27;:&#x27;&#x27;;p++;if(p&lt;=3){setTimeout(t,c&lt;7?420:110);}else{for(var j=0;j&lt;3;j++)ph[j].className=&#x27;&#x27;;c++;show();if(c&lt;30)setTimeout(step,c&lt;7?300:60);else setTimeout(function(){c=0;show();setTimeout(step,1500);},4500);}}t();}
+show();setTimeout(step,1200);
+&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;"></iframe>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#566A72">2의 거듭제곱: 2¹⁰ = 1,024 · 2³⁰ = 1,073,741,824</p>
+
+</section>
+
+<section class="sl" id="ct" data-transition="fade" style="background:#EEF3F4;color:#14232B;font-family:'IBM Plex Sans KR', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px;width:620px">
+<p style="font-size:24px;font-weight:700;color:#2C63C9;letter-spacing:2px">판정</p>
+<h2 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:64px;font-weight:400;line-height:1.15">바이러스가 많을수록 빨리 문턱을 넘어요</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px;width:620px">
+<p style="font-size:28px;line-height:1.5;color:#3E525A">실시간 PCR 장비는 증폭된 DNA에 붙는 형광 신호를 주기마다 측정해요.</p>
+<p style="font-size:28px;line-height:1.5;color:#3E525A">신호가 <b>문턱값</b>을 처음 넘는 주기를 <b>Ct값</b>이라고 해요. 같은 검사 조건에서 초기 표적이 많으면 Ct값이 작아요.</p>
+<p style="font-size:28px;line-height:1.5;color:#3E525A">실제 검사에서는 대조군과 검사별 판정 기준을 함께 확인해요.</p>
+</div>
+<iframe class="emb" style="position:absolute;left:800px;top:150px;width:992px;height:780px;border:0" sandbox="allow-scripts" srcdoc="&lt;!doctype html&gt;&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;style&gt;
+body{margin:0;font-family:system-ui,&quot;Apple SD Gothic Neo&quot;,&quot;Malgun Gothic&quot;,sans-serif;background:transparent}
+svg{display:block}
+text{font-family:system-ui,&quot;Apple SD Gothic Neo&quot;,&quot;Malgun Gothic&quot;,sans-serif}
+&lt;/style&gt;&lt;/head&gt;&lt;body&gt;
+&lt;svg id=&quot;g&quot; width=&quot;992&quot; height=&quot;780&quot; viewBox=&quot;0 0 992 780&quot;&gt;&lt;/svg&gt;
+&lt;script&gt;
+var g=document.getElementById(&#x27;g&#x27;),NS=&#x27;http://www.w3.org/2000/svg&#x27;;
+function el(t,a,p){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);(p||g).appendChild(e);return e;}
+var L=96,T=40,W=860,H=560,X=function(c){return L+c/40*W},Y=function(f){return T+(1-f)*H};
+el(&#x27;rect&#x27;,{x:0,y:0,width:992,height:780,rx:28,fill:&#x27;#FBFDFD&#x27;,stroke:&#x27;#D3DFE2&#x27;});
+for(var c=0;c&lt;=40;c+=10){el(&#x27;line&#x27;,{x1:X(c),y1:T,x2:X(c),y2:T+H,stroke:&#x27;#E1E9EB&#x27;});var t=el(&#x27;text&#x27;,{x:X(c),y:T+H+36,&#x27;text-anchor&#x27;:&#x27;middle&#x27;,&#x27;font-size&#x27;:24,fill:&#x27;#566A72&#x27;});t.textContent=c;}
+var a=el(&#x27;text&#x27;,{x:L+W/2,y:T+H+76,&#x27;text-anchor&#x27;:&#x27;middle&#x27;,&#x27;font-size&#x27;:26,fill:&#x27;#14232B&#x27;});a.textContent=&#x27;주기&#x27;;
+var b=el(&#x27;text&#x27;,{x:40,y:T+H/2,&#x27;text-anchor&#x27;:&#x27;middle&#x27;,&#x27;font-size&#x27;:26,fill:&#x27;#14232B&#x27;,transform:&#x27;rotate(-90 40 &#x27;+(T+H/2)+&#x27;)&#x27;});b.textContent=&#x27;형광 신호&#x27;;
+el(&#x27;line&#x27;,{x1:L,y1:T+H,x2:L+W,y2:T+H,stroke:&#x27;#14232B&#x27;,&#x27;stroke-width&#x27;:2});
+var TH=0.1;el(&#x27;line&#x27;,{x1:L,y1:Y(TH),x2:L+W,y2:Y(TH),stroke:&#x27;#A8501C&#x27;,&#x27;stroke-width&#x27;:3,&#x27;stroke-dasharray&#x27;:&#x27;10 8&#x27;});
+var tt=el(&#x27;text&#x27;,{x:L+W-8,y:Y(TH)-12,&#x27;text-anchor&#x27;:&#x27;end&#x27;,&#x27;font-size&#x27;:24,fill:&#x27;#A8501C&#x27;});tt.textContent=&#x27;문턱값&#x27;;
+var K=1e11;
+var S=[{n:1e6,c:&#x27;#2C63C9&#x27;,l:&#x27;바이러스 많음&#x27;},{n:1e3,c:&#x27;#0D7480&#x27;,l:&#x27;보통&#x27;},{n:10,c:&#x27;#7A5CC4&#x27;,l:&#x27;적음&#x27;},{n:0,c:&#x27;#9AAAB0&#x27;,l:&#x27;음성&#x27;}];
+function F(n,c){return n?0.015+0.95*n*Math.pow(2,c)/(n*Math.pow(2,c)+K):0.015;}
+function ct(n){return Math.log2(((TH-0.015)/0.95)/(1-(TH-0.015)/0.95)*K/n);}
+S.forEach(function(s,i){s.p=el(&#x27;path&#x27;,{fill:&#x27;none&#x27;,stroke:s.c,&#x27;stroke-width&#x27;:6,&#x27;stroke-linecap&#x27;:&#x27;round&#x27;});s.dot=el(&#x27;circle&#x27;,{r:10,fill:s.c,opacity:0});s.lab=el(&#x27;text&#x27;,{&#x27;font-size&#x27;:24,fill:s.c,&#x27;font-weight&#x27;:700,opacity:0});
+var lg=el(&#x27;text&#x27;,{x:L+24,y:T+40+i*36,&#x27;font-size&#x27;:24,fill:s.c,&#x27;font-weight&#x27;:700});lg.textContent=&#x27;● &#x27;+s.l;
+if(s.n){s.k=ct(s.n);s.dot.setAttribute(&#x27;cx&#x27;,X(s.k));s.dot.setAttribute(&#x27;cy&#x27;,Y(TH));s.lab.setAttribute(&#x27;x&#x27;,X(s.k)+8);s.lab.setAttribute(&#x27;y&#x27;,Y(TH)+38+ (i*30));s.lab.textContent=&#x27;Ct &#x27;+s.k.toFixed(0);}});
+var cur=0;function frame(){cur+=0.25;S.forEach(function(s){var d=&#x27;&#x27;;for(var c=0;c&lt;=cur;c+=0.25)d+=(c?&#x27;L&#x27;:&#x27;M&#x27;)+X(c).toFixed(1)+&#x27; &#x27;+Y(F(s.n,c)).toFixed(1);s.p.setAttribute(&#x27;d&#x27;,d);var on=s.n&amp;&amp;cur&gt;=s.k?1:0;s.dot.setAttribute(&#x27;opacity&#x27;,on);s.lab.setAttribute(&#x27;opacity&#x27;,on);});
+if(cur&lt;40)setTimeout(frame,50);else setTimeout(function(){cur=0;frame();},5000);}
+frame();
+&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;"></iframe>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#566A72">원리를 보이기 위한 단순 모형 · 실제 장비의 Ct값과 판정 기준은 검사 제품마다 다름</p>
+
+</section>
+
+<section class="sl" id="tracking" data-transition="fade" style="background:#EEF3F4;color:#14232B;font-family:'IBM Plex Sans KR', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:700;color:#0D7480;letter-spacing:2px">Ⅲ-2 감염 경로 조사 방식과 분석</p>
+<h2 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:64px;font-weight:400;line-height:1.15">진단 다음은 추적, 감염 경로를 끊어요</h2>
+</div>
+<p style="font-size:30px;line-height:1.5;color:#3E525A">환자의 이동 경로와 접촉자를 확인하고 어디에서 감염되었는지 분석하는 것을 <b>역학 조사</b>라고 해요. 과거에는 대부분 역학 조사관의 직접 조사에 의존했어요.</p>
+<div style="display:flex;gap:16px;align-items:center">
+<div style="flex:1;background:#FBFDFD;border:1px solid #D3DFE2;border-radius:20px;padding:32px;display:flex;flex-direction:column;gap:10px">
+<p style="font-size:24px;font-weight:700;color:#0D7480">수집</p>
+<h3 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:40px;font-weight:400">스마트 기기</h3>
+<p style="font-size:26px;line-height:1.45;color:#3E525A">감염자 이동 경로, 인구수, 체온 등 다양한 정보를 빠르게 모아요.</p>
+</div>
+<span style="width:56px;height:32px;background:#94A8AF;flex:none;display:block;clip-path:polygon(0 30%,60% 30%,60% 0,100% 50%,60% 100%,60% 70%,0 70%)"></span>
+<div style="flex:1;background:#FBFDFD;border:1px solid #D3DFE2;border-radius:20px;padding:32px;display:flex;flex-direction:column;gap:10px">
+<p style="font-size:24px;font-weight:700;color:#0D7480">전달</p>
+<h3 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:40px;font-weight:400">정보 통신 기술</h3>
+<p style="font-size:26px;line-height:1.45;color:#3E525A">수집한 정보를 실시간으로 전달해요.</p>
+</div>
+<span style="width:56px;height:32px;background:#94A8AF;flex:none;display:block;clip-path:polygon(0 30%,60% 30%,60% 0,100% 50%,60% 100%,60% 70%,0 70%)"></span>
+<div style="flex:1;background:#FBFDFD;border:1px solid #D3DFE2;border-radius:20px;padding:32px;display:flex;flex-direction:column;gap:10px">
+<p style="font-size:24px;font-weight:700;color:#0D7480">분석</p>
+<h3 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:40px;font-weight:400">인공지능</h3>
+<p style="font-size:26px;line-height:1.45;color:#3E525A">방대한 정보를 빠르게 처리하고 분석해요.</p>
+</div>
+</div>
+<div style="display:flex;gap:24px">
+<p style="flex:1;font-size:26px;line-height:1.45;color:#14232B;background:#DCEFF1;padding:20px 28px;border-radius:14px"><b>전국 상황판</b> · 감염자 수와 분포를 빠르게 모아 시민에게 알려요.</p>
+<p style="flex:1;font-size:26px;line-height:1.45;color:#14232B;background:#DCEFF1;padding:20px 28px;border-radius:14px"><b>해외 유입 예측</b> · 항공편, 감염자 수, 입국자 수를 인공지능으로 분석해요.</p>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#566A72">교과서 135쪽</p>
+
+</section>
+
+<section class="sl" id="future" data-transition="fade" style="background:#EEF3F4;color:#14232B;font-family:'IBM Plex Sans KR', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:700;color:#0D7480;letter-spacing:2px">Ⅲ-3 예상되는 미래 사회의 변화</p>
+<h2 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:64px;font-weight:400;line-height:1.15">과학은 미래 사회의 문제를 해결할 수 있을까?</h2>
+</div>
+<div style="display:flex;gap:28px">
+<div style="flex:1;background:#FBFDFD;border:1px solid #D3DFE2;border-radius:20px;padding:40px;display:flex;flex-direction:column;gap:14px">
+<span class="xi" style="color:#0D7480;width:56px;height:56px;display:inline-block;flex:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/></svg></span>
+<h3 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:44px;font-weight:400">새로운 기술 개발</h3>
+<p style="font-size:28px;line-height:1.5;color:#3E525A">인터넷과 스마트폰처럼, 인공지능 같은 새로운 기술이 미래 사회에 큰 영향을 줄 수 있어요.</p>
+</div>
+<div style="flex:1;background:#FBFDFD;border:1px solid #D3DFE2;border-radius:20px;padding:40px;display:flex;flex-direction:column;gap:14px">
+<span class="xi" style="color:#A8501C;width:56px;height:56px;display:inline-block;flex:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01"/></svg></span>
+<h3 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:44px;font-weight:400">기후 변화</h3>
+<p style="font-size:28px;line-height:1.5;color:#3E525A">기온 상승으로 자연재해와 환경 변화가 빨라지면 인류의 생존과 건강이 위협받을 수 있어요.</p>
+</div>
+<div style="flex:1;background:#FBFDFD;border:1px solid #D3DFE2;border-radius:20px;padding:40px;display:flex;flex-direction:column;gap:14px">
+<span class="xi" style="color:#2C63C9;width:56px;height:56px;display:inline-block;flex:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg></span>
+<h3 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:44px;font-weight:400">인구 증가</h3>
+<p style="font-size:28px;line-height:1.5;color:#3E525A">빠르게 늘어나는 세계 인구는 식량 부족, 자원 고갈, 거주 공간 부족을 일으킬 수 있어요.</p>
+</div>
+</div>
+<div style="background:#14232B;border-radius:20px;padding:36px 44px;display:flex;flex-direction:column;gap:10px">
+<p style="font-size:30px;line-height:1.5;color:#E3EDF0">과학기술의 필요성은 더 커지겠지만, 문제를 해결하는 과정에서 생길지 모르는 <span style="color:#F0A070">부작용과 위험성을 점검</span>하고 <span style="color:#41B6C0">사회적 합의</span>를 거치는 자세가 필요해요.</p>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#566A72">교과서 136쪽</p>
+
+</section>
+
+<section class="sl" id="wrapup" data-transition="fade" style="background:#EEF3F4;color:#14232B;font-family:'IBM Plex Sans KR', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:700;color:#0D7480;letter-spacing:2px">정리하기</p>
+<h2 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:64px;font-weight:400;line-height:1.15">오늘 배운 진단 기술을 정리해 봐요</h2>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:3;display:flex;flex-direction:column;gap:20px">
+<div style="background:#FBFDFD;border:1px solid #D3DFE2;border-radius:20px;padding:36px;display:flex;gap:24px;align-items:flex-start">
+<p style="font-family:'Do Hyeon', Arial, sans-serif;font-size:56px;color:#0D7480;line-height:1">1</p>
+<div style="display:flex;flex-direction:column;gap:8px">
+<p style="font-size:30px;font-weight:700;line-height:1.4">신속 항원 검사와 PCR 검사의 원리를 조사해 보자.</p>
+<p style="font-size:26px;line-height:1.5;color:#566A72">무엇을 찾는지, 왜 시간과 정확도가 다른지 한 문장씩 써 보기</p>
+</div>
+</div>
+<div style="background:#FBFDFD;border:1px solid #D3DFE2;border-radius:20px;padding:36px;display:flex;gap:24px;align-items:flex-start">
+<p style="font-family:'Do Hyeon', Arial, sans-serif;font-size:56px;color:#0D7480;line-height:1">2</p>
+<div style="display:flex;flex-direction:column;gap:8px">
+<p style="font-size:30px;font-weight:700;line-height:1.4">감염병 문제를 해결하는 데 진단 기술이 어떤 역할을 하는지 토의해 보자.</p>
+<p style="font-size:26px;line-height:1.5;color:#566A72">감염 초기 환자, 많은 사람을 빨리 검사해야 하는 공항이나 학교를 예로 들어 보기</p>
+</div>
+</div>
+</div>
+<div style="flex:2;background:#14232B;border-radius:20px;padding:40px;display:flex;flex-direction:column;gap:22px">
+<h3 style="font-family:'Do Hyeon', Arial, sans-serif;font-size:40px;font-weight:400;color:#41B6C0">평가하고 성찰하기</h3>
+<div style="display:flex;gap:16px;align-items:flex-start"><span class="xi" style="color:#41B6C0;width:36px;height:36px;display:inline-block;flex:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.1V12a10 10 0 1 1-5.9-9.1"/><path d="M22 4 12 14l-3-3"/></svg></span><p style="font-size:26px;line-height:1.5;color:#E3EDF0">실험 결과로 어떤 검체가 감염병 환자의 것인지 설명할 수 있는가?</p></div>
+<div style="display:flex;gap:16px;align-items:flex-start"><span class="xi" style="color:#41B6C0;width:36px;height:36px;display:inline-block;flex:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.1V12a10 10 0 1 1-5.9-9.1"/><path d="M22 4 12 14l-3-3"/></svg></span><p style="font-size:26px;line-height:1.5;color:#E3EDF0">대조군과 실험군을 나누고 변인을 잘 통제하여 실험하였는가?</p></div>
+<div style="display:flex;gap:16px;align-items:flex-start"><span class="xi" style="color:#41B6C0;width:36px;height:36px;display:inline-block;flex:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.1V12a10 10 0 1 1-5.9-9.1"/><path d="M22 4 12 14l-3-3"/></svg></span><p style="font-size:26px;line-height:1.5;color:#E3EDF0">안전 수칙을 지키며 탐구에 적극적으로 참여하였는가?</p></div>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#566A72">교과서 133쪽 「정리하기」 · 「평가하고 성찰하기」</p>
+
+</section>
+
+</div></div>
+
+<div id="bar"><button id="prev">◀ 이전</button><span id="num"></span><button id="next">다음 ▶</button><button id="fs">전체 화면</button></div>
+<script>
+var S=[].slice.call(document.querySelectorAll('.sl')),i=0;
+var srcs=S.map(function(s){return [].slice.call(s.querySelectorAll('iframe')).map(function(f){return f.getAttribute('srcdoc')})});
+function fit(){var k=Math.min(innerWidth/1920,innerHeight/1080);document.getElementById('frame').style.transform='scale('+k+')';}
+function show(n){i=Math.max(0,Math.min(S.length-1,n));S.forEach(function(s,j){s.classList.toggle('on',j===i);
+ s.querySelectorAll('iframe').forEach(function(f,k){if(j===i){if(!f.getAttribute('srcdoc'))f.setAttribute('srcdoc',srcs[j][k]);}else f.removeAttribute('srcdoc');});});
+ document.getElementById('num').textContent=(i+1)+' / '+S.length;
+ try{history.replaceState(null,'','#'+(i+1))}catch(e){}}
+addEventListener('resize',fit);fit();
+addEventListener('keydown',function(e){if(['ArrowRight','PageDown',' ','Enter'].indexOf(e.key)>=0){e.preventDefault();show(i+1)}if(['ArrowLeft','PageUp','Backspace'].indexOf(e.key)>=0){e.preventDefault();show(i-1)}if(e.key==='Home')show(0);if(e.key==='End')show(S.length-1);if(e.key==='f'||e.key==='F')fs();});
+document.getElementById('prev').onclick=function(){show(i-1)};document.getElementById('next').onclick=function(){show(i+1)};
+
+function fs(){if(!document.fullscreenElement)document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();else document.exitFullscreen()}document.getElementById('fs').onclick=fs;
+var tx=null;addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});addEventListener('touchend',function(e){if(tx===null)return;var d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>40)show(i+(d<0?1:-1));tx=null});
+document.getElementById('stage').addEventListener('click',function(e){if(e.target.closest('a,button,iframe'))return;show(i+(e.clientX>innerWidth/2?1:-1))});
+show((parseInt(location.hash.slice(1))||1)-1);
+</script></body></html>

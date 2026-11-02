@@ -161,6 +161,28 @@
           }
         ],
         "kind": "lab"
+      },
+      {
+        "title": "감염병 진단 실험실",
+        "subject": "biology",
+        "date": "2026-11-02",
+        "desc": "홈판에 모의 항체와 검체, 검출 시약을 넣고 대조군과 비교해 결과를 판정합니다. 잘못 넣으면 폐액 처리 후 같은 검체로 다시 실험하고, PCR에서는 초기 유전자 수에 따른 증폭 곡선을 비교합니다.",
+        "tag": "감염병 진단 · 항원 검사 · PCR",
+        "level": "고등학교 통합과학2",
+        "cover": "/assets/covers/cover-series-infection-diagnosis-lab.svg",
+        "poster": "lab",
+        "words": "감염병 진단\n실험실",
+        "links": [
+          {
+            "label": "모의실험 열기",
+            "url": "/infection-diagnosis/"
+          },
+          {
+            "label": "발표 슬라이드",
+            "url": "/lectures/infection-diagnosis.html"
+          }
+        ],
+        "kind": "lab"
       }
     ],
     "real": [
@@ -629,6 +651,28 @@
           {
             "label": "학습지 열기",
             "url": "/worksheets/energy-efficiency.html"
+          }
+        ],
+        "kind": "lesson"
+      },
+      {
+        "title": "감염병 진단 기술",
+        "subject": "biology",
+        "date": "2026-11-02",
+        "desc": "항원·항체·PCR 검사의 차이, 모의실험의 대조군과 결과 해석, PCR 증폭과 Ct값, 감염 경로 추적을 다루는 17장 발표 자료입니다.",
+        "tag": "과학과 미래 사회 · 감염병",
+        "level": "고등학교 통합과학2",
+        "cover": "/assets/covers/cover-series-infection-diagnosis-lesson.svg",
+        "poster": "lab",
+        "words": "감염병\n진단 기술",
+        "links": [
+          {
+            "label": "슬라이드 열기",
+            "url": "/lectures/infection-diagnosis.html"
+          },
+          {
+            "label": "모의실험 열기",
+            "url": "/infection-diagnosis/"
           }
         ],
         "kind": "lesson"
