@@ -107,6 +107,9 @@ th{font-weight:700;color:var(--muted);font-size:.8rem}
 td:first-child{font-weight:500;white-space:nowrap}
 .discuss{display:flex;flex-direction:column;gap:10px}
 .discuss li{margin-bottom:6px}
+.discuss .answer{margin:8px 0 14px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--well)}
+.discuss .answer summary{font-weight:700;padding:5px 0}
+.discuss .answer p{margin:8px 0 2px;line-height:1.65}
 .note{font-size:.82rem;color:var(--muted);border-left:3px solid var(--line);padding-left:10px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
@@ -261,9 +264,15 @@ canvas{height:230px}.chart-legend{font-size:.78rem;display:flex;flex-wrap:wrap;g
   <div class="panel discuss">
     <h3>정리하기 토의 거리</h3>
     <ol>
-      <li>감염 초기라 몸속 바이러스 양이 적은 사람에게는 어떤 검사가 더 알맞을까요? ⑤의 그래프에서 유전자 수를 줄여 보며 생각해 봐요.</li>
-      <li>공항이나 학교처럼 많은 사람을 빨리 검사해야 할 때는 어떤 검사가 유리할까요? 그때 생기는 한계는 무엇일까요?</li>
-      <li>진단 기술이 빠르고 정확해지면 감염병 확산을 막는 데 어떤 도움이 될까요? 확진자 추적, 격리 결정과 연결해 이야기해 봐요.</li>
+      <li>감염 초기라 몸속 바이러스 양이 적은 사람에게는 어떤 검사가 더 알맞을까요? ⑤의 그래프에서 유전자 수를 줄여 보며 생각해 봐요.
+        <details class="answer"><summary>예시 답변 보기</summary><p><b>적은 양을 검출하는 데는 일반적으로 PCR 검사가 유리해요.</b> 표적 유전 물질을 증폭하기 때문이에요. 그래프에서도 초기 유전자 수가 적을수록 문턱값을 늦게 넘지만, 너무 이르거나 검체 채취가 충분하지 않으면 PCR도 음성으로 나올 수 있어요.</p></details>
+      </li>
+      <li>공항이나 학교처럼 많은 사람을 빨리 검사해야 할 때는 어떤 검사가 유리할까요? 그때 생기는 한계는 무엇일까요?
+        <details class="answer"><summary>예시 답변 보기</summary><p><b>빠른 현장 검사에는 신속 항원 검사가 유리해요.</b> 장비 부담이 적고 결과를 빨리 확인할 수 있어요. 다만 항원 양이 적으면 감염을 놓칠 수 있으므로, 한 번의 음성 결과만으로 감염이 없다고 단정할 수는 없어요.</p></details>
+      </li>
+      <li>진단 기술이 빠르고 정확해지면 감염병 확산을 막는 데 어떤 도움이 될까요? 확진자 추적, 격리 결정과 연결해 이야기해 봐요.
+        <details class="answer"><summary>예시 답변 보기</summary><p><b>감염자를 일찍 찾아 다른 사람과의 접촉을 줄이는 데 도움이 돼요.</b> 접촉자 확인과 필요한 검사, 상황에 맞는 격리·치료 결정을 빨리 할 수 있어 추가 전파를 줄일 수 있어요. 검사 결과를 실제 예방 행동으로 연결하는 것이 중요해요.</p></details>
+      </li>
     </ol>
   </div>
 <p class="source-links">내용 확인: <a href="https://www.cdc.gov/covid/testing/" target="_blank" rel="noopener">CDC 검사 안내</a> · <a href="https://www.fda.gov/medical-devices/coronavirus-covid-19-and-medical-devices/understanding-home-otc-covid-19-antigen-diagnostic-test-results" target="_blank" rel="noopener">FDA 결과 해석</a></p></section></main><footer class="pager"><button class="btn ghost" id="prevView">← 이전</button><span id="viewCount" aria-live="polite">1 / 6 · 모의실험</span><button class="btn" id="nextView">다음 →</button></footer>
