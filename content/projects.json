@@ -288,6 +288,24 @@
     ],
     "tool": [
       {
+        "title": "콩 OMR",
+        "subject": "tools",
+        "date": "2026-11-03",
+        "desc": "객관식·리커트 답안지를 만들고, 사진·스캔 PDF로 답안을 판독·검토합니다. 학생 명단 양식과 채점·설문 결과 내보내기를 지원하며, 파일은 내 기기에서 처리합니다.",
+        "tag": "평가·설문 · 답안지·채점",
+        "level": "교사·학생 누구나",
+        "cover": "/assets/covers/cover-series-kong-omr.svg",
+        "poster": "note",
+        "words": "콩 OMR\n답안 판독실",
+        "links": [
+          {
+            "label": "OMR 열기",
+            "url": "/omr/"
+          }
+        ],
+        "kind": "tool"
+      },
+      {
         "title": "콩 영상 작업실",
         "subject": "tools",
         "date": "2026-10-30",
