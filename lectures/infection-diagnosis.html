@@ -170,6 +170,10 @@ html,body{margin:0;height:100%;background:#0b1114;overflow:hidden}
 
 </section>
 
+<section class="sl" id="control-line" data-transition="fade" style="background:#EEF3F4;color:#14232B;font-family:'IBM Plex Sans KR',Arial,sans-serif;padding:104px 128px 144px;display:flex;flex-direction:column;gap:32px"><div style="display:flex;flex-direction:column;gap:12px"><p style="font-size:24px;font-weight:700;color:#0D7480">키트 검사 원리 · 대조선(C)</p><h2 style="font-family:'Do Hyeon',Arial,sans-serif;font-size:64px;font-weight:400;line-height:1.15">항원이 없어도 대조선에는 왜 색이 나타날까?</h2></div><div style="display:flex;gap:24px">
+<div style="flex:1;background:#FBFDFD;border:1px solid #D3DFE2;border-radius:20px;padding:30px;display:flex;flex-direction:column;gap:20px"><h3 style="font-size:36px;color:#0D7480">① 색 표지도 함께 이동</h3><svg viewBox="0 0 400 130" style="height:130px" aria-label="색 입자가 붙은 항체가 액체와 함께 이동"><g fill="#D9534F"><circle cx="70" cy="45" r="12"/><circle cx="145" cy="85" r="12"/></g><g stroke="#2C63C9" stroke-width="7" fill="none"><path d="M70 45V70M70 70L54 87M70 70L86 87M145 85V60M145 60L129 43M145 60L161 43"/></g><path d="M210 65H340L315 45M340 65L315 85" stroke="#0D7480" stroke-width="7" fill="none"/></svg><p style="font-size:29px;line-height:1.55">금 나노입자처럼 <b>색을 띠는 표지가 붙은 항체 등의 물질</b>이 액체를 따라 이동해요.</p></div>
+<div style="flex:1;background:#FBFDFD;border:1px solid #D3DFE2;border-radius:20px;padding:30px;display:flex;flex-direction:column;gap:20px"><h3 style="font-size:36px;color:#0D7480">② C선이 물질을 붙잡음</h3><svg viewBox="0 0 400 130" style="height:130px" aria-label="대조선에 고정된 성분이 표지 물질을 붙잡음"><rect x="190" y="10" width="25" height="110" rx="5" fill="#DCEFF1"/><path d="M198 45H169L155 30M169 45L155 60M198 85H169L155 70M169 85L155 100" stroke="#0D7480" stroke-width="7" fill="none"/><circle cx="145" cy="45" r="12" fill="#D9534F"/><circle cx="145" cy="85" r="12" fill="#D9534F"/><text x="245" y="80" font-size="44" fill="#14232B">C</text></svg><p style="font-size:29px;line-height:1.55">C선에는 표지 물질을 붙잡는 성분이 고정되어 있어요. 이 결합에는 <b>바이러스 항원이 필요하지 않아요.</b></p></div>
+<div style="flex:1;background:#FBFDFD;border:1px solid #D3DFE2;border-radius:20px;padding:30px;display:flex;flex-direction:column;gap:20px"><h3 style="font-size:36px;color:#0D7480">③ 입자가 모여 색 띠 형성</h3><svg viewBox="0 0 400 130" style="height:130px" aria-label="축적된 색 입자로 대조선에 색 띠가 나타남"><rect x="90" y="20" width="220" height="90" rx="15" fill="#F4F7F8" stroke="#AEBDC2" stroke-width="3"/><rect x="190" y="30" width="20" height="70" rx="4" fill="#D9534F"/><text x="240" y="82" font-size="42" fill="#14232B">C</text></svg><p style="font-size:29px;line-height:1.55">붙잡힌 <b>색 입자가 한곳에 축적</b>되면서 눈에 보이는 선이 돼요. 따라서 음성 검체에서도 C선은 나타나요.</p></div></div><p style="font-size:30px;line-height:1.5;background:#DCEFF1;padding:20px 28px;border-radius:14px"><b>T선</b>은 표적 항원을 매개로 색 입자가 모이고, <b>C선</b>은 항원 유무와 관계없이 대조용 물질을 붙잡아요.</p><p style="font-size:23px;line-height:1.5;color:#566A72">대표적인 방식에서는 C선의 항체가 표지된 검출 항체 자체를 인식합니다. 제품에 따라 별도의 대조용 표지 물질을 사용하기도 합니다. 항체가 새 색을 만드는 것이 아니라, 원래 색을 띠는 표지가 모여 보이는 것입니다.</p><p style="position:absolute;left:128px;bottom:48px;width:1664px;font-size:20px;color:#566A72">원리 확인: FDA Healgen Rapid COVID-19 Antigen Test 심사 자료(K232377) · 그림은 결합과 축적 과정을 단순화한 모형</p></section>
 <section class="sl" id="readkit" data-transition="fade" style="background:#EEF3F4;color:#14232B;font-family:'IBM Plex Sans KR', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
 <div style="display:flex;flex-direction:column;gap:12px">
 <p style="font-size:24px;font-weight:700;color:#0D7480;letter-spacing:2px">결과 읽기</p>
@@ -283,7 +287,7 @@ html,body{margin:0;height:100%;background:#0b1114;overflow:hidden}
 <p style="font-family:'Do Hyeon', Arial, sans-serif;font-size:44px;color:#0D7480;line-height:1">3</p>
 <p style="font-size:28px;line-height:1.5;color:#3E525A">8개의 구멍에 <b>검출 시약</b>을 각각 2방울씩 넣고 색 변화를 관찰한다.</p>
 </div>
-<p style="font-size:26px;line-height:1.5;color:#566A72">직접 해 보기: <a href="/infection-diagnosis/">홈판 모의실험 페이지</a>에서 학생이 순서대로 넣어 볼 수 있어요.</p>
+
 </div>
 <iframe class="emb" style="position:absolute;left:1092px;top:150px;width:700px;height:790px;border:0" sandbox="allow-scripts" srcdoc="&lt;!doctype html&gt;&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;style&gt;
 body{margin:0;font-family:system-ui,&quot;Apple SD Gothic Neo&quot;,&quot;Malgun Gothic&quot;,sans-serif;color:#14232B;background:transparent}
@@ -443,7 +447,7 @@ text{font-family:system-ui,&quot;Apple SD Gothic Neo&quot;,&quot;Malgun Gothic&q
 &lt;script&gt;
 var g=document.getElementById(&#x27;g&#x27;),NS=&#x27;http://www.w3.org/2000/svg&#x27;;
 function el(t,a,p){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);(p||g).appendChild(e);return e;}
-var L=96,T=40,W=860,H=560,X=function(c){return L+c/40*W},Y=function(f){return T+(1-f)*H};
+var L=96,T=40,W=860,H=500,X=function(c){return L+c/40*W},Y=function(f){return T+(1-f)*H};
 el(&#x27;rect&#x27;,{x:0,y:0,width:992,height:780,rx:28,fill:&#x27;#FBFDFD&#x27;,stroke:&#x27;#D3DFE2&#x27;});
 for(var c=0;c&lt;=40;c+=10){el(&#x27;line&#x27;,{x1:X(c),y1:T,x2:X(c),y2:T+H,stroke:&#x27;#E1E9EB&#x27;});var t=el(&#x27;text&#x27;,{x:X(c),y:T+H+36,&#x27;text-anchor&#x27;:&#x27;middle&#x27;,&#x27;font-size&#x27;:24,fill:&#x27;#566A72&#x27;});t.textContent=c;}
 var a=el(&#x27;text&#x27;,{x:L+W/2,y:T+H+76,&#x27;text-anchor&#x27;:&#x27;middle&#x27;,&#x27;font-size&#x27;:26,fill:&#x27;#14232B&#x27;});a.textContent=&#x27;주기&#x27;;
@@ -452,11 +456,11 @@ el(&#x27;line&#x27;,{x1:L,y1:T+H,x2:L+W,y2:T+H,stroke:&#x27;#14232B&#x27;,&#x27;
 var TH=0.1;el(&#x27;line&#x27;,{x1:L,y1:Y(TH),x2:L+W,y2:Y(TH),stroke:&#x27;#A8501C&#x27;,&#x27;stroke-width&#x27;:3,&#x27;stroke-dasharray&#x27;:&#x27;10 8&#x27;});
 var tt=el(&#x27;text&#x27;,{x:L+W-8,y:Y(TH)-12,&#x27;text-anchor&#x27;:&#x27;end&#x27;,&#x27;font-size&#x27;:24,fill:&#x27;#A8501C&#x27;});tt.textContent=&#x27;문턱값&#x27;;
 var K=1e11;
-var S=[{n:1e6,c:&#x27;#2C63C9&#x27;,l:&#x27;바이러스 많음&#x27;},{n:1e3,c:&#x27;#0D7480&#x27;,l:&#x27;보통&#x27;},{n:10,c:&#x27;#7A5CC4&#x27;,l:&#x27;적음&#x27;},{n:0,c:&#x27;#9AAAB0&#x27;,l:&#x27;음성&#x27;}];
+var S=[{n:1e6,c:&#x27;#2C63C9&#x27;,l:&#x27;많음 · 100만 개&#x27;,dash:&#x27;&#x27;},{n:1e3,c:&#x27;#0D7480&#x27;,l:&#x27;보통 · 1,000개&#x27;,dash:&#x27;18 8&#x27;},{n:10,c:&#x27;#7A5CC4&#x27;,l:&#x27;적음 · 10개&#x27;,dash:&#x27;5 8&#x27;},{n:0,c:&#x27;#566A72&#x27;,l:&#x27;음성 · 0개&#x27;,dash:&#x27;18 6 4 6&#x27;}];
 function F(n,c){return n?0.015+0.95*n*Math.pow(2,c)/(n*Math.pow(2,c)+K):0.015;}
 function ct(n){return Math.log2(((TH-0.015)/0.95)/(1-(TH-0.015)/0.95)*K/n);}
-S.forEach(function(s,i){s.p=el(&#x27;path&#x27;,{fill:&#x27;none&#x27;,stroke:s.c,&#x27;stroke-width&#x27;:6,&#x27;stroke-linecap&#x27;:&#x27;round&#x27;});s.dot=el(&#x27;circle&#x27;,{r:10,fill:s.c,opacity:0});s.lab=el(&#x27;text&#x27;,{&#x27;font-size&#x27;:24,fill:s.c,&#x27;font-weight&#x27;:700,opacity:0});
-var lg=el(&#x27;text&#x27;,{x:L+24,y:T+40+i*36,&#x27;font-size&#x27;:24,fill:s.c,&#x27;font-weight&#x27;:700});lg.textContent=&#x27;● &#x27;+s.l;
+S.forEach(function(s,i){s.p=el(&#x27;path&#x27;,{fill:&#x27;none&#x27;,stroke:s.c,&#x27;stroke-width&#x27;:7,&#x27;stroke-linecap&#x27;:&#x27;round&#x27;,&#x27;stroke-dasharray&#x27;:s.dash});s.dot=el(&#x27;circle&#x27;,{r:10,fill:s.c,opacity:0});s.lab=el(&#x27;text&#x27;,{&#x27;font-size&#x27;:24,fill:s.c,&#x27;font-weight&#x27;:700,opacity:0});
+var lx=40+(i%2)*470,ly=665+Math.floor(i/2)*62;el(&#x27;line&#x27;,{x1:lx,y1:ly-10,x2:lx+65,y2:ly-10,stroke:s.c,&#x27;stroke-width&#x27;:7,&#x27;stroke-dasharray&#x27;:s.dash});var lg=el(&#x27;text&#x27;,{x:lx+80,y:ly,&#x27;font-size&#x27;:30,fill:&#x27;#14232B&#x27;,&#x27;font-weight&#x27;:700});lg.textContent=s.l;
 if(s.n){s.k=ct(s.n);s.dot.setAttribute(&#x27;cx&#x27;,X(s.k));s.dot.setAttribute(&#x27;cy&#x27;,Y(TH));s.lab.setAttribute(&#x27;x&#x27;,X(s.k)+8);s.lab.setAttribute(&#x27;y&#x27;,Y(TH)+38+ (i*30));s.lab.textContent=&#x27;Ct &#x27;+s.k.toFixed(0);}});
 var cur=0;function frame(){cur+=0.25;S.forEach(function(s){var d=&#x27;&#x27;;for(var c=0;c&lt;=cur;c+=0.25)d+=(c?&#x27;L&#x27;:&#x27;M&#x27;)+X(c).toFixed(1)+&#x27; &#x27;+Y(F(s.n,c)).toFixed(1);s.p.setAttribute(&#x27;d&#x27;,d);var on=s.n&amp;&amp;cur&gt;=s.k?1:0;s.dot.setAttribute(&#x27;opacity&#x27;,on);s.lab.setAttribute(&#x27;opacity&#x27;,on);});
 if(cur&lt;40)setTimeout(frame,50);else setTimeout(function(){cur=0;frame();},5000);}

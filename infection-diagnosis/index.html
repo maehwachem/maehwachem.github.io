@@ -112,7 +112,7 @@ td:first-child{font-weight:500;white-space:nowrap}
 
 html{height:100%}body{margin:0;height:100dvh;padding:12px max(12px,env(safe-area-inset-right)) 0;overflow:hidden}
 .wrap{max-width:1040px;height:100%;gap:10px}header{gap:5px;flex-shrink:0}h1{font-size:1.65rem}.lede{font-size:.86rem;max-width:none}
-nav{gap:5px;margin:0;display:grid;grid-template-columns:repeat(5,1fr)}nav button{font:inherit;font-size:.82rem;border:1px solid var(--line);border-radius:9px;padding:8px 3px;background:var(--surface);color:var(--ink);cursor:pointer}nav button[aria-current=step]{background:var(--accent);color:var(--surface);border-color:var(--accent)}
+nav{gap:5px;margin:0;display:grid;grid-template-columns:repeat(6,1fr)}nav button{font:inherit;font-size:.82rem;border:1px solid var(--line);border-radius:9px;padding:8px 3px;background:var(--surface);color:var(--ink);cursor:pointer}nav button[aria-current=step]{background:var(--accent);color:var(--surface);border-color:var(--accent)}
 .workspace{min-height:0;flex:1;overflow:hidden}.view{height:100%;overflow-y:auto;overscroll-behavior:contain;gap:10px;padding:4px 4px 14px}.view:focus{outline:none}.view h2{font-size:1.3rem}.panel{gap:10px;padding:12px}
 .pager{flex-shrink:0;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0 max(10px,env(safe-area-inset-bottom));border-top:1px solid var(--line);background:var(--bg)}.pager span{font-size:.82rem;color:var(--muted)}
 .lab-layout{display:grid;grid-template-columns:minmax(190px,1fr) minmax(260px,360px);gap:12px;align-items:center}.lab-controls{display:flex;flex-direction:column;gap:12px}.plate{min-width:0;width:100%;max-width:360px;margin:auto;gap:5px;padding:8px}.tools{gap:5px}.tool{font-size:.8rem;padding:7px 8px}.stepbar div{font-size:.75rem;padding:7px}.msg{min-height:0}.well .cnt{font-size:.6rem}
@@ -131,6 +131,11 @@ canvas{height:230px}.chart-legend{font-size:.78rem;display:flex;flex-wrap:wrap;g
 
 .colhead.ctrl{display:block;font-size:.72rem;line-height:1.3}.lab-controls .tools{max-width:420px}.lab-hint{max-width:430px}nav button{white-space:nowrap}
 @media(max-width:600px){.colhead.ctrl{font-size:.65rem}nav button{font-size:.68rem}}
+
+/* 읽기 쉬운 원리 화면과 색·선 모양을 함께 표시하는 범례 */
+.dna-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.dna-tabs button{font:inherit;font-weight:700;padding:10px 6px;border:1px solid var(--line);border-radius:9px;background:var(--well);color:var(--ink);cursor:pointer}.dna-tabs button[aria-pressed=true]{background:var(--accent-soft);border:2px solid var(--accent)}#dnaDiagram{display:block;width:100%;height:220px}.dna-key{display:flex;flex-wrap:wrap;justify-content:center;gap:18px;font-size:.85rem;font-weight:700}.dna-key span:first-child{color:var(--blue)}.dna-key span:last-child{color:var(--warn)}.pcr-summary{display:grid;grid-template-columns:1fr 1fr;gap:10px}.pcr-summary .card{padding:12px}.control-explanation ol{margin:0;padding-left:1.3em}.control-explanation li{margin:5px 0}.control-explanation a{color:var(--accent)}
+#pcr .chart-legend{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;font-size:1rem}#pcr .chart-legend span:before{content:none}.line-key{display:flex;align-items:center;gap:9px;padding:9px 10px;background:var(--surface);border:1px solid var(--line);border-radius:9px}.line-key svg{width:58px;height:16px;flex-shrink:0}.line-key b{font-size:16px;line-height:1.4;display:block}.line-key small{font-size:12px;color:var(--muted);line-height:1.4;display:block}.curve-overlap{font-size:.85rem;font-weight:600;padding:7px;background:var(--accent-soft);border-radius:8px}#pcr canvas{height:225px}#pcr .cyc b{font-size:1rem}#pcr .cyc{padding:7px}
+@media(max-width:600px){nav{gap:3px}nav button{font-size:.64rem;padding:9px 1px}#dnaDiagram{height:170px}.dna-tabs button{font-size:.72rem;padding:9px 4px}.dna-key{font-size:.72rem;gap:9px}.pcr-summary{grid-template-columns:1fr}.pcr-summary .card{padding:10px;gap:4px}.pcr-summary h3{font-size:1rem}#pcr .chart-legend{gap:6px;margin-top:8px}.line-key{gap:6px;padding:7px 6px}.line-key svg{width:38px}.line-key b{font-size:14px}.line-key small{font-size:11px}#pcr canvas{height:190px}#pcr .cyc b{font-size:.8rem}#pcr .cyc{padding:4px}.control-explanation{font-size:.9rem}}
 </style>
 </head><body>
 
@@ -139,7 +144,7 @@ canvas{height:230px}.chart-legend{font-size:.78rem;display:flex;flex-wrap:wrap;g
   <span class="eyebrow"><a href="/" style="color:inherit;text-decoration:none">KJE의 작업실</a> · 통합과학2 · Ⅲ. 과학과 미래 사회 · 탐구 「감염병 진단 기술 체험하기」</span>
   <h1>감염병 진단 실험실</h1>
   <p class="lede">교과서의 신속 항원 검사 모의실험을 화면에서 해 보고, PCR 검사가 어떻게 아주 적은 바이러스 유전자를 찾아내는지 증폭 과정을 직접 돌려 봐요.</p>
-  <nav aria-label="활동 선택"><button data-view="lab" aria-current="step">① 모의실험</button><button data-view="results">② 결과 해석</button><button data-view="principle">③ 검사 원리</button><button data-view="pcr">④ PCR 실험</button><button data-view="compare">⑤ 비교정리</button></nav>
+  <nav aria-label="활동 선택"><button data-view="lab" aria-current="step">① 모의실험</button><button data-view="results">② 결과 해석</button><button data-view="principle">③ 키트 원리</button><button data-view="pcrPrinciple">④ PCR 원리</button><button data-view="pcr">⑤ PCR 실험</button><button data-view="compare">⑥ 비교정리</button></nav>
 </header>
 <main class="workspace">
 
@@ -178,7 +183,7 @@ canvas{height:230px}.chart-legend{font-size:.78rem;display:flex;flex-wrap:wrap;g
 <section id="principle" class="view" tabindex="-1" hidden>
   <h2>③ 신속 항원 검사는 무엇을 찾을까</h2>
   <p>항원은 면역계가 인식하는 물질이고, 항체는 특정 항원의 구조를 인식해 결합하는 단백질이에요. 신속 항원 검사는 이 <b>특이적 결합</b>을 이용해 바이러스의 단백질을 찾아요.</p>
-  <div class="cards">
+  <div class="btnrow" role="group" aria-label="키트 원리 설명 선택"><button class="btn" id="kitBasicBtn" aria-pressed="true">항원 검사 원리</button><button class="btn ghost" id="kitControlBtn" aria-pressed="false">C선에는 왜 색이 생길까?</button></div><div class="cards" id="kitBasic">
     <div class="card">
       <h3>실제 검사 키트에서</h3>
       <ol>
@@ -199,18 +204,19 @@ canvas{height:230px}.chart-legend{font-size:.78rem;display:flex;flex-wrap:wrap;g
       </div>
     </div>
   </div>
-  <details class="small"><summary>대조군과 이 모형의 한계</summary><p class="note">대조군 두 개가 기대대로 나와야 환자 검체의 결과를 믿을 수 있어요. 양성 대조군에 색이 안 나오면 시약이나 과정에 문제가 있었다고 볼 수 있어요. 홈판은 검출 결과를 비교하는 과정을 단순화한 모형이며, 실제 키트의 구조나 반응을 그대로 재현하지는 않아요. 시약 성분은 제품마다 다를 수 있어요. 대조선(C)과 별도의 양성·음성 대조군은 확인하는 범위가 같지 않아요.</p></details>
+  <div class="panel control-explanation" id="kitControl" hidden><h3>항원이 없어도 대조선(C)에 색이 나타나는 이유</h3><ol><li>액체가 이동할 때 <b>색 입자가 붙은 항체 등의 물질</b>도 함께 이동해요.</li><li>C선에는 이 물질을 붙잡는 성분이 고정되어 있어요. <b>바이러스 항원이 없어도</b> 붙잡을 수 있어요.</li><li>붙잡힌 색 입자가 C선에 많이 모이면 <b>색 띠가 눈에 보여요.</b></li></ol><p class="msg">T선: 표적 항원을 매개로 색 입자가 모임<br>C선: 항원 유무와 관계없이 대조용 물질을 붙잡음</p><details class="small"><summary>조금 더 자세히</summary><p>대표적인 방식에서는 C선의 항체가 색 입자가 붙은 검출 항체 자체를 인식해 붙잡아요. 제품에 따라 별도의 대조용 표지 물질을 사용하기도 해요. 항체가 새로 색을 만드는 것이 아니라 금 나노입자 등의 색 표지가 한곳에 축적되어 보이는 원리예요. C선이 나타나도 검체 채취가 충분했는지까지 보장하지는 않아요.</p><a href="https://www.accessdata.fda.gov/cdrh_docs/reviews/K232377.pdf" target="_blank" rel="noopener">검사 원리 출처: FDA 제품 심사 자료</a></details></div><details class="small"><summary>대조군과 이 모형의 한계</summary><p class="note">대조군 두 개가 기대대로 나와야 환자 검체의 결과를 믿을 수 있어요. 양성 대조군에 색이 안 나오면 시약이나 과정에 문제가 있었다고 볼 수 있어요. 홈판은 검출 결과를 비교하는 과정을 단순화한 모형이며, 실제 키트의 구조나 반응을 그대로 재현하지는 않아요. 시약 성분은 제품마다 다를 수 있어요. 대조선(C)과 별도의 양성·음성 대조군은 확인하는 범위가 같지 않아요.</p></details>
 </section>
 
-<!-- ④ PCR -->
+<section id="pcrPrinciple" class="view" tabindex="-1" hidden><h2>④ PCR은 표적 DNA를 반복해서 복제해요</h2><p class="small">바이러스 전체를 늘리는 것이 아니라, 찾으려는 <b>특정 DNA 구간</b>을 증폭합니다. 아래 단계를 눌러 보세요.</p><div class="panel pcr-teaching"><div class="dna-tabs" role="group" aria-label="PCR 원리 단계"><button data-dna="0" aria-pressed="true">① 변성 · 95°C</button><button data-dna="1" aria-pressed="false">② 결합 · 약 55~60°C</button><button data-dna="2" aria-pressed="false">③ 신장 · 72°C</button></div><svg id="dnaDiagram" viewBox="0 0 640 245" role="img" aria-label="PCR 변성 단계: DNA 두 가닥이 분리됨"></svg><div class="dna-key"><span>━ 원래 DNA 가닥</span><span>━ 프라이머·새 DNA 가닥</span></div><div class="msg" id="dnaExplanation" aria-live="polite"></div><div class="btnrow"><button class="btn ghost" id="dnaPrev">← 앞 단계</button><button class="btn" id="dnaNext">다음 단계 →</button><button class="btn ghost" id="toPcr">증폭 실험으로 →</button></div></div><div class="pcr-summary"><div class="card"><h3>한 주기를 반복하면</h3><p><b>1 → 2 → 4 → 8 → …</b></p><p class="small">매 주기 2배가 된다는 이상적 모형에서는 N₀ × 2ⁿ개예요. 30주기면 처음의 약 10억 배이며 실제 증폭 효율은 달라요.</p></div><div class="card"><h3>RNA 바이러스라면?</h3><p>RNA → <b>역전사로 DNA 생성</b> → PCR</p><p class="small">코로나19 바이러스처럼 RNA를 가진 경우 DNA로 바꾸는 과정이 먼저 필요해요.</p></div></div><details class="small"><summary>증폭 곡선과 연결하기</summary><p>실시간 PCR은 증폭에 따른 형광 신호를 측정해요. 신호가 문턱값을 처음 넘는 주기가 Ct값입니다. 같은 검사 조건에서 초기 표적이 많으면 더 이른 주기에 문턱값을 넘어요. 온도와 주기 조건은 프라이머·효소·검사법에 따라 달라질 수 있습니다.</p></details></section>
+<!-- ⑤ PCR -->
 <section id="pcr" class="view" tabindex="-1" hidden>
-  <h2>④ PCR은 어떻게 적은 양을 찾아낼까</h2>
-  <details class="small"><summary>PCR과 역전사 알아보기</summary><p>PCR은 바이러스의 특정 유전자 조각을 반복해서 복제해 양을 늘리는 방법이에요. 한 번의 주기마다 이론적으로 2배가 되니, 30주기면 처음보다 약 10억 배가 돼요. 코로나19 바이러스는 유전 물질이 RNA라서, 먼저 DNA로 바꾸는 역전사 과정을 거친 뒤 증폭해요(RT-PCR).</p></details>
+  <h2>⑤ PCR 증폭 곡선을 비교해요</h2>
+  
   <div class="panel">
     <div class="cyclebox" id="cyclebox">
-      <div class="cyc" data-p="0"><b>95°C</b>변성<br>두 가닥이 떨어짐</div>
-      <div class="cyc" data-p="1"><b>약 55~60°C</b>결합<br>프라이머가 붙음</div>
-      <div class="cyc" data-p="2"><b>72°C</b>신장<br>새 가닥이 만들어짐</div>
+      <div class="cyc" data-p="0"><b>① 변성</b></div>
+      <div class="cyc" data-p="1"><b>② 결합</b></div>
+      <div class="cyc" data-p="2"><b>③ 신장</b></div>
     </div>
     <div class="readout">
       <div><span class="small">주기</span><b id="rCycle">0</b></div>
@@ -218,7 +224,7 @@ canvas{height:230px}.chart-legend{font-size:.78rem;display:flex;flex-wrap:wrap;g
       <div><span class="small">환자 검체 Ct</span><b id="rCt">–</b></div>
     </div>
     <div class="dots" id="dots" aria-hidden="true"></div>
-    <div class="pcr-graph"><canvas id="chart" role="img" aria-label="주기에 따른 형광 세기 그래프"></canvas><div class="chart-legend"><span>환자</span><span class="pos">양성 대조군</span><span class="neg">음성 대조군</span><span class="previous">이전</span></div></div><div class="pcr-settings">
+    <div class="pcr-graph"><p class="curve-overlap" id="curveOverlap" hidden></p><canvas id="chart" role="img" aria-label="주기에 따른 형광 세기 그래프"></canvas><div class="chart-legend" aria-label="그래프 선의 의미"><div class="line-key patient"><svg viewBox="0 0 64 12" aria-hidden="true"><path d="M2 6H62" stroke="var(--blue)" stroke-width="5"/></svg><span><b>환자 검체</b><small id="legendPatient">현재 설정</small></span></div><div class="line-key pos" id="legendPos"><svg viewBox="0 0 64 12" aria-hidden="true"><path d="M2 6H62" stroke="var(--accent)" stroke-width="4" stroke-dasharray="12 5"/></svg><span><b>양성 대조군</b><small>유전자 100만 개</small></span></div><div class="line-key neg" id="legendNeg"><svg viewBox="0 0 64 12" aria-hidden="true"><path d="M2 6H62" stroke="var(--violet)" stroke-width="4" stroke-dasharray="3 5"/></svg><span><b>음성 대조군</b><small>유전자 0개</small></span></div><div class="line-key previous" id="legendPrevious" hidden><svg viewBox="0 0 64 12" aria-hidden="true"><path d="M2 6H62" stroke="var(--warn)" stroke-width="3" stroke-dasharray="12 4 3 4"/></svg><span><b>이전 환자 검체</b><small id="legendPreviousValue">이전 조건</small></span></div></div></div><div class="pcr-settings">
     <div class="ctrl">
       <label for="load">환자 검체 속 바이러스 유전자 수: <b id="loadVal">1,000개</b></label>
       <input type="range" id="load" min="0" max="6" step="0.5" value="3">
@@ -239,7 +245,7 @@ canvas{height:230px}.chart-legend{font-size:.78rem;display:flex;flex-wrap:wrap;g
 
 <!-- ④ 비교 -->
 <section id="compare" class="view" tabindex="-1" hidden>
-  <h2>⑤ 두 검사 비교와 정리</h2>
+  <h2>⑥ 두 검사 비교와 정리</h2>
   <div class="tbl">
   <table>
     <thead><tr><th></th><th>신속 항원 검사</th><th>PCR 검사</th></tr></thead>
@@ -255,12 +261,12 @@ canvas{height:230px}.chart-legend{font-size:.78rem;display:flex;flex-wrap:wrap;g
   <div class="panel discuss">
     <h3>정리하기 토의 거리</h3>
     <ol>
-      <li>감염 초기라 몸속 바이러스 양이 적은 사람에게는 어떤 검사가 더 알맞을까요? ④의 그래프에서 유전자 수를 줄여 보며 생각해 봐요.</li>
+      <li>감염 초기라 몸속 바이러스 양이 적은 사람에게는 어떤 검사가 더 알맞을까요? ⑤의 그래프에서 유전자 수를 줄여 보며 생각해 봐요.</li>
       <li>공항이나 학교처럼 많은 사람을 빨리 검사해야 할 때는 어떤 검사가 유리할까요? 그때 생기는 한계는 무엇일까요?</li>
       <li>진단 기술이 빠르고 정확해지면 감염병 확산을 막는 데 어떤 도움이 될까요? 확진자 추적, 격리 결정과 연결해 이야기해 봐요.</li>
     </ol>
   </div>
-<p class="source-links">내용 확인: <a href="https://www.cdc.gov/covid/testing/" target="_blank" rel="noopener">CDC 검사 안내</a> · <a href="https://www.fda.gov/medical-devices/coronavirus-covid-19-and-medical-devices/understanding-home-otc-covid-19-antigen-diagnostic-test-results" target="_blank" rel="noopener">FDA 결과 해석</a></p></section></main><footer class="pager"><button class="btn ghost" id="prevView">← 이전</button><span id="viewCount" aria-live="polite">1 / 5 · 모의실험</span><button class="btn" id="nextView">다음 →</button></footer>
+<p class="source-links">내용 확인: <a href="https://www.cdc.gov/covid/testing/" target="_blank" rel="noopener">CDC 검사 안내</a> · <a href="https://www.fda.gov/medical-devices/coronavirus-covid-19-and-medical-devices/understanding-home-otc-covid-19-antigen-diagnostic-test-results" target="_blank" rel="noopener">FDA 결과 해석</a></p></section></main><footer class="pager"><button class="btn ghost" id="prevView">← 이전</button><span id="viewCount" aria-live="polite">1 / 6 · 모의실험</span><button class="btn" id="nextView">다음 →</button></footer>
 </div>
 
 <script>
@@ -447,34 +453,43 @@ function bigKo(n){
   if(n<1e12)return (n/1e8).toFixed(n<1e9?1:0).replace(/\.0$/,'')+'억 개';
   return (n/1e12).toFixed(1).replace(/\.0$/,'')+'조 개';
 }
+function updateLegend(){
+  document.getElementById('legendPatient').textContent='유전자 '+fmt(runN)+'개 · 실선';
+  document.getElementById('legendPos').hidden=!document.getElementById('showPos').checked;
+  document.getElementById('legendNeg').hidden=!document.getElementById('showNeg').checked;
+  document.getElementById('legendPrevious').hidden=!previous;
+  const overlap=document.getElementById('curveOverlap');let same=[];if(runN===1e6&&document.getElementById('showPos').checked)same.push('양성 대조군');if(runN===0&&document.getElementById('showNeg').checked)same.push('음성 대조군');if(previous&&previous.n===runN)same.push('이전 조건');overlap.hidden=!same.length;overlap.textContent='환자 검체와 '+same.join('·')+'의 초기 양이 같아 곡선이 겹칩니다.';
+  if(previous)document.getElementById('legendPreviousValue').textContent=fmt(previous.n)+'개 · '+previous.cycle+'주기까지';
+}
 function draw(){
+  updateLegend();
   const dpr=window.devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight;
   if(!w||!h)return;
   cv.width=w*dpr;cv.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
-  const L=40,R=12,T=12,B=34,pw=w-L-R,ph=h-T-B;
+  const L=57,R=18,T=16,B=44,pw=w-L-R,ph=h-T-B;
   const X=c=>L+c/MAXC*pw,Y=f=>T+(1-f)*ph;
   ctx.clearRect(0,0,w,h);
-  ctx.font='11px '+css('--f-mono');ctx.fillStyle=css('--muted');ctx.strokeStyle=css('--line');ctx.lineWidth=1;
-  for(let c=0;c<=MAXC;c+=10){ctx.beginPath();ctx.moveTo(X(c),T);ctx.lineTo(X(c),T+ph);ctx.stroke();ctx.textAlign='center';ctx.fillText(c,X(c),T+ph+14);}
+  ctx.font='13px '+css('--f-mono');ctx.fillStyle=css('--muted');ctx.strokeStyle=css('--line');ctx.lineWidth=1;
+  for(let c=0;c<=MAXC;c+=10){ctx.beginPath();ctx.moveTo(X(c),T);ctx.lineTo(X(c),T+ph);ctx.stroke();ctx.textAlign='center';ctx.fillText(c,X(c),T+ph+19);}
   for(let f=0;f<=1;f+=.25){ctx.beginPath();ctx.moveTo(L,Y(f));ctx.lineTo(L+pw,Y(f));ctx.stroke();ctx.textAlign='right';ctx.fillText(f.toFixed(2),L-5,Y(f)+4);}
-  ctx.textAlign='center';ctx.font='11px '+css('--f-body');ctx.fillText('주기',L+pw/2,h-4);
+  ctx.textAlign='center';ctx.font='14px '+css('--f-body');ctx.fillText('주기',L+pw/2,h-4);
   ctx.save();ctx.translate(11,T+ph/2);ctx.rotate(-Math.PI/2);ctx.fillText('형광 세기(상대값)',0,0);ctx.restore();
   // threshold
-  ctx.setLineDash([5,4]);ctx.strokeStyle=css('--warn');ctx.beginPath();ctx.moveTo(L,Y(TH));ctx.lineTo(L+pw,Y(TH));ctx.stroke();ctx.setLineDash([]);
-  ctx.fillStyle=css('--warn');ctx.textAlign='left';ctx.fillText('문턱값',L+4,Y(TH)-5);
+  ctx.setLineDash([6,5]);ctx.lineWidth=2;ctx.strokeStyle=css('--muted');ctx.beginPath();ctx.moveTo(L,Y(TH));ctx.lineTo(L+pw,Y(TH));ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle=css('--ink');ctx.textAlign='left';ctx.fillText('문턱값',L+4,Y(TH)-5);
   const series=[];
-  if(document.getElementById('showPos').checked)series.push({n:1e6,c:css('--muted'),label:'양성 대조군'});
-  if(document.getElementById('showNeg').checked)series.push({n:0,c:css('--violet'),label:'음성 대조군'});
-  series.push({n:runN,c:css('--blue'),label:'환자 검체',main:true});
+  if(document.getElementById('showPos').checked)series.push({n:1e6,c:css('--accent'),dash:[12,5],label:'양성 대조군'});
+  if(document.getElementById('showNeg').checked)series.push({n:0,c:css('--violet'),dash:[3,5],label:'음성 대조군'});
+  series.unshift({n:runN,c:css('--blue'),label:'환자 검체',main:true});
   if(previous)series.unshift({n:previous.n,c:css('--warn'),previous:true});
   series.forEach(s=>{
-    ctx.setLineDash(s.previous?[4,4]:[]);
-    ctx.strokeStyle=s.c;ctx.lineWidth=s.main?3:2;ctx.beginPath();
+    ctx.setLineDash(s.previous?[12,4,3,4]:(s.dash||[]));
+    ctx.strokeStyle=s.c;ctx.lineWidth=s.main?5:s.previous?3:3.5;ctx.beginPath();
     for(let c=0;c<=(s.previous?previous.cycle:cycle);c+=.25){const x=X(c),y=Y(F(s.n,c));c===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
     ctx.stroke();
     const k=ct(s.n);
     if(!s.previous&&k!==null&&cycle>=k){ctx.fillStyle=s.c;ctx.beginPath();ctx.arc(X(k),Y(TH),s.main?5:3.5,0,7);ctx.fill();
-      if(s.main){ctx.fillStyle=css('--ink');ctx.textAlign=k>30?'right':'left';ctx.font='12px '+css('--f-mono');ctx.fillText('Ct '+k.toFixed(1),X(k)+(k>30?-7:7),Y(TH)+16);}}
+      if(s.main){ctx.fillStyle=css('--ink');ctx.textAlign=k>30?'right':'left';ctx.font='bold 15px '+css('--f-mono');ctx.fillText('Ct '+k.toFixed(1),X(k)+(k>30?-7:7),Y(TH)+16);}}
   });
   ctx.setLineDash([]);
 }
@@ -538,8 +553,8 @@ document.getElementById('zeroLoad').addEventListener('change',()=>resetPcr(true)
 window.addEventListener('resize',draw);
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',draw);
 new MutationObserver(draw).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
-const viewIds=['lab','results','principle','pcr','compare'];
-const viewNames=['모의실험','결과 해석','검사 원리','PCR 실험','비교·정리'];let viewIndex=0;
+const viewIds=['lab','results','principle','pcrPrinciple','pcr','compare'];
+const viewNames=['모의실험','결과 해석','키트 원리','PCR 원리','PCR 실험','비교·정리'];let viewIndex=0;
 function showView(id,focus=true){
   const next=viewIds.indexOf(id);if(next<0)return;
   if(viewIds[viewIndex]==='pcr'&&id!=='pcr')stopPcr();
@@ -547,7 +562,7 @@ function showView(id,focus=true){
   viewIds.forEach(v=>document.getElementById(v).hidden=v!==id);
   document.querySelectorAll('nav [data-view]').forEach(b=>{if(b.dataset.view===id)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');});
   document.getElementById('prevView').disabled=next===0;document.getElementById('nextView').disabled=next===viewIds.length-1;
-  document.getElementById('viewCount').textContent=(next+1)+' / 5 · '+viewNames[next];
+  document.getElementById('viewCount').textContent=(next+1)+' / '+viewIds.length+' · '+viewNames[next];
   const section=document.getElementById(id);section.scrollTop=0;if(focus)section.focus();
   if(id==='pcr')requestAnimationFrame(draw);
 }
@@ -555,6 +570,23 @@ document.querySelectorAll('nav [data-view]').forEach(b=>b.addEventListener('clic
 document.getElementById('prevView').addEventListener('click',()=>showView(viewIds[viewIndex-1]));
 document.getElementById('nextView').addEventListener('click',()=>showView(viewIds[viewIndex+1]));
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stopPcr();});
+function showKit(control){document.getElementById('kitBasic').hidden=control;document.getElementById('kitControl').hidden=!control;document.getElementById('kitBasicBtn').setAttribute('aria-pressed',!control);document.getElementById('kitControlBtn').setAttribute('aria-pressed',control);document.getElementById('kitBasicBtn').classList.toggle('ghost',control);document.getElementById('kitControlBtn').classList.toggle('ghost',!control);}
+document.getElementById('kitBasicBtn').addEventListener('click',()=>showKit(false));document.getElementById('kitControlBtn').addEventListener('click',()=>showKit(true));
+let dnaStage=0;
+const dnaCopy=[['변성 · 약 95°C','온도를 높여 DNA의 두 가닥을 분리해요. 각 가닥이 새 DNA를 만드는 주형이 됩니다.'],['결합 · 약 55~60°C','온도를 낮추면 짧은 DNA 조각인 프라이머가 표적 구간의 양쪽에 붙어요. 프라이머는 복제를 시작할 위치를 정해 줍니다.'],['신장 · 약 72°C','DNA 중합 효소가 프라이머에서부터 새 가닥을 늘려요. 각 주형에 상보적인 가닥이 만들어져 이중 가닥 DNA가 두 개가 됩니다.']];
+function showDna(n){
+  dnaStage=Math.max(0,Math.min(2,n));const svg=document.getElementById('dnaDiagram');
+  const primer=dnaStage>=1,extend=dnaStage===2;
+  let art='<defs><marker id="dnaArrow" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0 0L6 3L0 6Z" fill="var(--warn)"/></marker></defs><g stroke-linecap="round"><path d="M120 50H500M120 190H500" stroke="var(--blue)" stroke-width="8"/>';
+  if(primer){art+='<path d="M120 78H'+(extend?'492':'188')+'M500 162H'+(extend?'128':'432')+'" stroke="var(--warn)" stroke-width="7" marker-end="url(#dnaArrow)"/>';for(let x=130;x<=(extend?490:180);x+=20)art+='<path d="M'+x+' 54V74" stroke="var(--line)" stroke-width="2"/>';for(let x=(extend?130:440);x<=490;x+=20)art+='<path d="M'+x+' 166V186" stroke="var(--line)" stroke-width="2"/>';}
+  art+='</g><g fill="var(--ink)" font-size="20" font-family="sans-serif" text-anchor="middle"><text x="310" y="27">'+(extend?'첫 번째 DNA':'원래 DNA의 한 가닥')+'</text><text x="310" y="225">'+(extend?'두 번째 DNA':'원래 DNA의 다른 가닥')+'</text><text x="310" y="128">'+(extend?'한 주기 완료 → DNA 2개':primer?'주황색 짧은 부분 = 프라이머':'두 가닥이 떨어진 상태')+'</text></g>';
+  svg.innerHTML=art;svg.setAttribute('aria-label',dnaCopy[dnaStage][0]+': '+dnaCopy[dnaStage][1]);
+  document.getElementById('dnaExplanation').textContent=dnaCopy[dnaStage][1];
+  document.querySelectorAll('[data-dna]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.dna===dnaStage));
+  document.getElementById('dnaPrev').disabled=dnaStage===0;document.getElementById('dnaNext').disabled=dnaStage===2;
+}
+document.querySelectorAll('[data-dna]').forEach(b=>b.addEventListener('click',()=>showDna(+b.dataset.dna)));
+document.getElementById('dnaPrev').addEventListener('click',()=>showDna(dnaStage-1));document.getElementById('dnaNext').addEventListener('click',()=>showDna(dnaStage+1));document.getElementById('toPcr').addEventListener('click',()=>showView('pcr'));showDna(0);
 resetPcr(false);showView('lab',false);
 if(document.fonts)document.fonts.ready.then(draw);
 })();
