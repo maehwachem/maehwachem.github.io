@@ -421,7 +421,7 @@
   </head>
   <body>
     <header>
-      <h1>NFC 출석 관리</h1>
+      <h1>NFC·QR 출석 관리</h1>
       <nav id="nav" class="hidden">
         <button data-tab="today" class="on">등하교 대시보드</button
         ><button data-tab="sessions">수업 출석</button
@@ -452,7 +452,7 @@
       <section id="tab-today">
         <div class="dashboard-heading">
           <div><h2>등하교 대시보드</h2><p class="sub" id="dashboardDate">날짜와 반을 선택해 출석을 확인하세요.</p></div>
-          <button class="btn" id="btnToday">오늘 보기</button>
+          <div class="row"><a class="btn" href="qr.html" target="_blank" rel="noopener" style="text-decoration:none">출결용 QR 보기</a><button class="btn" id="btnToday">오늘 보기</button></div>
         </div>
         <div class="card">
           <div class="row">
@@ -753,7 +753,7 @@
         </div>
 
         <div class="card">
-          <h2>NFC 스티커에 넣을 주소</h2>
+          <h2>NFC·QR 공통 출결 주소</h2>
           <div class="row">
             <input
               id="nfcUrl"
@@ -762,12 +762,13 @@
               class="mono"
             />
             <button class="btn" id="btnCopyUrl">복사</button>
+            <a class="btn" href="qr.html" target="_blank" rel="noopener" style="text-decoration:none">출결용 QR 보기·인쇄</a>
             <button class="btn p" id="btnWriteNfc">
               📲 이 폰으로 스티커에 쓰기 (안드로이드 크롬)
             </button>
           </div>
           <p class="sub">
-            모든 책상 스티커에 같은 주소를 넣습니다. 아이폰은 무료 앱 NFC Tools
+            NFC 스티커와 공통 출결 QR은 같은 주소를 사용합니다. 기존 NFC 스티커의 주소와 QR 아래 주소가 같은지 확인하세요. 주소가 다르면 기존 기기 등록이 이어지지 않을 수 있습니다. QR은 휴대폰·태블릿 카메라로 읽고 등록한 기기의 같은 브라우저에서 엽니다. 개인 등록 QR과 달리 이 QR은 교실에 게시할 수 있습니다.<br />아이폰에서 스티커를 쓸 때는 무료 앱 NFC Tools
             → 쓰기 → 레코드 추가 → URL로 기록하세요. NTAG213이면 충분합니다.
           </p>
         </div>
@@ -852,7 +853,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
     <script src="registration.js?v=20261028-qr"></script>
     <script src="vendor/qrcode-2.0.4.js"></script>
-    <script src="admin.js?v=20261103-movements"></script>
+    <script src="admin.js?v=20261103-qr-attendance"></script>
     <script src="sessions.js?v=20261103-movements"></script>
   </body>
 </html>

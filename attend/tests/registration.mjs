@@ -47,7 +47,7 @@ const scanned=await page();
 assert.equal(scanned.calls.filter(c=>c.name==='register_device').length,0);
 assert.equal(scanned.d.getElementById('fId').value,student.id);
 assert.equal(scanned.d.getElementById('fName').value,student.name);
-assert.equal(scanned.d.getElementById('btnReg').textContent,'이 휴대폰 등록');
+assert.equal(scanned.d.getElementById('btnReg').textContent,'이 기기 등록');
 scanned.d.getElementById('regForm').dispatchEvent(new scanned.w.Event('submit',{cancelable:true}));await tick();
 assert.equal(scanned.calls.filter(c=>c.name==='register_device').length,1);
 const args=scanned.calls.find(c=>c.name==='register_device').args;

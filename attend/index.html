@@ -7,7 +7,7 @@
       content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
     <meta name="robots" content="noindex" />
-    <title>NFC 출결 기록</title>
+    <title>NFC·QR 출결 기록</title>
     <meta name="referrer" content="no-referrer" />
     <script src="registration.js?v=20261028-qr"></script>
     <link
@@ -230,9 +230,9 @@
       <div id="vChoices" class="hidden">
         <header class="choice-header">
           <h1>오늘의 출결</h1><p id="choiceWho" class="who"></p>
-          <p class="hint">NFC로 화면을 연 뒤, 기록할 항목을 눌러 주세요.</p>
+          <p class="hint">NFC 또는 QR로 화면을 연 뒤, 기록할 항목을 눌러 주세요. 휴대폰·태블릿 모두 등록한 기기의 같은 브라우저를 사용해요.</p>
         </header>
-        <p id="registrationDone" class="hint hidden" role="status">휴대폰 등록을 마쳤어요. 아래에서 출결을 기록해 주세요. 다음에도 같은 브라우저를 사용해 주세요.</p>
+        <p id="registrationDone" class="hint hidden" role="status">기기 등록을 마쳤어요. 아래에서 출결을 기록해 주세요. 다음에도 같은 기기·브라우저를 사용해 주세요.</p>
         <nav class="choice-tabs" role="tablist" aria-label="출결 종류">
           <button type="button" id="choice-tab-classes" role="tab" data-choice-tab="classes" aria-controls="panel-classes" aria-selected="true">수업 출석</button>
           <button type="button" id="choice-tab-school" role="tab" data-choice-tab="school" aria-controls="panel-school" aria-selected="false" tabindex="-1">등하교</button>
@@ -288,7 +288,7 @@
       <div id="vRegister" class="hidden">
         <h1>처음 한 번만 등록해 주세요</h1>
         <div class="hint" style="margin-top: -8px">
-          선생님께 받은 <b>QR코드</b> 또는 <b>등록코드</b>로 본인 휴대폰을 등록해요.<br />QR 등록과 NFC 이용은 <b>같은 브라우저</b>에서 해 주세요.<br />등록은 출석이 아니에요. 등록 후 수업 이름이나 등교 버튼을 누르고 결과를 확인해 주세요.
+          선생님께 받은 <b>개인 등록 QR</b> 또는 <b>등록코드</b>로 본인 휴대폰·태블릿을 등록해요.<br />등록과 NFC·출결용 QR 이용은 <b>같은 기기의 같은 브라우저</b>에서 해 주세요.<br />등록은 출석이 아니에요. 등록 후 수업 이름이나 등교 버튼을 누르고 결과를 확인해 주세요.
         </div>
         <form id="regForm">
           <div id="qrInfo" class="hint hidden" role="status"></div>
@@ -325,9 +325,8 @@
           <button type="button" id="btnManual" class="ghost hidden">직접 입력하기</button>
         </form>
         <div class="hint">
-          ⚠️ 친구 휴대폰으로 등록하면 내 출석이 그 폰에 묶여요. 꼭 본인
-          휴대폰에서 해 주세요.<br />시크릿(개인정보 보호) 모드에서는 등록이
-          유지되지 않아요.<br />NFC를 열었는데 다시 등록 화면이 나오면, 등록했던 브라우저에서 열었는지 먼저 확인해 주세요.
+          본인 휴대폰·태블릿에서 등록해 주세요. 친구 기기로 등록하면 내 출석이 그 기기의 브라우저에 묶여요.<br />시크릿(개인정보 보호) 모드에서는 등록이
+          유지되지 않아요.<br />NFC·QR로 열었는데 다시 등록 화면이 나오면 등록했던 브라우저인지 먼저 확인하세요. 앱 안에서 열렸다면 등록한 크롬·사파리 등으로 열어 주세요.<br />기기를 바꿀 때는 선생님께 기기 초기화를 요청하세요.
         </div>
       </div>
     </div>
@@ -341,6 +340,7 @@
       });
       const TOKEN_KEY = "nfc_attend_token_v1";
       let registrationQR = window.NFCRegistration?.take() || null;
+      let registrationBusy = false;
       function clearRegistrationQR() {
         registrationQR = null;
         document.getElementById("fCode").value = "";
@@ -512,7 +512,7 @@
           pending: [
             "📋",
             "선생님 승인 대기 중이에요",
-            "휴대폰 등록은 완료됐어요. 선생님이 명단을 확정한 뒤 다시 화면을 열고 수업 또는 등교를 선택해 주세요.",
+            "기기 등록은 완료됐어요. 선생님이 명단을 확정한 뒤 다시 화면을 열고 수업 또는 등교를 선택해 주세요.",
           ],
           inactive: [
             "📋",
@@ -532,7 +532,7 @@
           need_location: [
             "📍",
             "위치 확인이 필요해요",
-            "위치 권한을 허용한 뒤 다시 시도해 주세요.<br>(휴대폰 설정 → 브라우저 → 위치 허용)",
+            "위치 권한을 허용한 뒤 다시 시도해 주세요.<br>(휴대폰·태블릿 설정 → 브라우저 → 위치 허용)",
           ],
           too_far: [
             "📍",
@@ -585,10 +585,18 @@
           const {data:r,error}=await sb.rpc("nfc_attendance_options",{p_token:token});
           if(seq!==choiceSequence)return;
           if(error)throw error;
-          if(!r.ok){if(r.error==="unknown_device"){clearToken();showRegister();}else showCheckIn(r);return;}
+          if(!r.ok){
+            if(r.error==="unknown_device"){clearToken();showRegister();}
+            else if(registrationQR?.student){
+              result("warn","📱","등록된 기기를 먼저 확인해 주세요","","",
+                (r.error==="pending"?"이 브라우저의 기기 등록이 선생님 승인 대기 상태예요.":"이 브라우저의 기기 등록 상태를 확인해야 해요.")+
+                "<br>지금 연 개인 등록 QR과 같은 학생인지 확인하지 못했어요. 학생 본인의 기기·브라우저에서 열고, 선생님께 등록 상태를 확인해 주세요.",true);
+            } else showCheckIn(r);
+            return;
+          }
           if (registrationQR?.student && (registrationQR.student.id !== r.student_id || registrationQR.student.name !== r.name)) {
             clearRegistrationQR();
-            result("bad", "📱", "이미 다른 학생으로 등록된 휴대폰이에요", `${r.name} (${r.student_id})`, "등록 유지", "기존 등록은 바꾸지 않았어요. QR은 학생 본인의 휴대폰에서 열어 주세요. 다시 확인하면 기존 학생의 출석 화면으로 이동합니다.", true);
+            result("bad", "📱", "이미 다른 학생으로 등록된 기기예요", `${r.name} (${r.student_id})`, "등록 유지", "기존 등록은 바꾸지 않았어요. 개인 등록 QR은 학생 본인의 기기에서 열어 주세요. 다시 확인하면 기존 학생의 출석 화면으로 이동합니다.", true);
             return;
           }
           clearRegistrationQR();
@@ -707,12 +715,12 @@
         show("vRegister");
         const student = registrationQR?.student;
         const info = document.getElementById("qrInfo");
-        info.textContent = student ? `${student.year}학년도 · ${student.id} ${student.name}\n본인 정보와 본인 휴대폰을 확인해 주세요. NFC가 열리는 기본 브라우저에서 등록해 주세요.` : registrationQR?.error || "";
+        info.textContent = student ? `${student.year}학년도 · ${student.id} ${student.name}\n본인 정보와 본인 휴대폰·태블릿을 확인해 주세요. NFC·출결용 QR을 열 때도 같은 브라우저를 사용해 주세요.` : registrationQR?.error || "";
         info.style.whiteSpace = "pre-line";
         info.classList.toggle("hidden", !info.textContent);
         document.getElementById("manualFields").classList.toggle("hidden", !!student);
         document.getElementById("btnManual").classList.toggle("hidden", !student);
-        document.getElementById("btnReg").textContent = student ? "이 휴대폰 등록" : "등록하고 출석 선택";
+        document.getElementById("btnReg").textContent = student ? "이 기기 등록" : "등록하고 출석 선택";
         if (student) {
           document.getElementById("fId").value = student.id;
           document.getElementById("fName").value = student.name;
@@ -730,11 +738,18 @@
         .getElementById("regForm")
         .addEventListener("submit", async (ev) => {
           ev.preventDefault();
+          if (registrationBusy) return;
+          registrationBusy = true;
           const btn = document.getElementById("btnReg");
           btn.disabled = true;
           btn.textContent = "확인 중…";
-          const token = newToken();
           try {
+            // Another tab may have completed registration while this form was open.
+            if (getToken()) { await start(); return; }
+            const token = newToken();
+            // Keep the candidate before sending: the server may commit registration
+            // even when its response is lost. start() verifies it on retry.
+            saveToken(token);
             const { data, error } = await sb.rpc("register_device", {
               p_student_id: document.getElementById("fId").value.trim(),
               p_name: document.getElementById("fName").value.trim().normalize("NFC"),
@@ -743,6 +758,7 @@
             });
             if (error) throw error;
             if (!data.ok) {
+              if (getToken() === token) clearToken();
               const msg =
                 {
                   mismatch:
@@ -751,9 +767,9 @@
                   locked:
                     "여러 번 틀려서 잠겼어요. 선생님께 코드 재발급을 요청해 주세요.",
                   already_bound:
-                    "이 학번은 이미 다른 휴대폰에 등록돼 있어요. 휴대폰을 바꿨다면 선생님께 기기 초기화를 요청해 주세요.",
+                    "이 학번은 이미 다른 기기에 등록돼 있어요. 기기를 바꿨다면 선생님께 기기 초기화를 요청해 주세요.",
                   device_in_use:
-                    "이 휴대폰은 이미 다른 학생으로 등록돼 있어요.",
+                    "이 기기는 이미 다른 학생으로 등록돼 있어요.",
                   not_on_roster:
                     "출석 명단에 없는 학번이에요. 학번을 다시 확인하거나 선생님께 문의해 주세요.",
                   bad_signup_code:
@@ -780,8 +796,9 @@
               true,
             );
           } finally {
+            registrationBusy = false;
             btn.disabled = false;
-            btn.textContent = registrationQR?.student ? "이 휴대폰 등록" : "등록하고 출석 선택";
+            btn.textContent = registrationQR?.student ? "이 기기 등록" : "등록하고 출석 선택";
           }
         });
 
