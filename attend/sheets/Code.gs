@@ -33,7 +33,7 @@ const NFC = {
     absent: "결석 확정",
     unconfirmed: "미확인",
   },
-  move: { out: "외출", return: "복귀", early: "조퇴", void: "직전 이동 취소" },
+  move: { out: "외출", return: "복귀", early: "조퇴", home: "하교", void: "직전 이동 취소" },
 };
 function onOpen() {
   SpreadsheetApp.getUi()
@@ -466,6 +466,8 @@ function nfcPull() {
       "복귀 예정",
       "복귀 지연",
       "처리",
+      "최근 이동 시각",
+      "이동 기록 방식",
     ];
     nfcMergePeriod_(
       "출석기록 v2",
@@ -485,10 +487,12 @@ function nfcPull() {
           ? "외출 중"
           : r.whereabouts === "early"
             ? "조퇴"
-            : "",
+            : r.whereabouts === "home" ? "하교" : "",
         nfcTime_(r.expected_return_at),
         r.overdue ? "지연" : "",
         r.source === "manual" ? "교사 확인" : "",
+        nfcTime_(r.movement_time),
+        r.movement_source ? (r.movement_source === "student" ? "학생 태그" : "교사 처리") : "",
       ]),
     );
     const names = {};
@@ -506,6 +510,7 @@ function nfcPull() {
         "사유",
         "기록 시각",
         "이동 ID",
+        "이동 기록 방식",
       ],
       from,
       to,
@@ -522,6 +527,7 @@ function nfcPull() {
           m.reason,
           m.created_at,
           m.id,
+          m.source === "student" ? "학생 태그" : "교사 처리",
         ];
       }),
     );

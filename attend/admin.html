@@ -139,7 +139,7 @@
       }
       .kpis {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(3, 1fr);
         gap: 8px;
       }
       .kpi {
@@ -384,6 +384,11 @@
         max-height: 350px;
         overflow: auto;
       }
+      #dashboardTimeValues {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0}
+      #dashboardTimeValues > span {display:block;border-left:3px solid var(--line);padding-left:12px}
+      #dashboardTimeValues small {display:block;font-size:13px;color:var(--sub)}
+      #dashboardTimeValues strong {display:block;font-size:23px;line-height:1.7;color:var(--ink)}
+      @media(max-width:720px){#dashboardTimeValues{grid-template-columns:repeat(2,minmax(0,1fr))}#dashboardTimeValues strong{font-size:21px}}
       .dashboard-heading { display:flex; justify-content:space-between; gap:12px; align-items:center; margin:8px 0 18px; }
       .dashboard-heading h2 { font-size:24px; margin-bottom:4px; }
       .dashboard-heading p { margin:0; }
@@ -418,7 +423,7 @@
     <header>
       <h1>NFC 출석 관리</h1>
       <nav id="nav" class="hidden">
-        <button data-tab="today" class="on">등교 대시보드</button
+        <button data-tab="today" class="on">등하교 대시보드</button
         ><button data-tab="sessions">수업 출석</button
         ><button data-tab="roster">학생 명단</button
         ><button data-tab="calendar">출석 대상일</button
@@ -446,7 +451,7 @@
     <main id="app" class="hidden">
       <section id="tab-today">
         <div class="dashboard-heading">
-          <div><h2>등교 출석 대시보드</h2><p class="sub" id="dashboardDate">날짜와 반을 선택해 출석을 확인하세요.</p></div>
+          <div><h2>등하교 대시보드</h2><p class="sub" id="dashboardDate">날짜와 반을 선택해 출석을 확인하세요.</p></div>
           <button class="btn" id="btnToday">오늘 보기</button>
         </div>
         <div class="card">
@@ -463,6 +468,7 @@
               <option value="absent">결석 확정</option>
               <option value="out">외출 중</option>
               <option value="early">조퇴</option>
+              <option value="home">하교</option>
               <option value="overdue">복귀 지연</option></select
             ><input id="dSearch" placeholder="이름·학번 검색" aria-label="이름·학번 검색" /><button
               class="btn"
@@ -471,6 +477,11 @@
               새로고침</button
             ><span class="sub" id="dUpdated"></span>
           </div>
+        </div>
+        <div class="card" id="dashboardTiming" aria-label="현재 등하교 기준시간">
+          <div class="row" style="justify-content:space-between"><h2 style="margin:0">등하교 기준시간</h2><button type="button" class="btn s" id="btnTimeSettings">설정에서 수정</button></div>
+          <p id="dashboardTimeValues" class="sub" role="status">기준시간을 불러오는 중입니다.</p>
+          <p class="sub">현재 설정 · 모든 학년 공통 · 한국 시각. 정상 등교 기준의 다음 분부터 지각입니다. 변경은 상단 ‘설정 → 등하교 시간’에서 합니다. 수업별 시간은 ‘수업 출석’에서 따로 설정합니다. 과거 기록은 다시 판정하지 않습니다.</p>
         </div>
         <p id="dLoadState" class="error" role="status"></p>
         <div id="dayContent">
@@ -509,7 +520,7 @@
           </div>
           <p class="sub">
             미확인은 아직 확인하지 않은 상태입니다. 결석은 교사가 확정합니다.
-            조퇴·외출·복귀는 등교 기록과 별도로 남으며, NFC 재태그로 이동 상태가
+            하교·조퇴·외출·복귀는 등교 기록과 별도로 남으며, 등교 재태그로 이동 상태가
             바뀌지 않습니다. 수동 출석은 태그 시각이 공란입니다.
           </p>
           <p id="eligibilityNote" class="sub"></p>
@@ -547,7 +558,7 @@
             <div class="row" id="sTools"><button class="btn" id="sEdit">이 회차 설정</button><button class="btn" id="sState">마감·휴강</button><button class="btn" id="sAddMember">이 회차 학생 추가</button><button class="btn" id="sHistory">회차 이력</button></div>
             <div class="row" style="margin:14px 0"><input id="sSearch" placeholder="이름·학번 검색" aria-label="수업 학생 검색"><select id="sFilter" aria-label="수업 출석 상태"><option value="">대상 전체</option><option value="unconfirmed">미확인</option><option value="present">출석</option><option value="late">지각</option><option value="excused">인정</option><option value="absent">결석 확정</option><option value="removed">대상 제외 기록</option></select></div>
             <p id="sCount" class="sub"></p><div id="sRows" class="session-roster"></div>
-            <p class="sub">휴대폰 없는 학생은 ‘교사 확인’에서 상태와 사유를 저장하세요. 등교·외출·조퇴 표시는 참고 정보이며 수업 출석을 자동 변경하지 않습니다.</p>
+            <p class="sub">휴대폰 없는 학생은 ‘교사 확인’에서 상태와 사유를 저장하세요. 등교·하교·외출·조퇴 표시는 참고 정보이며 수업 출석을 자동 변경하지 않습니다.</p>
           </div>
           <details class="card" id="sTemplates"><summary><strong>반복 시간표 설정</strong></summary><p class="sub">수업명·교시·요일·시간·수강생·수강 기간을 설정합니다. 수정은 아직 만들어지지 않은 회차에만 적용됩니다.</p><button class="btn p" id="sNewTemplate">시간표 추가</button><div id="sTemplateList"></div></details>
         </div>
@@ -657,7 +668,7 @@
       <section id="tab-settings" class="hidden">
         <div class="grid2">
           <div class="card">
-            <h2>출석 시간</h2>
+            <h2>등하교 시간</h2>
             <div class="field">
               <label>화면에 표시할 이름 (비워도 됨)</label
               ><input
@@ -667,19 +678,17 @@
               />
             </div>
             <div class="field">
-              <label>출석 접수 시작</label><input type="time" id="sOpen" />
+              <label for="sOpen">등교 접수 시작</label><input type="time" id="sOpen" />
             </div>
             <div class="field">
-              <label>출석 마감 (이후는 지각)</label
+              <label for="sDeadline">정상 등교 기준 (해당 분까지 출석)</label
               ><input type="time" id="sDeadline" />
             </div>
             <div class="field">
-              <label>출석 접수 종료</label><input type="time" id="sClose" />
+              <label for="sClose">등교 접수 종료</label><input type="time" id="sClose" />
             </div>
-            <p class="sub">
-              시작 전·종료 후에는 태그해도 기록되지 않아요. 집에서 미리 찍는 걸
-              막는 데 도움이 됩니다.
-            </p>
+            <div class="field"><label for="sDeparture">하교 기준시간 (비워 두면 학생 하교 기록 중지)</label><input type="time" id="sDeparture" /></div>
+            <p class="sub">등교는 접수 시작부터 종료까지 기록하며 정상 등교 기준의 다음 분부터 지각입니다. 하교는 하교 기준시간부터 기록합니다. 기준시간 전의 외출·조퇴는 교사 허가 후 별도 기록합니다. 하교 기준시간은 등교 접수 종료와 다릅니다.</p>
           </div>
           <div class="card">
             <h2>학교 위치 확인</h2>
@@ -775,7 +784,7 @@
             · <a href="sheets/Code.gs" download>연결 스크립트 받기</a>
           </p>
           <p class="sub">
-            명단은 시트에서 편집 → 미리보기 → 적용합니다. 출석·조퇴·외출·복귀
+            명단은 시트에서 편집 → 미리보기 → 적용합니다. 등교·하교·조퇴·외출·복귀
             정정은 이 관리 화면에서 합니다.
             <a href="sheets/README.md">설치 및 열 안내</a>
           </p>
@@ -843,7 +852,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
     <script src="registration.js?v=20261028-qr"></script>
     <script src="vendor/qrcode-2.0.4.js"></script>
-    <script src="admin.js?v=20261028-qr"></script>
-    <script src="sessions.js?v=20261028-reason-labels"></script>
+    <script src="admin.js?v=20261103-movements"></script>
+    <script src="sessions.js?v=20261103-movements"></script>
   </body>
 </html>

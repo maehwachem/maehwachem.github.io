@@ -40,3 +40,9 @@ context.nfcRpc_=(name,args)=>{assert.equal(name,'sync_pull_sessions');assert.equ
 context.nfcPullSessions();assert.equal(sessionWrite[0],'수업 출석');assert.equal(sessionWrite[4][0][4],'휴강');assert.equal(sessionWrite[4][0][8],'제외');
 context.nfcPrompt_=()=>"2026-01-01,2026-12-31";assert.throws(()=>context.nfcPullSessions(),/62일/);
 console.log('PASS separate session sheet, date range and cancelled/removed record retention');
+
+context.nfcPrompt_=()=>"2026-11-03,2026-11-03";
+const movementWrites=[];context.nfcMergePeriod_=(...args)=>movementWrites.push(args);context.nfcSummary_=()=>{};
+context.nfcRpc_=()=>({version:2,attendance:[{date:'2026-11-03',student_uid:'u',student_id:'30101',school_year:2026,name:'가학생',eligible:true,status:'present',whereabouts:'home',movement_time:'2026-11-03T07:32:00Z',movement_source:'student'}],movements:[{att_date:'2026-11-03',student_uid:'u',kind:'home',source:'student',happened_at:'2026-11-03T07:32:00Z',id:'m'}]});
+context.nfcPull();assert.equal(movementWrites[0][4][0][8],'하교');assert(movementWrites[0][1].includes('이동 기록 방식'));assert.equal(movementWrites[1][4][0][4],'하교');assert.equal(movementWrites[1][4][0].at(-1),'학생 태그');
+console.log('PASS school departure and student movement source survive sheet exports');

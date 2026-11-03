@@ -7,7 +7,7 @@
       content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
     <meta name="robots" content="noindex" />
-    <title>NFC 출석</title>
+    <title>NFC 출결 기록</title>
     <meta name="referrer" content="no-referrer" />
     <script src="registration.js?v=20261028-qr"></script>
     <link
@@ -42,16 +42,16 @@
         color: var(--ink);
         min-height: 100vh;
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         justify-content: center;
         padding: 16px;
       }
       .card {
         width: 100%;
-        max-width: 400px;
+        max-width: 480px;
         background: var(--card);
         border-radius: 24px;
-        padding: 28px 22px;
+        padding: 24px 18px;
         box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
         text-align: center;
       }
@@ -177,7 +177,44 @@
         display: none;
       }
     button:not(.ghost){background:var(--accent);color:var(--ink)}
-</style>
+      .choice-header {text-align:left;margin-bottom:18px}
+      .choice-header h1 {font-size:25px;margin:0 0 4px}
+      .choice-header .who {margin:0;font-size:16px}
+      .choice-header .hint {margin:8px 0 0;font-size:13px}
+      .choice-tabs {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;background:var(--soft);padding:4px;border-radius:13px;margin:18px 0}
+      .choice-tabs button {margin:0;padding:12px 4px;font-size:14px;border-radius:10px;background:transparent;color:var(--sub)}
+      .choice-tabs button[aria-selected="true"] {background:var(--brand);color:white}
+      .choice-panel {text-align:left}
+      .choice-panel h2 {font-size:19px;margin:0 0 5px}
+      .choice-panel > .hint {margin:0 0 16px;font-size:13px}
+      .class-card,.record-card {border:1px solid var(--line);border-radius:14px;padding:16px;margin:10px 0;background:#fff}
+      .class-card h3 {font-size:18px;line-height:1.4;margin:4px 0 10px;overflow-wrap:anywhere}
+      .class-period {font-size:12px;color:var(--sub)}
+      .class-summary {margin:0;font-size:14px;font-weight:600}
+      .class-card button {margin-top:12px;padding:12px;font-size:15px}
+      .class-card .hint {font-size:12px;margin:6px 0 0}
+      .group-title {font-size:13px;font-weight:600;color:var(--sub);margin:18px 0 6px}
+      .record-card h3 {font-size:14px;margin:0 0 8px;color:var(--sub)}
+      .record-state {font-size:18px;font-weight:700;line-height:1.6;margin:0}
+      .record-card button {padding:13px;margin-top:12px}
+      .timing {font-size:13px;color:var(--sub);line-height:1.8;margin:0 0 16px;padding:12px 14px;background:var(--bg);border-radius:12px}
+      .movement-buttons {display:grid;grid-template-columns:1fr 1fr;gap:10px}
+      .movement-buttons button {margin:0;padding:15px 8px;background:var(--soft);color:var(--brand)}
+      .movement-buttons #btnMoveEarly {grid-column:1/-1}
+      .movement-buttons button:disabled {opacity:.45}
+      .movement-history {list-style:none;padding:0;font-size:13px;color:var(--sub)}
+      .movement-history li {padding:8px 0;border-bottom:1px solid var(--line)}
+      .refresh-button {font-size:13px;padding:11px!important;margin-top:18px!important}
+      dialog {width:calc(100% - 32px);max-width:420px;max-height:90dvh;overflow:auto;border:0;border-radius:18px;padding:24px;color:var(--ink)}
+      dialog::backdrop {background:rgba(30,20,30,.5)}
+      dialog h2 {font-size:21px;margin:0 0 8px}
+      dialog form {margin:0}
+      textarea {width:100%;min-height:80px;padding:12px;font:inherit;border:1px solid var(--line);border-radius:10px}
+      .dialog-actions {display:flex;gap:8px}
+      .dialog-actions button {margin-top:16px}
+      #moveError {color:var(--bad);font-size:13px;white-space:pre-line}
+      @media(max-width:360px){body{padding:10px}.card{padding:20px 14px}.choice-tabs button{font-size:13px}}
+    </style>
   </head>
   <body>
     <div class="card">
@@ -191,19 +228,47 @@
       </div>
 
       <div id="vChoices" class="hidden">
-        <h1>출석할 수업·등교를 선택해 주세요</h1><p id="choiceWho" class="who"></p>
-        <p id="registrationDone" class="hint hidden">휴대폰 등록이 끝났어요. 등록만으로 출석되지는 않아요. 아래에서 수업 또는 등교 버튼을 눌러 주세요. 다음에 NFC로 열 때도 등록한 브라우저를 사용해 주세요.</p>
-        <div class="hint">NFC는 이 화면을 열어 줘요. 태그만으로 출석되지는 않아요.<br>수업마다 해당 수업 이름을 누르고 결과를 확인해 주세요.</div>
-        <h2 style="font-size:18px;margin-top:24px">수업·교시별 출석</h2>
-        <div id="classChoices"></div><p id="choiceHint" class="hint"></p>
-        <div style="border-top:1px solid var(--line);padding-top:16px;margin-top:24px">
-          <h2 style="font-size:18px">오늘 등교 기록</h2>
-          <p id="arrivalStatus" class="hint"></p>
-          <button id="btnArrival" class="ghost" type="button">등교 출석 확인·등록</button>
-          <p class="hint">등교 기록과 수업 출석은 별도예요.<br>이 버튼은 오늘 등교만 확인·등록해요. 수업마다 위의 수업 이름도 눌러 주세요.</p>
-        </div>
-        <button type="button" class="ghost" onclick="start()">수업 목록 새로고침</button>
+        <header class="choice-header">
+          <h1>오늘의 출결</h1><p id="choiceWho" class="who"></p>
+          <p class="hint">NFC로 화면을 연 뒤, 기록할 항목을 눌러 주세요.</p>
+        </header>
+        <p id="registrationDone" class="hint hidden" role="status">휴대폰 등록을 마쳤어요. 아래에서 출결을 기록해 주세요. 다음에도 같은 브라우저를 사용해 주세요.</p>
+        <nav class="choice-tabs" role="tablist" aria-label="출결 종류">
+          <button type="button" id="choice-tab-classes" role="tab" data-choice-tab="classes" aria-controls="panel-classes" aria-selected="true">수업 출석</button>
+          <button type="button" id="choice-tab-school" role="tab" data-choice-tab="school" aria-controls="panel-school" aria-selected="false" tabindex="-1">등하교</button>
+          <button type="button" id="choice-tab-movement" role="tab" data-choice-tab="movement" aria-controls="panel-movement" aria-selected="false" tabindex="-1">외출·조퇴</button>
+        </nav>
+        <section id="panel-classes" class="choice-panel" role="tabpanel" aria-labelledby="choice-tab-classes">
+          <h2>수업 출석</h2><p class="hint">해당 수업의 출석하기를 눌러 주세요. 등교 기록과 따로 저장돼요.</p>
+          <div id="classChoices"></div>
+        </section>
+        <section id="panel-school" class="choice-panel hidden" role="tabpanel" aria-labelledby="choice-tab-school">
+          <h2>등하교 기록</h2><p class="hint">학교에 도착했을 때 등교, 수업을 마치고 나갈 때 하교를 기록해요.</p>
+          <p id="schoolTiming" class="timing"></p>
+          <div class="record-card"><h3>오늘 등교</h3><p id="arrivalStatus" class="record-state"></p><button id="btnArrival" type="button">등교 기록하기</button></div>
+          <div class="record-card"><h3>오늘 하교</h3><p id="departureStatus" class="record-state"></p><button id="btnDeparture" type="button">하교 기록하기</button><p class="hint">하교 기준시간 전에는 선생님 허가 후 ‘외출·조퇴’에서 기록해 주세요.</p></div>
+        </section>
+        <section id="panel-movement" class="choice-panel hidden" role="tabpanel" aria-labelledby="choice-tab-movement">
+          <h2>외출·복귀·조퇴</h2><p class="hint">외출·조퇴는 선생님 허가를 받은 뒤 기록해 주세요. 이 기록이 허가를 대신하지는 않아요.</p>
+          <div class="record-card"><h3>현재 이동 상태</h3><p id="movementStatus" class="record-state"></p></div>
+          <div class="movement-buttons">
+            <button id="btnMoveOut" type="button">외출 기록</button><button id="btnMoveReturn" type="button">복귀 기록</button><button id="btnMoveEarly" type="button">조퇴 기록</button>
+          </div>
+          <p id="movementHint" class="hint"></p>
+          <details><summary class="hint">오늘 이동 이력</summary><ul id="movementHistory" class="movement-history"></ul></details>
+        </section>
+        <p id="choiceHint" class="hint" role="status"></p>
+        <button type="button" class="ghost refresh-button" onclick="start()">기록 새로고침</button>
       </div>
+      <dialog id="moveDialog" aria-labelledby="moveTitle">
+        <form id="moveForm">
+          <h2 id="moveTitle"></h2><p id="moveIntro" class="hint"></p>
+          <div id="moveReasonField"><label for="moveReason">사유</label><textarea id="moveReason" maxlength="200" placeholder="예: 병원 진료"></textarea></div>
+          <div id="moveExpectedField"><label for="moveExpected">복귀 예정 시각</label><input type="time" id="moveExpected"></div>
+          <p id="moveError" role="alert"></p>
+          <div class="dialog-actions"><button type="button" id="moveCancel" class="ghost">취소</button><button type="submit" id="moveSave">기록하기</button></div>
+        </form>
+      </dialog>
       <!-- 결과 -->
       <div id="vResult" class="hidden">
         <div id="resultBox" class="box">
@@ -216,7 +281,7 @@
         <button class="ghost hidden" id="btnRetry" onclick="start()">
           다시 시도
         </button>
-        <button class="ghost" onclick="start()">등교·수업 다시 선택</button>
+        <button class="ghost" onclick="start()">출결 항목 다시 선택</button>
       </div>
 
       <!-- 최초 등록 -->
@@ -341,14 +406,16 @@
       }
 
       // ---------- 위치 ----------
-      let settings = null;
-      async function loadSettings() {
-        if (settings) return settings;
+      let settings = null, settingsSequence = 0;
+      async function loadSettings(refresh = false) {
+        if (settings && !refresh) return settings;
+        const seq = ++settingsSequence;
         const { data, error } = await sb.rpc("get_public_settings");
         if (error) throw error;
-        settings = data;
-        document.getElementById("schoolName").textContent =
-          data.school_name || "";
+        if (seq === settingsSequence) {
+          settings = data;
+          document.getElementById("schoolName").textContent = data.school_name || "";
+        }
         return data;
       }
       function getLocation() {
@@ -369,7 +436,7 @@
 
       // ---------- 출석 ----------
       async function doCheckIn(token, session = null) {
-        const s = await loadSettings();
+        const s = await loadSettings(true);
         let loc = null;
         if (s.geo_required) {
           document.getElementById("loadingHint").textContent =
@@ -390,16 +457,16 @@
       function showCheckIn(r) {
         const who = r.name ? `${r.name} (${r.student_id || ""})` : "";
         if (r.ok) {
-          if (r.whereabouts === "early" || r.whereabouts === "out") {
+          if (["early", "out", "home"].includes(r.whereabouts)) {
             result(
               "warn",
-              r.whereabouts === "early" ? "🏠" : "🚶",
+              r.whereabouts === "out" ? "🚶" : "🏠",
               r.whereabouts === "early"
                 ? "조퇴 처리되어 있어요"
-                : "외출 중으로 기록되어 있어요",
+                : r.whereabouts === "home" ? "하교 기록이 있어요" : "외출 중으로 기록되어 있어요",
               who,
               r.time,
-              "등교 기록은 그대로 보존되어 있어요.<br>돌아왔다면 선생님께 복귀 확인을 요청하세요. 다시 출석을 요청해도 이동 상태는 바뀌지 않아요.",
+              "등교 기록은 그대로 보존되어 있어요.<br>외출 후 돌아왔다면 ‘외출·조퇴’에서 복귀를 기록하세요. 잘못된 조퇴·하교는 선생님께 취소를 요청해 주세요.",
             );
             return;
           }
@@ -428,7 +495,7 @@
             who,
             r.time,
             r.already
-              ? "오늘 등교의 기존 기록이에요. 수업 출석은 ‘등교·수업 다시 선택’에서 수업 이름을 눌러 주세요."
+              ? "오늘 등교의 기존 기록이에요. 수업 출석은 ‘출결 항목 다시 선택’에서 수업 이름을 눌러 주세요."
               : late
                 ? `등교 출석 마감(${r.deadline}) 이후에 등교 출석을 요청했어요. 수업 출석과 별도예요.`
                 : "등교 출석을 기록했어요. 수업 출석은 수업별로 따로 확인해 주세요.",
@@ -438,6 +505,7 @@
         const map = {
           not_enrolled: ["📋", "이 수업 명단을 확인해 주세요", "선생님께 이 회차의 수강생 명단을 확인해 달라고 알려 주세요."],
           session_closed: ["🔒", "수업 출석 접수가 닫혀 있어요", "수업의 날짜·접수시간·휴강 여부를 확인해 주세요. 목록에서 다시 선택할 수 있어요."],
+          movement_home: ["🏠", "하교 기록이 있어요", "수업 출석은 변경하지 않았어요. 잘못 기록했다면 선생님께 하교 기록 취소를 요청해 주세요."],
           movement_out: ["🚶", "외출 중으로 기록되어 있어요", "수업 출석은 변경하지 않았어요. 돌아왔다면 선생님께 복귀 확인을 요청하세요."],
           movement_early: ["🏠", "조퇴 처리되어 있어요", "수업 출석은 변경하지 않았어요. 선생님께 확인을 요청하세요."],
           daily_confirmed: ["📋", "등교 기록을 먼저 확인해 주세요", "오늘 등교가 결석 또는 인정으로 처리되어 있어요. 선생님께 확인을 요청하세요."],
@@ -485,6 +553,7 @@
         result("bad", m[0], m[1], who, "", m[2], true);
       }
 
+      let currentChoices = null, choicePanel = "classes", moveDraft = null;
       let attendanceBusy = false, choicesBusy = false, choiceSequence = 0, autoRefreshUntil = 0;
       const studentStatus = value => ({present:"출석",late:"지각",excused:"인정",absent:"결석 확정",unconfirmed:"미확인"}[value] || "미확인");
       const studentTime = iso => iso ? new Intl.DateTimeFormat("ko-KR", {timeZone:"Asia/Seoul",hour:"2-digit",minute:"2-digit",hour12:false}).format(new Date(iso)) : "";
@@ -512,7 +581,7 @@
         const token=getToken();
         if(!token){choicesBusy=false;showRegister();return;}
         try {
-          await loadSettings();
+          await loadSettings(true);
           const {data:r,error}=await sb.rpc("nfc_attendance_options",{p_token:token});
           if(seq!==choiceSequence)return;
           if(error)throw error;
@@ -524,31 +593,114 @@
           }
           clearRegistrationQR();
           document.getElementById("choiceWho").textContent=`${r.name} (${r.student_id})`;
-          document.getElementById("arrivalStatus").textContent = r.daily ? `등교: ${studentStatus(r.daily.status)}${r.daily.checked_at && r.daily.status !== "unconfirmed" ? " · " + studentTime(r.daily.checked_at) : ""} · 수업 출석과 별도` : "등교 기록은 아래 버튼에서 확인할 수 있어요.";
+          currentChoices=r;
+          renderSchoolChoices(r);
           const container=document.getElementById("classChoices");container.replaceChildren();
-          for(const item of r.sessions){
-            const card=document.createElement("div");card.style.cssText="border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px;text-align:left";
-            const b=document.createElement("button");b.type="button";b.className=item.available?"":"ghost";
-            const state=item.state==="cancelled"?"휴강":item.state==="closed"?"마감":item.available?"선택 가능":"접수시간 아님";
-            b.textContent=`${item.period_label || ""} ${item.title} · ${item.available ? "출석 확인" : state}`;
-            const summary=document.createElement("p");summary.style.cssText="margin:10px 0 0;font-weight:600";
+          let group="";
+          const items=[...r.sessions].sort((a,b)=>Number(b.available)-Number(a.available));
+          for(const item of items){
+            const nextGroup=item.available?"available":"other";
+            if(group!==nextGroup){const heading=document.createElement("p");heading.className="group-title";heading.textContent=item.available?"지금 출석할 수 있는 수업":"그 밖의 수업";container.append(heading);group=nextGroup;}
+            const card=document.createElement("article");card.className="class-card";
+            if(item.period_label && item.period_label!==item.title){const period=document.createElement("span");period.className="class-period";period.textContent=item.period_label;card.append(period);}
+            const title=document.createElement("h3");title.textContent=item.title;
+            const summary=document.createElement("p");summary.className="class-summary";
             summary.textContent=`이 수업: ${studentStatus(item.status)}${item.first_tag_at?" · 최초 기록 "+studentTime(item.first_tag_at):""}`;
-            const time=document.createElement("p");time.className="hint";time.style.cssText="text-align:left;margin:6px 0 0";
-            time.textContent=`접수 ${studentTime(item.opens_at)}~${studentTime(item.closes_at)} · 지각 시작 ${studentTime(item.late_at)}`;
-            b.disabled=!item.available;b.onclick=()=>chooseAttendance(item.id);card.append(b,summary,time);container.append(card);
+            const time=document.createElement("p");time.className="hint";
+            time.textContent=`접수 ${studentTime(item.opens_at)}–${studentTime(item.closes_at)} · 지각 ${studentTime(item.late_at)}부터`;
+            const b=document.createElement("button");b.type="button";b.className=item.available?"":"ghost";
+            b.textContent=item.state==="cancelled"?"휴강":item.state==="closed"?"접수 마감":item.available?(item.status && item.status!=="unconfirmed"?"출석 기록 확인":"출석하기"):"접수시간 아님";
+            b.disabled=!item.available;b.onclick=()=>chooseAttendance(item.id);card.append(title,summary,time,b);container.append(card);
           }
-          document.getElementById("choiceHint").textContent=r.sessions.length?"2분 동안 15초마다 목록과 기록을 새로 확인해요. 수업별 출석·지각은 각 수업의 시간 기준으로 따로 기록돼요.":"오늘 내 명단에 준비된 수업이 없어요. 수업 출석이 필요하면 선생님께 시간표와 수강생 명단을 확인해 달라고 알려 주세요.";
+          if(!items.length){const empty=document.createElement("p");empty.className="hint";empty.textContent="오늘 등록된 수업이 없어요. 수업 출석이 필요하면 선생님께 시간표와 명단 확인을 요청해 주세요.";container.append(empty);}
+          document.getElementById("choiceHint").textContent="화면을 열어 둔 동안 2분간 자동 갱신해요. 기록은 버튼을 눌러야 저장돼요.";
+          selectChoicePanel(choicePanel);
           show("vChoices");
-        } catch(e){if(seq!==choiceSequence)return;if(silent)document.getElementById("choiceHint").textContent="자동 갱신에 실패했어요. 표시된 기록이 최신이 아닐 수 있어요. 목록 새로고침을 눌러 주세요.";else result("bad","📶","목록을 불러오지 못했어요","","","인터넷 연결을 확인하고 다시 시도해 주세요. 아직 출석은 처리하지 않았어요.",true);}
+        } catch(e){if(seq!==choiceSequence)return;if(silent)document.getElementById("choiceHint").textContent="자동 갱신에 실패했어요. 표시된 기록이 최신이 아닐 수 있어요. 기록 새로고침을 눌러 주세요.";else result("bad","📶","목록을 불러오지 못했어요","","","인터넷 연결을 확인하고 다시 시도해 주세요. 아직 출석은 처리하지 않았어요.",true);}
         finally{if(seq===choiceSequence)choicesBusy=false;}
       }
       const refreshChoices = () => {
-        if (document.hidden || document.getElementById("vChoices").classList.contains("hidden")) return;
+        if (document.hidden || document.getElementById("moveDialog").open || document.getElementById("vChoices").classList.contains("hidden")) return;
         if (Date.now() < autoRefreshUntil) start(true);
-        else document.getElementById("choiceHint").textContent="자동 갱신을 잠시 멈췄어요. 최신 접수시간과 기록은 ‘수업 목록 새로고침’으로 확인해 주세요.";
+        else document.getElementById("choiceHint").textContent="자동 갱신을 잠시 멈췄어요. 최신 접수시간과 기록은 ‘기록 새로고침’으로 확인해 주세요.";
       };
       setInterval(refreshChoices, 15000);
       document.addEventListener("visibilitychange", refreshChoices);
+
+      // ---------- 등하교·학교 이동 ----------
+      const movementLabel=kind=>({out:"외출",return:"복귀",early:"조퇴",home:"하교",void:"이동 취소"}[kind]||"교내");
+      function selectChoicePanel(panel){
+        choicePanel=panel;
+        document.querySelectorAll("[data-choice-tab]").forEach(b=>{const on=b.dataset.choiceTab===panel;b.setAttribute("aria-selected",String(on));b.tabIndex=on?0:-1;document.getElementById("panel-"+b.dataset.choiceTab).classList.toggle("hidden",!on);});
+      }
+      document.querySelectorAll("[data-choice-tab]").forEach(b=>{
+        b.onclick=()=>selectChoicePanel(b.dataset.choiceTab);
+        b.onkeydown=e=>{if(!["ArrowLeft","ArrowRight","Home","End"].includes(e.key))return;e.preventDefault();const tabs=[...document.querySelectorAll("[data-choice-tab]")],i=tabs.indexOf(b),next=e.key==="Home"?0:e.key==="End"?tabs.length-1:(i+(e.key==="ArrowRight"?1:-1)+tabs.length)%tabs.length;tabs[next].click();tabs[next].focus();};
+      });
+      function renderSchoolChoices(r){
+        const s=settings||{},m=r.movement,kind=m?.kind,inside=!["out","early","home"].includes(kind),arrived=["present","late"].includes(r.daily?.status);
+        document.getElementById("schoolTiming").textContent=`등교 접수 ${s.open_time||"—"}–${s.close_time||"—"} · 정상 등교 ${s.deadline||"—"}까지 / 하교 ${s.departure_time? s.departure_time+"부터":"기준시간 미설정"}`;
+        document.getElementById("arrivalStatus").textContent=`등교: ${studentStatus(r.daily?.status)}${r.daily?.checked_at && r.daily.status!=="unconfirmed"?" · "+studentTime(r.daily.checked_at):""}`;
+        document.getElementById("btnArrival").textContent=r.daily?.status && r.daily.status!=="unconfirmed"?"등교 기록 확인":"등교 기록하기";
+        document.getElementById("departureStatus").textContent=kind==="home"?"하교 · "+studentTime(m.happened_at):kind==="early"?"조퇴 · "+studentTime(m.happened_at):"아직 하교 기록이 없어요";
+        document.getElementById("btnDeparture").disabled=!arrived||!inside||!s.departure_time;
+        document.getElementById("movementStatus").textContent=m?`${kind==="out"?"외출 중":kind==="return"?"교내 · 복귀 완료":movementLabel(kind)} · ${studentTime(m.happened_at)}${m.expected_return_at?" / 복귀 예정 "+studentTime(m.expected_return_at):""}`:arrived?"교내":"등교 미확인";
+        document.getElementById("btnMoveOut").disabled=!arrived||!inside;
+        document.getElementById("btnMoveReturn").disabled=!arrived||kind!=="out";
+        document.getElementById("btnMoveEarly").disabled=!arrived||["early","home"].includes(kind);
+        document.getElementById("movementHint").textContent=!arrived?"등교 출석을 먼저 확인해 주세요.":["early","home"].includes(kind)?"잘못 기록했다면 선생님께 이동 기록 취소를 요청해 주세요.":kind==="out"?"학교로 돌아오면 복귀 기록을 눌러 주세요.":"외출은 복귀 예정 시각과 사유, 조퇴는 사유를 입력해요.";
+        const history=document.getElementById("movementHistory");history.replaceChildren();
+        for(const item of r.movements||[]){const li=document.createElement("li");li.textContent=`${studentTime(item.happened_at)} · ${movementLabel(item.kind)} · ${item.source==="student"?"학생 태그":"교사 처리"}${item.voided?" (취소됨)":""}`;history.append(li);}
+        if(!history.children.length){const li=document.createElement("li");li.textContent="아직 이동 기록이 없어요.";history.append(li);}
+      }
+      function movementRequestId(){
+        if(crypto.randomUUID)return crypto.randomUUID();
+        const bytes=crypto.getRandomValues(new Uint8Array(16));bytes[6]=(bytes[6]&15)|64;bytes[8]=(bytes[8]&63)|128;
+        const hex=Array.from(bytes,b=>b.toString(16).padStart(2,"0")).join("");
+        return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`;
+      }
+      function openMovement(kind){
+        if(attendanceBusy||!currentChoices)return;
+        moveDraft={kind,previous:currentChoices.movement_id||null,date:currentChoices.att_date,request:movementRequestId(),payload:null};
+        document.getElementById("moveTitle").textContent=movementLabel(kind)+" 기록";
+        document.getElementById("moveIntro").textContent=["out","early"].includes(kind)?"선생님 허가를 받았는지 확인해 주세요. 기록 시각은 저장할 때의 시각이에요.":kind==="home"?"지금 학교에서 하교하는 것이 맞나요? 등교·수업 출석은 그대로 유지돼요.":"학교에 돌아왔는지 확인해 주세요. 복귀 시각을 기록해요.";
+        document.getElementById("moveReason").value="";
+        document.getElementById("moveReason").required=["out","early"].includes(kind);
+        document.getElementById("moveReasonField").classList.toggle("hidden",!["out","early"].includes(kind));
+        document.getElementById("moveExpected").value="";document.getElementById("moveExpected").required=kind==="out";
+        document.getElementById("moveExpectedField").classList.toggle("hidden",kind!=="out");
+        document.getElementById("moveError").textContent="";document.getElementById("moveSave").textContent="기록하기";
+        document.querySelectorAll("#moveForm input,#moveForm textarea").forEach(el=>el.disabled=false);
+        document.getElementById("moveDialog").showModal();
+      }
+      document.getElementById("btnDeparture").onclick=()=>openMovement("home");
+      document.getElementById("btnMoveOut").onclick=()=>openMovement("out");
+      document.getElementById("btnMoveReturn").onclick=()=>openMovement("return");
+      document.getElementById("btnMoveEarly").onclick=()=>openMovement("early");
+      document.getElementById("moveCancel").onclick=()=>document.getElementById("moveDialog").close();
+      const moveErrors={};
+      Object.assign(moveErrors,{arrival_required:"등교 출석을 먼저 확인해 주세요.",expected_return_required:"오늘의 현재 시각보다 뒤인 복귀 예정 시각을 입력해 주세요.",departure_not_configured:"하교 기준시간이 아직 없어요. 선생님께 설정을 요청해 주세요.",before_departure:"하교 기준시간 전이에요. 조퇴라면 선생님 허가 후 조퇴 기록을 이용해 주세요.",state_changed:"이동 상태가 바뀌었어요. 창을 닫고 기록을 새로고침해 주세요.",movement_locked:"현재 이동 상태에서는 기록할 수 없어요. 창을 닫고 기록을 새로고침해 주세요.",not_out:"외출 중일 때만 복귀를 기록할 수 있어요.",bad_input:"이동 종류와 사유를 확인해 주세요.",request_conflict:"이미 처리된 요청과 내용이 달라요. 기록을 새로고침해 주세요.",need_location:"위치 권한을 허용한 뒤 다시 시도해 주세요.",too_far:"학교 밖으로 확인돼요. 학교 안에서 다시 시도해 주세요.",geo_not_configured:"학교 위치 설정이 필요해요. 선생님께 알려 주세요.",not_school_day:"오늘은 출석 대상일이 아니에요. 선생님께 확인해 주세요.",pending:"선생님의 명단 승인이 필요해요.",inactive:"현재 출석 대상 명단을 선생님께 확인해 주세요.",unknown_device:"등록된 휴대폰을 확인할 수 없어요. 창을 닫고 기록을 새로고침해 주세요."});
+      document.getElementById("moveDialog").addEventListener("cancel",e=>{if(attendanceBusy)e.preventDefault();});
+      document.getElementById("moveForm").onsubmit=async e=>{
+        e.preventDefault();if(attendanceBusy||!moveDraft)return;
+        const draft=moveDraft,reason=["out","early"].includes(draft.kind)?document.getElementById("moveReason").value.trim():draft.kind==="home"?"정규 하교":"외출 후 복귀";
+        if(!reason){document.getElementById("moveError").textContent="사유를 입력해 주세요.";return;}
+        const expected=document.getElementById("moveExpected").value;
+        if(draft.kind==="out"&&(!expected||!draft.date)){document.getElementById("moveError").textContent="복귀 예정 시각을 입력해 주세요.";return;}
+        attendanceBusy=true;++choiceSequence;choicesBusy=false;
+        document.getElementById("moveSave").disabled=true;document.getElementById("moveCancel").disabled=true;
+        try{
+          const s=await loadSettings(true),loc=s.geo_required?await getLocation():null;
+          draft.payload ||= {p_token:getToken(),p_kind:draft.kind,p_expected:draft.kind==="out"?`${draft.date}T${expected}:00+09:00`:null,p_reason:reason,p_previous:draft.previous,p_request:draft.request};
+          const {data:r,error}=await sb.rpc("nfc_student_move",{...draft.payload,p_lat:loc?.lat??null,p_lng:loc?.lng??null,p_acc:loc?.acc??null});
+          if(error)throw error;
+          if(!r.ok){document.getElementById("moveError").textContent=moveErrors[r.error]||"기록하지 못했어요. 선생님께 확인해 주세요.";draft.payload=null;draft.request=movementRequestId();document.querySelectorAll("#moveForm input,#moveForm textarea").forEach(el=>el.disabled=false);document.getElementById("moveSave").textContent="기록하기";return;}
+          document.getElementById("moveDialog").close();
+          result("ok","✅",`${movementLabel(r.kind)} · 기록 ${r.already?"확인":"완료"}`,`${r.name} (${r.student_id})`,r.time,"학교 이동 기록을 저장했어요. 등교·수업 출석은 그대로 유지돼요."+(["out","early"].includes(r.kind)?"<br>학생 태그로 표시되며 교사 허가를 대신하지는 않아요.":""));
+          moveDraft=null;
+        }catch(error){document.getElementById("moveError").textContent="연결을 확인하지 못했어요. 내용은 유지했어요. 다시 누르면 같은 요청으로 저장 여부를 확인해요.";document.querySelectorAll("#moveForm input,#moveForm textarea").forEach(el=>el.disabled=true);document.getElementById("moveSave").textContent="저장 여부 다시 확인";}
+        finally{attendanceBusy=false;document.getElementById("moveSave").disabled=false;document.getElementById("moveCancel").disabled=false;}
+      };
 
       // ---------- 최초 등록 ----------
       async function showRegister() {
@@ -568,7 +720,7 @@
         }
         try {
           settings = null;
-          const s = await loadSettings();
+          const s = await loadSettings(true);
           document
             .getElementById("selfHint")
             .classList.toggle("hidden", !s.allow_self_signup);

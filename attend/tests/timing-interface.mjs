@@ -1,0 +1,18 @@
+import {JSDOM} from 'jsdom';
+import {readFile} from 'node:fs/promises';
+import assert from 'node:assert/strict';
+const read=p=>readFile(new URL(p,import.meta.url),'utf8');
+const dom=new JSDOM(await read('../admin.html'),{url:'https://example.invalid/attend/admin.html',runScripts:'outside-only'}),w=dom.window,d=w.document;
+let settings={open_time:'06:00',deadline:'08:20',close_time:'18:00',departure_time:'16:30',radius_m:300},failTiming=false,saved,lastMove;
+const row={student_uid:'u1',student_id:'30101',name:'가학생',eligible:true,status:'present',version:1,whereabouts:'home',movement_time:'2026-11-03T16:32:00+09:00',movement_source:'student'};
+w.ATTEND_CONFIG={};w.supabase={createClient:()=>({auth:{getSession:async()=>({data:{session:null}})},rpc:async(name,args)=>{if(name==='nfc_move')lastMove=args;return name==='get_public_settings'?failTiming?{error:{message:'offline'}}:{data:settings}:{data:name==='nfc_day'?[row]:[]};},from:()=>({select:()=>({eq:()=>({single:async()=>({data:settings})}),then:resolve=>resolve({data:[]})}),update:value=>({eq:async()=>{saved=value;settings={...settings,...value};return{};}})})})};
+w.HTMLDialogElement.prototype.showModal=function(){this.open=true;};w.HTMLDialogElement.prototype.close=function(){this.open=false;};
+w.eval(await read('../admin.js')+';window.testLoad=loadToday;');d.getElementById('dDate').value='2026-11-03';await w.testLoad();
+assert.match(d.getElementById('dashboardTiming').textContent,/06:00.*08:20.*18:00.*16:30/s);assert.match(d.getElementById('dashboardTiming').textContent,/설정/);
+assert.match(d.querySelector('#kpis [data-filter=home]').textContent,/1/);d.querySelector('#kpis [data-filter=home]').click();assert.match(d.getElementById('todayBody').textContent,/하교.*16:32.*학생 태그/s);
+await d.getElementById('btnTimeSettings').onclick();assert(!d.getElementById('tab-settings').classList.contains('hidden'));assert.equal(d.getElementById('sDeparture').value,'16:30');
+d.getElementById('sDeparture').value='16:40';await d.getElementById('btnSaveSettings').onclick();assert.equal(saved.departure_time,'16:40');assert.match(d.getElementById('dashboardTiming').textContent,/16:40/);
+failTiming=true;await w.testLoad();assert.match(d.getElementById('dashboardTiming').textContent,/불러오지 못/);assert(!d.getElementById('dayContent').classList.contains('hidden'),'time settings failure must not hide attendance');
+row.whereabouts='inside';d.getElementById('dStatus').value='';await w.testLoad();d.querySelector('#todayBody [data-action=move]').click();
+assert.equal(d.getElementById('xAt').getAttribute('step'),'1','teacher movement editor must preserve seconds');d.getElementById('xAt').value='14:16:45';d.getElementById('xKind').value='home';d.getElementById('xReason').value='학생 복귀 직후 하교 확인';await d.getElementById('editForm').onsubmit({preventDefault(){}});assert.equal(lastMove.p_at,'2026-11-03T14:16:45+09:00');
+dom.window.close();console.log('PASS dashboard timing, settings navigation and save refresh, departure counts, student source and independent failure');

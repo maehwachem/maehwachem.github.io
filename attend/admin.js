@@ -42,6 +42,7 @@ const MOVE = {
   out: "외출",
   return: "복귀",
   early: "조퇴",
+  home: "하교",
   void: "직전 이동 취소",
 };
 let students = [],
@@ -149,22 +150,28 @@ bind("btnLogout", async () => {
 sb.auth.getSession().then(({ data }) => {
   if (data.session) run(null, enterApp);
 });
-document.querySelectorAll("#nav button").forEach(
-  (b) =>
-    (b.onclick = () =>
-      run(b, async () => {
-        document
-          .querySelectorAll("#nav button")
-          .forEach((x) => x.classList.toggle("on", x === b));
-        ["today", "sessions", "roster", "calendar", "settings"].forEach((t) =>
-          $("tab-" + t).classList.toggle("hidden", t !== b.dataset.tab),
-        );
-        if (b.dataset.tab === "sessions") await window.loadClassDashboard();
-        if (b.dataset.tab === "settings") await loadSettings();
-        if (b.dataset.tab === "roster") await loadStudents();
-        if (b.dataset.tab === "calendar") await loadCalendar();
-      })),
-);
+async function activateTab(tab) {
+  document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.tab===tab));
+  ["today","sessions","roster","calendar","settings"].forEach(t=>$("tab-"+t).classList.toggle("hidden",t!==tab));
+  if(tab==="today") await loadToday();
+  if(tab==="sessions") await window.loadClassDashboard();
+  if(tab==="settings") await loadSettings();
+  if(tab==="roster") await loadStudents();
+  if(tab==="calendar") await loadCalendar();
+}
+document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>run(b,()=>activateTab(b.dataset.tab)));
+bind("btnTimeSettings",async()=>{await activateTab("settings");$("sDeadline").focus();});
+async function loadDashboardTiming() {
+  try {
+    const data=await rpc("get_public_settings"),short=value=>value?.slice(0,5)||"미설정";
+    $("dashboardTimeValues").innerHTML=[
+      ["등교 접수 시작",short(data.open_time)],
+      ["정상 등교 기준",short(data.deadline)+"까지"],
+      ["등교 접수 종료",short(data.close_time)],
+      ["하교 기준",data.departure_time?short(data.departure_time)+"부터":"미설정"]
+    ].map(([label,value])=>`<span><small>${label}</small><strong>${esc(value)}</strong></span>`).join("");
+  } catch(error) {$("dashboardTimeValues").textContent="기준시간을 불러오지 못했습니다. 현황 새로고침 또는 설정에서 확인하세요.";}
+}
 async function loadStudents() {
   students = await rpc("nfc_roster", { p_year: Number($("rYear").value) });
   fillClasses("rClass", students);
@@ -183,7 +190,7 @@ async function loadToday() {
   $("dayContent").setAttribute("aria-busy", "true");
   $("dLoadState").textContent = "출석 현황을 불러오는 중입니다…";
   try {
-    const rows = await rpc("nfc_day", { p_date: date });
+    const [rows] = await Promise.all([rpc("nfc_day", { p_date: date }), loadDashboardTiming()]);
     if (seq !== loadSequence) return;
     dayRows = rows;
     fillClasses("dClass", rows);
@@ -251,6 +258,7 @@ function renderToday() {
     ["결석 확정", count("absent"), "absent", "교사가 확정한 결석"],
     ["외출 중", records.filter((s) => s.whereabouts === "out").length, "out", "이동 기록 기준"],
     ["조퇴", records.filter((s) => s.whereabouts === "early").length, "early", "이동 기록 기준"],
+    ["하교", records.filter((s) => s.whereabouts === "home").length, "home", "이동 기록 기준"],
   ];
   $("kpis").innerHTML = kpis
     .map(([l, n, f, hint]) => `<button type="button" class="kpi" data-filter="${f}" aria-pressed="${current === f}" aria-label="${l} ${n}명 · 학생 보기"><b>${n}<span> 명</span></b><span>${l}</span><small>${hint}</small></button>`)
@@ -276,7 +284,7 @@ function renderToday() {
         ? s.eligible
         : f === "overdue"
         ? s.overdue
-        : f === "out" || f === "early"
+        : ["out", "early", "home"].includes(f)
           ? s.whereabouts === f
           : s.status === f),
   );
@@ -289,10 +297,10 @@ function renderToday() {
             ? `외출 중${s.overdue ? " · 복귀 지연" : ""}<br><small>예정 ${esc(seoulTime(s.expected_return_at))}</small>`
             : s.whereabouts === "early"
               ? "조퇴"
-              : ["present", "late"].includes(s.status)
+              : s.whereabouts === "home" ? "하교" : ["present", "late"].includes(s.status)
                 ? "교내"
                 : "—";
-        return `<tr><td>${esc(seat(s))}</td><td>${esc(s.student_id)} · <b>${esc(s.name)}</b>${!s.eligible ? "<br><small>대상 외 기록</small>" : ""}${s.last_pending_tag ? '<br><small>승인 전 태그 시도 · 출석 미확정 ' + esc(seoulTime(s.last_pending_tag)) + "</small>" : ""}${s.last_exception_tag ? '<br><small class="error">재태그 확인 ' + esc(seoulTime(s.last_exception_tag)) + "</small>" : ""}</td><td><span class="tag t-${s.status}">${STATUS[s.status]}</span>${s.source === "manual" ? `<br><small>교사 확인 ${esc(seoulTime(s.corrected_at))}</small>` : ""}</td><td><span class="tag t-${s.whereabouts}">${wh}</span></td><td class="mono">${esc(seoulTime(s.checked_at) || "—")}</td><td><button class="btn s" data-action="${s.status === "unconfirmed" ? "manual" : "correct"}" data-uid="${s.student_uid}" ${!s.eligible ? "disabled" : ""}>${s.status === "unconfirmed" ? "교사 출석 확인" : "출석 정정"}</button> <button class="btn s" data-action="move" data-uid="${s.student_uid}" ${!["present", "late"].includes(s.status) ? "disabled" : ""}>이동 처리</button> <button class="btn s" data-action="history" data-uid="${s.student_uid}">이력</button></td></tr>`;
+        return `<tr><td>${esc(seat(s))}</td><td>${esc(s.student_id)} · <b>${esc(s.name)}</b>${!s.eligible ? "<br><small>대상 외 기록</small>" : ""}${s.last_pending_tag ? '<br><small>승인 전 태그 시도 · 출석 미확정 ' + esc(seoulTime(s.last_pending_tag)) + "</small>" : ""}${s.last_exception_tag ? '<br><small class="error">재태그 확인 ' + esc(seoulTime(s.last_exception_tag)) + "</small>" : ""}</td><td><span class="tag t-${s.status}">${STATUS[s.status]}</span>${s.source === "manual" ? `<br><small>교사 확인 ${esc(seoulTime(s.corrected_at))}</small>` : ""}</td><td><span class="tag t-${s.whereabouts}">${wh}</span>${s.movement_time?`<br><small>${esc(seoulTime(s.movement_time))} · ${s.movement_source==="student"?"학생 태그":"교사 처리"}</small>`:""}</td><td class="mono">${esc(seoulTime(s.checked_at) || "—")}</td><td><button class="btn s" data-action="${s.status === "unconfirmed" ? "manual" : "correct"}" data-uid="${s.student_uid}" ${!s.eligible ? "disabled" : ""}>${s.status === "unconfirmed" ? "교사 출석 확인" : "출석 정정"}</button> <button class="btn s" data-action="move" data-uid="${s.student_uid}" ${!["present", "late"].includes(s.status) ? "disabled" : ""}>이동 처리</button> <button class="btn s" data-action="history" data-uid="${s.student_uid}">이력</button></td></tr>`;
       })
       .join("") ||
     '<tr><td colspan="6" style="padding:24px;text-align:center">해당하는 학생이 없습니다.</td></tr>';
@@ -375,11 +383,11 @@ function handleDayAction(e) {
     );
   else if (b.dataset.action === "move") {
     const options =
-      s.whereabouts === "early"
+      ["early","home"].includes(s.whereabouts)
         ? ["void"]
         : s.whereabouts === "out"
           ? ["return", "early", "void"]
-          : ["out", "early", ...(s.effective_movement_id ? ["void"] : [])];
+          : ["out", "early", "home", ...(s.effective_movement_id ? ["void"] : [])];
     const request = crypto.randomUUID();
     openEditor(
       `${s.name} · 이동 처리`,
@@ -389,7 +397,7 @@ function handleDayAction(e) {
       ) +
         field(
           "실제 시각",
-          `<input type="time" id="xAt" required value="${seoulTime(new Date().toISOString()).slice(0, 5)}">`,
+          `<input type="time" id="xAt" step="1" required value="${seoulTime(new Date().toISOString())}">`,
         ) +
         field(
           "복귀 예정 (외출일 때 필수)",
@@ -399,14 +407,14 @@ function handleDayAction(e) {
           "사유",
           '<textarea id="xReason" required maxlength="200" placeholder="예: 병원 진료"></textarea>',
         ) +
-        '<p class="sub">교사가 확인한 이동을 기록합니다. 조퇴는 출석·지각을 덮어쓰지 않습니다. 잘못 누른 이동은 직전 이동 취소로 되돌리세요. 이전 상태로 복원되며 취소 이력이 남습니다. 취소 후 실제 시각으로 다시 입력할 수 있습니다.</p>',
+        '<p class="sub">교사가 확인한 이동을 기록합니다. 하교·조퇴는 출석·지각을 덮어쓰지 않습니다. 학생 태그와 교사 처리는 구분해 보존합니다. 잘못 누른 이동은 직전 이동 취소로 되돌리세요. 이전 상태로 복원되며 취소 이력이 남습니다. 취소 후 실제 시각으로 다시 입력할 수 있습니다.</p>',
       async () => {
         const kind = $("xKind").value;
         await rpc("nfc_move", {
           p_uid: s.student_uid,
           p_date: date,
           p_kind: kind,
-          p_at: `${date}T${$("xAt").value}:00+09:00`,
+          p_at: `${date}T${$("xAt").value}${$("xAt").value.length===5?":00":""}+09:00`,
           p_expected:
             kind === "out" && $("xExpected").value
               ? `${date}T${$("xExpected").value}:00+09:00`
@@ -434,7 +442,7 @@ function handleDayAction(e) {
         data
           .map(
             (r) =>
-              `<div class="history"><b>${esc(seoulTime(r.created_at))} ${r.action === "movement" ? MOVE[r.after_value.kind] : "출석 정정"}</b><br>${r.action === "movement" ? `${esc(seoulTime(r.after_value.happened_at))} 처리` : `${STATUS[r.before_value?.status] || "미확인"} → ${STATUS[r.after_value?.status] || ""}`}<br>${esc(r.reason)}</div><hr>`,
+              `<div class="history"><b>${esc(seoulTime(r.created_at))} ${r.action === "movement" ? MOVE[r.after_value.kind] : "출석 정정"}</b><br>${r.action === "movement" ? `${esc(seoulTime(r.after_value.happened_at))} · ${r.after_value.source==="student"?"학생 태그":"교사 처리"}` : `${STATUS[r.before_value?.status] || "미확인"} → ${STATUS[r.after_value?.status] || ""}`}<br>${esc(r.reason)}</div><hr>`,
           )
           .join("") || "<p>교사 처리 이력이 없습니다.</p>",
         null,
@@ -474,6 +482,8 @@ bind("btnExport", async () => {
       "등교 상태",
       "태그 시각",
       "이동 상태",
+      "최근 이동 시각",
+      "이동 기록 방식",
       "복귀 예정",
       "복귀 지연",
       "학생 식별자",
@@ -490,7 +500,9 @@ bind("btnExport", async () => {
         ? "외출 중"
         : r.whereabouts === "early"
           ? "조퇴"
-          : "",
+          : r.whereabouts === "home" ? "하교" : "",
+      seoulTime(r.movement_time),
+      r.movement_source ? (r.movement_source==="student"?"학생 태그":"교사 처리") : "",
       seoulTime(r.expected_return_at),
       r.overdue ? "지연" : "",
       r.student_uid,
@@ -763,6 +775,7 @@ async function loadSettings() {
   $("sOpen").value = data.open_time.slice(0, 5);
   $("sDeadline").value = data.deadline.slice(0, 5);
   $("sClose").value = data.close_time.slice(0, 5);
+  $("sDeparture").value = data.departure_time?.slice(0,5) || "";
   schoolName = data.school_name || "";
   $("sSchool").value = schoolName;
   $("sSelf").checked = data.allow_self_signup;
@@ -794,7 +807,7 @@ $("btnSaveSettings").onclick = async () => {
       $("sDeadline").value < $("sClose").value
     )
   ) {
-    toast("시작 < 마감 < 종료 순서인지 확인해 주세요");
+    toast("등교 접수 시작 < 정상 등교 기준 < 등교 접수 종료 순서인지 확인해 주세요");
     return;
   }
   const { error } = await sb
@@ -803,6 +816,7 @@ $("btnSaveSettings").onclick = async () => {
       open_time: $("sOpen").value,
       deadline: $("sDeadline").value,
       close_time: $("sClose").value,
+      departure_time: $("sDeparture").value || null,
       school_name: $("sSchool").value.trim(),
       allow_self_signup: $("sSelf").checked,
       signup_code: signupCode || null,
@@ -813,7 +827,7 @@ $("btnSaveSettings").onclick = async () => {
       updated_at: new Date().toISOString(),
     })
     .eq("id", 1);
-  if (!error) schoolName = $("sSchool").value.trim();
+  if (!error) {schoolName = $("sSchool").value.trim();await loadDashboardTiming();}
   toast(error ? "저장 실패: " + error.message : "설정을 저장했어요");
 };
 $("btnGenSignup").onclick = () => {
