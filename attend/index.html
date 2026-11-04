@@ -234,19 +234,19 @@
         </header>
         <p id="registrationDone" class="hint hidden" role="status">기기 등록을 마쳤어요. 아래에서 출결을 기록해 주세요. 다음에도 같은 기기·브라우저를 사용해 주세요.</p>
         <nav class="choice-tabs" role="tablist" aria-label="출결 종류">
-          <button type="button" id="choice-tab-classes" role="tab" data-choice-tab="classes" aria-controls="panel-classes" aria-selected="true">수업 출석</button>
-          <button type="button" id="choice-tab-school" role="tab" data-choice-tab="school" aria-controls="panel-school" aria-selected="false" tabindex="-1">등하교</button>
+          <button type="button" id="choice-tab-school" role="tab" data-choice-tab="school" aria-controls="panel-school" aria-selected="true">등하교</button>
+          <button type="button" id="choice-tab-classes" role="tab" data-choice-tab="classes" aria-controls="panel-classes" aria-selected="false" tabindex="-1">수업 출석</button>
           <button type="button" id="choice-tab-movement" role="tab" data-choice-tab="movement" aria-controls="panel-movement" aria-selected="false" tabindex="-1">외출·조퇴</button>
         </nav>
-        <section id="panel-classes" class="choice-panel" role="tabpanel" aria-labelledby="choice-tab-classes">
-          <h2>수업 출석</h2><p class="hint">해당 수업의 출석하기를 눌러 주세요. 등교 기록과 따로 저장돼요.</p>
-          <div id="classChoices"></div>
-        </section>
-        <section id="panel-school" class="choice-panel hidden" role="tabpanel" aria-labelledby="choice-tab-school">
+        <section id="panel-school" class="choice-panel" role="tabpanel" aria-labelledby="choice-tab-school">
           <h2>등하교 기록</h2><p class="hint">학교에 도착했을 때 등교, 수업을 마치고 나갈 때 하교를 기록해요.</p>
           <p id="schoolTiming" class="timing"></p>
           <div class="record-card"><h3>오늘 등교</h3><p id="arrivalStatus" class="record-state"></p><button id="btnArrival" type="button">등교 기록하기</button></div>
           <div class="record-card"><h3>오늘 하교</h3><p id="departureStatus" class="record-state"></p><button id="btnDeparture" type="button">하교 기록하기</button><p class="hint">하교 기준시간 전에는 선생님 허가 후 ‘외출·조퇴’에서 기록해 주세요.</p></div>
+        </section>
+        <section id="panel-classes" class="choice-panel hidden" role="tabpanel" aria-labelledby="choice-tab-classes">
+          <h2>수업 출석</h2><p class="hint">해당 수업의 출석하기를 눌러 주세요. 등교 기록과 따로 저장돼요.</p>
+          <div id="classChoices"></div>
         </section>
         <section id="panel-movement" class="choice-panel hidden" role="tabpanel" aria-labelledby="choice-tab-movement">
           <h2>외출·복귀·조퇴</h2><p class="hint">외출·조퇴는 선생님 허가를 받은 뒤 기록해 주세요. 이 기록이 허가를 대신하지는 않아요.</p>
@@ -553,7 +553,7 @@
         result("bad", m[0], m[1], who, "", m[2], true);
       }
 
-      let currentChoices = null, choicePanel = "classes", moveDraft = null;
+      let currentChoices = null, choicePanel = "school", moveDraft = null;
       let attendanceBusy = false, choicesBusy = false, choiceSequence = 0, autoRefreshUntil = 0;
       const studentStatus = value => ({present:"출석",late:"지각",excused:"인정",absent:"결석 확정",unconfirmed:"미확인"}[value] || "미확인");
       const studentTime = iso => iso ? new Intl.DateTimeFormat("ko-KR", {timeZone:"Asia/Seoul",hour:"2-digit",minute:"2-digit",hour12:false}).format(new Date(iso)) : "";

@@ -12,7 +12,12 @@ const publicSettings={open_time:'06:00',deadline:'08:20',close_time:'18:00',depa
 w.supabase={createClient:()=>({rpc:async(name,args)=>{calls.push({name,args});if(name==="nfc_student_move"&&failureMode==="network")throw Error("offline");if(name==="nfc_student_move"&&failureMode==="invalid")return{data:{ok:false,error:"expected_return_required"}};return{data:name==='get_public_settings'?{...publicSettings}:name==='nfc_attendance_options'?options:{ok:true,kind:args.p_kind,time:'16:31:00',name:'가학생',student_id:'30101'},error:null};}})};
 w.eval([...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].at(-1)[1]);await new Promise(r=>setTimeout(r,0));
 assert.equal(d.querySelectorAll('[data-choice-tab]').length,3,'class, school and movement must be separate');
-d.querySelector('[data-choice-tab=school]').click();assert(!d.getElementById('panel-school').classList.contains('hidden'));assert(d.getElementById('panel-classes').classList.contains('hidden'));
+assert.deepEqual([...d.querySelectorAll('[data-choice-tab]')].map(b=>b.dataset.choiceTab),['school','classes','movement']);
+assert.equal(d.querySelector('[aria-selected=true]').dataset.choiceTab,'school','arrival/departure opens first');
+assert(!d.getElementById('panel-school').classList.contains('hidden'));assert(d.getElementById('panel-classes').classList.contains('hidden'));
+assert(!calls.some(c=>['check_in','nfc_session_check_in','nfc_student_move'].includes(c.name)),'opening a category cannot record attendance');
+d.querySelector('[data-choice-tab=classes]').click();await w.start(true);assert(!d.getElementById('panel-classes').classList.contains('hidden'),'refresh preserves selected class tab');
+d.querySelector('[data-choice-tab=classes]').dispatchEvent(new w.KeyboardEvent('keydown',{key:'Home'}));assert.equal(d.activeElement.dataset.choiceTab,'school','Home key follows the new tab order');
 assert.match(d.getElementById('schoolTiming').textContent,/16:30/);assert.match(d.getElementById('arrivalStatus').textContent,/08:00/);
 publicSettings.departure_time=null;await w.start();assert(d.getElementById('btnDeparture').disabled,'refresh observes cleared departure setting');
 publicSettings.departure_time='16:30';await w.start();assert(!d.getElementById('btnDeparture').disabled,'new departure setting becomes usable without reopening browser');
@@ -29,3 +34,4 @@ failureMode='network';await d.getElementById('moveForm').onsubmit({preventDefaul
 const retryId=calls.at(-1).args.p_request;
 failureMode='invalid';await d.getElementById('moveForm').onsubmit({preventDefault(){}});assert.equal(calls.at(-1).args.p_request,retryId,'uncertain save retries use same request');assert(!d.getElementById('moveExpected').disabled,'business rejection must let student correct expected return');assert.equal(d.getElementById('moveSave').textContent,'기록하기');
 dom.window.close();console.log('PASS student categories, accessible tabs, timing, explicit movement confirmation, expected return and state controls');
+
