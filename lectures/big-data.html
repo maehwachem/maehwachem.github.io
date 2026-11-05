@@ -1,0 +1,1593 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta name="content-version" content="2026-11-05-big-data-review"><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#000000"><title>강의 · 빅데이터와 과학기술사회 · KJE</title><style>
+/* ═══════════════════════════════════════════════════════════════
+   core.css — 소비 전력 강의 덱 공통 (Apple DESIGN.md 언어)
+   무대 1920×1080 · 면 색이 구획 · 액션 블루 하나 · UI 그림자 없음
+   ═══════════════════════════════════════════════════════════════ */
+:root{
+  /* 면 */
+  --c-white:#ffffff; --c-parchment:#f5f5f7; --c-black:#000000; --c-dark:#1d1d1f; --c-graphite:#272729;
+  /* 글자 */
+  --ink:#1d1d1f; --ink-2:#6e6e73; --ink-3:#86868b; --on-dark:#f5f5f7; --on-dark-2:#a1a1a6; --on-dark-3:#6e6e73;
+  --hair:#e0e0e0; --hair-dark:#3a3a3c;
+  /* 행동 */
+  --action:#0066cc; --action-dark:#2997ff;
+  /* 에너지 — 어두운 면 기본값(밝은 면에서 아래 .slide[data-tile] 규칙이 덮어씀) */
+  --elec:#64D2FF; --light:#FFD60A; --heat:#FF6A3D; --sound:#BF5AF2; --kin:#30D158;
+  /* 에너지 — 면과 무관하게 고정된 두 벌(그림 속에서 직접 고를 때) */
+  --elec-hi:#64D2FF; --light-hi:#FFD60A; --heat-hi:#FF6A3D; --sound-hi:#BF5AF2; --kin-hi:#30D158;
+  --elec-lo:#0077B6; --light-lo:#9A7400; --heat-lo:#C4391B; --sound-lo:#8A3FC0; --kin-lo:#1E8B3E;
+  /* 글꼴 */
+  --font:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"SF Pro Display","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+  /* 움직임 */
+  --ease-out:cubic-bezier(.2,.8,.2,1); --ease-inout:cubic-bezier(.65,0,.35,1); --ease-spring:cubic-bezier(.34,1.56,.64,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:#000}
+body{font-family:var(--font);color:var(--ink);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  word-break:keep-all;overflow-wrap:break-word;-webkit-user-select:none;user-select:none;font-feature-settings:"ss03"}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+
+/* ── 무대 ── */
+#viewport{position:fixed;inset:0;overflow:hidden;background:#000}
+#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden;background:#000;contain:layout paint}
+.slide{position:absolute;inset:0;display:none;overflow:hidden;isolation:isolate}
+.slide.is-on{display:block}
+.slide.is-out{display:block;z-index:1}
+.slide.is-on{z-index:2}
+
+/* ── 면(타일) ── 다크: 에너지가 빛나는 무대 / 라이트: 정의와 타이포 */
+.slide[data-tile="black"]{background:var(--c-black);color:var(--on-dark)}
+.slide[data-tile="dark"]{background:var(--c-dark);color:var(--on-dark)}
+.slide[data-tile="graphite"]{background:var(--c-graphite);color:var(--on-dark)}
+.slide[data-tile="light"]{background:var(--c-white);color:var(--ink)}
+.slide[data-tile="parchment"]{background:var(--c-parchment);color:var(--ink)}
+.slide[data-tile="light"],.slide[data-tile="parchment"]{
+  --elec:var(--elec-lo); --light:var(--light-lo); --heat:var(--heat-lo); --sound:var(--sound-lo); --kin:var(--kin-lo);
+  --t2:var(--ink-2); --t3:var(--ink-3); --hl:var(--hair); --act:var(--action);
+}
+.slide[data-tile="black"],.slide[data-tile="dark"],.slide[data-tile="graphite"]{
+  --t2:var(--on-dark-2); --t3:var(--on-dark-3); --hl:var(--hair-dark); --act:var(--action-dark);
+}
+
+/* ── 글자 체계 (무대 px) — 최소 24px ── */
+.t-hero{font-size:168px;font-weight:600;line-height:1.02;letter-spacing:-.035em}
+.t-display{font-size:120px;font-weight:600;line-height:1.05;letter-spacing:-.03em}
+.t-title{font-size:84px;font-weight:600;line-height:1.1;letter-spacing:-.025em}
+.t-head{font-size:60px;font-weight:600;line-height:1.14;letter-spacing:-.022em}
+.t-lead{font-size:44px;font-weight:400;line-height:1.3;letter-spacing:-.012em}
+.t-airy{font-size:40px;font-weight:300;line-height:1.4;letter-spacing:-.005em}
+.t-label{font-size:34px;font-weight:600;line-height:1.2;letter-spacing:-.01em}
+.t-body{font-size:32px;font-weight:400;line-height:1.47;letter-spacing:-.01em}
+.t-cap{font-size:26px;font-weight:400;line-height:1.35;letter-spacing:-.005em}
+.t-eyebrow{font-size:30px;font-weight:600;line-height:1.2;letter-spacing:.01em;color:var(--t2)}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum","ss03";letter-spacing:-.02em}
+.mute{color:var(--t2)} .mute2{color:var(--t3)}
+.c-elec{color:var(--elec)} .c-light{color:var(--light)} .c-heat{color:var(--heat)} .c-sound{color:var(--sound)} .c-kin{color:var(--kin)}
+.unit{font-weight:400;letter-spacing:0;margin-left:.12em}
+.center{text-align:center}
+
+/* 배치 도우미 — 슬라이드 조각이 자유롭게 쓴다 */
+.abs{position:absolute}
+.fill{position:absolute;inset:0}
+.full-svg{position:absolute;inset:0;width:1920px;height:1080px;overflow:visible}
+.row{display:flex;align-items:center}
+.col{display:flex;flex-direction:column}
+.pill{display:inline-flex;align-items:center;gap:12px;border-radius:9999px;padding:12px 26px;font-size:28px;font-weight:600}
+.pill.ghost{border:2px solid currentColor}
+.chip-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;border-radius:9999px;padding:16px 34px;font-size:30px;font-weight:600;
+  background:var(--act);color:#fff;transition:transform .15s var(--ease-out)}
+.chip-btn:active{transform:scale(.95)}
+.card{border-radius:18px;border:1px solid var(--hl);padding:32px}
+svg text{font-family:var(--font)}
+
+/* ── 선언형 등장: data-in(들어올 때) / data-step="k"(k번째 클릭) / data-out="k" ── */
+[data-in],[data-step]{opacity:0}
+[data-fx="draw"],[data-fx="draw"] :is(path,line,polyline,polygon,circle,ellipse,rect){stroke-dasharray:1 1;stroke-dashoffset:1}
+[data-fx="draw"]{opacity:1}
+svg [data-in],svg [data-step],svg .tb{transform-box:fill-box;transform-origin:center}
+.tb{transform-box:fill-box;transform-origin:center}
+.tb-bl{transform-box:fill-box;transform-origin:left bottom}
+.tb-b{transform-box:fill-box;transform-origin:center bottom}
+
+/* ── HUD (Apple 원형 칩) ── */
+#hud{position:fixed;right:22px;bottom:18px;display:flex;align-items:center;gap:8px;z-index:50;opacity:0;transform:translateY(8px);
+  transition:opacity .35s var(--ease-out),transform .35s var(--ease-out);pointer-events:none}
+#hud.show{opacity:1;transform:none;pointer-events:auto}
+#hud button{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:rgba(210,210,215,.64);color:#1d1d1f;
+  -webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);transition:transform .15s var(--ease-out)}
+#hud button:active{transform:scale(.92)}
+#hud button svg{width:20px;height:20px}
+#hud .count{min-width:84px;height:44px;border-radius:9999px;display:grid;place-items:center;padding:0 16px;background:rgba(210,210,215,.64);color:#1d1d1f;
+  font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px)}
+#progress{position:fixed;left:0;right:0;bottom:0;height:3px;z-index:40;background:transparent}
+#progress i{display:block;height:100%;width:0;background:rgba(255,255,255,.38);transition:width .5s var(--ease-out),background .4s}
+body.on-light #progress i{background:rgba(0,0,0,.22)}
+#stepdots{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:9px;z-index:40;opacity:0;transition:opacity .35s}
+#stepdots.show{opacity:1}
+#stepdots i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.28);transition:background .3s,transform .3s}
+#stepdots i.on{background:rgba(255,255,255,.9);transform:scale(1.15)}
+body.on-light #stepdots i{background:rgba(0,0,0,.16)} body.on-light #stepdots i.on{background:rgba(0,0,0,.62)}
+
+/* ── 덮개(노트·전체보기·도움말) ── */
+.overlay{position:fixed;inset:0;z-index:60;display:none}
+.overlay.show{display:block}
+#notes{position:fixed;left:0;right:0;bottom:0;height:36vh;z-index:55;transform:translateY(102%);transition:transform .45s var(--ease-out);
+  background:rgba(22,22,23,.86);color:#f5f5f7;-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);
+  padding:22px 40px 26px;overflow:auto;border-top:1px solid rgba(255,255,255,.08)}
+#notes.show{transform:none}
+#notes .nh{display:flex;align-items:baseline;gap:14px;margin-bottom:10px;font-size:15px;color:#a1a1a6;font-weight:600;letter-spacing:.01em}
+#notes .nh b{color:#f5f5f7;font-size:18px}
+#notes .nh .nx{margin-left:auto;font-weight:400}
+#notes p{font-size:clamp(17px,1.55vw,24px);line-height:1.6;margin:0 0 .7em;color:#e8e8ed;max-width:1500px}
+#notes p .pn{display:inline-block;font-size:.66em;font-weight:700;color:#2997ff;margin-right:.6em;vertical-align:.12em}
+#notes p b{color:#fff;font-weight:700}
+#notes p .cue{display:inline-block;margin-top:.3em;padding:2px 12px;border-radius:9999px;background:rgba(41,151,255,.18);color:#8cc8ff;font-size:.85em}
+
+#overview{background:rgba(0,0,0,.72);-webkit-backdrop-filter:saturate(180%) blur(24px);backdrop-filter:saturate(180%) blur(24px);overflow:auto;padding:56px 5vw}
+#overview h2{color:#f5f5f7;font-size:28px;font-weight:600;letter-spacing:-.01em;margin-bottom:22px}
+#overview .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+#overview .ov{position:relative;aspect-ratio:16/9;border-radius:11px;padding:14px 16px;display:flex;flex-direction:column;justify-content:space-between;text-align:left;
+  border:1px solid rgba(255,255,255,.1);transition:transform .2s var(--ease-out)}
+#overview .ov:active{transform:scale(.97)}
+#overview .ov.cur{outline:3px solid #2997ff;outline-offset:3px}
+#overview .ov .n{font-size:14px;font-weight:700;opacity:.6;font-variant-numeric:tabular-nums}
+#overview .ov .tt{font-size:19px;font-weight:600;line-height:1.25;letter-spacing:-.01em}
+#overview .ov[data-tile="black"],#overview .ov[data-tile="dark"],#overview .ov[data-tile="graphite"]{background:#1d1d1f;color:#f5f5f7}
+#overview .ov[data-tile="light"]{background:#fff;color:#1d1d1f}
+#overview .ov[data-tile="parchment"]{background:#f5f5f7;color:#1d1d1f}
+
+#help{background:rgba(0,0,0,.6);display:none;place-items:center}
+#help.show{display:grid}
+#help .box{background:#fff;color:#1d1d1f;border-radius:18px;padding:34px 40px;min-width:520px}
+#help h3{font-size:24px;font-weight:600;margin-bottom:16px;letter-spacing:-.01em}
+#help table{border-collapse:collapse;font-size:17px}
+#help td{padding:7px 18px 7px 0;border-bottom:1px solid #f0f0f0}
+#help kbd{display:inline-block;min-width:30px;padding:3px 9px;border-radius:8px;background:#f5f5f7;border:1px solid #e0e0e0;font:600 15px var(--font);text-align:center}
+#blank{position:fixed;inset:0;z-index:70;display:none}
+#blank.black{display:block;background:#000} #blank.white{display:block;background:#fff}
+
+/* 정지 화면(검증 스크린샷) — 크롬 UI 숨김 */
+html.still #hud,html.still #progress,html.still #stepdots{display:none!important}
+html.still *{cursor:none!important}
+/* 격자 보기(?grid=1) */
+#gridov{position:absolute;inset:0;z-index:30;pointer-events:none;display:none;
+  background-image:linear-gradient(rgba(255,0,80,.25) 1px,transparent 1px),linear-gradient(90deg,rgba(255,0,80,.25) 1px,transparent 1px);
+  background-size:120px 120px}
+html.grid #gridov{display:block}
+html.grid #gridov::after{content:"";position:absolute;inset:80px 120px;border:2px dashed rgba(255,0,80,.6)}
+
+@media (prefers-reduced-motion: reduce){ .slide *{scroll-behavior:auto} }
+
+/* ── 소리 단추·알림 ── */
+#hud button.off{opacity:.55}
+#sfxToast{position:fixed;left:50%;bottom:78px;transform:translate(-50%,8px);z-index:80;padding:10px 22px;border-radius:9999px;background:rgba(29,29,31,.86);color:#f5f5f7;
+  font-size:16px;font-weight:600;letter-spacing:-.01em;opacity:0;pointer-events:none;transition:opacity .25s var(--ease-out),transform .25s var(--ease-out);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px)}
+#sfxToast.show{opacity:1;transform:translate(-50%,0)}
+html.still #sfxToast{display:none}
+
+/* ── 학생 모드(?s=1): 대본 숨김 ── */
+html.student #notes{display:none!important}
+
+/* ── 장면 머리(제목) ── */
+.hd{position:absolute;left:120px;top:78px;right:120px;z-index:3}
+.hd .eb{font-size:28px;font-weight:600;letter-spacing:.01em;color:var(--t2);margin-bottom:10px}
+.hd .eb b{color:var(--act);font-weight:700;margin-right:.35em}
+.hd h2{font-size:66px;font-weight:600;line-height:1.1;letter-spacing:-.028em}
+.hd h2 .soft{color:var(--t2);font-weight:400}
+
+/* ── 개념정리 학습지 카드 · 빈칸(번호 = 학습지 빈칸 번호 ①~㉖) ── */
+.ws-card{position:absolute;border-radius:18px;padding:30px 44px 26px;background:#f5f5f7;z-index:3}
+.slide[data-tile="parchment"] .ws-card{background:#fff}
+.slide[data-tile="black"] .ws-card,.slide[data-tile="dark"] .ws-card,.slide[data-tile="graphite"] .ws-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
+.ws-card .ws-h{display:flex;align-items:baseline;gap:18px;margin-bottom:6px}
+.ws-card .ws-h b{font-size:40px;font-weight:700;letter-spacing:-.02em}
+.ws-card .ws-h span{font-size:28px;color:var(--t2)}
+.ws-row{display:grid;grid-template-columns:110px 1fr;gap:22px;align-items:baseline;font-size:38px;line-height:1.55;padding:12px 0;border-top:1px solid var(--hl)}
+.ws-row:first-of-type{border-top:0}
+.ws-row .tm{font-size:26px;font-weight:600;color:var(--t2);letter-spacing:.01em}
+.ws-line{font-size:38px;line-height:1.6}
+.bk{position:relative;display:inline-block;min-width:3.4em;margin:0 .2em;padding:0 .3em;text-align:center;line-height:1.3;white-space:nowrap;
+  border-bottom:4px solid #c7c7cc}
+.slide[data-tile="black"] .bk,.slide[data-tile="dark"] .bk,.slide[data-tile="graphite"] .bk{border-bottom-color:#48484a}
+.bk .a{display:inline-block;font-weight:700;color:var(--act)}
+.bk .n{position:absolute;left:-.62em;top:-.5em;min-width:1.25em;height:1.25em;padding:0 .2em;border-radius:9999px;background:var(--act);color:#fff;
+  font-size:.46em;font-weight:700;line-height:1.25em;text-align:center;font-variant-numeric:tabular-nums}
+.bk.wide{min-width:5.6em}
+.qbox{position:absolute;border-radius:18px;border:1px solid var(--hl);padding:26px 34px;font-size:32px;line-height:1.5}
+.qbox .qh{font-size:26px;font-weight:600;color:var(--t2);margin-bottom:6px}
+.say-line{position:absolute;left:120px;right:120px;text-align:center;font-size:44px;font-weight:600;letter-spacing:-.02em;z-index:3}
+.fine{position:absolute;left:120px;bottom:40px;font-size:24px;color:var(--t3);z-index:3}
+
+
+:root{--font:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",NanumGothic,sans-serif}
+.slide{--acid:#edaa55;--base:#67bdff;--na:#b9c1cf;--anion:#b9a5eb;--glass:rgba(220,235,255,.55);--liquid:rgba(186,212,242,.055)}
+.slide[data-tile="light"],.slide[data-tile="parchment"]{--acid:#a95708;--base:#0070b5;--na:#647184;--anion:#7955a8;--glass:rgba(50,72,94,.42);--liquid:rgba(93,139,175,.055)}
+.acid{color:var(--acid)}.base{color:var(--base)}.anion{color:var(--anion)}.neutral{color:var(--t2)}
+.hd{top:78px}.hd h2{font-size:68px;line-height:1.2}.hd .eb{font-size:28px;margin-bottom:18px}
+.fine{position:absolute;bottom:60px;left:120px;right:120px;font-size:25px;line-height:1.45;color:var(--t2)}
+.statement{font-size:62px;line-height:1.35;letter-spacing:-.035em;font-weight:600}
+.eq{font-size:76px;letter-spacing:-.02em;white-space:nowrap;line-height:1.4}
+.eq small{font-size:.42em;font-weight:400;color:var(--t2)}
+.abs.eq{position:absolute}
+sub,sup{font-size:.58em;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.22em}sup{top:-.5em}
+.big-number{font-size:150px;font-weight:600;letter-spacing:-.05em;line-height:1.2}
+.keyline{border-top:2px solid var(--hl);padding-top:26px}
+.body-copy{font-size:36px;line-height:1.6}.mini{font-size:28px;line-height:1.5;color:var(--t2)}
+.tagline{font-size:44px;line-height:1.5}.note-line{font-size:30px;line-height:1.5;color:var(--t2)}
+.value{font-variant-numeric:tabular-nums;white-space:nowrap}
+.callout{padding:28px 36px;border-radius:18px;background:rgba(127,127,127,.075);font-size:34px;line-height:1.5}
+.col-rule{position:absolute;top:310px;bottom:245px;border-left:2px solid var(--hl)}
+.legend{display:flex;gap:28px;align-items:center;font-size:27px;color:var(--t2)}.legend span{display:flex;align-items:center;gap:12px}.legend svg{width:52px;height:52px;overflow:visible}
+.lab-controls{position:absolute;left:1140px;top:295px;width:660px;font-size:32px}
+.lab-controls label{display:flex;align-items:baseline;justify-content:space-between;margin:30px 0 22px}.lab-controls output{font-size:58px;line-height:1;font-weight:600;font-variant-numeric:tabular-nums;color:var(--base)}
+input[type=range]{width:100%;height:42px;accent-color:var(--base);cursor:pointer;touch-action:pan-y}input[type=range]::-webkit-slider-thumb{width:32px;height:32px}
+.controls-row{display:flex;gap:16px;margin-top:22px}.smallbtn{border:1px solid var(--hl);border-radius:99px;padding:14px 24px;font-size:27px}.smallbtn:focus-visible,.chip-btn:focus-visible{outline:4px solid var(--act);outline-offset:4px}.smallbtn:hover{background:rgba(127,127,127,.1)}
+.live-table{margin-top:32px;border-top:2px solid var(--hl)}.live-row{display:flex;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--hl);font-size:31px}.live-row b{font-variant-numeric:tabular-nums}
+.status{font-size:65px;letter-spacing:-.04em;font-weight:600;margin-bottom:12px}.status-sub{font-size:30px;color:var(--t2);line-height:1.5;min-height:90px}
+.check-row{display:grid;grid-template-columns:64px 1fr 240px;align-items:center;gap:20px;font-size:37px;padding:30px 0;border-bottom:1px solid var(--hl)}.check-row b{font-size:48px}.check-row .answer{color:var(--act);font-size:36px}
+.source-copy{font-size:28px;color:var(--t2);line-height:1.7}
+.progress-hint{position:absolute;right:120px;bottom:60px;font-size:25px;color:var(--t2)}
+.slide svg{font-family:var(--font)}.beaker-outline{fill:none;stroke:var(--glass);stroke-width:4;stroke-linecap:round}.water-surface{stroke:var(--glass);stroke-width:2;opacity:.65}
+#hud{gap:7px}#hud .count{min-width:70px}#hud button{width:44px;height:44px}
+#alwaysNav{position:fixed;left:18px;bottom:18px;z-index:45;display:flex;gap:6px}#alwaysNav button{font-size:14px;padding:10px 14px;color:#ddd;background:rgba(45,45,49,.8);border-radius:99px;backdrop-filter:blur(12px)}
+html.still #alwaysNav{display:none}#stepdots{bottom:23px}
+@media(max-width:600px){#hud{right:10px;bottom:10px;gap:4px}#hud button{width:36px;height:36px}#hud .count{height:36px;font-size:13px;min-width:60px;padding:0 10px}#alwaysNav{left:10px;bottom:56px}#alwaysNav button{font-size:12px;padding:8px 12px}#help .box{min-width:0;width:92vw;padding:22px}#help td{font-size:14px;padding:5px}#notes{padding:18px;height:45vh}#notes .nx{display:none}#stepdots{bottom:17px;left:60px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ── 에너지 효율 덱 ── 에너지 색은 core.css 의 --elec --light --heat --sound --kin(면에 따라 저절로 바뀜) + 화학 --chem */
+.slide{--chem:#FF7AB6}
+.slide[data-tile="light"],.slide[data-tile="parchment"]{--chem:#B8306E}
+.c-chem{color:var(--chem)}
+.e-elec{--ec:var(--elec)} .e-light{--ec:var(--light)} .e-heat{--ec:var(--heat)} .e-sound{--ec:var(--sound)} .e-kin{--ec:var(--kin)} .e-chem{--ec:var(--chem)}
+.echip{display:inline-flex;align-items:center;gap:12px;padding:10px 22px;border-radius:9999px;font-size:30px;font-weight:600;color:var(--ec);
+  background:color-mix(in srgb,var(--ec) 14%,transparent);white-space:nowrap}
+.echip::before{content:"";width:14px;height:14px;border-radius:50%;background:var(--ec)}
+.dev-card{position:absolute;top:300px;width:520px;height:560px;border-radius:18px;padding:40px 40px 34px;background:rgba(127,127,127,.075);display:flex;flex-direction:column;gap:22px}
+.dev-card h3{font-size:50px;font-weight:600;letter-spacing:-.025em;line-height:1.15}
+.dev-card .flowcol{display:flex;flex-direction:column;align-items:flex-start;gap:16px}
+.dev-card .arrow{font-size:40px;color:var(--t2);line-height:1;padding-left:20px}
+.dev-card .outs{display:flex;flex-wrap:wrap;gap:12px}
+.dev-card p{font-size:30px;line-height:1.5;color:var(--t2);margin-top:auto}
+.dev-card .lead2{font-size:32px;line-height:1.5;color:inherit}
+.sk-lab{font-weight:600}
+.lab-controls .smallbtn.on{background:var(--act);color:#fff;border-color:transparent}
+.lab-controls output{color:var(--elec)}
+.lab-controls input[type=range]{accent-color:var(--act)}
+.devbtns{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
+.devbtns .smallbtn{padding:12px 20px;font-size:26px}
+.effbig{font-size:120px;font-weight:600;letter-spacing:-.05em;line-height:1.1;font-variant-numeric:tabular-nums}
+.grade-row{display:flex;align-items:center;gap:18px;height:62px}
+.grade-row b{width:44px;font-size:34px;text-align:center;font-variant-numeric:tabular-nums}
+.grade-row i{display:block;height:46px;border-radius:0 23px 23px 0}
+.tip-list{display:flex;flex-direction:column;gap:26px}
+.tip{display:grid;grid-template-columns:72px 1fr;gap:20px;align-items:baseline;font-size:36px;line-height:1.45}
+.tip .no{font-size:30px;font-weight:700;color:var(--act)}
+.tip small{display:block;font-size:28px;color:var(--t2);line-height:1.45;margin-top:4px}
+.ws-card .ws-line.big{font-size:46px;line-height:1.8}
+.sk-in{fill:#000}
+.slide[data-tile="light"] .sk-in,.slide[data-tile="parchment"] .sk-in{fill:#fff}
+/* ── 보강 ── */
+.dev-card>.echip,.dev-card>.chips{align-self:flex-start}
+.chips{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.chips .to,.chain-row .to{font-size:34px;color:var(--t2)}
+.stack{display:flex;flex-direction:column;align-items:flex-start;gap:18px}
+.colh{font-size:44px;font-weight:600;letter-spacing:-.02em;line-height:1.2;margin-bottom:6px}
+.colsub{font-size:28px;color:var(--t2);margin-bottom:28px}
+.colh+.tip-list{margin-top:22px}
+.chain-row{display:flex;align-items:center;gap:16px}
+.rowlab{width:120px;font-size:44px;font-weight:600;letter-spacing:-.02em}
+.tip .no{white-space:nowrap}
+.tip{grid-template-columns:96px 1fr}
+.elabel{position:absolute;width:360px;border-radius:14px;background:#fff;color:#1d1d1f;border:3px solid #1d1d1f;padding-bottom:18px}
+.elabel .eh{background:#1d1d1f;color:#fff;font-size:24px;font-weight:600;padding:10px 18px;border-radius:10px 10px 0 0}
+.elabel .eg{display:flex;align-items:baseline;gap:10px;padding:14px 18px 6px}
+.elabel .eg b{font-size:96px;line-height:1;font-weight:700}
+.elabel .eg span{font-size:32px;font-weight:600}
+.elabel .ebars{padding:6px 18px 4px;display:flex;flex-direction:column;gap:6px}
+.elabel .ebars i{display:block;height:20px;border-radius:0 10px 10px 0;position:relative;opacity:.45}
+.elabel .ebars i.on{opacity:1}
+.elabel .ebars i.on::after{content:"◀";position:absolute;left:calc(100% + 8px);top:-5px;font-size:22px;font-style:normal;color:#1d1d1f}
+.elabel .em{padding:12px 18px 0;font-size:24px;color:#555}
+.elabel .em b{display:block;font-size:46px;color:#1d1d1f;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+/* 분수 */
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 .15em;line-height:1.25}
+.frac>span{display:block;padding:.06em .3em;text-align:center;white-space:nowrap}
+.frac>span:first-child{border-bottom:.07em solid currentColor;padding-bottom:.14em}
+.frac>span:last-child{padding-top:.18em}
+.frac .bk{margin:0}
+.ws-line.big .frac{font-size:1em}
+/* 쪽 바로 가기 */
+#alwaysNav #navPage{font-variant-numeric:tabular-nums;min-width:74px}
+#count{cursor:pointer}
+#overview .ovhead{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px;margin-bottom:22px}
+#overview .ovhead h2{margin:0}
+.ovjump{display:flex;align-items:center;gap:8px}
+.ovjump label{color:#a1a1a6;font-size:15px;font-weight:600}
+.ovjump input{width:84px;height:40px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#f5f5f7;font:600 18px var(--font);text-align:center;font-variant-numeric:tabular-nums}
+.ovjump input:focus{outline:2px solid #2997ff;outline-offset:2px}
+.ovjump button{height:40px;padding:0 16px;border-radius:9999px;background:#2997ff;color:#fff;font-size:15px;font-weight:600}
+.ovjump .ovclose{background:rgba(255,255,255,.12)}
+@media(max-width:600px){#overview{padding:24px 14px}#overview .grid{grid-template-columns:repeat(2,1fr);gap:10px}#overview .ov .tt{font-size:15px}#alwaysNav #navPage{min-width:60px}}
+/* Keep controls outside the scaled slide, including its bottom captions. */
+:root{--controls-height:calc(80px + env(safe-area-inset-bottom,0px))}
+#viewport{bottom:var(--controls-height)}
+body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:var(--controls-height);background:#101012;border-top:1px solid #303034;z-index:39;pointer-events:none}
+#hud{bottom:calc(12px + env(safe-area-inset-bottom,0px))}
+#alwaysNav{bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+#stepdots{bottom:calc(64px + env(safe-area-inset-bottom,0px));left:50%}
+body.on-light #stepdots i{background:rgba(255,255,255,.28)}
+body.on-light #stepdots i.on{background:rgba(255,255,255,.9)}
+body.on-light #progress i{background:rgba(255,255,255,.38)}
+@media(max-width:900px){
+  :root{--controls-height:calc(124px + env(safe-area-inset-bottom,0px))}
+  #alwaysNav{left:12px;bottom:calc(64px + env(safe-area-inset-bottom,0px))}
+  #stepdots{bottom:calc(112px + env(safe-area-inset-bottom,0px));left:50%}
+}
+@media(max-width:380px){
+  #hud button{width:32px;height:36px}
+  #hud .count{min-width:40px;padding:0 6px;font-size:12px}
+}
+html.still{--controls-height:0px}
+html.still body::after{display:none}
+/* ── 빅데이터 덱 ── */
+.slide{--chem:#FF7AB6}
+.slide[data-tile="light"],.slide[data-tile="parchment"]{--chem:#B8306E}
+.c-chem{color:var(--chem)} .c-act{color:var(--act)}
+.use-card{border-radius:18px;background:#fff;padding:20px 26px;display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+.use-card p{font-size:30px;line-height:1.42}
+.ds-card{font:inherit;color:inherit;text-align:left;border-radius:18px;background:rgba(255,255,255,.06);border:3px solid rgba(255,255,255,.1);padding:26px 30px;height:250px;display:flex;flex-direction:column;align-items:flex-start;gap:14px;cursor:pointer;transition:border-color .4s}
+.ds-card:hover{background:rgba(255,255,255,.09)}
+.ds-card .ds-h{font-size:36px;font-weight:600;letter-spacing:-.02em;line-height:1.25}
+.ds-card .ds-i{font-size:29px;line-height:1.45;color:var(--t2)}
+.ds-card .ds-p{margin-top:auto;display:inline-flex;align-items:center;gap:10px;padding:8px 18px;border-radius:9999px;font-size:25px;font-weight:600;color:var(--sound);background:color-mix(in srgb,var(--sound) 16%,transparent)}
+.ds-card.pi{border-color:var(--sound)}
+.sum-row{display:flex;align-items:center;gap:30px;font-size:40px;line-height:1.4}
+.sum-row .echip{min-width:200px;justify-content:center;font-size:32px}
+.dtab{width:100%;border-collapse:collapse;font-size:31px}
+.dtab th{font-size:26px;font-weight:600;color:var(--t2);text-align:left;padding:10px 16px;border-bottom:2px solid var(--hl)}
+.dtab td{padding:12px 16px;border-bottom:1px solid var(--hl)}
+.qbox .qh{font-size:30px;color:inherit;margin-bottom:10px}
+.qbox>div:last-child{font-size:31px;line-height:1.5}
+.lab-controls .smallbtn.on{background:var(--act);color:#fff;border-color:transparent}
+.lab-controls output{color:var(--elec)}
+.lab-controls input[type=range]{accent-color:var(--act)}
+.devbtns{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
+.devbtns .smallbtn{padding:12px 22px;font-size:27px}
+.lab-controls label{margin:24px 0 16px}
+.live-row{font-size:29px;padding:13px 0}
+
+.card-art{width:100%;height:190px;display:block;margin:6px 0 0;overflow:visible}
+
+</style></head><body><div id="viewport"><main id="stage"><section class="slide" id="cover" data-title="빅데이터와 과학기술사회" data-tile="black"><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="hero-g"></g></svg><div class="abs t-eyebrow center" style="left:120px;top:684px;width:1680px;" data-in="200">통합과학2 · Ⅲ. 과학과 미래 사회 · 02</div><div class="abs t-display center" style="left:120px;top:746px;width:1680px;" data-in="450">빅데이터와 과학기술사회</div><div class="abs t-lead center mute" style="left:120px;top:899px;width:1680px;" data-in="800">흩어진 측정값을 모으면 무엇을 알 수 있을까?</div><div class="abs t-lead center mute" style="left:0;width:1920px;top:990px;font-size:30px;letter-spacing:.06em" data-in="1100">제작 · KJE</div><div class="progress-hint">클릭 또는 → 로 시작</div></section><section class="slide" id="goals" data-title="학습 목표와 수업 흐름" data-tile="parchment"><div class="hd" data-in><div class="eb"><b>01</b>학습 목표</div><h2>오늘은 데이터를 직접 모으고, 빅데이터의 쓰임을 따져 본다</h2></div><div class="ws-card" style="left:120px;top:330px;width:1680px" data-in="200"><div class="ws-row"><span class="tm">목표 1</span><span>실시간 생활 데이터를 측정하여 문제 해결 방안을 도출할 수 있다.</span></div><div class="ws-row"><span class="tm">목표 2</span><span>빅데이터를 사용하는 사례를 조사하고 빅데이터 활용의 장단점을 설명할 수 있다.</span></div></div><div class="abs" style="left:120px;top:690px;width:820px" data-step="1"><div class="colh"><span class="c-elec">1차시</span> 데이터 측정하기</div><div class="body-copy mute">데이터의 역할을 생각해 보고, 교실의 이산화 탄소 농도를 직접 측정한다.</div></div><div class="abs" style="left:980px;top:690px;width:820px" data-step="2"><div class="colh"><span class="c-kin">2차시</span> 빅데이터 활용하기</div><div class="body-copy mute">빅데이터가 쓰이는 곳을 알아보고, 활용의 유용성과 유의점을 확인한다.</div></div><div class="fine">교과서 138~143쪽 · 2차시 수업</div></section><section class="slide" id="whatdata" data-title="데이터란" data-tile="light"><div class="hd" data-in><div class="eb"><b>02</b>데이터로 무엇을 할 수 있을까?</div><h2>우리 주변의 숫자와 기록은 모두 데이터다</h2></div><div class="ws-card" style="left:120px;top:300px;width:1680px" data-in="200"><div class="ws-h"><b>데이터</b></div><div class="ws-line">정보를 가지고 있는 <span class="bk"><span class="a" data-step="1" data-fx="pop">값</span></span></div></div><div class="abs chips" style="left:120px;top:540px;width:1680px" data-step="2"><span class="echip e-heat">시간대별 기온</span><span class="echip e-sound">국가별 확진자 수</span><span class="echip e-kin">나의 하루 걸음 수</span><span class="echip e-elec">스마트폰 사용 시간</span></div><div class="abs" style="left:120px;top:690px;width:1680px;display:flex;align-items:center;gap:28px" data-step="3"><span class="pill" style="background:#f5f5f7;font-size:36px;padding:18px 34px">데이터<span class="mute" style="font-weight:400;font-size:28px">단순한 사실</span></span><span class="t-lead mute">→ 모으고 분석 →</span><span class="pill" style="background:var(--act);color:#fff;font-size:36px;padding:18px 34px">정보<span style="font-weight:400;font-size:28px;opacity:.8">많은 것을 알려 줌</span></span></div><div class="abs tagline" style="left:120px;top:850px;width:1680px" data-step="3" data-delay="300">필요한 데이터를 어떻게 모으고 분석하느냐에 따라 정보가 된다.</div><div class="fine">교과서 138쪽</div></section><section class="slide" id="datainfo" data-title="데이터에서 정보로" data-tile="dark"><div class="hd" data-in><div class="eb"><b>03</b>데이터 → 정보</div><h2>일주일 걸음 수에서 무엇을 알 수 있을까?</h2></div><div class="abs" style="left:120px;top:310px;width:520px" data-in="200"><div class="t-label mute" style="margin-bottom:18px">기록한 값(데이터)</div><div id="steps-list" class="num"></div></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="steps-g"></g></svg><div class="abs statement" style="left:760px;top:800px;width:1040px;font-size:48px" data-step="2">평일보다 주말에 훨씬 덜 걷는다.</div><div class="abs body-copy mute" style="left:760px;top:880px;width:1040px" data-step="3">→ "주말에 산책 시간을 정해 두자"는 결정으로 이어진다.</div><div class="fine">수치는 이해를 돕기 위한 예시 값이다.</div></section><section class="slide" id="sillok" data-title="조선왕조실록과 데이터" data-tile="parchment"><div class="hd" data-in><div class="eb"><b>04</b>기록의 힘</div><h2>수백 년 전의 기록이 오늘날 과학 연구에 쓰인다</h2></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="book-g"></g></svg><div class="abs" style="left:820px;top:320px;width:980px" data-in="300"><div class="colh">조선왕조실록</div><div class="body-copy">당시의 인물과 사건을 <b>날짜별</b>로 꾸준히 적어 두었다.</div></div><div class="abs" style="left:820px;top:520px;width:980px" data-step="1"><div class="chips"><span class="echip e-elec">역사 연구</span><span class="echip e-sound">천문학</span><span class="echip e-kin">지리학</span><span class="echip e-heat">기후 변화</span></div><div class="body-copy mute" style="margin-top:22px">역사뿐 아니라 과학적 분석에도 활용된다.</div></div><div class="abs callout" style="left:820px;top:760px;width:980px" data-step="2"><b>체계적으로 기록된 자료</b>는 분석을 거쳐 단순한 사실 이상의 정보를 준다.</div><div class="fine">교과서 138쪽 도입</div></section><section class="slide" id="inq-title" data-title="디지털 탐구 · 생활 데이터 측정" data-tile="black"><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="inq-hero"></g></svg><div class="abs t-eyebrow" style="left:120px;top:300px;width:1680px;" data-in="100"><span class="c-elec">ON 디지털 탐구</span> · 디지털 도구 활용 | 탐구 설계 | 협력적 소통</div><div class="abs t-title" style="left:120px;top:370px;width:1680px;" data-in="300">실시간 생활 데이터 측정하기</div><div class="abs t-lead" style="left:120px;top:560px;width:1080px;" data-in="600">사람이 내쉰 이산화 탄소가 쌓이면 환기가 부족하다는 신호일 수 있다. 졸림이나 집중 저하의 원인을 이산화 탄소 하나로 단정할 수는 없다.</div><div class="abs t-lead c-heat" style="left:120px;top:730px;width:1080px;" data-step="1">우리 교실의 이산화 탄소 농도는 얼마나 될까?<br>알아보려면 데이터를 어떻게 모아야 할까?</div><div class="fine">교과서 138~139쪽 · 목표: 교실의 이산화 탄소 농도를 측정하여 학교 환경을 평가하고, 개선할 방법을 찾는다.</div></section><section class="slide" id="ask" data-title="측정 전에 생각하기" data-tile="dark"><div class="hd" data-in><div class="eb"><b>05</b>생각해 보기</div><h2>측정하기 전에 정해야 할 것은?</h2></div><div class="dev-card" style="left:120px;width:390px;height:440px" data-step="1"><span class="echip e-elec">위치</span><h3 style="font-size:40px">교실 안에서도 위치에 따라 농도가 다를까?</h3></div><div class="dev-card" style="left:540px;width:390px;height:440px" data-step="2"><span class="echip e-kin">시간</span><h3 style="font-size:40px">시간에 따라 농도가 달라질까?</h3></div><div class="dev-card" style="left:960px;width:390px;height:440px" data-step="3"><span class="echip e-light">기간</span><h3 style="font-size:40px">하루 동안의 변화를 재려면 어떻게 할까?</h3></div><div class="dev-card" style="left:1380px;width:420px;height:440px" data-step="4"><span class="echip e-heat">정확도</span><h3 style="font-size:40px">농도를 정확하게 재려면 어떻게 할까?</h3></div><div class="abs tagline center" style="left:120px;top:820px;width:1680px" data-step="5">이 질문의 답이 곧 <b>측정 계획</b>이 된다.</div><div class="fine">준비물: 노트북, 마이크로컨트롤러, 브레드보드, 점퍼 케이블, 이산화 탄소 센서</div></section><section class="slide" id="plan" data-title="탐구 1 · 측정 계획" data-tile="light"><div class="hd" data-in><div class="eb"><b>06</b>탐구하기 1</div><h2>모둠별로 측정 위치·시간·주기를 정한다</h2></div><div class="ws-card" style="left:120px;top:300px;width:1040px" data-in="200"><div class="ws-h"><b>측정 계획표</b><span>예시</span></div><div class="ws-row"><span class="tm">위치</span><span><span class="a" data-step="1">교실 뒤쪽 사물함 위</span></span></div><div class="ws-row"><span class="tm">시간</span><span><span class="a" data-step="2">3교시 수업 시작 ~ 끝 (50분)</span></span></div><div class="ws-row"><span class="tm">주기</span><span><span class="a" data-step="3">1분마다 한 번</span></span></div></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="room-g"></g></svg><div class="abs callout" style="left:120px;top:760px;width:1040px;font-size:32px" data-step="4">모둠마다 <b>위치를 다르게</b> 정하고 같은 시간에 측정하면 교실 안의 위치별 차이를 비교할 수 있다.</div><div class="fine">교과서 139쪽 「탐구하기」 1 · 계획표의 값은 예시이다.</div><div class="abs mini" style="left:120px;top:880px;width:1680px;font-size:28px">센서는 호흡 높이 부근에 두고, 입김·문·창문의 직접 영향을 피한다. 재실 인원·환기 상태를 함께 기록하고 기기 시각을 맞춘다.</div></section><section class="slide" id="wiring" data-title="탐구 2 · 센서 연결" data-tile="parchment"><div class="hd" data-in><div class="eb"><b>07</b>탐구하기 2</div><h2>마이크로컨트롤러와 이산화 탄소 센서를 연결한다</h2></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="wire-g"></g></svg><div class="ws-card" style="left:1180px;top:300px;width:620px" data-in="200"><div class="ws-h"><b>개념 연결표</b><span>전압 호환 확인 후 연결</span></div><div class="ws-row" data-step="1"><span class="tm c-heat">5V</span><span>→ 5V <span class="mute" style="font-size:28px">전원</span></span></div><div class="ws-row" data-step="2"><span class="tm">GND</span><span>→ GND <span class="mute" style="font-size:28px">접지</span></span></div><div class="ws-row" data-step="3"><span class="tm c-light">D11</span><span>→ RX <span class="mute" style="font-size:28px">보드가 보냄</span></span></div><div class="ws-row" data-step="4"><span class="tm c-kin">D13</span><span>→ TX <span class="mute" style="font-size:28px">센서가 보냄</span></span></div></div><div class="abs mini" style="left:1180px;top:860px;width:620px" data-step="4" data-delay="400">TX → RX로 연결한다. 이 예의 SoftwareSerial 인자 순서는 (13, 11): 수신, 송신이다.</div><div class="fine">교과서 139쪽 「그림 설명」 · 아두이노·CM1106 계열의 개념 예시 · 제품별 설명서의 전압·핀 배치와 보드의 수신 가능 핀을 먼저 확인한다.</div><div class="abs mini" style="left:120px;top:875px;width:980px;font-size:27px;line-height:1.45"><b>전원을 끄고 배선한다.</b> 전원 전압과 UART 신호 전압을 각각 확인한다. 신호 전압이 다르면 레벨 변환이 필요하다. 이 그림은 부품의 실제 핀 배치도가 아니다.</div></section><section class="slide" id="coding" data-title="탐구 3 · 측정 코드" data-tile="black"><div class="hd" data-in><div class="eb"><b>08</b>탐구하기 3</div><h2>정한 주기마다 값을 읽어 노트북에 기록한다</h2></div><div class="abs chips" style="left:120px;top:300px;width:1680px" data-in="200"><span class="echip e-elec">① 농도 읽기</span><span class="to">→</span><span class="echip e-light">② 시각 붙이기</span><span class="to">→</span><span class="echip e-kin">③ 노트북에 저장</span><span class="to">→</span><span class="echip e-sound">④ 주기만큼 기다렸다 반복</span></div><div class="abs" style="left:120px;top:420px;width:900px;height:470px;border-radius:18px;background:#111113;border:1px solid #2c2c2e;padding:28px 36px;overflow:hidden" data-in="400"><div class="t-cap" style="color:#6e6e73;margin-bottom:12px">시리얼 모니터 (예시)</div><div id="log" class="num" style="font-family:ui-monospace,Menlo,Consolas,monospace;font-size:32px;line-height:1.5;color:#30D158"></div></div><div class="abs body-copy" style="left:1100px;top:440px;width:700px" data-step="1">코딩이 어렵다면 인터넷 검색이나 <b class="c-elec">생성형 인공지능</b>에서 코드를 얻어 볼 수 있다.</div><div class="abs body-copy mute" style="left:1100px;top:640px;width:700px" data-step="2">핀 번호·통신 속도·센서 명령·측정 주기를 확인한다. 통신 실패나 오류 응답은 0 ppm으로 저장하지 말고 결측으로 기록한다.</div><div class="fine">교과서 139쪽 「탐구하기」 3 · 화면의 값은 예시이다.</div></section><section class="slide" id="calib" data-title="탐구 4 · 측정기 확인" data-tile="light"><div class="hd" data-in><div class="eb"><b>09</b>탐구하기 4</div><h2>측정기가 제대로 작동하는지 어떻게 알 수 있을까?</h2></div><div class="dev-card" style="left:120px;width:780px;height:420px" data-step="1"><span class="echip e-kin">운동장처럼 열린 곳에서 측정</span><div class="big-number num c-kin" style="font-size:120px;line-height:1">약 440 <span class="unit" style="font-size:48px">ppm</span></div><p class="lead2">우리 측정기의 값 (예시)</p></div><div class="dev-card" style="left:1020px;width:780px;height:420px" data-step="2"><span class="echip e-elec">기상청 관측 자료와 비교</span><div class="big-number num c-elec" style="font-size:120px;line-height:1">432.7 <span class="unit" style="font-size:48px">ppm</span></div><p class="lead2">2025년 국내 3개 관측소 배경 농도의 연평균</p></div><div class="abs tagline center" style="left:120px;top:780px;width:1680px" data-step="3">비슷한 값은 대략적인 작동 점검일 뿐, 정확도 검증이나 교정은 아니다.</div><div class="fine"><a href="https://www.kma.go.kr/kma/news/press.jsp?bid=press&amp;mode=view&amp;num=1194641" target="_blank" rel="noopener">기상청·국립기상과학원(2026.4.27.)</a> · 안면도·제주고산·울릉도 평균 432.7 ppm · 학교 실외 값은 장소·시간·배출원에 따라 다르다.</div><div class="abs mini center" style="left:120px;top:870px;width:1680px;font-size:28px">제조사 안내대로 예열·안정화하고 입김·배기가스를 피한다. 정확도는 같은 조건의 기준기 비교와 제조사 교정 절차로 확인한다.</div></section><section class="slide" id="standard" data-title="교실 이산화 탄소 기준" data-tile="black"><div class="hd" data-in><div class="eb"><b>10</b>교실 공기 기준</div><h2>교실의 이산화 탄소 농도는 얼마 이하여야 할까?</h2></div><div class="abs" style="left:120px;top:330px;width:900px" data-step="1"><div class="t-label mute">유지 기준</div><div class="big-number num c-heat" style="font-size:220px;line-height:1.1">1000<span class="unit" style="font-size:70px"> ppm 이하</span></div></div><div class="abs" style="left:1100px;top:360px;width:700px" data-step="2"><div class="t-label mute">기계 환기 장치로 주로 환기하는 교실</div><div class="t-title num" style="margin-top:12px">1500 <span style="font-size:48px">ppm 이하</span></div></div><div class="abs body-copy" style="left:120px;top:700px;width:1680px" data-step="3"><b>ppm</b>은 100만분의 1을 뜻한다. 1000 ppm은 공기 분자 100만 개 중 이산화 탄소가 약 1000개인 상태이다.</div><div class="fine"><a href="https://www.easylaw.go.kr/CSP/CnpClsMainBtr.laf?ccfNo=4&amp;cciNo=3&amp;cnpClsNo=2&amp;csmSeq=1394" target="_blank" rel="noopener">학교보건법 시행규칙 [별표 4의2]</a> 공기 질 유지 기준 · 같은 규칙 [별표 2]는 1인당 환기량이 시간당 21.6 m³ 이상이 되도록 정한다. (교과서 139쪽)</div><div class="abs mini" style="left:120px;top:850px;width:1680px;font-size:30px">공기 질 유지·관리 기준이며, 독성이나 건강 영향이 시작되는 경계값을 뜻하지 않는다.</div></section><section class="slide" id="lab" data-title="직접 조작 · 교실 농도 모형" data-tile="black"><div class="hd" data-in><div class="eb"><b>11</b>직접 조작하기</div><h2>학생 수와 환기에 따라 농도는 어떻게 바뀔까?</h2></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="lab-g"></g></svg><div class="lab-controls" style="left:1180px;top:270px;width:620px" data-interactive><label for="nStu">학생 수 <output id="nOut">25명</output></label><input id="nStu" type="range" min="5" max="35" step="1" value="25" aria-label="학생 수"><div class="t-label" style="margin:30px 0 14px;font-size:30px">창문 상태</div><div class="devbtns"><button class="smallbtn" data-win="0">닫음</button><button class="smallbtn" data-win="1">조금 열기</button><button class="smallbtn" data-win="2">활짝 열기</button></div><label for="tOpen">창문 여는 시각 <output id="tOut">열지 않음</output></label><input id="tOpen" type="range" min="0" max="50" step="5" value="50" aria-label="창문 여는 시각"><div class="live-table"><div class="live-row"><span>수업 끝(50분) 농도</span><b id="endOut">-</b></div><div class="live-row"><span>1000 ppm 첫 초과 관측</span><b id="overOut">-</b></div><div class="live-row"><span>가장 높은 농도</span><b id="maxOut">-</b></div></div></div><div class="fine">가상 모형: 교실 180 m³ · 외기 440 ppm · 초기 500 ppm · 1인당 16 L/h · 완전 혼합 가정. 환기율(회/h): 닫음 0.4, 조금 2.5, 활짝 6. 첫 초과는 1분 간격 관측 기준이며 실측 예측값이 아니다.</div></section><section class="slide" id="collect" data-title="탐구 5·6 · 수집과 공유" data-tile="light"><div class="hd" data-in><div class="eb"><b>12</b>탐구하기 5 · 6</div><h2>데이터를 모으면서 교실에서 일어난 일도 함께 적는다</h2></div><div class="ws-card" style="left:120px;top:300px;width:1000px;padding:24px 34px" data-in="200"><div class="ws-h"><b>측정 기록</b><span>모둠 3 · 교실 뒤쪽 (예시)</span></div><div id="logtable"></div></div><div class="abs" style="left:1200px;top:310px;width:600px" data-step="1"><div class="colh">왜 메모가 필요할까?</div><div class="body-copy mute">농도가 갑자기 바뀐 이유를 나중에 설명할 수 있다.</div></div><div class="abs" style="left:1200px;top:600px;width:600px" data-step="2"><div class="colh">공유 플랫폼에 올리기</div><div class="body-copy mute">모둠별 기록을 한곳에 모으면 우리 반 전체의 데이터가 된다.</div></div><div class="fine">교과서 139쪽 「탐구하기」 5 · 6 · 기록 값은 예시이다.</div></section><section class="slide" id="evaluate" data-title="정리하기 1·2 · 우리 교실 평가" data-tile="dark"><div class="hd" data-in><div class="eb"><b>13</b>정리하기 1 · 2 · 예시 데이터</div><h2>수업 중 교탁 주변에서 측정한 이산화 탄소 농도</h2></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="ev-g"></g></svg><div class="abs" style="left:1250px;top:300px;width:560px" data-step="1"><div class="t-label c-heat">평가 ①</div><div class="body-copy" style="margin-top:8px;font-size:30px;line-height:1.5">측정을 시작하자 곧 기준을 넘었고, 환기 전까지 약 3500 ppm까지 계속 올라갔다.</div></div><div class="abs" style="left:1250px;top:520px;width:560px" data-step="2"><div class="t-label c-kin">평가 ②</div><div class="body-copy" style="margin-top:8px;font-size:30px;line-height:1.5">환기하자 몇 분 만에 기준 아래로 내려갔지만, 환기를 멈추자 다시 올라갔다.</div></div><div class="abs" style="left:1250px;top:740px;width:560px" data-step="3"><div class="t-label c-elec">낮추는 방법</div><div class="body-copy" style="margin-top:8px;font-size:30px;line-height:1.5">창문을 열어 충분히 환기한다.</div><div class="mini" style="margin-top:6px">외기가 드나드는 길을 만들고 선풍기·환풍기로 공기 교환을 돕는다. 실내 공기만 돌리면 CO₂는 제거되지 않는다. 열 손실은 외기온·환기 시간·유량에 따라 달라진다.</div></div><div class="fine">제공된 초지고 보충교재 예시 그래프의 경향을 다시 그린 개략도 · 시간 간격은 비례하지 않으며 변화율 계산에 사용할 수 없다.</div></section><section class="slide" id="more" data-title="정리하기 3 · 데이터의 양" data-tile="parchment"><div class="hd" data-in><div class="eb"><b>14</b>정리하기 3</div><h2>수집한 데이터의 <span class="bk"><span class="a" data-step="3" data-fx="pop">양</span></span>에 따라 얻을 수 있는 정보는?</h2></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="more-g"></g></svg><div class="abs t-label center" style="left:120px;top:600px;width:500px" data-in="200">우리 모둠<br><span class="mute num" style="font-weight:400">1곳 × 50분</span></div><div class="abs t-label center" style="left:710px;top:600px;width:500px" data-step="1">우리 반<br><span class="mute num" style="font-weight:400">4곳 × 50분</span></div><div class="abs t-label center" style="left:1300px;top:600px;width:500px" data-step="2">여러 반 · 여러 날<br><span class="mute num" style="font-weight:400">여러 상황</span></div><div class="abs tagline" style="left:120px;top:760px;width:1680px" data-step="3" data-delay="300">➤ 정확한 측정과 대표성을 갖추면 결론의 <b>신뢰성</b>이 높아질 수 있다.</div><div class="abs tagline" style="left:120px;top:840px;width:1680px" data-step="4">➤ 차이의 <b>원인 후보</b>를 탐색한다. 데이터의 양만으로 편향·오차가 사라지지는 않는다.</div><div class="fine">초지고 통합과학 보충교재 「정리하기」 · 교과서 139쪽 정리하기 3</div></section><section class="slide" id="reflect" data-title="평가하고 성찰하기" data-tile="light"><div class="hd" data-in><div class="eb"><b>15</b>평가하고 성찰하기</div><h2>1차시를 돌아보자</h2></div><div class="abs" style="left:120px;top:300px;width:1680px"><div class="check-row" data-step="1"><b class="c-elec">□</b><span>이산화 탄소 농도를 측정할 수 있는 디지털 탐구 도구를 제작하였는가?</span><span></span></div><div class="check-row" data-step="2"><b class="c-elec">□</b><span>측정 결과를 바탕으로 학교 환경을 평가하였는가?</span><span></span></div><div class="check-row" data-step="3"><b class="c-elec">□</b><span>주변 환경에 관심을 가지고, 탐구 결과를 근거로 학교 환경 개선 방안을 제시하였는가?</span><span></span></div></div><div class="abs callout" style="left:120px;top:760px;width:1680px" data-step="4"><b>다음 시간</b> · 우리 반의 데이터가 전국 모든 학교의 1년 치 데이터로 늘어난다면 무엇을 알 수 있을까?</div><div class="fine">교과서 139쪽 「평가하고 성찰하기」</div></section><section class="slide" id="part2" data-title="2차시 · 빅데이터" data-tile="black"><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="p2-g"></g></svg><div class="abs t-eyebrow center" style="left:120px;top:684px;width:1680px;" data-in="200">2차시</div><div class="abs t-display center" style="left:120px;top:746px;width:1680px;" data-in="450">빅데이터</div><div class="abs t-lead center mute" style="left:120px;top:899px;width:1680px;" data-in="800">우리 교실 하나가 전국의 모든 학교가 된다면?</div></section><section class="slide" id="define" data-title="빅데이터의 뜻" data-tile="dark"><div class="hd" data-in><div class="eb"><b>16</b>빅데이터</div><h2>교실 하나에서 전국으로, 하루에서 1년으로</h2></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="def-g"></g></svg><div class="abs num" style="left:120px;top:300px;width:900px" data-in="200"><span id="defCount" class="t-head c-elec">200</span><span class="t-lead mute"> 개의 측정값</span></div><div class="abs mini" style="left:120px;top:385px;width:900px" id="defCap" data-in="300">우리 반 · 4곳 × 50회</div><div class="ws-card" style="left:1100px;top:300px;width:700px" data-step="3"><div class="ws-h"><b>빅데이터</b></div><div class="ws-line" style="font-size:36px"><span class="bk wide"><span class="a" data-step="3" data-fx="pop" data-delay="300">방대하고 복잡한</span></span> 데이터의 집합</div></div><div class="abs chips" style="left:1100px;top:600px;width:700px" data-step="4"><span class="echip e-elec">수치</span><span class="echip e-light">글</span><span class="echip e-kin">영상</span><span class="echip e-sound">음성</span></div><div class="abs mini" style="left:1100px;top:690px;width:700px" data-step="4">형태도 다양하다. 개수만이 아니라 처리 속도와 복잡성도 함께 살핀다.</div><div class="fine">계산 예시: 교실당 4곳 · 1분마다 1회 · 교시당 50회(초기값 별도) · 하루 7교시 · 학교당 20교실 · 190일 · 가상 2만 개교. 실제 교육통계가 아니다.</div></section><section class="slide" id="threev" data-title="빅데이터의 특징 3V" data-tile="light"><div class="hd" data-in><div class="eb"><b>17</b>빅데이터의 특징</div><h2>양, 속도, 다양성 — 3V</h2></div><div class="dev-card" style="left:120px;height:470px" data-step="1"><span class="echip e-elec">Volume</span><h3>데이터의 양</h3><p class="lead2">기존 방식으로 효율적으로 처리하기 어려운 대규모 자료이다.</p><p>예: 전국 학교의 1년 치 측정값</p></div><div class="dev-card" style="left:700px;height:470px" data-step="2"><span class="echip e-kin">Velocity</span><h3>데이터의 속도</h3><p class="lead2">실시간으로 빠르게 만들어지고 쌓인다.</p><p>예: 많은 센서에서 끊임없이 들어오는 값</p></div><div class="dev-card" style="left:1280px;height:470px" data-step="3"><span class="echip e-sound">Variety</span><h3>데이터의 다양성</h3><p class="lead2">수치·글·사진·영상·음성 등 형태가 여러 가지이다.</p><p>예: 농도 값 + 관찰 메모 + 교실 사진</p></div><div class="abs body-copy" style="left:120px;top:810px;width:1680px" data-step="4">센서와 정보 통신 기술이 발달해 데이터를 실시간으로 모으고 디지털로 바꿀 수 있게 되면서 빅데이터가 등장했다. 지금은 데이터를 분석해 <b>가치 있는 정보를 뽑고 변화를 예측하는 기술</b>까지 뜻한다.</div><div class="fine" style="bottom:36px">교과서 140쪽 · 3V는 교과서 「수업 보충 자료」의 정리를 따랐다.</div></section><section class="slide" id="uses" data-title="생활 속 빅데이터" data-tile="parchment"><div class="hd" data-in><div class="eb"><b>18</b>생활 속 빅데이터</div><h2>빅데이터는 우리 생활 어디에 쓰이고 있을까?</h2></div><div class="abs" id="usegrid" style="left:120px;top:290px;width:1680px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px"><div class="use-card" data-step="1"><span class="echip e-kin">농업</span><p>환경 정보로 식물 성장에 알맞은 환경 제어</p></div><div class="use-card" data-step="1" data-delay="120"><span class="echip e-elec">교통</span><p>실시간 교통량 분석으로 교통 정보 제공</p></div><div class="use-card" data-step="1" data-delay="240"><span class="echip e-sound">기술</span><p>자동 번역 기술 향상</p></div><div class="use-card" data-step="2"><span class="echip e-heat">건강</span><p>검색량으로 독감 유행을 추정하고 진료·검사 자료와 함께 확인</p></div><div class="use-card" data-step="2" data-delay="120"><span class="echip e-light">교육</span><p>학습 분석으로 개별 맞춤 교육</p></div><div class="use-card" data-step="2" data-delay="240"><span class="echip e-chem">문화</span><p>개인별 맞춤 콘텐츠 제공</p></div><div class="use-card" data-step="3"><span class="echip e-elec">기업</span><p>소비자 행동 분석 후 관심 제품 추천</p></div><div class="use-card" data-step="3" data-delay="120"><span class="echip e-kin">여행</span><p>여행지 선호도로 새로운 노선 개발</p></div><div class="use-card" data-step="3" data-delay="240"><span class="echip e-sound">정부 기관</span><p>통화량·교통 카드 데이터로 심야 버스 노선 결정</p></div></div><div class="abs tagline center" style="left:120px;top:915px;width:1680px;font-size:38px" data-step="4">여러 변수가 얽힌 문제를 빠르게 분석해 합리적으로 결정하는 데 쓰인다.</div><div class="fine" style="bottom:28px">교과서 140쪽</div></section><section class="slide" id="nightbus" data-title="사례 · 심야 버스 노선" data-tile="dark"><div class="hd" data-in><div class="eb"><b>19</b>사례 살펴보기</div><h2>심야 버스는 어디로 다녀야 할까?</h2></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="bus-g"></g></svg><div class="abs" style="left:1240px;top:310px;width:560px" data-step="1"><span class="echip e-sound">① 밤 시간 통화량·발신 지역</span><div class="mini" style="margin-top:10px">밤에 사람들이 많이 머무는 곳</div></div><div class="abs" style="left:1240px;top:480px;width:560px" data-step="2"><span class="echip e-elec">② 교통 카드 데이터</span><div class="mini" style="margin-top:10px">사람들이 타고 내리는 곳</div></div><div class="abs" style="left:1240px;top:650px;width:560px" data-step="3"><span class="echip e-light">③ 두 데이터를 겹쳐 분석</span><div class="mini" style="margin-top:10px">심야 유동 인구가 많은 곳을 잇는 노선</div></div><div class="fine">교과서 140쪽 「정부 기관」 사례 · 지도는 원리를 보여 주는 모형이다.</div></section><section class="slide" id="science" data-title="과학 분야의 빅데이터" data-tile="light"><div class="hd" data-in><div class="eb"><b>20</b>과학 속 빅데이터</div><h2>새로운 장비가 엄청난 양의 관측·실험 데이터를 만든다</h2></div><div class="dev-card" style="left:120px;width:390px;height:590px" data-step="1"><span class="echip e-elec">과학 실험</span><h3 style="font-size:42px">입자 충돌 실험</h3><svg class="card-art" viewBox="0 0 320 190" role="img" aria-label="두 입자가 고리 모양 가속기 안에서 충돌해 여러 방향으로 흩어짐"><circle cx="160" cy="95" r="78" fill="none" stroke="var(--hl)" stroke-width="10"/><circle cx="160" cy="95" r="78" fill="none" stroke="var(--elec)" stroke-width="3" stroke-dasharray="6 10"/><circle cx="112" cy="95" r="10" fill="var(--elec)"/><circle cx="208" cy="95" r="10" fill="var(--heat)"/><path d="M124 95H146M196 95H174" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><g stroke="var(--light)" stroke-width="3" stroke-linecap="round"><path d="M160 95L138 58M160 95L190 60M160 95L132 128M160 95L186 132M160 95L160 48M160 95L160 142"/></g><circle cx="160" cy="95" r="9" fill="var(--light)"/></svg><p class="lead2" style="font-size:29px">방대한 실험 자료를 분석해 이론 모형과 비교하고 새 지식을 쌓는다.</p></div><div class="dev-card" style="left:540px;width:390px;height:590px" data-step="2"><span class="echip e-chem">신약 개발</span><h3 style="font-size:42px">화학 물질 데이터</h3><svg class="card-art" viewBox="0 0 320 190" role="img" aria-label="공과 막대로 나타낸 분자 모형과 데이터 막대"><g stroke="var(--t2)" stroke-width="6" stroke-linecap="round"><path d="M110 60L150 40L190 60L190 105L150 125L110 105Z" fill="none"/><path d="M190 60L230 40M190 105L232 125M110 105L72 128M150 40V12"/></g><g><circle cx="110" cy="60" r="14" fill="var(--chem)"/><circle cx="150" cy="40" r="14" fill="var(--t2)"/><circle cx="190" cy="60" r="14" fill="var(--chem)"/><circle cx="190" cy="105" r="14" fill="var(--t2)"/><circle cx="150" cy="125" r="14" fill="var(--elec)"/><circle cx="110" cy="105" r="14" fill="var(--t2)"/><circle cx="232" cy="40" r="10" fill="var(--elec)"/><circle cx="234" cy="125" r="10" fill="var(--kin)"/><circle cx="70" cy="130" r="10" fill="var(--kin)"/><circle cx="150" cy="12" r="10" fill="var(--elec)"/></g><g fill="var(--hl)"><rect x="40" y="160" width="60" height="12" rx="6"/><rect x="110" y="160" width="100" height="12" rx="6"/><rect x="220" y="160" width="60" height="12" rx="6"/></g></svg><p class="lead2" style="font-size:29px">물질의 구조와 성질을 데이터로 만들어 신약을 더 빨리 개발한다.</p></div><div class="dev-card" style="left:960px;width:390px;height:590px" data-step="3"><span class="echip e-kin">유전체 분석</span><h3 style="font-size:42px">DNA 염기 서열</h3><svg class="card-art" viewBox="0 0 320 190" role="img" aria-label="이중 나선 DNA와 색으로 구분한 염기쌍"><line x1="30" y1="95.0" x2="30" y2="95.0" stroke="var(--kin)" stroke-width="7" stroke-linecap="round"/><line x1="56" y1="63.638766264160445" x2="56" y2="126.36123373583956" stroke="var(--heat)" stroke-width="7" stroke-linecap="round"/><line x1="82" y1="41.52755839631388" x2="82" y2="148.47244160368612" stroke="var(--elec)" stroke-width="7" stroke-linecap="round"/><line x1="108" y1="35.18809829276486" x2="108" y2="154.81190170723514" stroke="var(--light)" stroke-width="7" stroke-linecap="round"/><line x1="134" y1="46.49021577082459" x2="134" y2="143.5097842291754" stroke="var(--kin)" stroke-width="7" stroke-linecap="round"/><line x1="160" y1="72.1003404768601" x2="160" y2="117.8996595231399" stroke="var(--heat)" stroke-width="7" stroke-linecap="round"/><line x1="186" y1="104.46474164859492" x2="186" y2="85.53525835140508" stroke="var(--elec)" stroke-width="7" stroke-linecap="round"/><line x1="212" y1="134.03750822391007" x2="212" y2="55.96249177608994" stroke="var(--light)" stroke-width="7" stroke-linecap="round"/><line x1="238" y1="152.09612443337096" x2="238" y2="37.90387556662904" stroke="var(--kin)" stroke-width="7" stroke-linecap="round"/><line x1="264" y1="153.31418416410924" x2="264" y2="36.68581583589075" stroke="var(--heat)" stroke-width="7" stroke-linecap="round"/><line x1="290" y1="137.3324195342235" x2="290" y2="52.66758046577648" stroke="var(--elec)" stroke-width="7" stroke-linecap="round"/><path d="M30 95 L32.6 91.7 L35.2 88.4 L37.8 85.1 L40.4 81.9 L43.0 78.7 L45.6 75.6 L48.2 72.5 L50.8 69.4 L53.4 66.5 L56.0 63.6 L58.6 60.9 L61.2 58.2 L63.8 55.7 L66.4 53.2 L69.0 50.9 L71.6 48.8 L74.2 46.7 L76.8 44.8 L79.4 43.1 L82.0 41.5 L84.6 40.1 L87.2 38.9 L89.8 37.8 L92.4 36.9 L95.0 36.1 L97.6 35.6 L100.2 35.2 L102.8 35.0 L105.4 35.0 L108.0 35.2 L110.6 35.5 L113.2 36.1 L115.8 36.8 L118.4 37.7 L121.0 38.7 L123.6 40.0 L126.2 41.3 L128.8 42.9 L131.4 44.6 L134.0 46.5 L136.6 48.5 L139.2 50.7 L141.8 52.9 L144.4 55.4 L147.0 57.9 L149.6 60.5 L152.2 63.3 L154.8 66.2 L157.4 69.1 L160.0 72.1 L162.6 75.2 L165.2 78.3 L167.8 81.5 L170.4 84.8 L173.0 88.0 L175.6 91.3 L178.2 94.6 L180.8 97.9 L183.4 101.2 L186.0 104.5 L188.6 107.7 L191.2 110.9 L193.8 114.1 L196.4 117.2 L199.0 120.2 L201.6 123.2 L204.2 126.0 L206.8 128.8 L209.4 131.5 L212.0 134.0 L214.6 136.5 L217.2 138.8 L219.8 141.0 L222.4 143.0 L225.0 144.9 L227.6 146.7 L230.2 148.3 L232.8 149.7 L235.4 151.0 L238.0 152.1 L240.6 153.0 L243.2 153.8 L245.8 154.3 L248.4 154.7 L251.0 155.0 L253.6 155.0 L256.2 154.8 L258.8 154.5 L261.4 154.0 L264.0 153.3 L266.6 152.4 L269.2 151.4 L271.8 150.2 L274.4 148.8 L277.0 147.3 L279.6 145.6 L282.2 143.7 L284.8 141.7 L287.4 139.6 L290.0 137.3" fill="none" stroke="var(--t2)" stroke-width="5"/><path d="M30 95 L32.6 98.3 L35.2 101.6 L37.8 104.9 L40.4 108.1 L43.0 111.3 L45.6 114.4 L48.2 117.5 L50.8 120.6 L53.4 123.5 L56.0 126.4 L58.6 129.1 L61.2 131.8 L63.8 134.3 L66.4 136.8 L69.0 139.1 L71.6 141.2 L74.2 143.3 L76.8 145.2 L79.4 146.9 L82.0 148.5 L84.6 149.9 L87.2 151.1 L89.8 152.2 L92.4 153.1 L95.0 153.9 L97.6 154.4 L100.2 154.8 L102.8 155.0 L105.4 155.0 L108.0 154.8 L110.6 154.5 L113.2 153.9 L115.8 153.2 L118.4 152.3 L121.0 151.3 L123.6 150.0 L126.2 148.7 L128.8 147.1 L131.4 145.4 L134.0 143.5 L136.6 141.5 L139.2 139.3 L141.8 137.1 L144.4 134.6 L147.0 132.1 L149.6 129.5 L152.2 126.7 L154.8 123.8 L157.4 120.9 L160.0 117.9 L162.6 114.8 L165.2 111.7 L167.8 108.5 L170.4 105.2 L173.0 102.0 L175.6 98.7 L178.2 95.4 L180.8 92.1 L183.4 88.8 L186.0 85.5 L188.6 82.3 L191.2 79.1 L193.8 75.9 L196.4 72.8 L199.0 69.8 L201.6 66.8 L204.2 64.0 L206.8 61.2 L209.4 58.5 L212.0 56.0 L214.6 53.5 L217.2 51.2 L219.8 49.0 L222.4 47.0 L225.0 45.1 L227.6 43.3 L230.2 41.7 L232.8 40.3 L235.4 39.0 L238.0 37.9 L240.6 37.0 L243.2 36.2 L245.8 35.7 L248.4 35.3 L251.0 35.0 L253.6 35.0 L256.2 35.2 L258.8 35.5 L261.4 36.0 L264.0 36.7 L266.6 37.6 L269.2 38.6 L271.8 39.8 L274.4 41.2 L277.0 42.7 L279.6 44.4 L282.2 46.3 L284.8 48.3 L287.4 50.4 L290.0 52.7" fill="none" stroke="var(--t2)" stroke-width="5"/></svg><p class="lead2" style="font-size:29px">사람의 유전체 데이터를 분석해 암·난치병 치료, 맞춤형 의학에 쓴다.</p></div><div class="dev-card" style="left:1380px;width:420px;height:590px" data-step="4"><span class="echip e-heat">기상 관측</span><h3 style="font-size:42px">관측소·인공위성</h3><svg class="card-art" viewBox="0 0 320 190" role="img" aria-label="지구를 도는 인공위성과 지상 관측소"><path d="M30 180a80 80 0 0 1 160 0z" fill="var(--elec)" opacity=".18"/><path d="M30 180a80 80 0 0 1 160 0" fill="none" stroke="var(--elec)" stroke-width="4"/><g transform="translate(228 52) rotate(-20)"><rect x="-16" y="-14" width="32" height="28" rx="4" fill="var(--t2)"/><rect x="-70" y="-10" width="48" height="20" fill="var(--elec)"/><rect x="22" y="-10" width="48" height="20" fill="var(--elec)"/></g><path d="M214 72L144 120M196 66L84 116" stroke="var(--light)" stroke-width="3" stroke-dasharray="6 7"/><g fill="var(--t2)"><rect x="76" y="124" width="8" height="26"/><path d="M70 124h20l-10-14z"/><rect x="136" y="124" width="8" height="26"/><path d="M130 124h20l-10-14z"/></g><path d="M250 150q0-18 18-18q6-14 22-10q16 2 16 18q12 2 12 12h-68z" fill="var(--hl)"/></svg><p class="lead2" style="font-size:29px">일기 예보의 정확도를 높이고 오랜 기간의 기후 변화를 연구한다.</p></div><div class="fine">교과서 141쪽 · 거대 입자 가속기, 인공위성 같은 장비의 발달로 데이터를 디지털로 대량 축적할 수 있게 되었다.</div></section><section class="slide" id="dataset" data-title="데이터셋" data-tile="parchment"><div class="hd" data-in><div class="eb"><b>21</b>데이터셋</div><h2>분석할 데이터를 모아 데이터셋을 구성한다</h2></div><div class="ws-card" style="left:120px;top:300px;width:1680px" data-in="200"><div class="ws-h"><b>데이터셋</b></div><div class="ws-line">비슷한 성질의 데이터를 모아 <span class="bk wide"><span class="a" data-step="1" data-fx="pop">검색이나 사용이 편리</span></span>하도록 정리한 것</div></div><div class="abs" style="left:120px;top:540px;width:1680px" data-step="2"><div class="t-label mute" style="margin-bottom:14px">우리 반 이산화 탄소 데이터셋 (가상 예시 · 2026년)</div><div id="dstable"></div></div><div class="fine">표는 데이터셋의 한 형태이며 영상·음성도 데이터셋이 될 수 있다. 원자료의 오류·결측·형식을 확인하고, 날짜·위치·단위·시각을 통일한다.</div></section><section class="slide" id="covid" data-title="해 보기 · 코로나19와 데이터셋" data-tile="dark"><div class="hd" data-in><div class="eb"><b>22</b>해 보기 · 정보 조사 | 과학적 추론</div><h2>어떤 데이터를 분석하면 감염병 확산을 막을 수 있을까?</h2></div><div class="abs" id="dsgrid" style="left:120px;top:290px;width:1680px;display:grid;grid-template-columns:repeat(3,1fr);gap:22px" data-interactive><button class="ds-card" data-pi="1"><span class="ds-h">전 세계 항공권 판매 데이터</span><span class="ds-i" data-step="1">출발·도착지와 현지 유행 상황을 함께 분석해 유입 위험 추정</span><span class="ds-p" data-step="2">개인 정보 포함 가능</span></button><button class="ds-card" data-pi="1"><span class="ds-h">지역별 백신 접종 현황</span><span class="ds-i" data-step="1" data-delay="100">감염병에 취약한 지역을 파악해 예방</span><span class="ds-p" data-step="2" data-delay="150">개인 정보 포함 가능</span></button><button class="ds-card" data-pi="1"><span class="ds-h">카드 이용 정보</span><span class="ds-i" data-step="1" data-delay="200">밀집 장소를 추정하고 병원체·환경·접촉 방식을 함께 고려</span><span class="ds-p" data-step="2" data-delay="300">개인 정보 포함 가능</span></button><button class="ds-card"><span class="ds-h">지역별 인구 현황</span><span class="ds-i" data-step="1" data-delay="300">취약 연령층이 많은 지역을 점검하되 감염병별 차이를 고려</span></button><button class="ds-card"><span class="ds-h">지역별 환자용 병상 수</span><span class="ds-i" data-step="1" data-delay="400">격리·치료 병상이 부족한 곳에 추가 대처</span></button><button class="ds-card"><span class="ds-h">마스크 재고 현황</span><span class="ds-i" data-step="1" data-delay="500">마스크가 부족한 지역에 집중 공급</span></button></div><div class="abs callout" style="left:120px;top:836px;width:1680px;font-size:30px;padding:20px 32px;background:rgba(191,90,242,.12)" data-step="2"><b class="c-sound">보라색 카드</b>는 개인별 원기록에 개인정보가 담길 수 있다. 지역 집계도 소수 집단·다른 자료와의 결합으로 개인이 드러날 수 있다. 필요한 정보만 모으고 접근을 제한한다.</div><div class="fine" style="bottom:28px">교과서 142쪽 「해 보기」 2 예시 답 기준 · 카드를 눌러 하나씩 열어 볼 수도 있다. 준비물: 스마트 기기</div></section><section class="slide" id="discuss" data-title="해 보기 · 토의" data-tile="light"><div class="hd" data-in><div class="eb"><b>23</b>해 보기 · 토의</div><h2>빅데이터 활용, 무엇이 좋고 무엇이 걱정될까?</h2></div><div class="qbox" style="left:120px;top:290px;width:1680px" data-in="200"><div class="qh">1. 빅데이터를 활용할 때의 장점은?</div><div data-step="1" class="c-act">여러 정보를 종합해 분석하므로 확산 속도 예측, 병상 확보, 취약층 대비 등 <b>종합적인 대책</b>을 세울 수 있다.</div></div><div class="qbox" style="left:120px;top:500px;width:1680px" data-in="300"><div class="qh">2. 이런 자료를 활용할 때 생길 수 있는 문제점은?</div><div data-step="2" class="c-act">항공권 판매, 카드 사용 내역, 접종 현황 등은 <b>개인 정보</b>를 담을 수 있다. 관리가 잘못되면 대량 유출로 사생활이 침해될 수 있다.</div></div><div class="qbox" style="left:120px;top:710px;width:1680px" data-in="400"><div class="qh">3. 모둠별로 빅데이터 활용 사례를 더 찾아 장점과 문제점을 분석해 보자.</div><div data-step="3" class="c-act" style="font-size:29px"><span class="pill" style="font-size:24px;padding:4px 16px;margin-right:12px;background:rgba(0,102,204,.1)">예시</span>장점: 의사 결정 향상, 맞춤형 서비스, 예측 능력 · 문제점: 개인 정보 보호, 데이터 보안, 데이터 품질·편향, 상관관계를 인과관계로 오해할 위험</div></div><div class="fine" style="bottom:36px">교과서 142쪽 「해 보기」 1~3</div></section><section class="slide" id="public" data-title="공공 데이터 찾기" data-tile="parchment"><div class="hd" data-in><div class="eb"><b>24</b>공공 데이터</div><h2>빅데이터는 어디에서 찾을 수 있을까?</h2></div><div class="dev-card" style="left:120px;width:800px;height:250px;top:290px" data-step="1"><span class="echip e-elec">공공 데이터 포털</span><h3 class="num" style="font-size:46px">data.go.kr</h3><p class="lead2" style="font-size:29px;margin-top:0">공공기관이 공개한 데이터를 이용 조건에 따라 활용</p></div><div class="dev-card" style="left:1000px;width:800px;height:250px;top:290px" data-step="2"><span class="echip e-kin">기상 자료 개방 포털</span><h3 class="num" style="font-size:46px">data.kma.go.kr</h3><p class="lead2" style="font-size:29px;margin-top:0">전국 관측소와 인공위성이 모은 기상 자료</p></div><div class="dev-card" style="left:120px;width:800px;height:250px;top:570px" data-step="3"><span class="echip e-sound">서울 열린데이터 광장</span><h3 class="num" style="font-size:46px">data.seoul.go.kr</h3><p class="lead2" style="font-size:29px;margin-top:0">지방 자치 단체가 공개하는 생활 데이터</p></div><div class="dev-card" style="left:1000px;width:800px;height:250px;top:570px" data-step="4"><span class="echip e-heat">과학 관측 자료</span><h3 style="font-size:46px">ARGO · Gaia</h3><p class="lead2" style="font-size:29px;margin-top:0">해양 관측 장비, 우주 망원경이 모은 자료 공개</p></div><div class="fine">교과서 143쪽 · 「수업 보충 자료」 · 직접 들어가서 어떤 데이터셋이 있는지 탐색해 보자.</div></section><section class="slide" id="caution" data-title="빅데이터 활용의 유의점" data-tile="dark"><div class="hd" data-in><div class="eb"><b>25</b>유의점</div><h2>데이터가 많기만 하면 언제나 옳은 결론을 얻을까?</h2></div><div class="dev-card" style="left:120px;height:590px" data-step="1"><span class="echip e-heat">편향된 데이터</span><h3 style="font-size:42px">한쪽으로 치우친 데이터</h3><svg class="card-art" style="height:150px" viewBox="0 0 320 190" role="img" aria-label="교실에서 창가 쪽에만 측정 지점이 몰려 있음"><rect x="40" y="20" width="240" height="150" rx="12" fill="none" stroke="var(--t2)" stroke-width="4"/><g fill="var(--elec)" opacity=".7"><rect x="274" y="40" width="10" height="40"/><rect x="274" y="110" width="10" height="40"/></g><g fill="var(--hl)"><rect x="62" y="44" width="28" height="18" rx="4"/><rect x="106" y="44" width="28" height="18" rx="4"/><rect x="150" y="44" width="28" height="18" rx="4"/><rect x="194" y="44" width="28" height="18" rx="4"/><rect x="62" y="78" width="28" height="18" rx="4"/><rect x="106" y="78" width="28" height="18" rx="4"/><rect x="150" y="78" width="28" height="18" rx="4"/><rect x="194" y="78" width="28" height="18" rx="4"/><rect x="62" y="112" width="28" height="18" rx="4"/><rect x="106" y="112" width="28" height="18" rx="4"/><rect x="150" y="112" width="28" height="18" rx="4"/><rect x="194" y="112" width="28" height="18" rx="4"/><rect x="62" y="146" width="28" height="18" rx="4"/><rect x="106" y="146" width="28" height="18" rx="4"/><rect x="150" y="146" width="28" height="18" rx="4"/><rect x="194" y="146" width="28" height="18" rx="4"/></g><g fill="var(--heat)"><circle cx="252" cy="40" r="7"/><circle cx="264" cy="60" r="7"/><circle cx="252" cy="80" r="7"/><circle cx="264" cy="100" r="7"/><circle cx="252" cy="120" r="7"/><circle cx="264" cy="140" r="7"/><circle cx="252" cy="160" r="7"/></g><path d="M60 182H240" stroke="var(--heat)" stroke-width="4" stroke-dasharray="8 8"/></svg><p class="lead2">창가에서만 측정하면 "교실 공기는 늘 깨끗하다"는 잘못된 결론이 나올 수 있다.</p></div><div class="dev-card" style="left:700px;height:590px" data-step="2"><span class="echip e-light">신뢰성 낮은 데이터</span><h3 style="font-size:42px">믿기 어려운 데이터</h3><svg class="card-art" style="height:150px" viewBox="0 0 320 190" role="img" aria-label="센서가 바깥 공기보다 낮은 비정상 값을 보여 줌"><rect x="40" y="40" width="110" height="110" rx="14" fill="none" stroke="var(--t2)" stroke-width="4"/><text x="95" y="106" text-anchor="middle" font-size="30" font-weight="700" fill="var(--t2)">CO₂</text><path d="M150 95H175" stroke="var(--t2)" stroke-width="4"/><rect x="175" y="50" width="115" height="90" rx="12" fill="none" stroke="var(--light)" stroke-width="4"/><text x="232" y="98" text-anchor="middle" font-size="32" font-weight="700" fill="var(--light)">150</text><text x="232" y="126" text-anchor="middle" font-size="20" fill="var(--t2)">ppm ?</text><circle cx="290" cy="40" r="20" fill="var(--light)"/><text x="290" y="49" text-anchor="middle" font-size="28" font-weight="800" fill="#1d1d1f">!</text></svg><p class="lead2">점검하지 않은 센서의 값은 아무리 많아도 믿기 어렵다. 탐구 4에서 운동장 값을 비교한 이유이다.</p></div><div class="dev-card" style="left:1280px;height:590px" data-step="3"><span class="echip e-sound">개인 정보</span><h3 style="font-size:42px">민감한 정보</h3><svg class="card-art" style="height:150px" viewBox="0 0 320 190" role="img" aria-label="사람과 자물쇠가 있는 방패"><circle cx="110" cy="70" r="28" fill="var(--t2)"/><path d="M58 160q0-52 52-52q52 0 52 52z" fill="var(--t2)"/><path d="M210 50l46 16v34q0 40-46 58q-46-18-46-58V66z" fill="var(--sound)" opacity=".25" stroke="var(--sound)" stroke-width="4"/><rect x="194" y="96" width="32" height="26" rx="4" fill="var(--sound)"/><path d="M200 96v-8a10 10 0 0 1 20 0v8" fill="none" stroke="var(--sound)" stroke-width="5"/></svg><p class="lead2">위치·결제·의료 기록은 최소한만 수집하고 접근을 제한한다. 이름을 지워도 다른 자료와 결합해 개인이 드러날 수 있다.</p></div><div class="abs tagline center" style="left:120px;top:912px;width:1680px;font-size:38px" data-step="4">데이터를 <b>적절하게 선별</b>하여 다루고, 개인 정보를 <b>보호</b>해야 한다.</div><div class="fine">교과서 143쪽</div></section><section class="slide" id="proscons" data-title="장점과 유의점 정리" data-tile="light"><div class="hd" data-in><div class="eb"><b>26</b>정리</div><h2>빅데이터 활용의 장점과 유의점</h2></div><div class="abs" style="left:120px;top:300px;width:800px" data-step="1"><div class="colh c-kin">장점</div><div class="tip-list"><div class="tip"><span class="no">발견</span><span>데이터 사이의 관계와 패턴을 찾는다<small>과학 지식의 발견과 정확도 향상</small></span></div><div class="tip"><span class="no">절약</span><span>시간과 비용을 줄인다<small>실험·조사를 모두 새로 하지 않아도 된다.</small></span></div><div class="tip"><span class="no">예측</span><span>앞으로 일어날 일을 예측한다<small>정책과 대책을 미리 세운다.</small></span></div><div class="tip"><span class="no">맞춤</span><span>개인 맞춤형 서비스를 제공한다</span></div></div></div><div class="abs" style="left:1000px;top:300px;width:800px" data-step="2"><div class="colh c-heat">유의점</div><div class="tip-list"><div class="tip"><span class="no">품질</span><span>편향되거나 신뢰성이 낮은 데이터<small>잘못된 결론으로 이어질 수 있다.</small></span></div><div class="tip"><span class="no">해석</span><span>같은 데이터도 해석이 달라질 수 있다</span></div><div class="tip"><span class="no">보호</span><span>개인 정보와 데이터 보안<small>유출되면 사생활 침해가 생긴다.</small></span></div></div></div><div class="fine">교과서 143쪽 「수업 보충 자료」 · 142쪽 「해 보기」</div></section><section class="slide" id="check" data-title="스스로 확인하기" data-tile="parchment"><div class="hd" data-in><div class="eb"><b>27</b>확인하기</div><h2>빅데이터를 설명할 수 있을까?</h2></div><div class="abs" style="left:120px;top:290px;width:1680px"><div class="check-row" style="grid-template-columns:64px 1fr 360px"><b>1</b><span>빅데이터는 수치로 된 자료만을 말한다.</span><span class="answer" data-step="1">× (글·영상·음성도)</span></div><div class="check-row" style="grid-template-columns:64px 1fr 360px"><b>2</b><span>측정값이 많기만 하면 항상 믿을 수 있는 결론을 얻는다.</span><span class="answer" data-step="2">× (편향·신뢰성)</span></div><div class="check-row" style="grid-template-columns:64px 1fr 360px"><b>3</b><span>비슷한 성질의 데이터를 모아 쓰기 편하게 정리한 것은?</span><span class="answer" data-step="3">데이터셋</span></div><div class="check-row" style="grid-template-columns:64px 1fr 360px"><b>4</b><span style="font-size:29px">기계 환기를 주로 이용하지 않는 교실의 CO₂ 유지 기준은?</span><span class="answer" data-step="4">1000 ppm 이하</span></div></div><div class="fine">매 클릭마다 답 하나가 나타난다. · 기계 환기를 주로 이용하는 교실은 1500 ppm 이하 · 교과서 143쪽 「스스로 확인」</div></section><section class="slide" id="summary" data-title="정리 · 과학과 나" data-tile="black"><div class="hd" data-in><div class="eb"><b>28</b>정리</div><h2>오늘 배운 것</h2></div><div class="abs" style="left:120px;top:290px;width:1680px;display:flex;flex-direction:column;gap:34px"><div class="sum-row" data-step="1"><span class="echip e-elec">데이터</span><span>값을 모으고 분석하면 문제를 푸는 <b>정보</b>가 된다.</span></div><div class="sum-row" data-step="2"><span class="echip e-kin">빅데이터</span><span>방대하고 복잡한 데이터의 집합 · 양·속도·다양성</span></div><div class="sum-row" data-step="3"><span class="echip e-light">활용</span><span>생활, 정책, 과학 연구에서 합리적인 결정과 예측을 돕는다.</span></div><div class="sum-row" data-step="4"><span class="echip e-heat">유의점</span><span>편향·신뢰성을 따지고, 개인 정보를 보호한다.</span></div></div><div class="abs callout" style="left:120px;top:830px;width:1680px;background:rgba(41,151,255,.12)" data-step="5"><b class="c-elec">과학과 나</b> · 빅데이터로 우리 주변의 어떤 문제를 해결할 수 있을까? <span class="mute">(교통, 환경 오염 감시, 보건 의료, 학교 생활 …)</span></div></section>
+</main></div><div id="alwaysNav"><button onclick="Deck.prev()" aria-label="이전 단계">← 이전</button><button onclick="Deck.next()" aria-label="다음 단계">다음 →</button><button id="navPage" onclick="Deck.toggleOverview()" aria-label="쪽 목록 열기">1 / 31</button></div><script>
+
+/* ═══════════════════════════════════════════════════════════════
+   core.js — 강의 덱 엔진
+   · 1920×1080 무대를 화면에 맞춰 배율(레터박스)
+   · 장면(scene) = 도입(enter, 저절로) + 빌드 단계(go(k), 클릭마다)
+   · 되돌아가기·건너뛰기는 "처음 상태로 복원 → 순간 재생"이라 언제나 같은 모습
+   · 애니메이션 도구는 ctx 가 쥐고 있어 장면을 떠나면 저절로 정리됨
+   ═══════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+  const SW = 1920, SH = 1080;
+  const Q = new URLSearchParams(location.search);
+  const STILL = Q.get('still') === '1';
+  // 공개 자료는 항상 학생용으로 제공한다.
+  const STUDENT = true;
+  if (STUDENT) document.documentElement.classList.add('student');
+  const REDUCED = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  if (STILL || Q.get('clean') === '1') document.documentElement.classList.add('still');
+  if (Q.get('grid') === '1') document.documentElement.classList.add('grid');
+  if (Q.get('log') === '1') {   // 검증용: 콘솔 수준을 앞머리로 남김(console.py 가 읽음)
+    const oe = console.error.bind(console), ow = console.warn.bind(console);
+    const txt = a => a.map(x => (x && x.stack) ? String(x.stack).split(String.fromCharCode(10)).slice(0, 2).join(' | ') : (typeof x === 'object' ? (() => { try { return JSON.stringify(x); } catch (e) { return String(x); } })() : String(x))).join(' ');
+    console.error = (...a) => oe('[ERR] ' + txt(a));
+    console.warn = (...a) => ow('[WARN] ' + txt(a));
+    window.addEventListener('error', e => oe('[ERR] uncaught ' + (e.message || '') + ' @' + (e.lineno || '')));
+    window.addEventListener('unhandledrejection', e => oe('[ERR] rejection ' + ((e.reason && e.reason.stack) || e.reason)));
+  }
+
+  /* ── 곡선 ── */
+  const EASE = {
+    out: 'cubic-bezier(.2,.8,.2,1)', outQuint: 'cubic-bezier(.22,1,.36,1)', inOut: 'cubic-bezier(.65,0,.35,1)',
+    in: 'cubic-bezier(.55,0,.75,.1)', spring: 'cubic-bezier(.34,1.56,.64,1)', soft: 'cubic-bezier(.25,.1,.25,1)', linear: 'linear',
+  };
+  const JE = {
+    linear: t => t,
+    out: t => 1 - Math.pow(1 - t, 3),
+    outQuint: t => 1 - Math.pow(1 - t, 5),
+    inOut: t => (t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2),
+    in: t => t * t * t,
+    soft: t => t * t * (3 - 2 * t),
+    spring: t => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); },
+    elastic: t => (t === 0 || t === 1) ? t : Math.pow(2, -10 * t) * Math.sin((t * 10 - .75) * (2 * Math.PI) / 3) + 1,
+  };
+
+  /* ── 등장 모양(선언형·ctx.reveal 공용) ── svg 요소에는 blur(필터) 빼고 */
+  const REVEAL = {
+    rise:  { k: [{ opacity: 0, transform: 'translateY(28px)', filter: 'blur(12px)' }, { opacity: 1, transform: 'translateY(0px)', filter: 'blur(0px)' }], dur: 900 },
+    fade:  { k: [{ opacity: 0 }, { opacity: 1 }], dur: 700 },
+    blur:  { k: [{ opacity: 0, transform: 'scale(1.06)', filter: 'blur(24px)' }, { opacity: 1, transform: 'scale(1)', filter: 'blur(0px)' }], dur: 1100 },
+    scale: { k: [{ opacity: 0, transform: 'scale(.92)' }, { opacity: 1, transform: 'scale(1)' }], dur: 900 },
+    pop:   { k: [{ opacity: 0, transform: 'scale(.5)' }, { opacity: 1, transform: 'scale(1)' }], dur: 750, ease: 'spring' },
+    left:  { k: [{ opacity: 0, transform: 'translateX(-64px)' }, { opacity: 1, transform: 'translateX(0px)' }], dur: 900 },
+    right: { k: [{ opacity: 0, transform: 'translateX(64px)' }, { opacity: 1, transform: 'translateX(0px)' }], dur: 900 },
+    down:  { k: [{ opacity: 0, transform: 'translateY(-28px)' }, { opacity: 1, transform: 'translateY(0px)' }], dur: 900 },
+    up:    { k: [{ opacity: 0, transform: 'translateY(72px)' }, { opacity: 1, transform: 'translateY(0px)' }], dur: 1000 },
+    draw:  { k: [{ opacity: 1, strokeDashoffset: 1 }, { opacity: 1, strokeDashoffset: 0 }], dur: 1200, ease: 'inOut' },
+    wipe:  { k: [{ opacity: 1, clipPath: 'inset(0 100% 0 0)' }, { opacity: 1, clipPath: 'inset(0 0% 0 0)' }], dur: 1000, ease: 'inOut' },
+    none:  { k: [{ opacity: 1 }, { opacity: 1 }], dur: 1 },
+  };
+  const isSVG = el => el instanceof SVGElement && !(el instanceof SVGSVGElement);
+  const GEOM = 'path,line,polyline,polygon,circle,ellipse,rect';
+  const noFilter = k => k.map(f => { const g = Object.assign({}, f); delete g.filter; return g; });
+
+  const STUB = { finished: Promise.resolve(), cancel() {}, finish() {}, pause() {}, play() {}, playbackRate: 1, effect: null };
+
+  /* ═════════ 장면 도구 상자 ═════════ */
+  class Ctx {
+    constructor(root, idx) {
+      this.root = root; this.idx = idx; this.instant = false; this.alive = true;
+      this.reduced = REDUCED; this.still = STILL; this.E = EASE; this.JE = JE; this.data = {};
+      this._anims = []; this._loops = []; this._timers = []; this._waits = []; this._tweens = []; this._sfxT = []; this._disp = [];
+    }
+    /** 효과음: SFX.play(name, a, b) 를 delay ms 뒤에. 순간 모드(되돌리기·복원)·건너뛰기·장면 나감이면 조용히 */
+    sfx(name, delay = 0, a, b) {
+      if (STILL || this.instant || !this.alive || !window.SFX) return;
+      if (delay > 0) { const id = setTimeout(() => { if (this.alive && !this.instant) SFX.play(name, a, b); }, delay); this._sfxT.push(id); }
+      else SFX.play(name, a, b);
+    }
+    /** 이어지는 소리('fan'|'hum'|'boil') — 장면을 떠나면 저절로 멎는다. 반환: {level(v), whine(v), stop()} */
+    sfxLoop(kind, o) { const h = window.SFX ? SFX.loop(kind, o) : null; if (h) this._disp.push(() => h.stop()); return h; }
+    onDispose(fn) { this._disp.push(fn); }
+    $(s) { return this.root.querySelector(s); }
+    $$(s) { return Array.from(this.root.querySelectorAll(s)); }
+    _el(el) { return typeof el === 'string' ? this.$(el) : el; }
+    _els(els) { if (typeof els === 'string') return this.$$(els); if (!els) return []; return (els.length !== undefined && !(els instanceof Element)) ? Array.from(els) : [els]; }
+
+    /** Web Animations 한 방. o: {dur, delay, ease, fill, iter, dir, composite}. 순간 모드면 바로 끝 상태 */
+    a(el, kf, o = {}) {
+      el = this._el(el);
+      if (!el || !this.alive) return STUB;
+      const infinite = o.iter === Infinity;
+      const inst = (this.instant || this.reduced) && !infinite;
+      const an = el.animate(kf, {
+        duration: inst ? 0 : (o.dur ?? 700), delay: inst ? 0 : (o.delay ?? 0),
+        easing: EASE[o.ease] || o.ease || EASE.out, fill: o.fill || 'both',
+        iterations: o.iter ?? 1, direction: o.dir || 'normal', composite: o.composite || 'replace',
+      });
+      if (inst) { try { an.finish(); } catch (e) {} }
+      this._anims.push(an);
+      return an;
+    }
+    /** 여러 요소에 시차(stagger ms)를 두고 같은 애니 */
+    all(els, kf, o = {}) {
+      return this._els(els).map((e, i) => this.a(e, typeof kf === 'function' ? kf(e, i) : kf, Object.assign({}, o, { delay: (o.delay || 0) + i * (o.stagger || 0) })));
+    }
+    /** 등장: fx = rise|fade|blur|scale|pop|left|right|down|up|draw|wipe */
+    reveal(el, fx = 'rise', o = {}) {
+      const els = this._els(el); const out = [];
+      els.forEach((e, i) => {
+        const P = REVEAL[fx] || REVEAL.rise;
+        const d = Object.assign({ dur: P.dur, ease: P.ease || 'out' }, o);
+        if (o.stagger) d.delay = (o.delay || 0) + i * o.stagger;
+        // 효과음: 학습지 빈칸 답이 채워지면 「띠링」, pop·up 등장이면 「톡」
+        if (!this.instant) {
+          const sk = (e.classList && e.classList.contains('a') && e.parentElement && e.parentElement.classList.contains('bk')) ? 'blank' : ((fx === 'pop' || fx === 'up') ? 'pop' : null);
+          if (sk) this.sfx(sk, d.delay || 0);
+        }
+        if (fx === 'draw') {
+          const geo = (e.matches && e.matches(GEOM)) ? [e] : Array.from(e.querySelectorAll(GEOM));
+          this.a(e, [{ opacity: 1 }, { opacity: 1 }], { dur: 1, delay: d.delay });
+          geo.forEach(g => { if (!g.hasAttribute('pathLength')) g.setAttribute('pathLength', '1'); out.push(this.a(g, P.k, d)); });
+        } else {
+          out.push(this.a(e, isSVG(e) ? noFilter(P.k) : P.k, d));
+        }
+      });
+      return out.length === 1 ? out[0] : { finished: Promise.all(out.map(x => x.finished)), list: out };
+    }
+    /** 사라짐(기본: 흐려지며 살짝 위로) */
+    hide(el, o = {}) {
+      return this.all(el, isSVG(this._els(el)[0] || document.body) ? [{ opacity: 1 }, { opacity: 0 }] : [{ opacity: 1, filter: 'blur(0px)' }, { opacity: 0, filter: 'blur(8px)' }],
+        Object.assign({ dur: 500, ease: 'out' }, o));
+    }
+    /** 기다리기(순간 모드면 곧장) */
+    wait(ms) {
+      if (this.instant || !this.alive) return Promise.resolve();
+      return new Promise(res => { const w = { res }; w.t = setTimeout(() => { const i = this._waits.indexOf(w); if (i >= 0) this._waits.splice(i, 1); res(); }, ms); this._waits.push(w); });
+    }
+    /** JS 트윈 — WAAPI 로 못 움직이는 것(속성·viewBox·path d·숫자). fn(p, rawT) */
+    tween(dur, fn, o = {}) {
+      const ease = typeof o.ease === 'function' ? o.ease : (JE[o.ease] || JE.out);
+      if (this.instant || !this.alive) { if (this.alive) fn(1, 1); return Promise.resolve(); }
+      const delay = o.delay || 0;
+      return new Promise(res => {
+        let start = null, done = false, id = 0;
+        const tw = {
+          finish: () => { if (done) return; done = true; cancelAnimationFrame(id); try { fn(1, 1); } catch (e) { console.error(e); } res(); },
+          kill: () => { if (done) return; done = true; cancelAnimationFrame(id); res(); },
+        };
+        this._tweens.push(tw);
+        if (!o.noInit) { try { fn(0, 0); } catch (e) { console.error(e); } }
+        const tick = now => {
+          if (done) return;
+          if (start === null) start = now + delay;
+          const t = (now - start) / dur;
+          if (t < 0) { id = requestAnimationFrame(tick); return; }
+          if (t >= 1) { tw.finish(); return; }
+          try { fn(ease(t), t); } catch (e) { console.error(e); tw.kill(); return; }
+          id = requestAnimationFrame(tick);
+        };
+        id = requestAnimationFrame(tick);
+      });
+    }
+    /** 숫자 굴리기. o.fmt(v) 로 모양 */
+    count(el, from, to, o = {}) {
+      el = this._el(el); if (!el) return Promise.resolve();
+      const fmt = o.fmt || (v => Math.round(v).toLocaleString('ko-KR'));
+      if (to !== from) this.sfx('counter', o.delay || 0, o.dur ?? 1200);
+      return this.tween(o.dur ?? 1200, p => { el.textContent = fmt(from + (to - from) * p); }, Object.assign({ ease: 'outQuint' }, o));
+    }
+    /** 선 그리기(pathLength=1 을 붙여 stroke-dashoffset 1→0) */
+    draw(el, o = {}) { return this.reveal(el, 'draw', o); }
+    /** SVG 카메라 — viewBox 를 [x,y,w,h] 로 옮김 */
+    camera(svg, to, o = {}) {
+      svg = this._el(svg); if (!svg) return Promise.resolve();
+      const from = (svg.getAttribute('viewBox') || `0 0 ${SW} ${SH}`).split(/[\s,]+/).map(Number);
+      this.sfx('whoosh', o.delay || 0, o.dur ?? 1400, .55);
+      return this.tween(o.dur ?? 1400, p => { svg.setAttribute('viewBox', from.map((v, i) => (v + (to[i] - v) * p).toFixed(2)).join(' ')); }, Object.assign({ ease: 'inOut' }, o));
+    }
+    /** 장면이 살아 있는 동안 도는 고리. fn(t초, dt초). 반환값.stop() */
+    loop(fn) {
+      const L = { on: true, t: 0, last: null, id: 0 };
+      const tick = now => {
+        if (!L.on || !this.alive) return;
+        const dt = L.last === null ? 0 : Math.min(0.05, (now - L.last) / 1000);
+        L.last = now; L.t += dt;
+        try { fn(L.t, dt); } catch (e) { console.error('[loop]', e); L.on = false; return; }
+        L.id = requestAnimationFrame(tick);
+      };
+      L.stop = () => { L.on = false; cancelAnimationFrame(L.id); };
+      L.id = requestAnimationFrame(tick);
+      this._loops.push(L);
+      return L;
+    }
+    timer(fn, ms) { const id = setTimeout(() => { if (this.alive) fn(); }, this.instant ? 0 : ms); this._timers.push(id); return id; }
+    every(fn, ms) { const id = setInterval(() => { if (this.alive) fn(); }, ms); this._timers.push(id); return id; }
+    /** 지금 도는 것을 끝 상태로(클릭이 애니 도중에 오면) */
+    hurry() {
+      this.instant = true;
+      this._sfxT.splice(0).forEach(id => clearTimeout(id));      // 아직 울리기 전인 효과음은 접는다
+      this._anims.forEach(a => { try { const t = a.effect && a.effect.getComputedTiming(); if (t && t.iterations !== Infinity && a.playState !== 'finished') a.finish(); } catch (e) {} });
+      this._tweens.slice().forEach(tw => tw.finish());
+      this._waits.splice(0).forEach(w => { clearTimeout(w.t); w.res(); });
+    }
+    dispose() {
+      this.alive = false;
+      this._sfxT.splice(0).forEach(id => clearTimeout(id));
+      this._disp.splice(0).forEach(fn => { try { fn(); } catch (e) {} });
+      this._loops.forEach(l => l.stop());
+      this._timers.forEach(id => clearTimeout(id));
+      this._tweens.slice().forEach(tw => tw.kill());
+      this._waits.splice(0).forEach(w => { clearTimeout(w.t); w.res(); });
+    }
+  }
+
+  /* ═════════ SVG 도우미 ═════════ */
+  const NS = 'http://www.w3.org/2000/svg';
+  const U = {
+    NS,
+    el(tag, attrs = {}, parent) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; },
+    lerp: (a, b, t) => a + (b - a) * t,
+    clamp: (v, a = 0, b = 1) => Math.max(a, Math.min(b, v)),
+    rand: (a = 0, b = 1) => a + Math.random() * (b - a),
+    /** 결정적 난수(검증 화면이 매번 같게): U.rng(seed)() */
+    rng(seed = 1) { let s = seed >>> 0 || 1; return () => { s ^= s << 13; s >>>= 0; s ^= s >> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; }; },
+    uid: (() => { let n = 0; return (p = 'u') => `${p}${(++n).toString(36)}`; })(),
+    E: EASE, JE,
+  };
+
+  /* ═════════ 덱 ═════════ */
+  const scenes = {};
+  const Deck = {
+    scene(id, def) { scenes[id] = def; },
+    list: [], i: -1, k: 0, ctx: null, busy: null, U, EASE, JE, Ctx, STILL, REDUCED, STUDENT,
+  };
+  window.Deck = Deck; window.U = U;
+
+  let stage, viewport, hud, prog, dots, ovEl, helpEl, blankEl;
+  const fit = () => {
+    const vw = viewport.clientWidth, vh = viewport.clientHeight;
+    const s = Math.min(vw / SW, vh / SH);
+    stage.style.transform = `translate(${(vw - SW * s) / 2 - vw / 2}px, ${(vh - SH * s) / 2 - vh / 2}px) scale(${s})`;
+    Deck.scale = s;
+  };
+  const defOf = sec => scenes[sec.id] || {};
+  const stepsOf = sec => {
+    if (sec.__steps != null) return sec.__steps;
+    let m = +(defOf(sec).steps || 0);
+    const tmp = document.createElement('div'); tmp.innerHTML = sec.__pristine;
+    tmp.querySelectorAll('[data-step]').forEach(e => { m = Math.max(m, +e.getAttribute('data-step') || 0); });
+    tmp.querySelectorAll('[data-out]').forEach(e => { m = Math.max(m, +e.getAttribute('data-out') || 0); });
+    return (sec.__steps = m);
+  };
+  const safe = async (fn, c) => { try { await fn(); } catch (e) { if (c && c.alive) console.error(`[scene ${c.root.id}]`, e); } };
+
+  function runDecl(c, k) {
+    if (k === 0) {
+      c.$$('[data-in]').forEach(el => {
+        const v = el.getAttribute('data-in'); const delay = +(el.dataset.delay || (v && !isNaN(+v) ? v : 0));
+        c.reveal(el, el.dataset.fx || 'rise', { delay, dur: el.dataset.dur ? +el.dataset.dur : undefined, ease: el.dataset.ease || undefined });
+      });
+    } else {
+      c.$$(`[data-step="${k}"]`).forEach(el => {
+        c.reveal(el, el.dataset.fx || 'rise', { delay: +(el.dataset.delay || 0), dur: el.dataset.dur ? +el.dataset.dur : undefined, ease: el.dataset.ease || undefined });
+      });
+      c.$$(`[data-out="${k}"]`).forEach(el => c.hide(el, { delay: +(el.dataset.outDelay || 0) }));
+    }
+  }
+
+  async function show(i, k = 0, opt = {}) {
+    const n = Deck.list.length; if (!n) return;
+    i = Math.max(0, Math.min(n - 1, i));
+    const to = Deck.list[i]; const from = Deck.i >= 0 ? Deck.list[Deck.i] : null;
+    k = Math.max(0, Math.min(stepsOf(to), k));
+    const instant = !!opt.instant || STILL || REDUCED;
+    if (Deck.ctx) { Deck.ctx.hurry(); Deck.ctx.dispose(); }
+    Deck.busy = null;
+
+    if (from && from !== to) {
+      from.classList.remove('is-on');
+      if (instant || opt.cut) { from.classList.remove('is-out'); from.innerHTML = ''; }
+      else {
+        from.classList.add('is-out');
+        const done = () => { if (!from.classList.contains('is-on')) { from.classList.remove('is-out'); from.innerHTML = ''; } };
+        setTimeout(done, 700);
+      }
+    }
+    to.getAnimations && to.getAnimations().forEach(a => a.cancel());
+    to.innerHTML = to.__pristine;
+    to.classList.remove('is-out'); to.classList.add('is-on');
+    Deck.i = i; Deck.k = k;
+    const tile = to.getAttribute('data-tile') || 'dark';
+    document.body.classList.toggle('on-light', tile === 'light' || tile === 'parchment');
+    if (from && from !== to && !instant && !opt.cut) {
+      to.animate([{ opacity: 0, transform: 'scale(1.015)' }, { opacity: 1, transform: 'scale(1)' }], { duration: 620, easing: EASE.out });
+      if (window.SFX) SFX.play('slide');
+    }
+    const c = new Ctx(to, i); Deck.ctx = c;
+    const def = defOf(to);
+    const run = (async () => {
+      c.instant = instant;
+      runDecl(c, 0);
+      if (def.enter) await safe(() => def.enter(c), c);
+      for (let s = 1; s <= k; s++) {
+        if (!c.alive) return;
+        c.instant = true; runDecl(c, s);
+        if (def.go) await safe(() => def.go(c, s), c);
+      }
+      c.instant = STILL;
+    })();
+    Deck.busy = run; ui();
+    await run;
+    if (Deck.busy === run) Deck.busy = null;
+    markReady();
+    try { history.replaceState(null, '', `#${i + 1}${k ? '.' + k : ''}`); } catch (e) {}
+  }
+  async function stepTo(k) {
+    const c = Deck.ctx, sec = Deck.list[Deck.i]; if (!c) return;
+    Deck.k = k; ui();
+    if (window.SFX && !STILL) SFX.play('step');
+    c.instant = STILL; runDecl(c, k);
+    const def = defOf(sec);
+    const run = def.go ? safe(() => def.go(c, k), c) : Promise.resolve();
+    Deck.busy = run;
+    await run;
+    if (Deck.busy === run) { Deck.busy = null; c.instant = STILL; }
+    try { history.replaceState(null, '', `#${Deck.i + 1}${k ? '.' + k : ''}`); } catch (e) {}
+  }
+  Deck.next = () => {
+    if (Deck.busy && Deck.ctx) { Deck.ctx.hurry(); return; }
+    const sec = Deck.list[Deck.i];
+    if (Deck.k < stepsOf(sec)) stepTo(Deck.k + 1);
+    else if (Deck.i < Deck.list.length - 1) show(Deck.i + 1, 0);
+  };
+  Deck.prev = () => {
+    if (Deck.k > 0) show(Deck.i, Deck.k - 1, { instant: true });
+    else if (Deck.i > 0) show(Deck.i - 1, stepsOf(Deck.list[Deck.i - 1]), { instant: true });
+  };
+  Deck.go = (i, k = 0, opt) => show(i, k, opt);
+  Deck.goId = (id, k = 0) => { const i = Deck.list.findIndex(s => s.id === id); if (i >= 0) show(i, k); };
+  /** 지금 단계 다시 보기(R) */
+  Deck.replay = async () => {
+    const k = Deck.k;
+    if (k === 0) { const i = Deck.i; Deck.i = -1; await show(i, 0, { cut: true }); }
+    else { await show(Deck.i, k - 1, { instant: true }); stepTo(k); }
+  };
+  Deck.steps = sec => stepsOf(sec || Deck.list[Deck.i]);
+
+  function markReady() {
+    const fin = () => { document.documentElement.dataset.ready = '1'; };
+    (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(() => setTimeout(fin, 60));
+  }
+
+  /* ── 화면 바깥 UI ── */
+  const ICON = {
+    prev: '<svg viewBox="0 0 20 20"><path d="M12.5 4 6.5 10l6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    next: '<svg viewBox="0 0 20 20"><path d="M7.5 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    grid: '<svg viewBox="0 0 20 20"><g fill="currentColor"><rect x="3" y="3" width="6" height="6" rx="1.5"/><rect x="11" y="3" width="6" height="6" rx="1.5"/><rect x="3" y="11" width="6" height="6" rx="1.5"/><rect x="11" y="11" width="6" height="6" rx="1.5"/></g></svg>',
+    full: '<svg viewBox="0 0 20 20"><path d="M3.5 8V3.5H8M12 3.5h4.5V8M16.5 12v4.5H12M8 16.5H3.5V12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    replay: '<svg viewBox="0 0 20 20"><path d="M4.5 10a5.5 5.5 0 1 0 1.8-4.1M4.5 3.8v3.4h3.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    sound: '<svg viewBox="0 0 20 20"><path d="M3.5 8h3l4-3.5v11L6.5 12h-3z" fill="currentColor"/><path d="M13.5 7.2a4 4 0 0 1 0 5.6M15.6 5a7 7 0 0 1 0 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+    mute: '<svg viewBox="0 0 20 20"><path d="M3.5 8h3l4-3.5v11L6.5 12h-3z" fill="currentColor"/><path d="M13.5 7.5l4.5 5M18 7.5l-4.5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  };
+  function syncSound() {
+    const b = hud && hud.querySelector('[data-a="sound"]'); if (!b) return;
+    const on = !window.SFX || SFX.isOn();
+    b.innerHTML = on ? ICON.sound : ICON.mute; b.classList.toggle('off', !on); b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  }
+  function buildChrome() {
+    hud = document.createElement('div'); hud.id = 'hud';
+    hud.innerHTML = `<button data-a="replay" aria-label="이 단계 다시 보기(R)">${ICON.replay}</button><button data-a="grid" aria-label="전체 보기(O)">${ICON.grid}</button><button data-a="prev" aria-label="이전">${ICON.prev}</button><span class="count" id="count">1 / 1</span><button data-a="next" aria-label="다음">${ICON.next}</button><button data-a="sound" aria-label="소리 켜기/끄기(M)">${ICON.sound}</button><button data-a="full" aria-label="전체 화면(F)">${ICON.full}</button>`;
+    document.body.appendChild(hud); syncSound();
+    hud.addEventListener('click', e => { if (e.target.closest('#count')) { e.stopPropagation(); toggleOverview(); return; } const b = e.target.closest('button'); if (!b) return; e.stopPropagation(); act(b.dataset.a); });
+    prog = document.createElement('div'); prog.id = 'progress'; prog.innerHTML = '<i></i>'; document.body.appendChild(prog);
+    dots = document.createElement('div'); dots.id = 'stepdots'; document.body.appendChild(dots);
+    ovEl = document.createElement('div'); ovEl.id = 'overview'; ovEl.className = 'overlay'; document.body.appendChild(ovEl);
+    helpEl = document.createElement('div'); helpEl.id = 'help'; helpEl.className = 'overlay';
+    helpEl.innerHTML = `<div class="box"><h3>강의 조작</h3><table>
+      <tr><td><kbd>→</kbd> <kbd>Space</kbd> 화면 클릭</td><td>다음(빌드 단계 → 다음 장)</td></tr>
+      <tr><td><kbd>←</kbd> 오른쪽 클릭</td><td>이전</td></tr>
+      <tr><td><kbd>R</kbd></td><td>이 단계 애니메이션 다시 보기</td></tr>
+      <tr><td><kbd>O</kbd></td><td>전체 보기</td></tr>
+      <tr><td><kbd>F</kbd></td><td>전체 화면</td></tr>
+      <tr><td><kbd>M</kbd></td><td>소리 켜기/끄기</td></tr>
+      
+      <tr><td><kbd>B</kbd> / <kbd>W</kbd></td><td>검은 화면 / 흰 화면</td></tr>
+      <tr><td>숫자 + <kbd>Enter</kbd></td><td>그 장으로 이동</td></tr>
+      <tr><td>아래쪽 쪽 번호 단추</td><td>전체 보기에서 골라 이동</td></tr>
+      <tr><td>좌우로 밀기</td><td>전자칠판에서 넘기기</td></tr></table></div>`;
+    document.body.appendChild(helpEl);
+    helpEl.addEventListener('click', () => helpEl.classList.remove('show'));
+    blankEl = document.createElement('div'); blankEl.id = 'blank'; document.body.appendChild(blankEl);
+    blankEl.addEventListener('click', () => { blankEl.className = ''; });
+  }
+  function act(a) {
+    if (a === 'next') Deck.next(); else if (a === 'prev') Deck.prev();
+    else if (a === 'grid') toggleOverview();
+    else if (a === 'full') toggleFull(); else if (a === 'replay') Deck.replay();
+    else if (a === 'sound') { if (window.SFX) SFX.toggle(); syncSound(); }
+  }
+  function ui() {
+    const n = Deck.list.length, sec = Deck.list[Deck.i]; if (!sec || !hud) return;
+    const st = stepsOf(sec);
+    hud.querySelector('#count').textContent = `${Deck.i + 1} / ${n}`;
+    const np = document.getElementById('navPage'); if (np) np.textContent = `${Deck.i + 1} / ${n}`;
+    prog.firstChild.style.width = `${((Deck.i + (st ? Deck.k / (st + 1) : 0)) / Math.max(1, n - 1)) * 100}%`;
+    dots.innerHTML = st ? Array.from({ length: st + 1 }, (_, j) => `<i class="${j <= Deck.k ? 'on' : ''}"></i>`).join('') : '';
+    if (ovEl.classList.contains('show')) renderOverview();
+  }
+  function md(s) { return s.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>'); }
+  function renderOverview() {
+    ovEl.innerHTML = `<div class="ovhead"><h2>전체 보기 · ${Deck.list.length}장</h2><form class="ovjump" autocomplete="off"><label for="ovNum">번호로 이동</label><input id="ovNum" type="number" inputmode="numeric" min="1" max="${Deck.list.length}" placeholder="${Deck.i + 1}"><button type="submit">이동</button><button type="button" class="ovclose" aria-label="닫기">닫기</button></form></div><div class="grid">` + Deck.list.map((s, i) =>
+      `<button class="ov ${i === Deck.i ? 'cur' : ''}" data-i="${i}" data-tile="${s.getAttribute('data-tile') || 'dark'}"><span class="n">${String(i + 1).padStart(2, '0')}</span><span class="tt">${s.dataset.title || s.id}</span></button>`).join('') + '</div>';
+  }
+  function toggleOverview() {
+    const on = !ovEl.classList.contains('show');
+    ovEl.classList.toggle('show', on);
+    if (on) { renderOverview(); const cur = ovEl.querySelector('.ov.cur'); if (cur) cur.scrollIntoView({ block: 'center' }); }
+  }
+  Deck.toggleOverview = toggleOverview;
+  function toggleFull() {
+    const d = document;
+    if (!d.fullscreenElement) (d.documentElement.requestFullscreen || d.documentElement.webkitRequestFullscreen || (() => {})).call(d.documentElement);
+    else (d.exitFullscreen || d.webkitExitFullscreen).call(d);
+  }
+
+  let hudTimer = 0;
+  function pokeHud() { if (STILL) return; hud.classList.add('show'); dots.classList.add('show'); clearTimeout(hudTimer); hudTimer = setTimeout(() => { hud.classList.remove('show'); dots.classList.remove('show'); }, 2600); }
+
+  function bind() {
+    let jump = '';
+    document.addEventListener('keydown', e => {
+      if (e.target.closest && e.target.closest('input,textarea,select,[contenteditable]')) return;
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      const key = e.key;
+      if (helpEl.classList.contains('show')) { helpEl.classList.remove('show'); e.preventDefault(); return; }
+      if (blankEl.className && key !== 'b' && key !== 'B' && key !== 'w' && key !== 'W') { blankEl.className = ''; e.preventDefault(); return; }
+      if (/^[0-9]$/.test(key)) { jump += key; return; }
+      if (key === 'Enter' && jump) { show(+jump - 1, 0); jump = ''; e.preventDefault(); return; }
+      jump = '';
+      if (ovEl.classList.contains('show') && (key === 'Escape' || key === 'o' || key === 'O')) { toggleOverview(); e.preventDefault(); return; }
+      switch (key) {
+        case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown': case 'Enter': Deck.next(); break;
+        case 'ArrowLeft': case 'ArrowUp': case 'PageUp': case 'Backspace': Deck.prev(); break;
+        case 'Home': show(0, 0); break;
+        case 'End': show(Deck.list.length - 1, 0); break;
+        case 'o': case 'O': toggleOverview(); break;
+        case 'f': case 'F': toggleFull(); break;
+        case 'm': case 'M': act('sound'); break;
+        case 'r': case 'R': Deck.replay(); break;
+        case 'b': case 'B': blankEl.className = blankEl.className === 'black' ? '' : 'black'; break;
+        case 'w': case 'W': blankEl.className = blankEl.className === 'white' ? '' : 'white'; break;
+        case 'h': case 'H': case '?': helpEl.classList.add('show'); break;
+        default: return;
+      }
+      e.preventDefault();
+    });
+    ovEl.addEventListener('click', e => {
+      if (e.target.closest('.ovclose')) { ovEl.classList.remove('show'); return; }
+      if (e.target.closest('.ovjump')) return;
+      const b = e.target.closest('.ov'); if (b) { ovEl.classList.remove('show'); show(+b.dataset.i, 0); } else ovEl.classList.remove('show');
+    });
+    ovEl.addEventListener('submit', e => {
+      e.preventDefault();
+      const v = Math.round(+ovEl.querySelector('#ovNum').value);
+      if (v >= 1 && v <= Deck.list.length) { ovEl.classList.remove('show'); show(v - 1, 0); }
+      else { const inp = ovEl.querySelector('#ovNum'); inp.value = ''; inp.placeholder = `1~${Deck.list.length}`; inp.focus(); }
+    });
+    // 무대 클릭·밀기
+    let down = null;
+    viewport.addEventListener('pointerdown', e => { down = { x: e.clientX, y: e.clientY, t: performance.now(), inter: !!e.target.closest('button,a,input,select,textarea,label,[data-interactive]') }; pokeHud(); });
+    viewport.addEventListener('pointerup', e => {
+      if (!down) return; const dx = e.clientX - down.x, dy = e.clientY - down.y; const d0 = down; down = null;
+      if (d0.inter) return;
+      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.3) { dx < 0 ? Deck.next() : Deck.prev(); return; }
+      if (Math.abs(dx) < 12 && Math.abs(dy) < 12 && e.button === 0) {
+        const r = stage.getBoundingClientRect();
+        (e.clientX - r.left < r.width * 0.12) ? Deck.prev() : Deck.next();
+      }
+    });
+    viewport.addEventListener('contextmenu', e => { if (e.target.closest('[data-interactive]')) return; e.preventDefault(); Deck.prev(); });
+    document.addEventListener('mousemove', pokeHud, { passive: true });
+    window.addEventListener('resize', fit);
+  }
+
+  function boot() {
+    viewport = document.getElementById('viewport'); stage = document.getElementById('stage');
+    Deck.list = Array.from(stage.querySelectorAll(':scope > section.slide'));
+    // 한 번만: 장면별 build(root) → 처음 상태 저장
+    Deck.list.forEach(sec => {
+      const def = defOf(sec);
+      if (def.build) { try { def.build(sec, U); } catch (e) { console.error(`[build ${sec.id}]`, e); } }
+      sec.querySelectorAll('[data-fx="draw"]').forEach(g => {
+        const geo = g.matches(GEOM) ? [g] : Array.from(g.querySelectorAll(GEOM));
+        geo.forEach(x => { if (!x.hasAttribute('pathLength')) x.setAttribute('pathLength', '1'); });
+      });
+      sec.__pristine = sec.innerHTML;
+      sec.innerHTML = '';
+    });
+    buildChrome(); fit(); bind();
+    const h = (location.hash || '').replace('#', '').split('.');
+    let si = Q.has('p') ? (+Q.get('p') - 1) : (h[0] ? +h[0] - 1 : 0);
+    let sk = Q.has('k') ? +Q.get('k') : (h[1] ? +h[1] : 0);
+    if (Q.has('id')) { const j = Deck.list.findIndex(s => s.id === Q.get('id')); if (j >= 0) si = j; }
+    if (!(si >= 0)) si = 0;
+    if (sk === -1 || Q.get('k') === 'last') sk = 99;
+    if (Q.get('play') === '1' && sk > 0 && !STILL) { show(si, sk - 1, { instant: true }).then(() => stepTo(Math.min(sk, stepsOf(Deck.list[si])))); }
+    else show(si, sk, { instant: sk > 0 });
+    if (!STILL) setTimeout(pokeHud, 400);
+  }
+  Deck.boot = boot;
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(boot, 0));
+  else setTimeout(boot, 0);
+})();
+
+
+</script><script>
+/* ── 03_sfx.js ── */
+try{
+/* ═══════════════════════════════════════════════════════════════
+   03_sfx.js — 효과음(WebAudio 합성). 소리 파일 0개 · 오프라인 OK
+   · 장면에서는 c.sfx('blank', 지연ms) · c.sfxLoop('fan') 로 부른다(core.js 가 순간 모드·건너뛰기·장면 나감을 알아서 처리)
+   · 브라우저 정책상 첫 클릭·키 입력 뒤부터 소리가 난다. M 키·HUD 단추로 켜고 끔(기기에 기억). 학생 모드(?s=1)는 기본 꺼짐
+   · 점검: ?sfx=demo → 모든 소리를 눌러 들어 보는 패널 / SFX.analyze('blank') → 오프라인 렌더로 세기·길이 점검
+   · 주소 도우미: ?sound=1|0 강제 켜기·끄기 · ?nosfx=1 완전 끔 · ?sfxtest=1 클릭 없이 잠금 해제(자동 점검용)
+   ═══════════════════════════════════════════════════════════════ */
+window.SFX = (function () {
+  'use strict';
+  const Q = new URLSearchParams(location.search);
+  const D = window.Deck || {};
+  const OFF = !!D.STILL || Q.get('nosfx') === '1';
+  const KEY = 'sc_sfx';
+  const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+  let on = !D.STUDENT;
+  try { const s = localStorage.getItem(KEY); if (s === '1' || s === '0') on = s === '1'; } catch (e) {}
+  if (Q.get('sound') === '1') on = true; else if (Q.get('sound') === '0') on = false;
+  let ac = null, out = null, X = null, unlocked = Q.get('sfxtest') === '1', broken = false;
+  const pending = new Set();
+
+  /* ── 잡음(결정적) ── */
+  function noiseBuf(actx) {
+    const n = Math.floor(actx.sampleRate * 2), b = actx.createBuffer(1, n, actx.sampleRate), d = b.getChannelData(0);
+    let s = 12345;
+    for (let i = 0; i < n; i++) { s = (s * 1664525 + 1013904223) >>> 0; d[i] = s / 2147483648 - 1; }
+    return b;
+  }
+  function ensure() {
+    if (OFF || broken || !unlocked) return null;
+    if (!ac) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) { broken = true; return null; }
+      try { ac = new AC(); } catch (e) { broken = true; return null; }
+      const comp = ac.createDynamicsCompressor();
+      comp.threshold.value = -14; comp.knee.value = 18; comp.ratio.value = 4; comp.attack.value = .004; comp.release.value = .18;
+      out = ac.createGain(); out.gain.value = on ? .9 : 0;
+      out.connect(comp); comp.connect(ac.destination);
+      X = { ac, dest: out, nz: noiseBuf(ac) };
+    }
+    if (ac.state === 'suspended' && on && !document.hidden) ac.resume().catch(() => {});
+    return X;
+  }
+
+  /* ── 소리 부품 ── */
+  function env(g, t, a, d, peak) {
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(Math.max(0.0002, peak), t + a);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + a + d);
+  }
+  function route(x, node, pan) {
+    if (pan && x.ac.createStereoPanner) { const p = x.ac.createStereoPanner(); p.pan.value = clamp(pan, -1, 1); node.connect(p); p.connect(x.dest); return; }
+    node.connect(x.dest);
+  }
+  /** 톤: f(→f2) Hz, a 올림 s, d 사라짐 s, g 세기, type, vib[Hz, 깊이Hz], lp 저역통과, pan */
+  function tone(x, t, o) {
+    const ac = x.ac, osc = ac.createOscillator(), g = ac.createGain();
+    const a = o.a ?? .004, d = o.d ?? .3;
+    osc.type = o.type || 'sine';
+    osc.frequency.setValueAtTime(o.f, t);
+    if (o.f2) osc.frequency.exponentialRampToValueAtTime(o.f2, t + a + d);
+    if (o.vib) {
+      const l = ac.createOscillator(), lg = ac.createGain();
+      l.frequency.value = o.vib[0]; lg.gain.value = o.vib[1]; l.connect(lg); lg.connect(osc.frequency); l.start(t); l.stop(t + a + d + .06);
+    }
+    env(g, t, a, d, o.g ?? .2);
+    osc.connect(g);
+    let last = g;
+    if (o.lp) { const f = ac.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = o.lp; g.connect(f); last = f; }
+    route(x, last, o.pan);
+    osc.start(t); osc.stop(t + a + d + .07);
+  }
+  /** 잡음: type(bandpass|highpass|lowpass), f(→f2) Hz, q */
+  function noise(x, t, o) {
+    const ac = x.ac, s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+    const a = o.a ?? .003, d = o.d ?? .1;
+    s.buffer = x.nz; s.loop = true;
+    f.type = o.type || 'bandpass'; f.frequency.setValueAtTime(o.f || 2000, t);
+    if (o.f2) f.frequency.exponentialRampToValueAtTime(o.f2, t + a + d);
+    f.Q.value = o.q ?? 1;
+    env(g, t, a, d, o.g ?? .15);
+    s.connect(f); f.connect(g); route(x, g, o.pan);
+    s.start(t, (t * 7.13) % 1.5); s.stop(t + a + d + .07);
+  }
+  const PART = [[1, 1, 1], [2.76, .3, .55], [5.4, .1, .3], [8.93, .04, .18]];
+  function bell(x, t, f, g = .3, d = 1.1) { PART.forEach(([r, w, k]) => tone(x, t, { f: f * r, a: .002, d: d * k, g: g * w })); }
+  function tickAt(x, t, f, g) {
+    tone(x, t, { f, a: .001, d: .014, g });
+    noise(x, t, { a: .001, d: .006, g: g * .9, type: 'bandpass', f: f * 1.6, q: 1.5 });
+  }
+
+  /* ═════════ 소리 목록: (x, t, a, b) ═════════ */
+  const SCALE = [0, 2, 4, 7, 9, 12, 9, 7, 4, 2];       // 빈칸이 채워질 때마다 음계가 오르내린다
+  const S = {
+    /** 빈칸이 채워짐 — 마림바 같은 「띠링」. i = 몇 번째 빈칸(음 높이 순서) */
+    blank(x, t, i) {
+      const f = 659.25 * Math.pow(2, SCALE[(i | 0) % 10] / 12);
+      tone(x, t, { f, a: .003, d: .34, g: .24 });
+      tone(x, t, { f: f * 2, a: .002, d: .16, g: .07 });
+      tone(x, t, { f: f * 4.02, a: .001, d: .05, g: .025 });
+      noise(x, t, { a: .001, d: .012, g: .05, type: 'highpass', f: 3500 });
+    },
+    /** 무언가 톡 나타남 */
+    pop(x, t) {
+      tone(x, t, { f: 420, f2: 840, a: .002, d: .1, g: .2 });
+      noise(x, t, { a: .001, d: .02, g: .05, type: 'highpass', f: 3000 });
+    },
+    /** 클릭으로 다음 단계 — 아주 작은 톡 */
+    step(x, t) { tone(x, t, { f: 1500, f2: 900, type: 'triangle', a: .001, d: .045, g: .075 }); noise(x, t, { a: .001, d: .01, g: .03, f: 3000, q: 1.5 }); },
+    /** 다음 장으로 — 부드러운 슥 */
+    slide(x, t) {
+      noise(x, t, { a: .12, d: .5, g: .2, f: 400, f2: 2600, q: .8 });
+      tone(x, t, { f: 220, f2: 110, a: .005, d: .25, g: .09 });
+    },
+    /** 휙 — dur ms, gain */
+    whoosh(x, t, dur = 700, g = 1) {
+      const d = (dur || 700) / 1000;
+      noise(x, t, { a: d * .4, d: d * .6, g: .2 * (g ?? 1), f: 350, f2: 2400, q: .7 });
+    },
+    /** 숫자 굴러감 — 오르는 째깍째깍 */
+    counter(x, t, dur = 1200) {
+      const n = clamp(Math.round((dur || 1200) / 70), 4, 22), sp = (dur || 1200) / 1000 / n;
+      for (let i = 0; i < n; i++) tickAt(x, t + i * sp, 1500 + i * (900 / n), .07);
+    },
+    /** 세는 선을 조각이 지나감(가이거처럼) — p 음높이, g 세기 */
+    tick(x, t, p = 1, g = 1) { tickAt(x, t, 2100 * (p || 1), .1 * (g ?? 1)); },
+    /** 1초가 지남 — 나무 시계 */
+    clock(x, t) {
+      tone(x, t, { f: 1050, f2: 620, type: 'triangle', a: .001, d: .06, g: .17 });
+      noise(x, t, { a: .001, d: .012, g: .08, f: 2600, q: 2 });
+    },
+    /** 쾅(도장) */
+    thunk(x, t) {
+      tone(x, t, { f: 150, f2: 44, a: .002, d: .24, g: .5 });
+      noise(x, t, { a: .002, d: .1, g: .28, type: 'lowpass', f: 700, f2: 200 });
+    },
+    /** 땡 */
+    ding(x, t, k = 1) { bell(x, t, 1318.5 * (k || 1), .32, 1.1); },
+    /** 딩동딩동 ↑ (정답·완성) */
+    chime(x, t) { [1046.5, 1318.5, 1568, 2093].forEach((f, i) => bell(x, t + i * .085, f, .3, .9)); },
+    /** 명판 뒤집기 */
+    flip(x, t) {
+      noise(x, t, { a: .002, d: .03, g: .18, f: 3200, q: 1.5 });
+      noise(x, t + .12, { a: .002, d: .03, g: .18, f: 2600, q: 1.5 });
+      noise(x, t + .02, { a: .03, d: .16, g: .09, f: 900, f2: 2600 });
+    },
+    /** 토스터 레버 내림 — 철컥 */
+    lever(x, t) {
+      tone(x, t, { f: 260, f2: 75, type: 'triangle', a: .002, d: .14, g: .4 });
+      noise(x, t, { a: .002, d: .06, g: .22, type: 'lowpass', f: 1200, f2: 400 });
+      tone(x, t + .01, { f: 1900, f2: 1200, a: .001, d: .05, g: .04 });
+    },
+    /** 토스터 빵 튀어 오름 — 텅~ 팅! */
+    toasterPop(x, t) {
+      tone(x, t, { f: 150, f2: 55, a: .002, d: .12, g: .32 });
+      tone(x, t + .02, { f: 210, f2: 640, type: 'triangle', a: .005, d: .32, g: .11, vib: [22, 26] });
+      noise(x, t + .02, { a: .01, d: .2, g: .05, f: 2400, q: 1.2 });
+      bell(x, t + .16, 2637, .22, .9);
+    },
+    /** 열선이 달아오르며 탁탁 — dur ms */
+    sizzle(x, t, dur = 2000) {
+      const d = (dur || 2000) / 1000, n = Math.round(d * 34);
+      for (let i = 0; i < n; i++) noise(x, t + Math.random() * d, { a: .001, d: .009, g: .11 * (1 - i / n * .3), f: 2500 + Math.random() * 3500, q: 1.4, pan: (Math.random() - .5) * .6 });
+    },
+    /** 스피커 박 — strong 이면 큰 북, 아니면 작은 북 + 심벌 */
+    kick(x, t, strong, lv) {
+      const k = lv == null ? 1 : lv, g = (strong ? .5 : .3) * k;
+      tone(x, t, { f: strong ? 150 : 130, f2: 44, a: .002, d: strong ? .2 : .14, g });
+      noise(x, t, { a: .001, d: .05, g: g * .5, type: 'lowpass', f: 900, f2: 300 });
+      if (!strong) noise(x, t + .02, { a: .001, d: .04, g: .045, type: 'highpass', f: 7000 });
+    },
+    /** 백열전구 켜짐 — 딸깍 · 웅 · 팅 */
+    bulbOn(x, t) {
+      noise(x, t, { a: .001, d: .006, g: .12, f: 3000, q: 1.5 });
+      tone(x, t + .02, { f: 98, type: 'triangle', a: .05, d: .55, g: .08, lp: 500 });
+      noise(x, t + .03, { a: .08, d: .5, g: .05, type: 'lowpass', f: 300, f2: 3000 });
+      bell(x, t + .05, 1760, .12, .8);
+    },
+    /** LED 켜짐 — 딸깍 · 띠링 */
+    ledOn(x, t) {
+      noise(x, t, { a: .001, d: .006, g: .1, f: 3400, q: 1.5 });
+      tone(x, t + .01, { f: 1568, f2: 2093, a: .003, d: .2, g: .1 });
+      bell(x, t + .03, 2349, .1, .7);
+    },
+    /** 집 창문 켜짐 — 딸깍 · 띵띵띵 */
+    lightsOn(x, t) {
+      noise(x, t, { a: .001, d: .01, g: .08, f: 2600, q: 1.5 });
+      [1568, 1760, 1976].forEach((f, i) => bell(x, t + .04 + i * .09, f, .15, .7));
+    },
+    /** 송전선을 타고 전달 — 웅~ + 쉬익 + 지직, 소리가 왼쪽에서 오른쪽으로 움직임 */
+    zap(x, t, dur = 2400) {
+      const ac = x.ac, d = (dur || 2400) / 1000;
+      const o = ac.createOscillator(), lp = ac.createBiquadFilter(), g = ac.createGain();
+      o.type = 'sawtooth'; o.frequency.setValueAtTime(55, t); o.frequency.exponentialRampToValueAtTime(230, t + d * .8);
+      lp.type = 'lowpass'; lp.frequency.setValueAtTime(260, t); lp.frequency.exponentialRampToValueAtTime(1400, t + d);
+      g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(.15, t + d * .15); g.gain.setValueAtTime(.15, t + d * .7); g.gain.exponentialRampToValueAtTime(.0001, t + d + .5);
+      o.connect(lp); lp.connect(g);
+      if (ac.createStereoPanner) { const p = ac.createStereoPanner(); p.pan.setValueAtTime(-.85, t); p.pan.linearRampToValueAtTime(.85, t + d); g.connect(p); p.connect(x.dest); } else g.connect(x.dest);
+      o.start(t); o.stop(t + d + .6);
+      noise(x, t, { a: d * .3, d: d * .7, g: .07, f: 600, f2: 4200, q: .6 });
+      for (let i = 0, n = Math.round(d * 22); i < n; i++) noise(x, t + Math.random() * d, { a: .001, d: .008, g: .045, type: 'highpass', f: 5000, pan: -1 + 2 * Math.random() });
+    },
+    /** 열 보기 훑기 — 스캐너 */
+    scan(x, t, dur = 900) {
+      const d = (dur || 900) / 1000;
+      tone(x, t, { f: 280, f2: 1250, a: .04, d, g: .09, vib: [9, 14] });
+      tone(x, t, { f: 283, f2: 1262, type: 'triangle', a: .04, d, g: .04, pan: .4 });
+    },
+    /** 온도계가 오름 — 조용한 상승음 */
+    rise(x, t, dur = 2400) { tone(x, t, { f: 260, f2: 640, a: .15, d: (dur || 2400) / 1000, g: .07, vib: [5, 6] }); },
+    /** 바늘이 내려옴 — 슬라이드 휘슬 + 톡 */
+    sweepDown(x, t, dur = 1300) {
+      const d = (dur || 1300) / 1000;
+      tone(x, t, { f: 1100, f2: 380, a: .02, d, g: .09 });
+      tickAt(x, t + d, 1800, .08);
+    },
+    /** 푸슉(연기) */
+    puff(x, t) { noise(x, t, { a: .05, d: .5, g: .22, type: 'lowpass', f: 1000, f2: 300, q: .4 }); },
+    /** 싹둑 싹둑 */
+    snip(x, t) {
+      [0, .07, .14].forEach(o => { noise(x, t + o, { a: .001, d: .012, g: .18, f: 5000, q: 2 }); tone(x, t + o, { f: 3000, a: .001, d: .02, g: .03 }); });
+    },
+    /** 슥(선 그리기) */
+    zip(x, t, dur = 500) { noise(x, t, { a: .02, d: Math.min(.3, (dur || 500) / 1000 * .5), g: .12, f: 1500, f2: 4200, q: 1 }); },
+    /** 반짝 */
+    spark(x, t) { for (let i = 0; i < 4; i++) tone(x, t + i * .04 + Math.random() * .02, { f: 2200 + Math.random() * 2000, a: .001, d: .08, g: .04 }); },
+  };
+
+  /* ═════════ 이어지는 소리(선풍기·발전소·끓는 물) — level(0..1) 로 세기 조종 ═════════ */
+  function buildFan(x) {
+    const ac = x.ac, out = ac.createGain(); out.gain.value = 0; out.connect(x.dest);
+    const ns = ac.createBufferSource(); ns.buffer = x.nz; ns.loop = true;
+    const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 500; bp.Q.value = .7;
+    const gw = ac.createGain(); gw.gain.value = 0;
+    const lfo = ac.createOscillator(), lg = ac.createGain(); lfo.frequency.value = 3; lg.gain.value = 0; lfo.connect(lg); lg.connect(gw.gain);   // 날개가 바람을 자르는 울렁임
+    ns.connect(bp); bp.connect(gw); gw.connect(out);
+    const m1 = ac.createOscillator(), m2 = ac.createOscillator(), gm = ac.createGain(), lp = ac.createBiquadFilter();   // 모터 웅~
+    m1.type = 'triangle'; m1.frequency.value = 50; m2.type = 'sine'; m2.frequency.value = 100; gm.gain.value = 0;
+    lp.type = 'lowpass'; lp.frequency.value = 700; m1.connect(gm); m2.connect(gm); gm.connect(lp); lp.connect(out);
+    ns.start(0, .3); lfo.start(); m1.start(); m2.start();
+    let lv = 0, wh = 0;
+    const apply = () => {
+      const T = ac.currentTime, v = clamp(lv, 0, 1.1), tc = .07;
+      gw.gain.setTargetAtTime(v * v * .095, T, tc); lg.gain.setTargetAtTime(v * v * .035, T, tc);
+      lfo.frequency.setTargetAtTime(2 + 7 * v, T, tc);
+      bp.frequency.setTargetAtTime(380 + 900 * v, T, tc);
+      m1.frequency.setTargetAtTime(46 + 70 * v, T, tc); m2.frequency.setTargetAtTime(92 + 140 * v, T, tc);
+      gm.gain.setTargetAtTime(v > .02 ? .01 + .034 * v + wh * .04 : 0, T, tc);
+      out.gain.setTargetAtTime(v > .01 ? 1 : 0, T, .05);
+    };
+    return {
+      level(v) { lv = v; apply(); }, whine(v) { wh = v; apply(); },
+      stop() {
+        const T = ac.currentTime; out.gain.cancelScheduledValues(T); out.gain.setTargetAtTime(0, T, .08);
+        setTimeout(() => { try { ns.stop(); lfo.stop(); m1.stop(); m2.stop(); out.disconnect(); } catch (e) {} }, 500);
+      },
+    };
+  }
+  function buildHum(x) {   // 발전소 웅~
+    const ac = x.ac, out = ac.createGain(); out.gain.value = 0; out.connect(x.dest);
+    const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 220; lp.connect(out);
+    const o1 = ac.createOscillator(), o2 = ac.createOscillator(); o1.type = 'sawtooth'; o1.frequency.value = 50; o2.type = 'sine'; o2.frequency.value = 100;
+    const g2 = ac.createGain(); g2.gain.value = .5; o1.connect(lp); o2.connect(g2); g2.connect(lp);
+    const ns = ac.createBufferSource(); ns.buffer = x.nz; ns.loop = true; const nl = ac.createBiquadFilter(); nl.type = 'lowpass'; nl.frequency.value = 380; const ng = ac.createGain(); ng.gain.value = .5;
+    ns.connect(nl); nl.connect(ng); ng.connect(lp);
+    o1.start(); o2.start(); ns.start(0, .7);
+    return {
+      level(v) { const T = ac.currentTime; out.gain.setTargetAtTime(clamp(v, 0, 1.1) * .06, T, .15); o1.frequency.setTargetAtTime(44 + 8 * v, T, .3); },
+      stop() { const T = ac.currentTime; out.gain.setTargetAtTime(0, T, .1); setTimeout(() => { try { o1.stop(); o2.stop(); ns.stop(); out.disconnect(); } catch (e) {} }, 500); },
+    };
+  }
+  function buildBoil(x) {   // 주전자 끓는 소리: 쉬이~ + 보글보글
+    const ac = x.ac, out = ac.createGain(); out.gain.value = 0; out.connect(x.dest);
+    const ns = ac.createBufferSource(); ns.buffer = x.nz; ns.loop = true; const hp = ac.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 3200;
+    const gh = ac.createGain(); gh.gain.value = 0; ns.connect(hp); hp.connect(gh); gh.connect(out); ns.start(0, .2);
+    let lv = 0; const rnd = U_rng(7);
+    const id = setInterval(() => {
+      if (lv < .05 || !on) return;
+      if (rnd() < .15 + lv * .5) { const T = ac.currentTime + .005, f0 = 260 + rnd() * 260; tone({ ac, dest: out, nz: x.nz }, T, { f: f0, f2: f0 * 1.9, a: .003, d: .07, g: .1 * lv, pan: (rnd() - .5) * .8 }); }
+    }, 70);
+    return {
+      level(v) { lv = clamp(v, 0, 1); const T = ac.currentTime; gh.gain.setTargetAtTime(lv * .05, T, .4); out.gain.setTargetAtTime(lv > .01 ? 1 : 0, T, .1); },
+      stop() { clearInterval(id); const T = ac.currentTime; out.gain.setTargetAtTime(0, T, .1); setTimeout(() => { try { ns.stop(); out.disconnect(); } catch (e) {} }, 500); },
+    };
+  }
+  function U_rng(seed) { let s = seed >>> 0 || 1; return () => { s ^= s << 13; s >>>= 0; s ^= s >> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; }; }
+  const LOOPS = { fan: buildFan, hum: buildHum, boil: buildBoil };
+  const NULL_LOOP = { level() {}, whine() {}, stop() {} };
+
+  /* ═════════ 바깥 API ═════════ */
+  let blankN = 0;
+  const tickLog = [];
+  function play(name, a, b) {
+    if (OFF || !on) return;
+    const x = ensure(); if (!x) return;
+    const f = S[name]; if (!f) { console.warn('[SFX] 없는 소리:', name); return; }
+    if (name === 'blank') a = blankN++;
+    if (name === 'tick') {   // 빽빽할수록(100 W 레인) 톡톡이 작고 높은 지지직으로 — 촘촘한 정도에 따라 세기·음높이 자동 조절
+      const now = performance.now(); tickLog.push(now); while (tickLog.length && now - tickLog[0] > 250) tickLog.shift();
+      const n = tickLog.length;
+      b = (b ?? 1) / (1 + n * .22); a = (a ?? 1) * (1 + Math.min(n, 30) * .012);
+    }
+    try { f(x, x.ac.currentTime + .008, a, b); } catch (e) { console.error('[SFX]', name, e); }
+  }
+  function loop(kind, o) {
+    const build = LOOPS[kind];
+    if (OFF || !build) return NULL_LOOP;
+    const h = {
+      built: null, lvl: 0, wh: 0, dead: false,
+      level(v) { h.lvl = v; if (h.built) h.built.level(v); },
+      whine(v) { h.wh = v; if (h.built && h.built.whine) h.built.whine(v); },
+      stop() { h.dead = true; pending.delete(h); if (h.built) { h.built.stop(); h.built = null; } },
+      tryBuild() {
+        if (h.built || h.dead) return;
+        const x = ensure(); if (!x) return;
+        try { h.built = build(x, o || {}); h.built.level(h.lvl); if (h.wh && h.built.whine) h.built.whine(h.wh); }
+        catch (e) { console.error('[SFX loop]', kind, e); h.dead = true; }
+      },
+    };
+    pending.add(h); h.tryBuild();
+    return h;
+  }
+  function unlock() {
+    if (unlocked) return;
+    unlocked = true;
+    if (!OFF) { ensure(); pending.forEach(h => h.tryBuild()); }
+  }
+  ['pointerdown', 'keydown', 'touchstart'].forEach(ev => document.addEventListener(ev, unlock, { capture: true, once: false, passive: true }));
+  document.addEventListener('visibilitychange', () => {
+    if (!ac) return;
+    if (document.hidden) ac.suspend().catch(() => {}); else if (on) ac.resume().catch(() => {});
+  });
+
+  let toastEl = null, toastT = 0;
+  function toast(v) {
+    if (!document.body) return;
+    if (!toastEl) { toastEl = document.createElement('div'); toastEl.id = 'sfxToast'; document.body.appendChild(toastEl); }
+    toastEl.textContent = v ? '소리 켜짐' : '소리 꺼짐';
+    toastEl.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => toastEl.classList.remove('show'), 1400);
+  }
+  function toggle(v) {
+    on = v == null ? !on : !!v;
+    try { localStorage.setItem(KEY, on ? '1' : '0'); } catch (e) {}
+    unlock();
+    const x = ensure();
+    if (x && out) out.gain.setTargetAtTime(on ? .9 : 0, ac.currentTime, .03);
+    toast(on);
+    if (on) play('pop');
+    return on;
+  }
+
+  /* ═════════ 점검 도구 ═════════ */
+  function measure(buf) {
+    let peak = 0, sum = 0, n = 0, last = 0, first = -1, zc = 0, prev = 0;
+    const ch = buf.getChannelData(0), ch2 = buf.numberOfChannels > 1 ? buf.getChannelData(1) : ch, sr = buf.sampleRate;
+    for (let i = 0; i < ch.length; i++) {
+      const v = Math.max(Math.abs(ch[i]), Math.abs(ch2[i]));
+      if (v > peak) peak = v;
+      sum += ch[i] * ch[i]; n++;
+      if (v > .003) { last = i; if (first < 0) first = i; }
+      if ((ch[i] >= 0) !== (prev >= 0)) zc++; prev = ch[i];
+    }
+    const active = Math.max(1, last - Math.max(0, first)) / sr;
+    return { peak: +peak.toFixed(3), rms: +Math.sqrt(sum / n).toFixed(4), attack: first < 0 ? null : +(first / sr).toFixed(3), length: +(last / sr).toFixed(2), approxHz: Math.round(zc / 2 / active), clipped: peak >= .98, silent: peak < .01 };
+  }
+  async function analyze(name, a, b, secs = 3) {
+    const OA = window.OfflineAudioContext || window.webkitOfflineAudioContext, sr = 44100;
+    const oc = new OA(2, Math.floor(sr * secs), sr), g = oc.createGain(); g.gain.value = .9; g.connect(oc.destination);
+    const x = { ac: oc, dest: g, nz: noiseBuf(oc) };
+    S[name](x, .02, a, b);
+    return measure(await oc.startRendering());
+  }
+  async function analyzeLoop(kind, level = 1, secs = 1.5) {
+    const OA = window.OfflineAudioContext || window.webkitOfflineAudioContext, sr = 44100;
+    const oc = new OA(2, Math.floor(sr * secs), sr), g = oc.createGain(); g.gain.value = .9; g.connect(oc.destination);
+    const h = LOOPS[kind]({ ac: oc, dest: g, nz: noiseBuf(oc) }); h.level(level);
+    const r = measure(await oc.startRendering()); try { h.stop(); } catch (e) {} return r;
+  }
+
+  /** ?sfx=demo — 모든 소리를 눌러 들어 보는 패널 */
+  function demoPanel() {
+    const box = document.createElement('div');
+    box.style.cssText = 'position:fixed;left:12px;top:12px;z-index:200;max-width:340px;max-height:92vh;overflow:auto;background:rgba(29,29,31,.94);color:#f5f5f7;border-radius:14px;padding:14px;font:600 13px/1.3 system-ui,sans-serif';
+    const btn = (t, fn) => { const b = document.createElement('button'); b.textContent = t; b.style.cssText = 'margin:3px;padding:6px 10px;border-radius:9999px;border:0;background:#0066cc;color:#fff;font:600 13px system-ui'; b.onclick = () => { unlock(); fn(); }; return b; };
+    box.appendChild(Object.assign(document.createElement('div'), { textContent: '효과음 듣기 (F2 로 닫기)', style: 'margin-bottom:8px;font-size:14px' }));
+    Object.keys(S).forEach(k => box.appendChild(btn(k, () => { if (!on) toggle(true); play(k, k === 'kick' ? true : undefined, 1); })));
+    let fan = null;
+    box.appendChild(btn('fan 0→1→0', () => { if (!on) toggle(true); if (fan) fan.stop(); fan = loop('fan'); let v = 0, dir = 1; const id = setInterval(() => { v += dir * .05; if (v >= 1) dir = -1; fan.level(clamp(v)); if (v <= 0 && dir < 0) { clearInterval(id); fan.stop(); fan = null; } }, 60); }));
+    box.appendChild(btn('boil', () => { if (!on) toggle(true); const h = loop('boil'); h.level(1); setTimeout(() => h.stop(), 4000); }));
+    box.appendChild(btn('hum', () => { if (!on) toggle(true); const h = loop('hum'); h.level(1); setTimeout(() => h.stop(), 3000); }));
+    document.body.appendChild(box);
+    document.addEventListener('keydown', e => { if (e.key === 'F2') box.remove(); });
+  }
+  if (Q.get('sfx') === 'demo') { const go = () => demoPanel(); if (document.body) go(); else document.addEventListener('DOMContentLoaded', go); }
+
+  return { play, loop, toggle, unlock, analyze, analyzeLoop, names: () => Object.keys(S), isOn: () => on, isOff: () => OFF, S, debug: () => ({ pendingLoops: pending.size, unlocked, state: ac ? ac.state : 'none' }) };
+})();
+
+}catch(e){console.error("[object 03_sfx.js]",e)}
+
+</script><script>
+'use strict';
+/* ── 빅데이터와 과학기술사회 덱 · 그림 도우미 ── */
+function txt(x,y,s,size=28,color='var(--t2)',anchor='middle',extra=''){return `<text x="${x}" y="${y}" text-anchor="${anchor}" font-size="${size}" fill="${color}" ${extra}>${s}</text>`;}
+function line(x1,y1,x2,y2,color='var(--hl)',width=2,extra=''){return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="${width}" ${extra}/>`;}
+const f1=v=>Math.round(v*10)/10;
+const fmt=v=>Math.round(v).toLocaleString('ko-KR');
+const sfxAt=(map)=>(c,k)=>{const f=map[k];if(f)f(c);};
+
+/* 교실 이산화 탄소 모형: 잘 섞인 상자 모형
+   dC/dt = 학생 배출량/부피 − 환기율 × (C − 바깥 농도) */
+const CO2={V:180,G:0.016,OUT:440,LAM:[0.4,2.5,6]};
+function co2Series({n=25,win=0,tOpen=50,c0=CO2.OUT+60,T=50,dt=0.25}){
+  const S=n*CO2.G/CO2.V*1e6;           // ppm / 시간
+  let C=c0;const pts=[[0,C]];
+  for(let t=dt;t<=T+1e-9;t+=dt){
+    const lam=(t>tOpen&&win>0)?CO2.LAM[win]:CO2.LAM[0];
+    C+=(S-lam*(C-CO2.OUT))*dt/60;
+    if(Math.abs(t-Math.round(t))<1e-6)pts.push([Math.round(t),C]);
+  }
+  return pts;
+}
+
+/* 그래프 틀: x 0~T분, y lo~hi ppm */
+function chartFrame({x,y,w,h,T=50,lo=400,hi=3000,ticks=[500,1000,1500,2000,2500,3000],std=true}){
+  const X=t=>x+t/T*w,Y=v=>y+h-(v-lo)/(hi-lo)*h;
+  let s='';
+  ticks.forEach(v=>{s+=line(x,f1(Y(v)),x+w,f1(Y(v)),'var(--hl)',1.5)+txt(x-16,f1(Y(v))+9,v,24,'var(--t3)','end');});
+  for(let t=0;t<=T;t+=10)s+=txt(f1(X(t)),y+h+40,t+'분',24,'var(--t3)');
+  s+=line(x,y+h,x+w,y+h,'var(--t2)',2);
+  if(std){s+=line(x,f1(Y(1000)),x+w,f1(Y(1000)),'var(--heat)',3,'stroke-dasharray="14 10"')+txt(x+10,f1(Y(1000))-14,'기준 1000 ppm',26,'var(--heat)','start','font-weight="600"');}
+  s+=txt(x,y-26,'이산화 탄소 농도(ppm)',24,'var(--t3)','start');
+  return {s,X,Y};
+}
+const polyD=(pts,X,Y)=>pts.map((p,i)=>(i?'L':'M')+f1(X(p[0]))+' '+f1(Y(p[1]))).join(' ');
+
+/* ═════════ 장면 ═════════ */
+
+/* 표지: 흩어진 점(측정값)이 모여 그래프가 됨 */
+const HERO_N=51;
+function heroPts(){
+  const R=U.rng(11),src=[],dst=[];
+  const ser=co2Series({n:28,win:2,tOpen:34});
+  for(let i=0;i<HERO_N;i++){
+    src.push([260+R()*1400,140+R()*460]);
+    const v=ser[i][1];dst.push([300+i*26.4,600-(v-400)/(2300-400)*440]);
+  }
+  return {src,dst};
+}
+Deck.scene('cover',{steps:0,
+  build(root){
+    const {src,dst}=heroPts();
+    let h=`<path id="hero-line" d="${dst.map((p,i)=>(i?'L':'M')+f1(p[0])+' '+f1(p[1])).join(' ')}" fill="none" stroke="var(--elec)" stroke-width="4" opacity=".0"/>`;
+    src.forEach((p,i)=>h+=`<circle class="hd-dot" cx="${f1(p[0])}" cy="${f1(p[1])}" r="7" fill="var(--elec)" opacity=".85"/>`);
+    root.querySelector('#hero-g').innerHTML=h;
+  },
+  async enter(c){
+    const {src,dst}=heroPts(),els=c.$$('#hero-g .hd-dot'),ln=c.$('#hero-line');
+    await c.wait(500);
+    c.sfx('whoosh',0,1800,.5);
+    await c.tween(1800,p=>els.forEach((e,i)=>{e.setAttribute('cx',f1(src[i][0]+(dst[i][0]-src[i][0])*p));e.setAttribute('cy',f1(src[i][1]+(dst[i][1]-src[i][1])*p));}),{ease:'inOut'});
+    ln.setAttribute('opacity','.9');c.draw(ln,{dur:1200});
+  }
+});
+
+/* 일주일 걸음 수 */
+const STEPS=[['월',8200],['화',7900],['수',8600],['목',8100],['금',9000],['토',3200],['일',2800]];
+Deck.scene('datainfo',{steps:3,
+  build(root){
+    root.querySelector('#steps-list').innerHTML=STEPS.map(([d,v])=>`<div style="display:flex;justify-content:space-between;font-size:34px;line-height:1.6;border-bottom:1px solid var(--hl)"><span class="mute">${d}요일</span><span>${v.toLocaleString('ko-KR')}걸음</span></div>`).join('');
+    const x0=780,base=720,W=124,gap=18,k=360/10000;let h='';
+    h+=txt(760,330,'그래프로 나타내면',30,'var(--t2)','start','font-weight="600"');
+    h+=line(760,base,1800,base,'var(--t2)',2);
+    STEPS.forEach(([d,v],i)=>{const x=x0+i*(W+gap),bh=v*k,we=i>=5;
+      h+=`<g data-step="1" data-fx="up" data-delay="${i*90}"><rect x="${x}" y="${f1(base-bh)}" width="${W}" height="${f1(bh)}" rx="10" fill="${we?'var(--heat)':'var(--elec)'}" fill-opacity=".85"/>${txt(x+W/2,f1(base-bh-14),(v/1000).toFixed(1)+'천',24,'var(--t2)')}</g>`;
+      h+=txt(x+W/2,base+38,d,28,'var(--t2)');});
+    root.querySelector('#steps-g').innerHTML=h;
+  },
+  go:sfxAt({2:c=>c.sfx('ding')})
+});
+
+/* 실록: 책 그림 */
+Deck.scene('sillok',{
+  build(root){
+    let h='';
+    for(let i=0;i<5;i++){const x=150+i*24,y=330+i*18;
+      h+=`<rect x="${x}" y="${y}" width="420" height="540" rx="8" fill="#e9e3d4" stroke="#b9ad92" stroke-width="2"/>`;}
+    const bx=246,by=402;
+    h+=`<rect x="${bx}" y="${by}" width="420" height="540" rx="8" fill="#f4efe2" stroke="#a89b7c" stroke-width="3"/>`;
+    for(let j=0;j<4;j++)h+=line(bx+18,by+90+j*130,bx+18,by+130+j*130,'#7a6b4d',4);
+    h+=`<rect x="${bx+300}" y="${by+40}" width="80" height="300" fill="#fffaf0" stroke="#a89b7c" stroke-width="2"/>`+txt(bx+340,by+90,'實',40,'#5b4d33')+txt(bx+340,by+150,'錄',40,'#5b4d33');
+    const R=U.rng(3);
+    for(let col=0;col<6;col++)for(let r=0;r<9;r++){if(R()<.18)continue;h+=`<rect x="${bx+250-col*38}" y="${by+50+r*52}" width="16" height="34" rx="3" fill="#8b7b5a" opacity=".55"/>`;}
+    root.querySelector('#book-g').innerHTML=h;
+  }
+});
+
+/* 탐구 표지: 센서 물결 */
+Deck.scene('inq-title',{
+  build(root){
+    let h='';const cx=1560,cy=500;
+    h+=`<rect x="${cx-90}" y="${cy-60}" width="180" height="120" rx="18" fill="#1d1d1f" stroke="var(--elec)" stroke-width="3"/>`+txt(cx,cy+12,'CO₂',40,'var(--elec)','middle','font-weight="700"');
+    for(let i=1;i<=3;i++)h+=`<circle class="wave" cx="${cx}" cy="${cy}" r="${80+i*70}" fill="none" stroke="var(--elec)" stroke-width="3" opacity="${.5/i}"/>`;
+    root.querySelector('#inq-hero').innerHTML=h;
+  },
+  enter(c){if(c.still||c.reduced)return;const w=c.$$('#inq-hero .wave');c.loop(t=>w.forEach((e,i)=>{const r=80+((i*70+t*60)%210);e.setAttribute('r',f1(r));e.setAttribute('opacity',(0.55*(1-(r-80)/210)).toFixed(2));}));}
+});
+
+/* 탐구 1: 교실 배치도 */
+Deck.scene('plan',{
+  build(root){
+    const x=1240,y=300,w=560,h=420;let s='';
+    s+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="14" fill="none" stroke="var(--t2)" stroke-width="3"/>`;
+    s+=`<rect x="${x+w/2-110}" y="${y-6}" width="220" height="12" fill="var(--t2)"/>`+txt(x+w/2,y-20,'칠판',24,'var(--t3)');
+    for(let i=0;i<3;i++)s+=`<rect x="${x+w-6}" y="${y+60+i*120}" width="12" height="80" fill="var(--elec)" opacity=".6"/>`;
+    s+=txt(x+w,y+h+44,'창문 →',24,'var(--t3)','end');
+    s+=`<rect x="${x-6}" y="${y+h-110}" width="12" height="80" fill="var(--t3)"/>`+txt(x-16,y+h-60,'문',24,'var(--t3)','end');
+    for(let r=0;r<4;r++)for(let col=0;col<5;col++)s+=`<rect x="${x+50+col*96}" y="${y+70+r*76}" width="64" height="40" rx="6" fill="var(--hl)"/>`;
+    const P=[['앞',x+w/2,y+40,'var(--light)'],['가운데',x+w/2,y+h/2+10,'var(--kin)'],['창가',x+w-50,y+h/2-60,'var(--elec)'],['뒤',x+w/2,y+h-28,'var(--heat)']];
+    P.forEach(([n,px,py,col],i)=>{s+=`<g data-step="${i===3?1:4}" data-fx="pop" data-delay="${i===3?0:i*150}"><circle cx="${px}" cy="${py}" r="20" fill="${col}"/>${txt(px,py+56,n,26,col,'middle','font-weight="700"')}</g>`;});
+    root.querySelector('#room-g').innerHTML=s;
+  }
+});
+
+/* 탐구 2: 배선 그림 */
+Deck.scene('wiring',{
+  build(root){
+    let s='';
+    // 보드
+    const bx=150,by=330,bw=440,bh=500;
+    s+=`<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="22" fill="#0b5fa5"/><rect x="${bx+40}" y="${by+200}" width="140" height="140" rx="8" fill="#1d1d1f"/>`;
+    s+=`<rect x="${bx-24}" y="${by+60}" width="80" height="90" rx="6" fill="#b7bcc4"/>`+txt(bx+bw/2,by+bh-30,'마이크로컨트롤러 보드',26,'#e8f1fb');
+    const pins=[['5V',by+110,'#FF6A3D'],['GND',by+200,'#1d1d1f'],['D11',by+290,'#D4A800'],['D13',by+380,'#1E8B3E']];
+    pins.forEach(([n,py])=>{s+=`<rect x="${bx+bw-46}" y="${py-14}" width="28" height="28" rx="4" fill="#111"/>`+txt(bx+bw-62,py+9,n,26,'#fff','end','font-weight="700"');});
+    // 센서
+    const sx=830,sy=360,sw=250,sh=440;
+    s+=`<rect x="${sx}" y="${sy}" width="${sw}" height="${sh}" rx="16" fill="#f5f5f7" stroke="#86868b" stroke-width="3"/>`;
+    for(let i=0;i<5;i++)s+=`<circle cx="${sx+60+i*30}" cy="${sy+70}" r="9" fill="#86868b"/>`;
+    s+=txt(sx+sw/2,sy+150,'CO₂ 센서',30,'#1d1d1f','middle','font-weight="700"');
+    const spins=[['5V',sy+200],['GND',sy+240],['RX',sy+280],['TX',sy+300+0]];
+    const sp=[sy+200,sy+258,sy+316,sy+374];
+    ['5V','GND','RX','TX'].forEach((n,i)=>{s+=`<rect x="${sx-14}" y="${sp[i]-10}" width="20" height="20" rx="3" fill="#111"/>`+txt(sx+22,sp[i]+9,n,26,'#1d1d1f','start','font-weight="700"');});
+    // 선
+    pins.forEach(([n,py,col],i)=>{const x1=bx+bw-18,x2=sx-14,mx=650+i*40;
+      s+=`<path data-step="${i+1}" data-fx="draw" d="M${x1} ${py} H${mx} V${sp[i]} H${x2}" fill="none" stroke="${col}" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>`;});
+    root.querySelector('#wire-g').innerHTML=s;
+  }
+});
+
+/* 탐구 3: 시리얼 모니터 */
+Deck.scene('coding',{
+  build(root){root.querySelector('#log').innerHTML='';},
+  enter(c){
+    const box=c.$('#log');let t=0,v=612;const R=U.rng(5);
+    const add=()=>{const mm=String(t).padStart(2,'0');v+=14+Math.round(R()*16);box.insertAdjacentHTML('beforeend',`<div>10:${mm}:00, ${v} ppm</div>`);while(box.children.length>8)box.firstChild.remove();t++;};
+    for(let i=0;i<4;i++)add();
+    if(c.still)return;c.every(add,900);
+  }
+});
+
+/* 직접 조작: 교실 농도 모형 */
+const LABX={x:240,y:330,w:840,h:500};
+function drawLab(root){
+  const n=+root.querySelector('#nStu').value,tOpen=+root.querySelector('#tOpen').value;
+  const g=root.querySelector('#lab-g');let win=+(g.dataset.win||0);
+  const F=chartFrame(Object.assign({lo:400,hi:3000},LABX));
+  const closed=co2Series({n,win:0});
+  const ser=co2Series({n,win,tOpen});
+  let s=F.s;
+  if(win>0&&tOpen<50)s+=`<rect x="${f1(F.X(tOpen))}" y="${LABX.y}" width="${f1(F.X(50)-F.X(tOpen))}" height="${LABX.h}" fill="var(--kin)" opacity=".10"/>`+txt(f1(F.X(tOpen))+12,LABX.y+34,'창문 엶',24,'var(--kin)','start','font-weight="600"');
+  if(win>0&&tOpen<50)s+=`<path d="${polyD(closed,F.X,F.Y)}" fill="none" stroke="var(--t3)" stroke-width="3" stroke-dasharray="6 8"/>`;
+  s+=`<path d="${polyD(ser,F.X,F.Y)}" fill="none" stroke="var(--elec)" stroke-width="6" stroke-linejoin="round"/>`;
+  const end=ser[ser.length-1][1],mx=Math.max(...ser.map(p=>p[1]));
+  s+=`<circle cx="${f1(F.X(50))}" cy="${f1(F.Y(Math.min(end,3000)))}" r="10" fill="var(--elec)"/>`;
+  g.innerHTML=s;
+  const over=ser.find(p=>p[1]>1000);
+  root.querySelector('#nOut').textContent=n+'명';
+  root.querySelector('#tOut').textContent=(win===0||tOpen>=50)?'열지 않음':tOpen+'분';
+  root.querySelector('#endOut').textContent=fmt(end)+' ppm';
+  root.querySelector('#overOut').textContent=over?over[0]+'분':'넘지 않음';
+  root.querySelector('#maxOut').textContent=fmt(mx)+' ppm';
+  root.querySelector('#endOut').style.color=end>1000?'var(--heat)':'var(--kin)';
+  root.querySelectorAll('[data-win]').forEach(b=>b.classList.toggle('on',+b.dataset.win===win));
+}
+Deck.scene('lab',{
+  build(root){drawLab(root);},
+  enter(c){
+    const root=c.root;
+    const on=()=>drawLab(root);
+    root.querySelector('#nStu').addEventListener('input',on);
+    root.querySelector('#tOpen').addEventListener('input',()=>{const g=root.querySelector('#lab-g');if(+(g.dataset.win||0)===0&&+root.querySelector('#tOpen').value<50)g.dataset.win='2';on();});
+    root.querySelectorAll('[data-win]').forEach(b=>b.addEventListener('click',()=>{const g=root.querySelector('#lab-g');g.dataset.win=b.dataset.win;const t=root.querySelector('#tOpen');if(+b.dataset.win>0&&+t.value>=50)t.value=25;on();if(window.SFX&&!Deck.STILL)SFX.play('clock');}));
+    on();
+  }
+});
+
+/* 탐구 5·6: 기록표 */
+Deck.scene('collect',{
+  build(root){
+    const rows=[['10:00','612','수업 시작, 창문 닫힘'],['10:10','905',''],['10:20','1,214','졸린다는 학생이 생김'],['10:30','1,488','창문 두 개 엶'],['10:35','1,102',''],['10:45','826','']];
+    root.querySelector('#logtable').innerHTML=`<table class="dtab"><tr><th style="width:22%">시각</th><th style="width:26%">농도(ppm)</th><th>교실 상황 메모</th></tr>${rows.map((r,i)=>`<tr data-in="${300+i*120}"><td class="num">${r[0]}</td><td class="num">${r[1]}</td><td class="${r[2]?'c-act':'mute'}">${r[2]||'-'}</td></tr>`).join('')}</table>`;
+  }
+});
+
+/* 정리하기 1·2: 보충교재 예시 그래프(교탁 주변) — 원본 그래프의 가로 위치를 그대로 옮김 */
+const REAL=[[800,945],[812,945],[815,905],[848,900],[852,900],[862,860],[870,820],[878,760],[888,700],[900,670],[915,655],[930,645],[955,637],[985,632],[1000,628],[1020,618],[1050,617],[1080,610],[1110,612],[1130,608],[1160,598],[1200,589],[1250,584],[1280,575],[1300,570],[1330,569],[1360,562],[1400,553],[1430,550],[1450,546],[1500,544],[1540,535],[1560,527],[1585,530],[1590,560],[1600,650],[1610,730],[1620,800],[1635,850],[1650,885],[1665,905],[1680,918],[1700,918],[1730,908],[1760,902],[1800,895],[1830,888],[1860,880],[1880,875],[1895,867],[1905,857]].map(([x,y])=>[x,(1025-y)/0.1425]);
+const RMARK=[[852,'측정 시작','10:13:12','var(--kin)'],[1537,'환기 시작','10:45:17','var(--kin)'],[1653,'환기 종료','10:49:17','var(--elec)'],[1870,'수업 종료','10:59:19','var(--light)']];
+Deck.scene('evaluate',{steps:3,
+  build(root){
+    const B={x:220,y:330,w:920,h:500},P0=797,P1=1905;
+    const X=p=>B.x+(p-P0)/(P1-P0)*B.w,Y=v=>B.y+B.h-v/4000*B.h;
+    let s='';
+    [0,1000,2000,3000,4000].forEach(v=>{s+=line(B.x,f1(Y(v)),B.x+B.w,f1(Y(v)),'var(--hl)',1.5)+txt(B.x-16,f1(Y(v))+9,v,24,'var(--t3)','end');});
+    s+=line(B.x,B.y+B.h,B.x+B.w,B.y+B.h,'var(--t2)',2)+txt(B.x,B.y-26,'이산화 탄소 농도(ppm)',24,'var(--t3)','start');
+    RMARK.forEach(([p,n,t,col],i)=>{const x=f1(X(p));
+      s+=`<g data-in="${150+i*120}" data-fx="fade">${line(x,B.y,x,B.y+B.h,col,3,'stroke-dasharray="8 8"')}${txt(x,B.y+B.h+38,t,24,'var(--t3)',i===2?'start':(i===1?'end':'middle'))}${txt(x,B.y+B.h+72,n,24,col,i===2?'start':(i===1?'end':'middle'),'font-weight="600"')}</g>`;});
+    s+=line(B.x,f1(Y(1000)),B.x+B.w,f1(Y(1000)),'var(--heat)',3,'stroke-dasharray="14 10"')+txt(B.x+110,f1(Y(1000))+36,'학교보건법상 기준 1000 ppm',26,'var(--heat)','start','font-weight="600"');
+    s+=`<path data-in="400" data-fx="draw" data-dur="2600" d="${REAL.map((p,i)=>(i?'L':'M')+f1(X(p[0]))+' '+f1(Y(p[1]))).join(' ')}" fill="none" stroke="var(--on-dark)" stroke-width="5" stroke-linejoin="round"/>`;
+    s+=`<g data-step="1" data-fx="pop"><circle cx="${f1(X(1560))}" cy="${f1(Y(3495))}" r="11" fill="var(--heat)"/>${txt(f1(X(1560))-14,f1(Y(3495))-22,'약 3500 ppm',26,'var(--heat)','end','font-weight="700"')}</g>`;
+    s+=`<g data-step="2" data-fx="pop"><circle cx="${f1(X(1690))}" cy="${f1(Y(752))}" r="11" fill="var(--kin)"/>${txt(f1(X(1690))+22,f1(Y(752))+42,'약 750 ppm',26,'var(--kin)','start','font-weight="700"')}</g>`;
+    root.querySelector('#ev-g').innerHTML=s;
+  },
+  go:sfxAt({1:c=>c.sfx('thunk'),2:c=>c.sfx('ding'),3:c=>c.sfx('chime')})
+});
+
+/* 정리하기 3: 점 격자 */
+function dotGrid(cx,top,cols,rows,r,gap,col,step,seed){
+  let s='';const w=(cols-1)*gap,x0=cx-w/2;
+  for(let i=0;i<rows;i++)for(let j=0;j<cols;j++)s+=`<circle cx="${f1(x0+j*gap)}" cy="${f1(top+i*gap)}" r="${r}" fill="${col}"/>`;
+  return step?`<g data-step="${step}" data-fx="fade">${s}</g>`:`<g data-in="100" data-fx="fade">${s}</g>`;
+}
+Deck.scene('more',{
+  build(root){
+    let s='';
+    s+=dotGrid(370,400,10,5,9,30,'var(--elec)',0);
+    s+=dotGrid(960,330,20,10,6,21,'var(--elec)',1);
+    s+=dotGrid(1550,300,48,26,3,9.6,'var(--elec)',2);
+    root.querySelector('#more-g').innerHTML=s;
+  }
+});
+
+/* 2부 표지 */
+Deck.scene('part2',{
+  build(root){
+    const R=U.rng(21);let s='';
+    for(let i=0;i<420;i++){const x=120+R()*1680,y=110+R()*480,r=2+R()*4;s+=`<circle cx="${f1(x)}" cy="${f1(y)}" r="${f1(r)}" fill="var(--elec)" opacity="${(.25+R()*.6).toFixed(2)}"/>`;}
+    root.querySelector('#p2-g').innerHTML=s;
+  }
+});
+
+/* 빅데이터의 뜻: 점이 불어남 */
+const DEFSTAGE=[[200,'우리 반 · 4곳 × 50회'],[28000,'가상 학교 · 20교실 × 4곳 × 7교시 × 50회'],[106400000000,'가상 전국 · 2만 개교 × 28,000회/일 × 190일']];
+Deck.scene('define',{steps:4,
+  build(root){
+    const R=U.rng(9);let s='';
+    for(let i=0;i<900;i++){const x=130+R()*880,y=440+R()*440;s+=`<circle class="dd" data-i="${i}" cx="${f1(x)}" cy="${f1(y)}" r="${i<40?6:3.2}" fill="var(--elec)" opacity="${i<40?.9:0}"/>`;}
+    root.querySelector('#def-g').innerHTML=s;
+  },
+  async go(c,k){
+    if(k>2)return;
+    const [n,cap]=DEFSTAGE[k],prev=DEFSTAGE[k-1][0];
+    c.$('#defCap').textContent=cap;
+    const els=c.$$('#def-g .dd'),lim=k===1?260:900;
+    els.forEach((e,i)=>{if(i>=40&&i<lim)c.a(e,[{opacity:0},{opacity:.75}],{dur:500,delay:(i%120)*6});});
+    await c.count(c.$('#defCount'),prev,n,{dur:1400,fmt:v=>Math.round(v).toLocaleString('ko-KR')});
+  }
+});
+
+/* 심야 버스: 도시 모형 */
+const HOT=[[330,430],[640,620],[930,410],[1080,760],[420,800]];
+Deck.scene('nightbus',{steps:3,
+  build(root){
+    const X0=120,Y0=300,W=1040,H=600;let s='';
+    s+=`<rect x="${X0}" y="${Y0}" width="${W}" height="${H}" rx="18" fill="#141416"/>`;
+    for(let i=1;i<8;i++)s+=line(X0+i*W/8,Y0,X0+i*W/8,Y0+H,'#2a2a2d',6);
+    for(let j=1;j<6;j++)s+=line(X0,Y0+j*H/6,X0+W,Y0+j*H/6,'#2a2a2d',6);
+    const R=U.rng(4);let a='',b='';
+    HOT.forEach(([hx,hy],h)=>{for(let i=0;i<34;i++){const ang=R()*6.283,rr=Math.sqrt(R())*80;a+=`<circle cx="${f1(hx+Math.cos(ang)*rr)}" cy="${f1(hy+Math.sin(ang)*rr)}" r="6" fill="var(--sound)" opacity=".75"/>`;}
+      for(let i=0;i<18;i++){const ang=R()*6.283,rr=Math.sqrt(R())*60;b+=`<rect x="${f1(hx+Math.cos(ang)*rr-5)}" y="${f1(hy+Math.sin(ang)*rr-5)}" width="10" height="10" fill="var(--elec)" opacity=".85"/>`;}});
+    for(let i=0;i<40;i++)a+=`<circle cx="${f1(X0+40+R()*(W-80))}" cy="${f1(Y0+40+R()*(H-80))}" r="5" fill="var(--sound)" opacity=".35"/>`;
+    s+=`<g data-step="1" data-fx="fade">${a}</g><g data-step="2" data-fx="fade">${b}</g>`;
+    const order=[0,4,1,3,2];
+    s+=`<path data-step="3" data-fx="draw" d="${order.map((o,i)=>(i?'L':'M')+HOT[o][0]+' '+HOT[o][1]).join(' ')}" fill="none" stroke="var(--light)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>`;
+    s+=`<g data-step="3" data-fx="pop" data-delay="900">${HOT.map(([x,y])=>`<circle cx="${x}" cy="${y}" r="16" fill="#141416" stroke="var(--light)" stroke-width="6"/>`).join('')}</g>`;
+    s+=txt(X0+24,Y0+44,'도시 (모형) · 밤 12시 이후',24,'#86868b','start');
+    root.querySelector('#bus-g').innerHTML=s;
+  }
+});
+
+/* 데이터셋 표 */
+Deck.scene('dataset',{
+  build(root){
+    const rows=[['3교시','앞','10:30','1,420','창문 두 개 엶'],['3교시','창가','10:30','1,260','-'],['3교시','뒤','10:30','1,488','-'],['4교시','가운데','11:30','930','쉬는 시간 환기']];
+    root.querySelector('#dstable').innerHTML=`<table class="dtab"><tr><th>날짜</th><th>수업</th><th>위치</th><th>시각</th><th>농도(ppm)</th><th>메모</th></tr>${rows.map(r=>`<tr><td>11/5</td>${r.map((v,i)=>`<td class="${i===3?'num':''}">${v}</td>`).join('')}</tr>`).join('')}</table>`;
+  }
+});
+
+/* 코로나19 데이터셋 카드 */
+Deck.scene('covid',{steps:2,
+  enter(c){
+    c.$$('.ds-card').forEach(card=>card.addEventListener('click',()=>{
+      const i=card.querySelector('.ds-i');if(card.classList.contains('open'))return;card.classList.add('open');
+      c.reveal(i,'rise');if(window.SFX&&!Deck.STILL)SFX.play('flip');
+    }));
+  },
+  go(c,k){
+    if(k===1)c.$$('.ds-card').forEach(e=>e.classList.add('open'));
+    if(k===2){c.$$('.ds-card[data-pi]').forEach(e=>e.classList.add('pi'));c.sfx('thunk');}
+  }
+});
+
+</script></body></html>
