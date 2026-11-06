@@ -85,7 +85,7 @@
   .filterbar{display:flex;align-items:center;gap:8px;padding:10px 16px;background:#e7f3fe;font-size:14px}
   .filterbar button{margin-left:auto}
   .empty{padding:48px 20px;text-align:center;color:var(--sub)}
-  .codebig{font-size:40px;font-weight:900;letter-spacing:.18em;font-family:ui-monospace,Menlo,monospace;margin:6px 0}
+  .codebig{width:100%;border:0;background:transparent;text-align:center;font-size:40px;font-weight:900;letter-spacing:.18em;font-family:ui-monospace,Menlo,monospace;margin:6px 0}
   .switch{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
   .switch:first-of-type{border-top:none}
   .switch input{width:22px;height:22px}
@@ -357,7 +357,7 @@ async function refreshFromServer() {
   const previous = S.snapshot;
   if (!await loadClass() || (previous === S.snapshot && S.tab !== 'admin')) return;
   if (S.tab === 'me' && $('#pBox')?.open) { renderHeader(); return; }
-  if (S.tab === 'admin' && document.activeElement?.matches('#aName, #aInvite')) { renderHeader(); return; }
+  if (S.tab === 'admin' && document.activeElement?.matches('#aName, #aJoinCode')) { renderHeader(); return; }
   renderClassBody();
 }
 document.addEventListener('visibilitychange', refreshFromServer);
@@ -692,9 +692,8 @@ async function renderAdmin() {
       ? sb.rpc('ks_member_emails', { p_class: cid }) : null,
   ]);
   if (S.cid !== cid || S.tab !== 'admin' || body !== $('#body') ||
-      document.activeElement?.matches('#aName, #aInvite')) return;
+      document.activeElement?.matches('#aName, #aJoinCode')) return;
   const inviteCode = typeof code.data === 'string' && /^[A-Z0-9]{6}$/.test(code.data) ? code.data : '';
-  const link = inviteCode ? 'https://kjelab.kr/kongsae/?join=' + inviteCode : '';
   (emails?.data || []).forEach(r => S.emails.set(r.user_id, r.email));
   if (code.error || emails?.error) toast(errMsg(code.error || emails.error));
   const mems = [...S.members.values()].sort((a, b) => (a.role === 'teacher' ? -1 : 0) - (b.role === 'teacher' ? -1 : 0) || a.display_name.localeCompare(b.display_name, 'ko'));
@@ -702,14 +701,13 @@ async function renderAdmin() {
   body.innerHTML = `
     <div class="pad">
       <div class="box center">
-        <div class="muted">참여 코드</div>
-        <div class="codebig">${esc(inviteCode || '코드를 불러오지 못했어요')}</div>
-        ${link ? `<label class="field"><span>학생에게 보낼 참여 링크</span><input id="aInvite" readonly value="${esc(link)}" style="font-size:13px"></label>` : ''}
+        <label class="muted" for="aJoinCode">참여 코드</label>
+        ${inviteCode ? `<input class="codebig" id="aJoinCode" readonly value="${esc(inviteCode)}">` : '<div class="muted">코드를 불러오지 못했어요.</div>'}
         <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap">
-          <button class="btn sm" id="aCopy" ${link ? '' : 'disabled'}>참여 링크 복사</button>
+          <button class="btn sm" id="aCopy" ${inviteCode ? '' : 'disabled'}>참여 코드 복사</button>
           <button class="btn ghost sm" id="aNew">코드 새로 만들기</button>
         </div>
-        <p class="muted" style="margin:10px 0 0">링크로 들어온 학생은 구글 로그인 뒤 코드가 자동으로 채워져요.</p>
+        <p class="muted" style="margin:10px 0 0">학생에게 6자리 코드를 알려 주세요. 학생은 구글 로그인 후 ‘반에 참여하기’에서 코드를 입력해요.</p>
       </div>
       <div class="box">
         <h3>반 설정</h3>
@@ -736,13 +734,13 @@ async function renderAdmin() {
       </div>` : ''}
     </div>`;
   $('#aCopy').onclick = async () => {
-    try { await navigator.clipboard.writeText(link); toast('참여 링크를 복사했어요.'); }
+    try { await navigator.clipboard.writeText(inviteCode); toast('참여 코드를 복사했어요.'); }
     catch {
-      const field = $('#aInvite');
-      if (field?.value !== link) return;
+      const field = $('#aJoinCode');
+      if (field?.value !== inviteCode) return;
       field.focus();
       field.select();
-      toast('선택된 참여 링크를 복사해 주세요.');
+      toast('선택된 참여 코드를 복사해 주세요.');
     }
   };
   $('#aNew').onclick = async () => {
