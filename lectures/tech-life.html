@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#000000"><title>강의 · 과학기술의 발전과 우리 생활 · KJE</title><style>
+/* ═══════════════════════════════════════════════════════════════
+   core.css — 소비 전력 강의 덱 공통 (Apple DESIGN.md 언어)
+   무대 1920×1080 · 면 색이 구획 · 액션 블루 하나 · UI 그림자 없음
+   ═══════════════════════════════════════════════════════════════ */
+:root{
+  /* 면 */
+  --c-white:#ffffff; --c-parchment:#f5f5f7; --c-black:#000000; --c-dark:#1d1d1f; --c-graphite:#272729;
+  /* 글자 */
+  --ink:#1d1d1f; --ink-2:#6e6e73; --ink-3:#86868b; --on-dark:#f5f5f7; --on-dark-2:#a1a1a6; --on-dark-3:#6e6e73;
+  --hair:#e0e0e0; --hair-dark:#3a3a3c;
+  /* 행동 */
+  --action:#0066cc; --action-dark:#2997ff;
+  /* 에너지 — 어두운 면 기본값(밝은 면에서 아래 .slide[data-tile] 규칙이 덮어씀) */
+  --elec:#64D2FF; --light:#FFD60A; --heat:#FF6A3D; --sound:#BF5AF2; --kin:#30D158;
+  /* 에너지 — 면과 무관하게 고정된 두 벌(그림 속에서 직접 고를 때) */
+  --elec-hi:#64D2FF; --light-hi:#FFD60A; --heat-hi:#FF6A3D; --sound-hi:#BF5AF2; --kin-hi:#30D158;
+  --elec-lo:#0077B6; --light-lo:#9A7400; --heat-lo:#C4391B; --sound-lo:#8A3FC0; --kin-lo:#1E8B3E;
+  /* 글꼴 */
+  --font:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"SF Pro Display","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+  /* 움직임 */
+  --ease-out:cubic-bezier(.2,.8,.2,1); --ease-inout:cubic-bezier(.65,0,.35,1); --ease-spring:cubic-bezier(.34,1.56,.64,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:#000}
+body{font-family:var(--font);color:var(--ink);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  word-break:keep-all;overflow-wrap:break-word;-webkit-user-select:none;user-select:none;font-feature-settings:"ss03"}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+
+/* ── 무대 ── */
+#viewport{position:fixed;inset:0;overflow:hidden;background:#000}
+#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden;background:#000;contain:layout paint}
+.slide{position:absolute;inset:0;display:none;overflow:hidden;isolation:isolate}
+.slide.is-on{display:block}
+.slide.is-out{display:block;z-index:1}
+.slide.is-on{z-index:2}
+
+/* ── 면(타일) ── 다크: 에너지가 빛나는 무대 / 라이트: 정의와 타이포 */
+.slide[data-tile="black"]{background:var(--c-black);color:var(--on-dark)}
+.slide[data-tile="dark"]{background:var(--c-dark);color:var(--on-dark)}
+.slide[data-tile="graphite"]{background:var(--c-graphite);color:var(--on-dark)}
+.slide[data-tile="light"]{background:var(--c-white);color:var(--ink)}
+.slide[data-tile="parchment"]{background:var(--c-parchment);color:var(--ink)}
+.slide[data-tile="light"],.slide[data-tile="parchment"]{
+  --elec:var(--elec-lo); --light:var(--light-lo); --heat:var(--heat-lo); --sound:var(--sound-lo); --kin:var(--kin-lo);
+  --t2:var(--ink-2); --t3:var(--ink-3); --hl:var(--hair); --act:var(--action);
+}
+.slide[data-tile="black"],.slide[data-tile="dark"],.slide[data-tile="graphite"]{
+  --t2:var(--on-dark-2); --t3:var(--on-dark-3); --hl:var(--hair-dark); --act:var(--action-dark);
+}
+
+/* ── 글자 체계 (무대 px) — 최소 24px ── */
+.t-hero{font-size:168px;font-weight:600;line-height:1.02;letter-spacing:-.035em}
+.t-display{font-size:120px;font-weight:600;line-height:1.05;letter-spacing:-.03em}
+.t-title{font-size:84px;font-weight:600;line-height:1.1;letter-spacing:-.025em}
+.t-head{font-size:60px;font-weight:600;line-height:1.14;letter-spacing:-.022em}
+.t-lead{font-size:44px;font-weight:400;line-height:1.3;letter-spacing:-.012em}
+.t-airy{font-size:40px;font-weight:300;line-height:1.4;letter-spacing:-.005em}
+.t-label{font-size:34px;font-weight:600;line-height:1.2;letter-spacing:-.01em}
+.t-body{font-size:32px;font-weight:400;line-height:1.47;letter-spacing:-.01em}
+.t-cap{font-size:26px;font-weight:400;line-height:1.35;letter-spacing:-.005em}
+.t-eyebrow{font-size:30px;font-weight:600;line-height:1.2;letter-spacing:.01em;color:var(--t2)}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum","ss03";letter-spacing:-.02em}
+.mute{color:var(--t2)} .mute2{color:var(--t3)}
+.c-elec{color:var(--elec)} .c-light{color:var(--light)} .c-heat{color:var(--heat)} .c-sound{color:var(--sound)} .c-kin{color:var(--kin)}
+.unit{font-weight:400;letter-spacing:0;margin-left:.12em}
+.center{text-align:center}
+
+/* 배치 도우미 — 슬라이드 조각이 자유롭게 쓴다 */
+.abs{position:absolute}
+.fill{position:absolute;inset:0}
+.full-svg{position:absolute;inset:0;width:1920px;height:1080px;overflow:visible}
+.row{display:flex;align-items:center}
+.col{display:flex;flex-direction:column}
+.pill{display:inline-flex;align-items:center;gap:12px;border-radius:9999px;padding:12px 26px;font-size:28px;font-weight:600}
+.pill.ghost{border:2px solid currentColor}
+.chip-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;border-radius:9999px;padding:16px 34px;font-size:30px;font-weight:600;
+  background:var(--act);color:#fff;transition:transform .15s var(--ease-out)}
+.chip-btn:active{transform:scale(.95)}
+.card{border-radius:18px;border:1px solid var(--hl);padding:32px}
+svg text{font-family:var(--font)}
+
+/* ── 선언형 등장: data-in(들어올 때) / data-step="k"(k번째 클릭) / data-out="k" ── */
+[data-in],[data-step]{opacity:0}
+[data-fx="draw"],[data-fx="draw"] :is(path,line,polyline,polygon,circle,ellipse,rect){stroke-dasharray:1 1;stroke-dashoffset:1}
+[data-fx="draw"]{opacity:1}
+svg [data-in],svg [data-step],svg .tb{transform-box:fill-box;transform-origin:center}
+.tb{transform-box:fill-box;transform-origin:center}
+.tb-bl{transform-box:fill-box;transform-origin:left bottom}
+.tb-b{transform-box:fill-box;transform-origin:center bottom}
+
+/* ── HUD (Apple 원형 칩) ── */
+#hud{position:fixed;right:22px;bottom:18px;display:flex;align-items:center;gap:8px;z-index:50;opacity:0;transform:translateY(8px);
+  transition:opacity .35s var(--ease-out),transform .35s var(--ease-out);pointer-events:none}
+#hud.show{opacity:1;transform:none;pointer-events:auto}
+#hud button{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:rgba(210,210,215,.64);color:#1d1d1f;
+  -webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);transition:transform .15s var(--ease-out)}
+#hud button:active{transform:scale(.92)}
+#hud button svg{width:20px;height:20px}
+#hud .count{min-width:84px;height:44px;border-radius:9999px;display:grid;place-items:center;padding:0 16px;background:rgba(210,210,215,.64);color:#1d1d1f;
+  font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px)}
+#progress{position:fixed;left:0;right:0;bottom:0;height:3px;z-index:40;background:transparent}
+#progress i{display:block;height:100%;width:0;background:rgba(255,255,255,.38);transition:width .5s var(--ease-out),background .4s}
+body.on-light #progress i{background:rgba(0,0,0,.22)}
+#stepdots{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:9px;z-index:40;opacity:0;transition:opacity .35s}
+#stepdots.show{opacity:1}
+#stepdots i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.28);transition:background .3s,transform .3s}
+#stepdots i.on{background:rgba(255,255,255,.9);transform:scale(1.15)}
+body.on-light #stepdots i{background:rgba(0,0,0,.16)} body.on-light #stepdots i.on{background:rgba(0,0,0,.62)}
+
+/* ── 덮개(노트·전체보기·도움말) ── */
+.overlay{position:fixed;inset:0;z-index:60;display:none}
+.overlay.show{display:block}
+#notes{position:fixed;left:0;right:0;bottom:0;height:36vh;z-index:55;transform:translateY(102%);transition:transform .45s var(--ease-out);
+  background:rgba(22,22,23,.86);color:#f5f5f7;-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);
+  padding:22px 40px 26px;overflow:auto;border-top:1px solid rgba(255,255,255,.08)}
+#notes.show{transform:none}
+#notes .nh{display:flex;align-items:baseline;gap:14px;margin-bottom:10px;font-size:15px;color:#a1a1a6;font-weight:600;letter-spacing:.01em}
+#notes .nh b{color:#f5f5f7;font-size:18px}
+#notes .nh .nx{margin-left:auto;font-weight:400}
+#notes p{font-size:clamp(17px,1.55vw,24px);line-height:1.6;margin:0 0 .7em;color:#e8e8ed;max-width:1500px}
+#notes p .pn{display:inline-block;font-size:.66em;font-weight:700;color:#2997ff;margin-right:.6em;vertical-align:.12em}
+#notes p b{color:#fff;font-weight:700}
+#notes p .cue{display:inline-block;margin-top:.3em;padding:2px 12px;border-radius:9999px;background:rgba(41,151,255,.18);color:#8cc8ff;font-size:.85em}
+
+#overview{background:rgba(0,0,0,.72);-webkit-backdrop-filter:saturate(180%) blur(24px);backdrop-filter:saturate(180%) blur(24px);overflow:auto;padding:56px 5vw}
+#overview h2{color:#f5f5f7;font-size:28px;font-weight:600;letter-spacing:-.01em;margin-bottom:22px}
+#overview .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+#overview .ov{position:relative;aspect-ratio:16/9;border-radius:11px;padding:14px 16px;display:flex;flex-direction:column;justify-content:space-between;text-align:left;
+  border:1px solid rgba(255,255,255,.1);transition:transform .2s var(--ease-out)}
+#overview .ov:active{transform:scale(.97)}
+#overview .ov.cur{outline:3px solid #2997ff;outline-offset:3px}
+#overview .ov .n{font-size:14px;font-weight:700;opacity:.6;font-variant-numeric:tabular-nums}
+#overview .ov .tt{font-size:19px;font-weight:600;line-height:1.25;letter-spacing:-.01em}
+#overview .ov[data-tile="black"],#overview .ov[data-tile="dark"],#overview .ov[data-tile="graphite"]{background:#1d1d1f;color:#f5f5f7}
+#overview .ov[data-tile="light"]{background:#fff;color:#1d1d1f}
+#overview .ov[data-tile="parchment"]{background:#f5f5f7;color:#1d1d1f}
+
+#help{background:rgba(0,0,0,.6);display:none;place-items:center}
+#help.show{display:grid}
+#help .box{background:#fff;color:#1d1d1f;border-radius:18px;padding:34px 40px;min-width:520px}
+#help h3{font-size:24px;font-weight:600;margin-bottom:16px;letter-spacing:-.01em}
+#help table{border-collapse:collapse;font-size:17px}
+#help td{padding:7px 18px 7px 0;border-bottom:1px solid #f0f0f0}
+#help kbd{display:inline-block;min-width:30px;padding:3px 9px;border-radius:8px;background:#f5f5f7;border:1px solid #e0e0e0;font:600 15px var(--font);text-align:center}
+#blank{position:fixed;inset:0;z-index:70;display:none}
+#blank.black{display:block;background:#000} #blank.white{display:block;background:#fff}
+
+/* 정지 화면(검증 스크린샷) — 크롬 UI 숨김 */
+html.still #hud,html.still #progress,html.still #stepdots{display:none!important}
+html.still *{cursor:none!important}
+/* 격자 보기(?grid=1) */
+#gridov{position:absolute;inset:0;z-index:30;pointer-events:none;display:none;
+  background-image:linear-gradient(rgba(255,0,80,.25) 1px,transparent 1px),linear-gradient(90deg,rgba(255,0,80,.25) 1px,transparent 1px);
+  background-size:120px 120px}
+html.grid #gridov{display:block}
+html.grid #gridov::after{content:"";position:absolute;inset:80px 120px;border:2px dashed rgba(255,0,80,.6)}
+
+@media (prefers-reduced-motion: reduce){ .slide *{scroll-behavior:auto} }
+
+/* ── 소리 단추·알림 ── */
+#hud button.off{opacity:.55}
+#sfxToast{position:fixed;left:50%;bottom:78px;transform:translate(-50%,8px);z-index:80;padding:10px 22px;border-radius:9999px;background:rgba(29,29,31,.86);color:#f5f5f7;
+  font-size:16px;font-weight:600;letter-spacing:-.01em;opacity:0;pointer-events:none;transition:opacity .25s var(--ease-out),transform .25s var(--ease-out);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px)}
+#sfxToast.show{opacity:1;transform:translate(-50%,0)}
+html.still #sfxToast{display:none}
+
+/* ── 학생 모드(?s=1): 대본 숨김 ── */
+html.student #notes{display:none!important}
+
+/* ── 장면 머리(제목) ── */
+.hd{position:absolute;left:120px;top:78px;right:120px;z-index:3}
+.hd .eb{font-size:28px;font-weight:600;letter-spacing:.01em;color:var(--t2);margin-bottom:10px}
+.hd .eb b{color:var(--act);font-weight:700;margin-right:.35em}
+.hd h2{font-size:66px;font-weight:600;line-height:1.1;letter-spacing:-.028em}
+.hd h2 .soft{color:var(--t2);font-weight:400}
+
+/* ── 개념정리 학습지 카드 · 빈칸(번호 = 학습지 빈칸 번호 ①~㉖) ── */
+.ws-card{position:absolute;border-radius:18px;padding:30px 44px 26px;background:#f5f5f7;z-index:3}
+.slide[data-tile="parchment"] .ws-card{background:#fff}
+.slide[data-tile="black"] .ws-card,.slide[data-tile="dark"] .ws-card,.slide[data-tile="graphite"] .ws-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
+.ws-card .ws-h{display:flex;align-items:baseline;gap:18px;margin-bottom:6px}
+.ws-card .ws-h b{font-size:40px;font-weight:700;letter-spacing:-.02em}
+.ws-card .ws-h span{font-size:28px;color:var(--t2)}
+.ws-row{display:grid;grid-template-columns:110px 1fr;gap:22px;align-items:baseline;font-size:38px;line-height:1.55;padding:12px 0;border-top:1px solid var(--hl)}
+.ws-row:first-of-type{border-top:0}
+.ws-row .tm{font-size:26px;font-weight:600;color:var(--t2);letter-spacing:.01em}
+.ws-line{font-size:38px;line-height:1.6}
+.bk{position:relative;display:inline-block;min-width:3.4em;margin:0 .2em;padding:0 .3em;text-align:center;line-height:1.3;white-space:nowrap;
+  border-bottom:4px solid #c7c7cc}
+.slide[data-tile="black"] .bk,.slide[data-tile="dark"] .bk,.slide[data-tile="graphite"] .bk{border-bottom-color:#48484a}
+.bk .a{display:inline-block;font-weight:700;color:var(--act)}
+.bk .n{position:absolute;left:-.62em;top:-.5em;min-width:1.25em;height:1.25em;padding:0 .2em;border-radius:9999px;background:var(--act);color:#fff;
+  font-size:.46em;font-weight:700;line-height:1.25em;text-align:center;font-variant-numeric:tabular-nums}
+.bk.wide{min-width:5.6em}
+.qbox{position:absolute;border-radius:18px;border:1px solid var(--hl);padding:26px 34px;font-size:32px;line-height:1.5}
+.qbox .qh{font-size:26px;font-weight:600;color:var(--t2);margin-bottom:6px}
+.say-line{position:absolute;left:120px;right:120px;text-align:center;font-size:44px;font-weight:600;letter-spacing:-.02em;z-index:3}
+.fine{position:absolute;left:120px;bottom:40px;font-size:24px;color:var(--t3);z-index:3}
+
+
+:root{--font:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",NanumGothic,sans-serif}
+.slide{--acid:#edaa55;--base:#67bdff;--na:#b9c1cf;--anion:#b9a5eb;--glass:rgba(220,235,255,.55);--liquid:rgba(186,212,242,.055)}
+.slide[data-tile="light"],.slide[data-tile="parchment"]{--acid:#a95708;--base:#0070b5;--na:#647184;--anion:#7955a8;--glass:rgba(50,72,94,.42);--liquid:rgba(93,139,175,.055)}
+.acid{color:var(--acid)}.base{color:var(--base)}.anion{color:var(--anion)}.neutral{color:var(--t2)}
+.hd{top:78px}.hd h2{font-size:68px;line-height:1.2}.hd .eb{font-size:28px;margin-bottom:18px}
+.fine{position:absolute;bottom:60px;left:120px;right:120px;font-size:25px;line-height:1.45;color:var(--t2)}
+.statement{font-size:62px;line-height:1.35;letter-spacing:-.035em;font-weight:600}
+.eq{font-size:76px;letter-spacing:-.02em;white-space:nowrap;line-height:1.4}
+.eq small{font-size:.42em;font-weight:400;color:var(--t2)}
+.abs.eq{position:absolute}
+sub,sup{font-size:.58em;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.22em}sup{top:-.5em}
+.big-number{font-size:150px;font-weight:600;letter-spacing:-.05em;line-height:1.2}
+.keyline{border-top:2px solid var(--hl);padding-top:26px}
+.body-copy{font-size:36px;line-height:1.6}.mini{font-size:28px;line-height:1.5;color:var(--t2)}
+.tagline{font-size:44px;line-height:1.5}.note-line{font-size:30px;line-height:1.5;color:var(--t2)}
+.value{font-variant-numeric:tabular-nums;white-space:nowrap}
+.callout{padding:28px 36px;border-radius:18px;background:rgba(127,127,127,.075);font-size:34px;line-height:1.5}
+.col-rule{position:absolute;top:310px;bottom:245px;border-left:2px solid var(--hl)}
+.legend{display:flex;gap:28px;align-items:center;font-size:27px;color:var(--t2)}.legend span{display:flex;align-items:center;gap:12px}.legend svg{width:52px;height:52px;overflow:visible}
+.lab-controls{position:absolute;left:1140px;top:295px;width:660px;font-size:32px}
+.lab-controls label{display:flex;align-items:baseline;justify-content:space-between;margin:30px 0 22px}.lab-controls output{font-size:58px;line-height:1;font-weight:600;font-variant-numeric:tabular-nums;color:var(--base)}
+input[type=range]{width:100%;height:42px;accent-color:var(--base);cursor:pointer;touch-action:pan-y}input[type=range]::-webkit-slider-thumb{width:32px;height:32px}
+.controls-row{display:flex;gap:16px;margin-top:22px}.smallbtn{border:1px solid var(--hl);border-radius:99px;padding:14px 24px;font-size:27px}.smallbtn:focus-visible,.chip-btn:focus-visible{outline:4px solid var(--act);outline-offset:4px}.smallbtn:hover{background:rgba(127,127,127,.1)}
+.live-table{margin-top:32px;border-top:2px solid var(--hl)}.live-row{display:flex;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--hl);font-size:31px}.live-row b{font-variant-numeric:tabular-nums}
+.status{font-size:65px;letter-spacing:-.04em;font-weight:600;margin-bottom:12px}.status-sub{font-size:30px;color:var(--t2);line-height:1.5;min-height:90px}
+.check-row{display:grid;grid-template-columns:64px 1fr 240px;align-items:center;gap:20px;font-size:37px;padding:30px 0;border-bottom:1px solid var(--hl)}.check-row b{font-size:48px}.check-row .answer{color:var(--act);font-size:36px}
+.source-copy{font-size:28px;color:var(--t2);line-height:1.7}
+.progress-hint{position:absolute;right:120px;bottom:60px;font-size:25px;color:var(--t2)}
+.slide svg{font-family:var(--font)}.beaker-outline{fill:none;stroke:var(--glass);stroke-width:4;stroke-linecap:round}.water-surface{stroke:var(--glass);stroke-width:2;opacity:.65}
+#hud{gap:7px}#hud .count{min-width:70px}#hud button{width:44px;height:44px}
+#alwaysNav{position:fixed;left:18px;bottom:18px;z-index:45;display:flex;gap:6px}#alwaysNav button{font-size:14px;padding:10px 14px;color:#ddd;background:rgba(45,45,49,.8);border-radius:99px;backdrop-filter:blur(12px)}
+html.still #alwaysNav{display:none}#stepdots{bottom:23px}
+@media(max-width:600px){#hud{right:10px;bottom:10px;gap:4px}#hud button{width:36px;height:36px}#hud .count{height:36px;font-size:13px;min-width:60px;padding:0 10px}#alwaysNav{left:10px;bottom:56px}#alwaysNav button{font-size:12px;padding:8px 12px}#help .box{min-width:0;width:92vw;padding:22px}#help td{font-size:14px;padding:5px}#notes{padding:18px;height:45vh}#notes .nx{display:none}#stepdots{bottom:17px;left:60px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ── 에너지 효율 덱 ── 에너지 색은 core.css 의 --elec --light --heat --sound --kin(면에 따라 저절로 바뀜) + 화학 --chem */
+.slide{--chem:#FF7AB6}
+.slide[data-tile="light"],.slide[data-tile="parchment"]{--chem:#B8306E}
+.c-chem{color:var(--chem)}
+.e-elec{--ec:var(--elec)} .e-light{--ec:var(--light)} .e-heat{--ec:var(--heat)} .e-sound{--ec:var(--sound)} .e-kin{--ec:var(--kin)} .e-chem{--ec:var(--chem)}
+.echip{display:inline-flex;align-items:center;gap:12px;padding:10px 22px;border-radius:9999px;font-size:30px;font-weight:600;color:var(--ec);
+  background:color-mix(in srgb,var(--ec) 14%,transparent);white-space:nowrap}
+.echip::before{content:"";width:14px;height:14px;border-radius:50%;background:var(--ec)}
+.dev-card{position:absolute;top:300px;width:520px;height:560px;border-radius:18px;padding:40px 40px 34px;background:rgba(127,127,127,.075);display:flex;flex-direction:column;gap:22px}
+.dev-card h3{font-size:50px;font-weight:600;letter-spacing:-.025em;line-height:1.15}
+.dev-card .flowcol{display:flex;flex-direction:column;align-items:flex-start;gap:16px}
+.dev-card .arrow{font-size:40px;color:var(--t2);line-height:1;padding-left:20px}
+.dev-card .outs{display:flex;flex-wrap:wrap;gap:12px}
+.dev-card p{font-size:30px;line-height:1.5;color:var(--t2);margin-top:auto}
+.dev-card .lead2{font-size:32px;line-height:1.5;color:inherit}
+.sk-lab{font-weight:600}
+.lab-controls .smallbtn.on{background:var(--act);color:#fff;border-color:transparent}
+.lab-controls output{color:var(--elec)}
+.lab-controls input[type=range]{accent-color:var(--act)}
+.devbtns{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
+.devbtns .smallbtn{padding:12px 20px;font-size:26px}
+.effbig{font-size:120px;font-weight:600;letter-spacing:-.05em;line-height:1.1;font-variant-numeric:tabular-nums}
+.grade-row{display:flex;align-items:center;gap:18px;height:62px}
+.grade-row b{width:44px;font-size:34px;text-align:center;font-variant-numeric:tabular-nums}
+.grade-row i{display:block;height:46px;border-radius:0 23px 23px 0}
+.tip-list{display:flex;flex-direction:column;gap:26px}
+.tip{display:grid;grid-template-columns:72px 1fr;gap:20px;align-items:baseline;font-size:36px;line-height:1.45}
+.tip .no{font-size:30px;font-weight:700;color:var(--act)}
+.tip small{display:block;font-size:28px;color:var(--t2);line-height:1.45;margin-top:4px}
+.ws-card .ws-line.big{font-size:46px;line-height:1.8}
+.sk-in{fill:#000}
+.slide[data-tile="light"] .sk-in,.slide[data-tile="parchment"] .sk-in{fill:#fff}
+/* ── 보강 ── */
+.dev-card>.echip,.dev-card>.chips{align-self:flex-start}
+.chips{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.chips .to,.chain-row .to{font-size:34px;color:var(--t2)}
+.stack{display:flex;flex-direction:column;align-items:flex-start;gap:18px}
+.colh{font-size:44px;font-weight:600;letter-spacing:-.02em;line-height:1.2;margin-bottom:6px}
+.colsub{font-size:28px;color:var(--t2);margin-bottom:28px}
+.colh+.tip-list{margin-top:22px}
+.chain-row{display:flex;align-items:center;gap:16px}
+.rowlab{width:120px;font-size:44px;font-weight:600;letter-spacing:-.02em}
+.tip .no{white-space:nowrap}
+.tip{grid-template-columns:96px 1fr}
+.elabel{position:absolute;width:360px;border-radius:14px;background:#fff;color:#1d1d1f;border:3px solid #1d1d1f;padding-bottom:18px}
+.elabel .eh{background:#1d1d1f;color:#fff;font-size:24px;font-weight:600;padding:10px 18px;border-radius:10px 10px 0 0}
+.elabel .eg{display:flex;align-items:baseline;gap:10px;padding:14px 18px 6px}
+.elabel .eg b{font-size:96px;line-height:1;font-weight:700}
+.elabel .eg span{font-size:32px;font-weight:600}
+.elabel .ebars{padding:6px 18px 4px;display:flex;flex-direction:column;gap:6px}
+.elabel .ebars i{display:block;height:20px;border-radius:0 10px 10px 0;position:relative;opacity:.45}
+.elabel .ebars i.on{opacity:1}
+.elabel .ebars i.on::after{content:"◀";position:absolute;left:calc(100% + 8px);top:-5px;font-size:22px;font-style:normal;color:#1d1d1f}
+.elabel .em{padding:12px 18px 0;font-size:24px;color:#555}
+.elabel .em b{display:block;font-size:46px;color:#1d1d1f;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+/* 분수 */
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 .15em;line-height:1.25}
+.frac>span{display:block;padding:.06em .3em;text-align:center;white-space:nowrap}
+.frac>span:first-child{border-bottom:.07em solid currentColor;padding-bottom:.14em}
+.frac>span:last-child{padding-top:.18em}
+.frac .bk{margin:0}
+.ws-line.big .frac{font-size:1em}
+/* 쪽 바로 가기 */
+#alwaysNav #navPage{font-variant-numeric:tabular-nums;min-width:74px}
+#count{cursor:pointer}
+#overview .ovhead{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px;margin-bottom:22px}
+#overview .ovhead h2{margin:0}
+.ovjump{display:flex;align-items:center;gap:8px}
+.ovjump label{color:#a1a1a6;font-size:15px;font-weight:600}
+.ovjump input{width:84px;height:40px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#f5f5f7;font:600 18px var(--font);text-align:center;font-variant-numeric:tabular-nums}
+.ovjump input:focus{outline:2px solid #2997ff;outline-offset:2px}
+.ovjump button{height:40px;padding:0 16px;border-radius:9999px;background:#2997ff;color:#fff;font-size:15px;font-weight:600}
+.ovjump .ovclose{background:rgba(255,255,255,.12)}
+@media(max-width:600px){#overview{padding:24px 14px}#overview .grid{grid-template-columns:repeat(2,1fr);gap:10px}#overview .ov .tt{font-size:15px}#alwaysNav #navPage{min-width:60px}}
+/* Keep controls outside the scaled slide, including its bottom captions. */
+:root{--controls-height:calc(80px + env(safe-area-inset-bottom,0px))}
+#viewport{bottom:var(--controls-height)}
+body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:var(--controls-height);background:#101012;border-top:1px solid #303034;z-index:39;pointer-events:none}
+#hud{bottom:calc(12px + env(safe-area-inset-bottom,0px))}
+#alwaysNav{bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+#stepdots{bottom:calc(64px + env(safe-area-inset-bottom,0px));left:50%}
+body.on-light #stepdots i{background:rgba(255,255,255,.28)}
+body.on-light #stepdots i.on{background:rgba(255,255,255,.9)}
+body.on-light #progress i{background:rgba(255,255,255,.38)}
+@media(max-width:900px){
+  :root{--controls-height:calc(124px + env(safe-area-inset-bottom,0px))}
+  #alwaysNav{left:12px;bottom:calc(64px + env(safe-area-inset-bottom,0px))}
+  #stepdots{bottom:calc(112px + env(safe-area-inset-bottom,0px));left:50%}
+}
+@media(max-width:380px){
+  #hud button{width:32px;height:36px}
+  #hud .count{min-width:40px;padding:0 6px;font-size:12px}
+}
+html.still{--controls-height:0px}
+html.still body::after{display:none}
+/* ── 과학기술 덱 ── */
+.slide{--chem:#FF7AB6}
+.slide[data-tile="light"],.slide[data-tile="parchment"]{--chem:#B8306E}
+.c-chem{color:var(--chem)} .c-act{color:var(--act)}
+.use-card{border-radius:18px;background:#fff;padding:20px 26px;display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+.use-card p{font-size:30px;line-height:1.42}
+.ds-card{font:inherit;color:inherit;text-align:left;border-radius:18px;background:rgba(255,255,255,.06);border:3px solid rgba(255,255,255,.1);padding:26px 30px;height:250px;display:flex;flex-direction:column;align-items:flex-start;gap:14px;cursor:pointer;transition:border-color .4s}
+.ds-card:hover{background:rgba(255,255,255,.09)}
+.ds-card .ds-h{font-size:36px;font-weight:600;letter-spacing:-.02em;line-height:1.25}
+.ds-card .ds-i{font-size:29px;line-height:1.45;color:var(--t2)}
+.ds-card .ds-p{margin-top:auto;display:inline-flex;align-items:center;gap:10px;padding:8px 18px;border-radius:9999px;font-size:25px;font-weight:600;color:var(--sound);background:color-mix(in srgb,var(--sound) 16%,transparent)}
+.ds-card.pi{border-color:var(--sound)}
+.sum-row{display:flex;align-items:center;gap:30px;font-size:40px;line-height:1.4}
+.sum-row .echip{min-width:200px;justify-content:center;font-size:32px}
+.dtab{width:100%;border-collapse:collapse;font-size:31px}
+.dtab th{font-size:26px;font-weight:600;color:var(--t2);text-align:left;padding:10px 16px;border-bottom:2px solid var(--hl)}
+.dtab td{padding:12px 16px;border-bottom:1px solid var(--hl)}
+.qbox .qh{font-size:30px;color:inherit;margin-bottom:10px}
+.qbox>div:last-child{font-size:31px;line-height:1.5}
+.lab-controls .smallbtn.on{background:var(--act);color:#fff;border-color:transparent}
+.lab-controls output{color:var(--elec)}
+.lab-controls input[type=range]{accent-color:var(--act)}
+.devbtns{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
+.devbtns .smallbtn{padding:12px 22px;font-size:27px}
+.lab-controls label{margin:24px 0 16px}
+.live-row{font-size:29px;padding:13px 0}
+
+.card-art{width:100%;height:190px;display:block;margin:6px 0 0;overflow:visible}
+.hs-panel{position:absolute;border-radius:22px;background:#1d1d1f;border:1px solid #2c2c2e;padding:34px 36px;min-height:420px;display:flex;flex-direction:column;gap:18px;align-items:flex-start}
+.hs-panel h3{font-size:46px;font-weight:700;letter-spacing:-.02em;color:#f5f5f7}
+.hs-panel .hs-row{display:flex;flex-direction:column;gap:6px}
+.hs-panel .hs-row span{font-size:24px;font-weight:600;color:#86868b}
+.hs-panel .hs-row p{font-size:32px;line-height:1.45;color:#f5f5f7}
+.hs-panel .hs-empty{font-size:30px;line-height:1.5;color:#86868b;margin:auto 0}
+.pill.ex{font-size:24px;padding:4px 16px;margin-right:12px;background:rgba(0,102,204,.1)}
+
+.hs .hs-in{transition:transform .45s cubic-bezier(.3,1.5,.5,1),opacity .3s}
+.hs .hs-halo,.hs .hs-ring,.hs .hs-ic2{opacity:0;transition:opacity .3s}
+.hs.dim{opacity:.5}
+.hs:focus-visible .hs-bg{stroke:#fff;stroke-width:7}
+.hs.on .hs-in{transform:scale(1.45)}
+.hs.on .hs-halo{opacity:.28}
+.hs.on .hs-ic{opacity:0}.hs.on .hs-ic2{opacity:1}
+.hs.on .hs-ring{opacity:1;animation:hsPulse 1.6s ease-out infinite}
+.hs.on .hs-lb{font-size:26px;font-weight:800}
+@keyframes hsPulse{0%{transform:scale(1);opacity:.9}100%{transform:scale(1.9);opacity:0}}
+html.still .hs.on .hs-ring,html.reduced .hs.on .hs-ring{animation:none;opacity:.6}
+.hs-panel{transition:box-shadow .3s,border-color .3s}
+.hs-panel .hs-big{position:absolute;right:30px;top:28px;width:96px;height:96px}
+#summary .fine a{color:inherit;text-decoration:underline;text-underline-offset:.16em}
+
+</style></head><body><div id="viewport"><main id="stage"><section class="slide" id="cover" data-title="과학기술의 발전과 우리 생활" data-tile="black"><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="hero-g"></g></svg><div class="abs t-eyebrow center" style="left:120px;top:684px;width:1680px;" data-in="200">통합과학2 · Ⅲ. 과학과 미래 사회 · 03</div><div class="abs t-display center" style="left:120px;top:746px;width:1680px;" data-in="450">과학기술의 발전과 우리 생활</div><div class="abs t-lead center mute" style="left:120px;top:899px;width:1680px;" data-in="800">물건이 서로 연결되고, 기계가 스스로 판단한다면?</div><div class="abs t-lead center mute" style="left:0;width:1920px;top:990px;font-size:30px;letter-spacing:.06em" data-in="1100">제작 · KJE</div><div class="progress-hint">클릭 또는 → 로 시작</div></section><section class="slide" id="goals" data-title="학습 목표와 수업 흐름" data-tile="parchment"><div class="hd" data-in><div class="eb"><b>01</b>학습 목표</div><h2>첨단 과학기술이 바꾼 생활과 그 영향을 살펴본다</h2></div><div class="ws-card" style="left:120px;top:330px;width:1680px" data-in="200"><div class="ws-row"><span class="tm">목표 1</span><span>인공지능, 로봇, 사물 인터넷 등을 인간 삶과 환경 개선에 활용하는 사례를 찾을 수 있다.</span></div><div class="ws-row"><span class="tm">목표 2</span><span>과학기술의 발전이 미래 사회에 미치는 유용성과 한계를 예측할 수 있다.</span></div></div><div class="abs" style="left:120px;top:690px;width:820px" data-step="1"><div class="colh"><span class="c-elec">1차시</span> 첨단 과학기술 알기</div><div class="body-copy mute">사물 인터넷, 인공지능, 로봇의 뜻을 알고 일상 속 적용 사례와 그 영향을 살펴본다.</div></div><div class="abs" style="left:980px;top:690px;width:820px" data-step="2"><div class="colh"><span class="c-kin">2차시</span> 로봇 탐구하기</div><div class="body-copy mute">여러 로봇의 특징과 기능을 조사해 개선 방안을 고안하고, 과학기술의 유용성과 한계를 생각한다.</div></div><div class="fine">교과서 144~147쪽 · 2차시 수업</div></section><section class="slide" id="intro" data-title="과학기술과 생활의 변화" data-tile="light"><div class="hd" data-in><div class="eb"><b>02</b>과학기술의 발전은 우리 생활을 어떻게 변화시켰을까?</div><h2>센서로 주변 상황을 알아차린다</h2></div><div class="dev-card" style="left:120px;width:800px;height:560px" data-step="1"><span class="echip e-heat">스마트워치</span><svg class="card-art" style="height:330px;margin-top:10px" viewBox="0 0 320 190" role="img" aria-label="스마트워치의 움직임 감지와 알림을 나타낸 그림"><rect x="40" y="70" width="240" height="50" rx="20" fill="var(--hl)"/><rect x="105" y="35" width="110" height="120" rx="26" fill="#1d1d1f"/><path d="M160 71v35m0 13v2" fill="none" stroke="var(--heat)" stroke-width="8" stroke-linecap="round"/><g fill="none" stroke="var(--heat)" stroke-width="4" stroke-linecap="round"><path d="M240 40a30 30 0 0 1 0 40"/><path d="M256 26a52 52 0 0 1 0 68"/></g></svg><p class="lead2">일부 모델은 <b>낙상이 의심되면</b> 알리고, 설정과 통신 조건에 따라 구조를 요청할 수 있다.</p></div><div class="dev-card" style="left:1000px;width:800px;height:560px" data-step="2"><span class="echip e-light">스마트 블라인드</span><svg class="card-art" style="height:330px;margin-top:10px" viewBox="0 0 320 190" role="img" aria-label="햇빛의 세기에 따라 블라인드가 열리고 닫힘"><circle cx="270" cy="40" r="24" fill="var(--light)"/><g stroke="var(--light)" stroke-width="4" stroke-linecap="round"><path d="M270 4v8M234 40h-8M244 14l6 6M296 14l-6 6"/></g><rect x="60" y="30" width="160" height="150" rx="6" fill="none" stroke="var(--t2)" stroke-width="4"/><g fill="var(--t3)"><rect x="66" y="40" width="148" height="12" rx="3"/><rect x="66" y="60" width="148" height="12" rx="3"/><rect x="66" y="80" width="148" height="12" rx="3"/><rect x="66" y="100" width="148" height="12" rx="3"/></g><path d="M140 130v30m-12-12 12 12 12-12" stroke="var(--elec)" stroke-width="5" fill="none" stroke-linecap="round"/></svg><p class="lead2">조도가 기준값을 넘으면 <b>정해 둔 규칙</b>에 따라 블라인드가 닫힌다.</p></div><div class="abs tagline center" style="left:120px;top:910px;width:1680px;font-size:40px" data-step="3">두 물건은 무엇을 감지하고, 그 정보로 어떤 일을 할까?</div><div class="fine" style="bottom:28px">교과서 144쪽</div></section><section class="slide" id="iot" data-title="사물 인터넷" data-tile="parchment"><div class="hd" data-in><div class="eb"><b>03</b>사물 인터넷(IoT)</div><h2>물건에 감각과 통신을 더해 인터넷에 연결한다</h2></div><div class="ws-card" style="left:120px;top:300px;width:1680px" data-in="200"><div class="ws-h"><b>사물 인터넷</b><span>Internet of Things</span></div><div class="ws-line">각종 물건에 <span class="bk wide"><span class="a" data-step="1" data-fx="pop">센서</span></span>와 <span class="bk wide"><span class="a" data-step="1" data-fx="pop" data-delay="200">통신 기능</span></span>을 내장한 뒤 <span class="bk"><span class="a" data-step="1" data-fx="pop" data-delay="400">인터넷</span></span>에 연결하는 기술</div></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="iot-g"></g></svg><div class="fine">교과서 144쪽 · 위 그림은 센서를 쓰는 예시다. 기기는 인터넷에 직접 연결되거나 허브를 거쳐 데이터를 주고받을 수 있다.</div></section><section class="slide" id="home" data-title="미래 스마트 홈" data-tile="black"><div class="hd" data-in><div class="eb"><b>04</b>미래 스마트 홈</div><h2>집 안의 물건들은 무엇을 알아차리고 무엇을 할까?</h2></div><svg class="full-svg" viewBox="0 0 1920 1080"><g id="home-g"></g></svg><div class="hs-panel" id="homePanel" aria-live="polite" style="left:1220px;top:300px;width:580px"><div class="hs-empty">표시를 누르거나 클릭으로 하나씩 살펴보자.</div></div><div class="fine">교과서 144쪽 그림 Ⅲ-6 「집 안에서 사용되는 사물 인터넷」</div></section><section class="slide" id="ai" data-title="인공지능" data-tile="light"><div class="hd" data-in><div class="eb"><b>05</b>인공지능(AI)</div><h2>인공지능은 데이터를 바탕으로 결과를 추론한다</h2></div><div class="ws-card" style="left:120px;top:300px;width:1680px" data-in="200"><div class="ws-h"><b>인공지능</b><span>Artificial Intelligence</span></div><div class="ws-line">인간의 <span class="bk wide"><span class="a" data-step="1" data-fx="pop">추론이나 학습 능력</span></span>을 컴퓨터에 구현한 기술</div></div><div class="abs" style="left:120px;top:560px;width:1680px;display:flex;align-items:center;gap:26px" data-step="2"><span class="pill" style="background:#f5f5f7;font-size:34px;padding:18px 30px">사물 인터넷<span class="mute" style="font-weight:400;font-size:26px">데이터 수집</span></span><span class="t-lead mute">+</span><span class="pill" style="background:var(--act);color:#fff;font-size:34px;padding:18px 30px">인공지능<span style="font-weight:400;font-size:26px;opacity:.85">데이터 분석</span></span><span class="t-lead mute">→</span><span class="pill" style="background:#f5f5f7;font-size:34px;padding:18px 30px">문제 해결</span></div><div class="abs chips" style="left:120px;top:740px;width:1680px" data-step="3"><span class="echip e-elec">데이터 분석</span><span class="echip e-kin">의사 결정 지원</span><span class="echip e-light">자동화</span><span class="echip e-sound">개인 맞춤 서비스</span></div><div class="abs mini" style="left:120px;top:830px;width:1680px" data-step="3">여러 분야에서 이렇게 활용된다.</div><div class="fine">교과서 145쪽 · 「수업 보충 자료」</div></section><section class="slide" id="venn" data-title="인공지능·로봇·인공지능 로봇" data-tile="parchment"><div class="hd" data-in><div class="eb"><b>06</b>인공지능 로봇</div><h2>모든 로봇에 인공지능이 들어 있을까?</h2></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="venn-g"></g></svg><div class="abs" style="left:1260px;top:310px;width:540px" data-step="1"><div class="t-label c-elec">인공지능</div><div class="body-copy" style="font-size:30px;line-height:1.5;margin-top:6px">입력된 정보로 분류·예측하거나 추천하는 기술</div></div><div class="abs" style="left:1260px;top:500px;width:540px" data-step="2"><div class="t-label c-heat">로봇</div><div class="body-copy" style="font-size:30px;line-height:1.5;margin-top:6px">프로그래밍된 동작으로 물리적 작업을 하는 기계. 정해진 동작을 반복하는 로봇도 있다.</div></div><div class="abs" style="left:1260px;top:720px;width:540px" data-step="3"><div class="t-label c-kin">인공지능 로봇</div><div class="body-copy" style="font-size:30px;line-height:1.5;margin-top:6px">인공지능으로 주변 정보를 해석해 행동을 정하는 로봇. 정해진 범위에서 사람의 매번 지시 없이 움직일 수 있다.</div></div><div class="fine">교과서 145쪽 · 「학생들의 오개념 해결」</div></section><section class="slide" id="together" data-title="기술이 함께 일하는 방식" data-tile="dark"><div class="hd" data-in><div class="eb"><b>07</b>함께 일하는 기술</div><h2>감지·연결·판단·작동의 역할을 구별하자</h2></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="flow-g"></g></svg><div class="abs mini center" style="left:120px;top:600px;width:1680px" data-step="4">목적에 따라 필요한 역할을 조합한다. 예를 들어 조도 센서가 달린 블라인드는 정해 둔 규칙으로 작동할 수 있다.</div><div class="dev-card" style="left:120px;top:695px;width:540px;height:280px" data-step="5"><span class="echip e-elec">규칙으로 작동</span><p class="lead2" style="margin-top:0">조도 감지 → 기준값과 비교 → 모터로 블라인드 닫기</p></div><div class="dev-card" style="left:690px;top:695px;width:540px;height:280px" data-step="5" data-delay="150"><span class="echip e-kin">인터넷에 연결</span><p class="lead2" style="margin-top:0">스마트폰으로 집 밖에서 블라인드를 조절할 수 있다.</p></div><div class="dev-card" style="left:1260px;top:695px;width:540px;height:280px" data-step="5" data-delay="300"><span class="echip e-sound">인공지능 적용</span><p class="lead2" style="margin-top:0">사용자가 조절한 기록에서 패턴을 학습해 열고 닫을 때를 추천할 수 있다.</p></div><div class="fine">교과서 145쪽 · 블라인드 비교는 수업 보충 사례</div></section><section class="slide" id="city" data-title="미래 과학 도시" data-tile="black"><div class="hd" data-in><div class="eb"><b>08</b>미래 과학 도시</div><h2>도시 곳곳에서 과학기술은 어떤 일을 할까?</h2></div><svg class="full-svg" viewBox="0 0 1920 1080"><g id="city-g"></g></svg><div class="hs-panel" id="cityPanel" aria-live="polite" style="left:1220px;top:300px;width:580px"><div class="hs-empty">표시를 누르거나 클릭으로 하나씩 살펴보자.</div></div><div class="fine">교과서 145쪽 그림 Ⅲ-7 「과학기술이 적용되는 도시」</div></section><section class="slide" id="citydata" data-title="도시 데이터와 도시 관리" data-tile="light"><div class="hd" data-in><div class="eb"><b>09</b>도시 관리 시스템</div><h2>도시 데이터로 사물과 시민이 함께 움직인다</h2></div><div class="dev-card" style="left:120px;width:390px;height:400px" data-step="1"><span class="echip e-elec">대기 상태</span><svg class="card-art" viewBox="0 0 320 190" role="img" aria-label="측정 장치가 공기 속 먼지를 감지함"><rect x="70" y="60" width="12" height="120" fill="var(--t3)"/><rect x="46" y="40" width="60" height="40" rx="8" fill="none" stroke="var(--elec)" stroke-width="4"/><path d="M62 60h28" stroke="var(--elec)" stroke-width="4" stroke-linecap="round"/><path d="M118 56a20 20 0 0 1 0 12M128 48a32 32 0 0 1 0 28" fill="none" stroke="var(--elec)" stroke-width="3" stroke-linecap="round"/><circle cx="170" cy="60" r="7" fill="var(--t3)" opacity=".55"/><circle cx="205" cy="90" r="10" fill="var(--t3)" opacity=".55"/><circle cx="240" cy="55" r="6" fill="var(--t3)" opacity=".55"/><circle cx="260" cy="110" r="8" fill="var(--t3)" opacity=".55"/><circle cx="190" cy="130" r="6" fill="var(--t3)" opacity=".55"/><circle cx="225" cy="145" r="9" fill="var(--t3)" opacity=".55"/><circle cx="280" cy="70" r="5" fill="var(--t3)" opacity=".55"/></svg><p class="lead2" style="margin-top:4px">미세 먼지·오염 정도</p></div><div class="dev-card" style="left:540px;width:390px;height:400px" data-step="1" data-delay="120"><span class="echip e-kin">쓰레기통 포화 정도</span><svg class="card-art" viewBox="0 0 320 190" role="img" aria-label="쓰레기통이 얼마나 찼는지 표시"><path d="M110 50h100l-10 130h-80z" fill="none" stroke="var(--t2)" stroke-width="5" stroke-linejoin="round"/><path d="M100 40h120" stroke="var(--t2)" stroke-width="6" stroke-linecap="round"/><path d="M116 90h88l-7 90h-74z" fill="var(--kin)" opacity=".35"/><rect x="240" y="50" width="22" height="130" rx="8" fill="none" stroke="var(--kin)" stroke-width="4"/><rect x="244" y="90" width="14" height="86" rx="5" fill="var(--kin)"/><text x="251" y="38" text-anchor="middle" font-size="24" font-weight="700" fill="var(--kin)">80%</text></svg><p class="lead2" style="margin-top:4px">가득 찬 곳부터 수거</p></div><div class="dev-card" style="left:960px;width:390px;height:400px" data-step="1" data-delay="240"><span class="echip e-light">교통량</span><svg class="card-art" viewBox="0 0 320 190" role="img" aria-label="도로의 막히는 구간과 원활한 구간"><rect x="20" y="70" width="280" height="70" fill="var(--hl)"/><path d="M20 105h280" stroke="#fff" stroke-width="4" stroke-dasharray="16 14"/><rect x="30" y="76" width="40" height="22" rx="6" fill="var(--heat)"/><rect x="80" y="76" width="40" height="22" rx="6" fill="var(--heat)"/><rect x="130" y="76" width="40" height="22" rx="6" fill="var(--heat)"/><rect x="180" y="76" width="40" height="22" rx="6" fill="var(--light)"/><rect x="240" y="112" width="40" height="22" rx="6" fill="var(--kin)"/><path d="M40 40h120" stroke="var(--heat)" stroke-width="8" stroke-linecap="round"/><path d="M170 40h50" stroke="var(--light)" stroke-width="8" stroke-linecap="round"/><path d="M230 40h50" stroke="var(--kin)" stroke-width="8" stroke-linecap="round"/></svg><p class="lead2" style="margin-top:4px">막히는 길과 시간</p></div><div class="dev-card" style="left:1380px;width:420px;height:400px" data-step="1" data-delay="360"><span class="echip e-heat">실시간 주차 공간</span><svg class="card-art" viewBox="0 0 320 190" role="img" aria-label="주차장에서 비어 있는 한 칸이 표시됨"><path d="M30 40v130M90 40v130M150 40v130M210 40v130M270 40v130" stroke="var(--t3)" stroke-width="4"/><rect x="39" y="70" width="42" height="72" rx="10" fill="var(--t3)" opacity=".6"/><rect x="99" y="70" width="42" height="72" rx="10" fill="var(--t3)" opacity=".6"/><rect x="219" y="70" width="42" height="72" rx="10" fill="var(--t3)" opacity=".6"/><text x="180" y="122" text-anchor="middle" font-size="44" font-weight="800" fill="var(--heat)">P</text><circle cx="180" cy="106" r="34" fill="none" stroke="var(--heat)" stroke-width="4"/></svg><p class="lead2" style="margin-top:4px">비어 있는 자리 안내</p></div><div class="abs tagline center" style="left:120px;top:750px;width:1680px;font-size:38px" data-step="2">다양한 도시 데이터 → 사물과 시민이 <b>효율적으로 상호작용</b>하는 도시 관리 시스템</div><div class="abs mini center" style="left:120px;top:860px;width:1680px" data-step="3">지난 시간에 배운 <b class="c-act">빅데이터</b>가 여기에 쓰인다.</div><div class="fine">교과서 145쪽 · 카드 아래 설명은 이해를 돕기 위한 예이다.</div></section><section class="slide" id="inq-title" data-title="탐구 · 일상생활 속 로봇" data-tile="black"><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="inq-hero"></g></svg><div class="abs t-eyebrow" style="left:120px;top:300px;width:1680px;" data-in="100"><span class="c-kin">탐구</span> · 2차시 · 정보 조사 | 과학적 지식 활용</div><div class="abs t-title" style="left:120px;top:370px;width:1200px;" data-in="300">일상생활 속 로봇의 특징 분석 및 개선 방안 고안하기</div><div class="abs t-lead" style="left:120px;top:640px;width:1080px;" data-in="600">우리 주변에는 어떤 로봇이 있을까?</div><div class="abs t-lead c-kin" style="left:120px;top:730px;width:1080px;" data-step="1">다양한 로봇을 사용하게 되면서 우리 생활은 어떻게 변했을까?</div><div class="fine">교과서 146쪽 · 목표: 일상생활에서 활용하는 로봇의 특징을 분석하고 더 편리하게 사용하도록 개선 방안을 고안한다. · 준비물: 스마트 기기</div></section><section class="slide" id="robots" data-title="탐구 1 · 우리가 쓰는 로봇" data-tile="dark"><div class="hd" data-in><div class="eb"><b>10</b>탐구하기 1</div><h2>모둠원과 로봇을 나누어 용도와 기능을 조사하자</h2></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="robots-g"></g></svg><div class="abs tagline center" style="left:120px;top:880px;width:1680px;font-size:38px" data-step="5">제시된 로봇 말고 다른 로봇을 골라도 좋다.</div><div class="fine">교과서 146쪽 · 그림은 이해를 돕기 위해 단순하게 그린 것이다.</div></section><section class="slide" id="serving" data-title="조사 예시 · 서빙 로봇" data-tile="light"><div class="hd" data-in><div class="eb"><b>11</b>조사 예시</div><h2>서빙 로봇은 어디에 쓰이고, 무엇을 할 수 있을까?</h2></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="serve-g"></g></svg><div class="ws-card" style="left:560px;top:300px;width:1240px" data-in="200"><div class="ws-h"><b>조사 기록</b><span>예시</span></div><div class="ws-row"><span class="tm">종류</span><span><span class="a" data-step="1">서빙 로봇</span></span></div><div class="ws-row"><span class="tm">용도</span><span><span class="a" data-step="2">식당, 카페, 호텔 같은 곳에서 음식과 음료를 손님에게 전달한다.</span></span></div><div class="ws-row"><span class="tm">기능</span><span><span class="a" data-step="3"><b class="c-elec">센서</b>로 주변 환경을 인식하고 장애물을 감지하며 이동한다. 주문·조리 시스템과 <b class="c-kin">연동한 경우</b>, 전달받은 정보에 맞춰 음식을 나를 수 있다.</span></span></div></div><div class="abs mini" style="left:560px;top:860px;width:1240px" data-step="4">장애물 감지에는 <b class="c-elec">센서</b>를 쓴다. 주문 정보를 주고받는 기능은 연결 방식에 따라 달라진다.</div><div class="fine">교과서 146쪽 「탐구하기」 1 예시</div></section><section class="slide" id="discuss" data-title="탐구 2·3 · 찾기와 토의" data-tile="parchment"><div class="hd" data-in><div class="eb"><b>12</b>탐구하기 2 · 3</div><h2>로봇은 우리 생활을 어떻게 바꾸었을까?</h2></div><div class="qbox" style="left:120px;top:290px;width:1680px" data-in="200"><div class="qh">2. 제시된 로봇 말고 또 어떤 로봇이 있을까?</div><div data-step="1" class="c-act"><span class="pill ex">예시</span>주차 로봇, 배달 로봇, 농업용 로봇 등</div></div><div class="qbox" style="left:120px;top:500px;width:1680px" data-in="300"><div class="qh">3. 로봇을 사용하면서 어떤 변화가 생겼을까?</div><div data-step="2" class="c-act"><span class="pill ex">예시</span>청소, 요리, 서빙 같은 생활 속 노동을 로봇이 대신해 생활이 더 효율적이고 편리해졌다.</div><div data-step="3" class="c-heat" style="margin-top:10px">일부 업무가 줄거나 바뀌고, 로봇을 관리하는 새 업무가 생길 수 있다. 오작동으로 사고가 나면 <b>책임을 누가 질지</b>도 생각해 보자.</div></div><div class="fine">교과서 146쪽 「탐구하기」 2 · 3</div></section><section class="slide" id="improve" data-title="탐구 4 · 개선 방안 고안" data-tile="light"><div class="hd" data-in><div class="eb"><b>13</b>탐구하기 4</div><h2>로봇을 더 편리하게 쓰려면 무엇을 바꾸면 좋을까?</h2></div><div class="ws-card" style="left:120px;top:300px;width:900px" data-in="200"><div class="ws-h"><b>개선 방안</b><span>예시</span></div><div class="ws-row"><span class="tm">로봇</span><span><span class="a" data-step="1">음식을 나르는 로봇</span></span></div><div class="ws-row"><span class="tm">불편한 점</span><span><span class="a" data-step="2">다른 층으로 배달하기 어렵다.</span></span></div><div class="ws-row"><span class="tm">개선 방법</span><span><span class="a" data-step="3">교과서 예시 · 바퀴 대신 다리를 달아 계단을 오르게 한다.</span></span></div></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="imp-g"></g></svg><div class="abs" style="left:120px;top:710px;width:900px" data-step="4"><div class="t-label mute" style="margin-bottom:12px">우리 모둠이라면 어떤 방법을 고를까?</div><div class="mini">엘리베이터를 부르는 바퀴형 로봇이나 우리 모둠의 새 아이디어와 비교하자. 음식물이 쏟아질 위험과 설치 비용을 따져 선택하고, 선택한 로봇의 모습을 그려 보자.</div></div><div class="fine">교과서 147쪽 「탐구하기」 4 · 비교 기준 예시: 효율성, 비용, 안전성, 사용 편의성</div></section><section class="slide" id="reflect" data-title="평가하고 성찰하기" data-tile="parchment"><div class="hd" data-in><div class="eb"><b>14</b>평가하고 성찰하기</div><h2>탐구를 돌아보자</h2></div><div class="abs" style="left:120px;top:300px;width:1680px"><div class="check-row" data-step="1"><b class="c-elec">□</b><span>로봇의 종류에 따라 용도와 기능을 설명하였는가?</span><span></span></div><div class="check-row" data-step="2"><b class="c-elec">□</b><span>신뢰할 만한 자료를 조사하였는가?</span><span></span></div><div class="check-row" data-step="3"><b class="c-elec">□</b><span>우리 주변의 로봇에 관심을 가지고 창의적으로 생각하여 개선 방안을 고안하였는가?</span><span></span></div></div><div class="fine">교과서 147쪽 「평가하고 성찰하기」</div></section><section class="slide" id="impact" data-title="인공지능 로봇의 영향" data-tile="dark"><div class="hd" data-in><div class="eb"><b>15</b>사회에 미치는 영향</div><h2>인공지능 로봇이 빠르게 퍼지고 있다</h2></div><div class="abs chips" style="left:120px;top:300px;width:1680px" data-in="200"><span class="echip e-elec">언론</span><span class="echip e-light">교통</span><span class="echip e-kin">물류</span><span class="echip e-heat">안전</span><span class="echip e-sound">환경</span><span class="mute" style="font-size:30px;align-self:center">등 각종 분야</span></div><div class="dev-card" style="left:120px;top:420px;width:820px;height:400px" data-step="1"><span class="echip e-kin">긍정적 영향</span><h3 style="font-size:44px">생활이 편리해지고<br>반복 작업을 줄일 수 있다</h3><p class="lead2">예를 들어 배달 로봇은 물건을 옮기는 작업을 돕는다.</p></div><div class="dev-card" style="left:980px;top:420px;width:820px;height:400px" data-step="2"><span class="echip e-heat">우려</span><h3 style="font-size:44px">업무의 변화,<br>오작동과 안전 문제</h3><p class="lead2">인터넷을 쓰는 기기는 통신 장애나 개인정보 노출도 고려해야 한다.</p></div><div class="fine">교과서 147쪽</div></section><section class="slide" id="prepare" data-title="미래를 위한 대비" data-tile="black"><div class="hd" data-in><div class="eb"><b>16</b>어떻게 대비할까?</div><h2>좋은 효과는 키우고, 나쁜 효과는 막으려면</h2></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="scale-g"></g></svg><div class="abs" style="left:1080px;top:320px;width:720px" data-step="1"><div class="t-label c-elec">① 영향을 예측한다</div><div class="body-copy" style="margin-top:8px">기술이 사회 전반에 어떤 영향을 줄지 미리 내다본다.</div></div><div class="abs" style="left:1080px;top:540px;width:720px" data-step="2"><div class="t-label c-kin">② 기술적·제도적으로 대비한다</div><div class="body-copy" style="margin-top:8px">기술을 더 안전하게 만들고, 사회의 규칙과 제도를 함께 마련한다.</div></div><div class="abs mini" style="left:1080px;top:760px;width:720px" data-step="3">토의해 보자 · 교실 냉난방이 재실 여부에 따라 작동하면 언제 전기를 아낄까? 센서가 재실을 잘못 판단하면 어떤 문제가 생길까? 예상한 이점과 한계의 근거를 말해 보자.</div><div class="fine">교과서 147쪽 · 토의 질문은 교과서 내용을 바탕으로 덧붙인 것이다.</div></section><section class="slide" id="check" data-title="확인하기" data-tile="parchment"><div class="hd" data-in><div class="eb"><b>17</b>확인하기</div><h2>세 가지 기술을 구별할 수 있을까?</h2></div><div class="abs" style="left:120px;top:290px;width:1680px"><div class="check-row" style="grid-template-columns:64px 1fr 360px"><b>1</b><span>기기를 인터넷에 연결해 정보를 주고받는 기술은?</span><span class="answer" data-step="1">사물 인터넷</span></div><div class="check-row" style="grid-template-columns:64px 1fr 360px"><b>2</b><span>인간의 추론이나 학습 능력을 컴퓨터에 구현한 기술은?</span><span class="answer" data-step="2">인공지능</span></div><div class="check-row" style="grid-template-columns:64px 1fr 360px"><b>3</b><span>모든 로봇에는 인공지능이 들어 있다.</span><span class="answer" data-step="3">× (아닌 로봇도 있음)</span></div><div class="check-row" style="grid-template-columns:64px 1fr 360px"><b>4</b><span>인공지능으로 주변 정보를 해석해 움직임을 결정하는 기계의 예는?</span><span class="answer" data-step="4">자율주행 자동차 등</span></div></div><div class="fine">교과서 145쪽 · 147쪽 「스스로 확인」</div></section><section class="slide" id="summary" data-title="정리 · 과학과 나" data-tile="black"><div class="hd" data-in><div class="eb"><b>18</b>정리</div><h2>오늘 배운 것</h2></div><div class="abs" style="left:120px;top:290px;width:1680px;display:flex;flex-direction:column;gap:34px"><div class="sum-row" data-step="1"><span class="echip e-elec">사물 인터넷</span><span>기기를 인터넷에 연결해 데이터를 주고받는다.</span></div><div class="sum-row" data-step="2"><span class="echip e-kin">인공지능</span><span>입력된 정보를 바탕으로 분류·예측·추천 등을 한다.</span></div><div class="sum-row" data-step="3"><span class="echip e-light">인공지능 로봇</span><span>인공지능으로 주변 정보를 해석해 행동을 정하는 로봇이다.</span></div><div class="sum-row" data-step="4"><span class="echip e-heat">대비</span><span>영향을 예측하고 기술적·제도적으로 대비한다.</span></div></div><div class="abs callout" style="left:120px;top:830px;width:1680px;background:rgba(41,151,255,.12)" data-step="5"><b class="c-elec">과학과 나</b> · 우리 생활 주변에서 사물 인터넷, 인공지능, 로봇 기술이 쓰인 곳을 찾아보자. <span class="mute">(에너지 관리 시스템, 인공지능 비서, 청소 로봇 …)</span></div><div class="fine" style="bottom:34px">참고 · <a href="https://www.moe.go.kr/boardCnts/viewRenew.do?boardID=141&amp;boardSeq=93458" target="_blank" rel="noopener">과학과 교육과정 [10통과2-03-03]</a> · <a href="https://csrc.nist.gov/glossary/term/iot_device" target="_blank" rel="noopener">NIST 사물 인터넷</a> · <a href="https://doi.org/10.1787/623da898-en" target="_blank" rel="noopener">OECD 인공지능</a> · <a href="https://support.apple.com/ko-kr/108896" target="_blank" rel="noopener">Apple 낙상 감지</a> · <a href="https://www.fda.gov/medical-devices/surgery-devices/computer-assisted-surgical-systems" target="_blank" rel="noopener">FDA 수술 보조 시스템</a></div></section>
+</main></div><div id="alwaysNav"><button onclick="Deck.prev()" aria-label="이전 단계">← 이전</button><button onclick="Deck.next()" aria-label="다음 단계">다음 →</button><button id="navPage" onclick="Deck.toggleOverview()" aria-label="쪽 목록 열기">1 / 20</button></div><script>
+
+/* ═══════════════════════════════════════════════════════════════
+   core.js — 강의 덱 엔진
+   · 1920×1080 무대를 화면에 맞춰 배율(레터박스)
+   · 장면(scene) = 도입(enter, 저절로) + 빌드 단계(go(k), 클릭마다)
+   · 되돌아가기·건너뛰기는 "처음 상태로 복원 → 순간 재생"이라 언제나 같은 모습
+   · 애니메이션 도구는 ctx 가 쥐고 있어 장면을 떠나면 저절로 정리됨
+   ═══════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+  const SW = 1920, SH = 1080;
+  const Q = new URLSearchParams(location.search);
+  const STILL = Q.get('still') === '1';
+  // 공개 자료는 항상 학생용으로 제공한다.
+  const STUDENT = true;
+  if (STUDENT) document.documentElement.classList.add('student');
+  const REDUCED = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  if (STILL || Q.get('clean') === '1') document.documentElement.classList.add('still');
+  if (Q.get('grid') === '1') document.documentElement.classList.add('grid');
+  if (Q.get('log') === '1') {   // 검증용: 콘솔 수준을 앞머리로 남김(console.py 가 읽음)
+    const oe = console.error.bind(console), ow = console.warn.bind(console);
+    const txt = a => a.map(x => (x && x.stack) ? String(x.stack).split(String.fromCharCode(10)).slice(0, 2).join(' | ') : (typeof x === 'object' ? (() => { try { return JSON.stringify(x); } catch (e) { return String(x); } })() : String(x))).join(' ');
+    console.error = (...a) => oe('[ERR] ' + txt(a));
+    console.warn = (...a) => ow('[WARN] ' + txt(a));
+    window.addEventListener('error', e => oe('[ERR] uncaught ' + (e.message || '') + ' @' + (e.lineno || '')));
+    window.addEventListener('unhandledrejection', e => oe('[ERR] rejection ' + ((e.reason && e.reason.stack) || e.reason)));
+  }
+
+  /* ── 곡선 ── */
+  const EASE = {
+    out: 'cubic-bezier(.2,.8,.2,1)', outQuint: 'cubic-bezier(.22,1,.36,1)', inOut: 'cubic-bezier(.65,0,.35,1)',
+    in: 'cubic-bezier(.55,0,.75,.1)', spring: 'cubic-bezier(.34,1.56,.64,1)', soft: 'cubic-bezier(.25,.1,.25,1)', linear: 'linear',
+  };
+  const JE = {
+    linear: t => t,
+    out: t => 1 - Math.pow(1 - t, 3),
+    outQuint: t => 1 - Math.pow(1 - t, 5),
+    inOut: t => (t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2),
+    in: t => t * t * t,
+    soft: t => t * t * (3 - 2 * t),
+    spring: t => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); },
+    elastic: t => (t === 0 || t === 1) ? t : Math.pow(2, -10 * t) * Math.sin((t * 10 - .75) * (2 * Math.PI) / 3) + 1,
+  };
+
+  /* ── 등장 모양(선언형·ctx.reveal 공용) ── svg 요소에는 blur(필터) 빼고 */
+  const REVEAL = {
+    rise:  { k: [{ opacity: 0, transform: 'translateY(28px)', filter: 'blur(12px)' }, { opacity: 1, transform: 'translateY(0px)', filter: 'blur(0px)' }], dur: 900 },
+    fade:  { k: [{ opacity: 0 }, { opacity: 1 }], dur: 700 },
+    blur:  { k: [{ opacity: 0, transform: 'scale(1.06)', filter: 'blur(24px)' }, { opacity: 1, transform: 'scale(1)', filter: 'blur(0px)' }], dur: 1100 },
+    scale: { k: [{ opacity: 0, transform: 'scale(.92)' }, { opacity: 1, transform: 'scale(1)' }], dur: 900 },
+    pop:   { k: [{ opacity: 0, transform: 'scale(.5)' }, { opacity: 1, transform: 'scale(1)' }], dur: 750, ease: 'spring' },
+    left:  { k: [{ opacity: 0, transform: 'translateX(-64px)' }, { opacity: 1, transform: 'translateX(0px)' }], dur: 900 },
+    right: { k: [{ opacity: 0, transform: 'translateX(64px)' }, { opacity: 1, transform: 'translateX(0px)' }], dur: 900 },
+    down:  { k: [{ opacity: 0, transform: 'translateY(-28px)' }, { opacity: 1, transform: 'translateY(0px)' }], dur: 900 },
+    up:    { k: [{ opacity: 0, transform: 'translateY(72px)' }, { opacity: 1, transform: 'translateY(0px)' }], dur: 1000 },
+    draw:  { k: [{ opacity: 1, strokeDashoffset: 1 }, { opacity: 1, strokeDashoffset: 0 }], dur: 1200, ease: 'inOut' },
+    wipe:  { k: [{ opacity: 1, clipPath: 'inset(0 100% 0 0)' }, { opacity: 1, clipPath: 'inset(0 0% 0 0)' }], dur: 1000, ease: 'inOut' },
+    none:  { k: [{ opacity: 1 }, { opacity: 1 }], dur: 1 },
+  };
+  const isSVG = el => el instanceof SVGElement && !(el instanceof SVGSVGElement);
+  const GEOM = 'path,line,polyline,polygon,circle,ellipse,rect';
+  const noFilter = k => k.map(f => { const g = Object.assign({}, f); delete g.filter; return g; });
+
+  const STUB = { finished: Promise.resolve(), cancel() {}, finish() {}, pause() {}, play() {}, playbackRate: 1, effect: null };
+
+  /* ═════════ 장면 도구 상자 ═════════ */
+  class Ctx {
+    constructor(root, idx) {
+      this.root = root; this.idx = idx; this.instant = false; this.alive = true;
+      this.reduced = REDUCED; this.still = STILL; this.E = EASE; this.JE = JE; this.data = {};
+      this._anims = []; this._loops = []; this._timers = []; this._waits = []; this._tweens = []; this._sfxT = []; this._disp = [];
+    }
+    /** 효과음: SFX.play(name, a, b) 를 delay ms 뒤에. 순간 모드(되돌리기·복원)·건너뛰기·장면 나감이면 조용히 */
+    sfx(name, delay = 0, a, b) {
+      if (STILL || this.instant || !this.alive || !window.SFX) return;
+      if (delay > 0) { const id = setTimeout(() => { if (this.alive && !this.instant) SFX.play(name, a, b); }, delay); this._sfxT.push(id); }
+      else SFX.play(name, a, b);
+    }
+    /** 이어지는 소리('fan'|'hum'|'boil') — 장면을 떠나면 저절로 멎는다. 반환: {level(v), whine(v), stop()} */
+    sfxLoop(kind, o) { const h = window.SFX ? SFX.loop(kind, o) : null; if (h) this._disp.push(() => h.stop()); return h; }
+    onDispose(fn) { this._disp.push(fn); }
+    $(s) { return this.root.querySelector(s); }
+    $$(s) { return Array.from(this.root.querySelectorAll(s)); }
+    _el(el) { return typeof el === 'string' ? this.$(el) : el; }
+    _els(els) { if (typeof els === 'string') return this.$$(els); if (!els) return []; return (els.length !== undefined && !(els instanceof Element)) ? Array.from(els) : [els]; }
+
+    /** Web Animations 한 방. o: {dur, delay, ease, fill, iter, dir, composite}. 순간 모드면 바로 끝 상태 */
+    a(el, kf, o = {}) {
+      el = this._el(el);
+      if (!el || !this.alive) return STUB;
+      const infinite = o.iter === Infinity;
+      const inst = (this.instant || this.reduced) && !infinite;
+      const an = el.animate(kf, {
+        duration: inst ? 0 : (o.dur ?? 700), delay: inst ? 0 : (o.delay ?? 0),
+        easing: EASE[o.ease] || o.ease || EASE.out, fill: o.fill || 'both',
+        iterations: o.iter ?? 1, direction: o.dir || 'normal', composite: o.composite || 'replace',
+      });
+      if (inst) { try { an.finish(); } catch (e) {} }
+      this._anims.push(an);
+      return an;
+    }
+    /** 여러 요소에 시차(stagger ms)를 두고 같은 애니 */
+    all(els, kf, o = {}) {
+      return this._els(els).map((e, i) => this.a(e, typeof kf === 'function' ? kf(e, i) : kf, Object.assign({}, o, { delay: (o.delay || 0) + i * (o.stagger || 0) })));
+    }
+    /** 등장: fx = rise|fade|blur|scale|pop|left|right|down|up|draw|wipe */
+    reveal(el, fx = 'rise', o = {}) {
+      const els = this._els(el); const out = [];
+      els.forEach((e, i) => {
+        const P = REVEAL[fx] || REVEAL.rise;
+        const d = Object.assign({ dur: P.dur, ease: P.ease || 'out' }, o);
+        if (o.stagger) d.delay = (o.delay || 0) + i * o.stagger;
+        // 효과음: 학습지 빈칸 답이 채워지면 「띠링」, pop·up 등장이면 「톡」
+        if (!this.instant) {
+          const sk = (e.classList && e.classList.contains('a') && e.parentElement && e.parentElement.classList.contains('bk')) ? 'blank' : ((fx === 'pop' || fx === 'up') ? 'pop' : null);
+          if (sk) this.sfx(sk, d.delay || 0);
+        }
+        if (fx === 'draw') {
+          const geo = (e.matches && e.matches(GEOM)) ? [e] : Array.from(e.querySelectorAll(GEOM));
+          this.a(e, [{ opacity: 1 }, { opacity: 1 }], { dur: 1, delay: d.delay });
+          geo.forEach(g => { if (!g.hasAttribute('pathLength')) g.setAttribute('pathLength', '1'); out.push(this.a(g, P.k, d)); });
+        } else {
+          out.push(this.a(e, isSVG(e) ? noFilter(P.k) : P.k, d));
+        }
+      });
+      return out.length === 1 ? out[0] : { finished: Promise.all(out.map(x => x.finished)), list: out };
+    }
+    /** 사라짐(기본: 흐려지며 살짝 위로) */
+    hide(el, o = {}) {
+      return this.all(el, isSVG(this._els(el)[0] || document.body) ? [{ opacity: 1 }, { opacity: 0 }] : [{ opacity: 1, filter: 'blur(0px)' }, { opacity: 0, filter: 'blur(8px)' }],
+        Object.assign({ dur: 500, ease: 'out' }, o));
+    }
+    /** 기다리기(순간 모드면 곧장) */
+    wait(ms) {
+      if (this.instant || !this.alive) return Promise.resolve();
+      return new Promise(res => { const w = { res }; w.t = setTimeout(() => { const i = this._waits.indexOf(w); if (i >= 0) this._waits.splice(i, 1); res(); }, ms); this._waits.push(w); });
+    }
+    /** JS 트윈 — WAAPI 로 못 움직이는 것(속성·viewBox·path d·숫자). fn(p, rawT) */
+    tween(dur, fn, o = {}) {
+      const ease = typeof o.ease === 'function' ? o.ease : (JE[o.ease] || JE.out);
+      if (this.instant || !this.alive) { if (this.alive) fn(1, 1); return Promise.resolve(); }
+      const delay = o.delay || 0;
+      return new Promise(res => {
+        let start = null, done = false, id = 0;
+        const tw = {
+          finish: () => { if (done) return; done = true; cancelAnimationFrame(id); try { fn(1, 1); } catch (e) { console.error(e); } res(); },
+          kill: () => { if (done) return; done = true; cancelAnimationFrame(id); res(); },
+        };
+        this._tweens.push(tw);
+        if (!o.noInit) { try { fn(0, 0); } catch (e) { console.error(e); } }
+        const tick = now => {
+          if (done) return;
+          if (start === null) start = now + delay;
+          const t = (now - start) / dur;
+          if (t < 0) { id = requestAnimationFrame(tick); return; }
+          if (t >= 1) { tw.finish(); return; }
+          try { fn(ease(t), t); } catch (e) { console.error(e); tw.kill(); return; }
+          id = requestAnimationFrame(tick);
+        };
+        id = requestAnimationFrame(tick);
+      });
+    }
+    /** 숫자 굴리기. o.fmt(v) 로 모양 */
+    count(el, from, to, o = {}) {
+      el = this._el(el); if (!el) return Promise.resolve();
+      const fmt = o.fmt || (v => Math.round(v).toLocaleString('ko-KR'));
+      if (to !== from) this.sfx('counter', o.delay || 0, o.dur ?? 1200);
+      return this.tween(o.dur ?? 1200, p => { el.textContent = fmt(from + (to - from) * p); }, Object.assign({ ease: 'outQuint' }, o));
+    }
+    /** 선 그리기(pathLength=1 을 붙여 stroke-dashoffset 1→0) */
+    draw(el, o = {}) { return this.reveal(el, 'draw', o); }
+    /** SVG 카메라 — viewBox 를 [x,y,w,h] 로 옮김 */
+    camera(svg, to, o = {}) {
+      svg = this._el(svg); if (!svg) return Promise.resolve();
+      const from = (svg.getAttribute('viewBox') || `0 0 ${SW} ${SH}`).split(/[\s,]+/).map(Number);
+      this.sfx('whoosh', o.delay || 0, o.dur ?? 1400, .55);
+      return this.tween(o.dur ?? 1400, p => { svg.setAttribute('viewBox', from.map((v, i) => (v + (to[i] - v) * p).toFixed(2)).join(' ')); }, Object.assign({ ease: 'inOut' }, o));
+    }
+    /** 장면이 살아 있는 동안 도는 고리. fn(t초, dt초). 반환값.stop() */
+    loop(fn) {
+      const L = { on: true, t: 0, last: null, id: 0 };
+      const tick = now => {
+        if (!L.on || !this.alive) return;
+        const dt = L.last === null ? 0 : Math.min(0.05, (now - L.last) / 1000);
+        L.last = now; L.t += dt;
+        try { fn(L.t, dt); } catch (e) { console.error('[loop]', e); L.on = false; return; }
+        L.id = requestAnimationFrame(tick);
+      };
+      L.stop = () => { L.on = false; cancelAnimationFrame(L.id); };
+      L.id = requestAnimationFrame(tick);
+      this._loops.push(L);
+      return L;
+    }
+    timer(fn, ms) { const id = setTimeout(() => { if (this.alive) fn(); }, this.instant ? 0 : ms); this._timers.push(id); return id; }
+    every(fn, ms) { const id = setInterval(() => { if (this.alive) fn(); }, ms); this._timers.push(id); return id; }
+    /** 지금 도는 것을 끝 상태로(클릭이 애니 도중에 오면) */
+    hurry() {
+      this.instant = true;
+      this._sfxT.splice(0).forEach(id => clearTimeout(id));      // 아직 울리기 전인 효과음은 접는다
+      this._anims.forEach(a => { try { const t = a.effect && a.effect.getComputedTiming(); if (t && t.iterations !== Infinity && a.playState !== 'finished') a.finish(); } catch (e) {} });
+      this._tweens.slice().forEach(tw => tw.finish());
+      this._waits.splice(0).forEach(w => { clearTimeout(w.t); w.res(); });
+    }
+    dispose() {
+      this.alive = false;
+      this._sfxT.splice(0).forEach(id => clearTimeout(id));
+      this._disp.splice(0).forEach(fn => { try { fn(); } catch (e) {} });
+      this._loops.forEach(l => l.stop());
+      this._timers.forEach(id => clearTimeout(id));
+      this._tweens.slice().forEach(tw => tw.kill());
+      this._waits.splice(0).forEach(w => { clearTimeout(w.t); w.res(); });
+    }
+  }
+
+  /* ═════════ SVG 도우미 ═════════ */
+  const NS = 'http://www.w3.org/2000/svg';
+  const U = {
+    NS,
+    el(tag, attrs = {}, parent) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; },
+    lerp: (a, b, t) => a + (b - a) * t,
+    clamp: (v, a = 0, b = 1) => Math.max(a, Math.min(b, v)),
+    rand: (a = 0, b = 1) => a + Math.random() * (b - a),
+    /** 결정적 난수(검증 화면이 매번 같게): U.rng(seed)() */
+    rng(seed = 1) { let s = seed >>> 0 || 1; return () => { s ^= s << 13; s >>>= 0; s ^= s >> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; }; },
+    uid: (() => { let n = 0; return (p = 'u') => `${p}${(++n).toString(36)}`; })(),
+    E: EASE, JE,
+  };
+
+  /* ═════════ 덱 ═════════ */
+  const scenes = {};
+  const Deck = {
+    scene(id, def) { scenes[id] = def; },
+    list: [], i: -1, k: 0, ctx: null, busy: null, U, EASE, JE, Ctx, STILL, REDUCED, STUDENT,
+  };
+  window.Deck = Deck; window.U = U;
+
+  let stage, viewport, hud, prog, dots, ovEl, helpEl, blankEl;
+  const fit = () => {
+    const vw = viewport.clientWidth, vh = viewport.clientHeight;
+    const s = Math.min(vw / SW, vh / SH);
+    stage.style.transform = `translate(${(vw - SW * s) / 2 - vw / 2}px, ${(vh - SH * s) / 2 - vh / 2}px) scale(${s})`;
+    Deck.scale = s;
+  };
+  const defOf = sec => scenes[sec.id] || {};
+  const stepsOf = sec => {
+    if (sec.__steps != null) return sec.__steps;
+    let m = +(defOf(sec).steps || 0);
+    const tmp = document.createElement('div'); tmp.innerHTML = sec.__pristine;
+    tmp.querySelectorAll('[data-step]').forEach(e => { m = Math.max(m, +e.getAttribute('data-step') || 0); });
+    tmp.querySelectorAll('[data-out]').forEach(e => { m = Math.max(m, +e.getAttribute('data-out') || 0); });
+    return (sec.__steps = m);
+  };
+  const safe = async (fn, c) => { try { await fn(); } catch (e) { if (c && c.alive) console.error(`[scene ${c.root.id}]`, e); } };
+
+  function runDecl(c, k) {
+    if (k === 0) {
+      c.$$('[data-in]').forEach(el => {
+        const v = el.getAttribute('data-in'); const delay = +(el.dataset.delay || (v && !isNaN(+v) ? v : 0));
+        c.reveal(el, el.dataset.fx || 'rise', { delay, dur: el.dataset.dur ? +el.dataset.dur : undefined, ease: el.dataset.ease || undefined });
+      });
+    } else {
+      c.$$(`[data-step="${k}"]`).forEach(el => {
+        c.reveal(el, el.dataset.fx || 'rise', { delay: +(el.dataset.delay || 0), dur: el.dataset.dur ? +el.dataset.dur : undefined, ease: el.dataset.ease || undefined });
+      });
+      c.$$(`[data-out="${k}"]`).forEach(el => c.hide(el, { delay: +(el.dataset.outDelay || 0) }));
+    }
+  }
+
+  async function show(i, k = 0, opt = {}) {
+    const n = Deck.list.length; if (!n) return;
+    i = Math.max(0, Math.min(n - 1, i));
+    const to = Deck.list[i]; const from = Deck.i >= 0 ? Deck.list[Deck.i] : null;
+    k = Number.isFinite(k) ? Math.max(0, Math.min(stepsOf(to), Math.trunc(k))) : 0;
+    const instant = !!opt.instant || STILL || REDUCED;
+    if (Deck.ctx) { Deck.ctx.hurry(); Deck.ctx.dispose(); }
+    Deck.busy = null;
+
+    if (from && from !== to) {
+      from.classList.remove('is-on');
+      if (instant || opt.cut) { from.classList.remove('is-out'); from.innerHTML = ''; }
+      else {
+        from.classList.add('is-out');
+        const done = () => { if (!from.classList.contains('is-on')) { from.classList.remove('is-out'); from.innerHTML = ''; } };
+        setTimeout(done, 700);
+      }
+    }
+    to.getAnimations && to.getAnimations().forEach(a => a.cancel());
+    to.innerHTML = to.__pristine;
+    to.classList.remove('is-out'); to.classList.add('is-on');
+    Deck.i = i; Deck.k = k;
+    const tile = to.getAttribute('data-tile') || 'dark';
+    document.body.classList.toggle('on-light', tile === 'light' || tile === 'parchment');
+    if (from && from !== to && !instant && !opt.cut) {
+      to.animate([{ opacity: 0, transform: 'scale(1.015)' }, { opacity: 1, transform: 'scale(1)' }], { duration: 620, easing: EASE.out });
+      if (window.SFX) SFX.play('slide');
+    }
+    const c = new Ctx(to, i); Deck.ctx = c;
+    const def = defOf(to);
+    const run = (async () => {
+      c.instant = instant;
+      runDecl(c, 0);
+      if (def.enter) await safe(() => def.enter(c), c);
+      for (let s = 1; s <= k; s++) {
+        if (!c.alive) return;
+        c.instant = true; runDecl(c, s);
+        if (def.go) await safe(() => def.go(c, s), c);
+      }
+      c.instant = STILL;
+    })();
+    Deck.busy = run; ui();
+    await run;
+    if (Deck.busy === run) Deck.busy = null;
+    markReady();
+    try { history.replaceState(null, '', `#${i + 1}${k ? '.' + k : ''}`); } catch (e) {}
+  }
+  async function stepTo(k) {
+    const c = Deck.ctx, sec = Deck.list[Deck.i]; if (!c) return;
+    Deck.k = k; ui();
+    if (window.SFX && !STILL) SFX.play('step');
+    c.instant = STILL; runDecl(c, k);
+    const def = defOf(sec);
+    const run = def.go ? safe(() => def.go(c, k), c) : Promise.resolve();
+    Deck.busy = run;
+    await run;
+    if (Deck.busy === run) { Deck.busy = null; c.instant = STILL; }
+    try { history.replaceState(null, '', `#${Deck.i + 1}${k ? '.' + k : ''}`); } catch (e) {}
+  }
+  Deck.next = () => {
+    if (Deck.busy && Deck.ctx) { Deck.ctx.hurry(); return; }
+    const sec = Deck.list[Deck.i];
+    if (Deck.k < stepsOf(sec)) stepTo(Deck.k + 1);
+    else if (Deck.i < Deck.list.length - 1) show(Deck.i + 1, 0);
+  };
+  Deck.prev = () => {
+    if (Deck.k > 0) show(Deck.i, Deck.k - 1, { instant: true });
+    else if (Deck.i > 0) show(Deck.i - 1, stepsOf(Deck.list[Deck.i - 1]), { instant: true });
+  };
+  Deck.go = (i, k = 0, opt) => show(i, k, opt);
+  Deck.goId = (id, k = 0) => { const i = Deck.list.findIndex(s => s.id === id); if (i >= 0) show(i, k); };
+  /** 지금 단계 다시 보기(R) */
+  Deck.replay = async () => {
+    const k = Deck.k;
+    if (k === 0) { const i = Deck.i; Deck.i = -1; await show(i, 0, { cut: true }); }
+    else { await show(Deck.i, k - 1, { instant: true }); stepTo(k); }
+  };
+  Deck.steps = sec => stepsOf(sec || Deck.list[Deck.i]);
+
+  function markReady() {
+    const fin = () => { document.documentElement.dataset.ready = '1'; };
+    (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(() => setTimeout(fin, 60));
+  }
+
+  /* ── 화면 바깥 UI ── */
+  const ICON = {
+    prev: '<svg viewBox="0 0 20 20"><path d="M12.5 4 6.5 10l6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    next: '<svg viewBox="0 0 20 20"><path d="M7.5 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    grid: '<svg viewBox="0 0 20 20"><g fill="currentColor"><rect x="3" y="3" width="6" height="6" rx="1.5"/><rect x="11" y="3" width="6" height="6" rx="1.5"/><rect x="3" y="11" width="6" height="6" rx="1.5"/><rect x="11" y="11" width="6" height="6" rx="1.5"/></g></svg>',
+    full: '<svg viewBox="0 0 20 20"><path d="M3.5 8V3.5H8M12 3.5h4.5V8M16.5 12v4.5H12M8 16.5H3.5V12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    replay: '<svg viewBox="0 0 20 20"><path d="M4.5 10a5.5 5.5 0 1 0 1.8-4.1M4.5 3.8v3.4h3.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    sound: '<svg viewBox="0 0 20 20"><path d="M3.5 8h3l4-3.5v11L6.5 12h-3z" fill="currentColor"/><path d="M13.5 7.2a4 4 0 0 1 0 5.6M15.6 5a7 7 0 0 1 0 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+    mute: '<svg viewBox="0 0 20 20"><path d="M3.5 8h3l4-3.5v11L6.5 12h-3z" fill="currentColor"/><path d="M13.5 7.5l4.5 5M18 7.5l-4.5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  };
+  function syncSound() {
+    const b = hud && hud.querySelector('[data-a="sound"]'); if (!b) return;
+    const on = !window.SFX || SFX.isOn();
+    b.innerHTML = on ? ICON.sound : ICON.mute; b.classList.toggle('off', !on); b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  }
+  function buildChrome() {
+    hud = document.createElement('div'); hud.id = 'hud';
+    hud.innerHTML = `<button data-a="replay" aria-label="이 단계 다시 보기(R)">${ICON.replay}</button><button data-a="grid" aria-label="전체 보기(O)">${ICON.grid}</button><button data-a="prev" aria-label="이전">${ICON.prev}</button><span class="count" id="count">1 / 1</span><button data-a="next" aria-label="다음">${ICON.next}</button><button data-a="sound" aria-label="소리 켜기/끄기(M)">${ICON.sound}</button><button data-a="full" aria-label="전체 화면(F)">${ICON.full}</button>`;
+    document.body.appendChild(hud); syncSound();
+    hud.addEventListener('click', e => { if (e.target.closest('#count')) { e.stopPropagation(); toggleOverview(); return; } const b = e.target.closest('button'); if (!b) return; e.stopPropagation(); act(b.dataset.a); });
+    prog = document.createElement('div'); prog.id = 'progress'; prog.innerHTML = '<i></i>'; document.body.appendChild(prog);
+    dots = document.createElement('div'); dots.id = 'stepdots'; document.body.appendChild(dots);
+    ovEl = document.createElement('div'); ovEl.id = 'overview'; ovEl.className = 'overlay'; document.body.appendChild(ovEl);
+    helpEl = document.createElement('div'); helpEl.id = 'help'; helpEl.className = 'overlay';
+    helpEl.innerHTML = `<div class="box"><h3>강의 조작</h3><table>
+      <tr><td><kbd>→</kbd> <kbd>Space</kbd> 화면 클릭</td><td>다음(빌드 단계 → 다음 장)</td></tr>
+      <tr><td><kbd>←</kbd> 오른쪽 클릭</td><td>이전</td></tr>
+      <tr><td><kbd>R</kbd></td><td>이 단계 애니메이션 다시 보기</td></tr>
+      <tr><td><kbd>O</kbd></td><td>전체 보기</td></tr>
+      <tr><td><kbd>F</kbd></td><td>전체 화면</td></tr>
+      <tr><td><kbd>M</kbd></td><td>소리 켜기/끄기</td></tr>
+      
+      <tr><td><kbd>B</kbd> / <kbd>W</kbd></td><td>검은 화면 / 흰 화면</td></tr>
+      <tr><td>숫자 + <kbd>Enter</kbd></td><td>그 장으로 이동</td></tr>
+      <tr><td>아래쪽 쪽 번호 단추</td><td>전체 보기에서 골라 이동</td></tr>
+      <tr><td>좌우로 밀기</td><td>전자칠판에서 넘기기</td></tr></table></div>`;
+    document.body.appendChild(helpEl);
+    helpEl.addEventListener('click', () => helpEl.classList.remove('show'));
+    blankEl = document.createElement('div'); blankEl.id = 'blank'; document.body.appendChild(blankEl);
+    blankEl.addEventListener('click', () => { blankEl.className = ''; });
+  }
+  function act(a) {
+    if (a === 'next') Deck.next(); else if (a === 'prev') Deck.prev();
+    else if (a === 'grid') toggleOverview();
+    else if (a === 'full') toggleFull(); else if (a === 'replay') Deck.replay();
+    else if (a === 'sound') { if (window.SFX) SFX.toggle(); syncSound(); }
+  }
+  function ui() {
+    const n = Deck.list.length, sec = Deck.list[Deck.i]; if (!sec || !hud) return;
+    const st = stepsOf(sec);
+    hud.querySelector('#count').textContent = `${Deck.i + 1} / ${n}`;
+    const np = document.getElementById('navPage'); if (np) np.textContent = `${Deck.i + 1} / ${n}`;
+    prog.firstChild.style.width = `${((Deck.i + (st ? Deck.k / (st + 1) : 0)) / Math.max(1, n - 1)) * 100}%`;
+    dots.innerHTML = st ? Array.from({ length: st + 1 }, (_, j) => `<i class="${j <= Deck.k ? 'on' : ''}"></i>`).join('') : '';
+    if (ovEl.classList.contains('show')) renderOverview();
+  }
+  function md(s) { return s.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>'); }
+  function renderOverview() {
+    ovEl.innerHTML = `<div class="ovhead"><h2>전체 보기 · ${Deck.list.length}장</h2><form class="ovjump" autocomplete="off"><label for="ovNum">번호로 이동</label><input id="ovNum" type="number" inputmode="numeric" min="1" max="${Deck.list.length}" placeholder="${Deck.i + 1}"><button type="submit">이동</button><button type="button" class="ovclose" aria-label="닫기">닫기</button></form></div><div class="grid">` + Deck.list.map((s, i) =>
+      `<button class="ov ${i === Deck.i ? 'cur' : ''}" data-i="${i}" data-tile="${s.getAttribute('data-tile') || 'dark'}"><span class="n">${String(i + 1).padStart(2, '0')}</span><span class="tt">${s.dataset.title || s.id}</span></button>`).join('') + '</div>';
+  }
+  function toggleOverview() {
+    const on = !ovEl.classList.contains('show');
+    ovEl.classList.toggle('show', on);
+    if (on) { renderOverview(); const cur = ovEl.querySelector('.ov.cur'); if (cur) cur.scrollIntoView({ block: 'center' }); }
+  }
+  Deck.toggleOverview = toggleOverview;
+  function toggleFull() {
+    const d = document;
+    if (!d.fullscreenElement) (d.documentElement.requestFullscreen || d.documentElement.webkitRequestFullscreen || (() => {})).call(d.documentElement);
+    else (d.exitFullscreen || d.webkitExitFullscreen).call(d);
+  }
+
+  let hudTimer = 0;
+  function pokeHud() { if (STILL) return; hud.classList.add('show'); dots.classList.add('show'); clearTimeout(hudTimer); hudTimer = setTimeout(() => { hud.classList.remove('show'); dots.classList.remove('show'); }, 2600); }
+
+  function bind() {
+    let jump = '';
+    document.addEventListener('keydown', e => {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      const key = e.key;
+      if (ovEl.classList.contains('show') && (key === 'Escape' || key === 'o' || key === 'O')) {
+        toggleOverview(); e.preventDefault(); return;
+      }
+      if (e.target.closest && e.target.closest('input,textarea,select,[contenteditable]')) return;
+      if ((key === 'Enter' || key === ' ') && e.target.closest && e.target.closest('button,a')) return;
+      if (helpEl.classList.contains('show')) { helpEl.classList.remove('show'); e.preventDefault(); return; }
+      if (blankEl.className && key !== 'b' && key !== 'B' && key !== 'w' && key !== 'W') { blankEl.className = ''; e.preventDefault(); return; }
+      if (/^[0-9]$/.test(key)) { jump += key; return; }
+      if (key === 'Enter' && jump) { show(+jump - 1, 0); jump = ''; e.preventDefault(); return; }
+      jump = '';
+      switch (key) {
+        case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown': case 'Enter': Deck.next(); break;
+        case 'ArrowLeft': case 'ArrowUp': case 'PageUp': case 'Backspace': Deck.prev(); break;
+        case 'Home': show(0, 0); break;
+        case 'End': show(Deck.list.length - 1, 0); break;
+        case 'o': case 'O': toggleOverview(); break;
+        case 'f': case 'F': toggleFull(); break;
+        case 'm': case 'M': act('sound'); break;
+        case 'r': case 'R': Deck.replay(); break;
+        case 'b': case 'B': blankEl.className = blankEl.className === 'black' ? '' : 'black'; break;
+        case 'w': case 'W': blankEl.className = blankEl.className === 'white' ? '' : 'white'; break;
+        case 'h': case 'H': case '?': helpEl.classList.add('show'); break;
+        default: return;
+      }
+      e.preventDefault();
+    });
+    ovEl.addEventListener('click', e => {
+      if (e.target.closest('.ovclose')) { ovEl.classList.remove('show'); return; }
+      if (e.target.closest('.ovjump')) return;
+      const b = e.target.closest('.ov'); if (b) { ovEl.classList.remove('show'); show(+b.dataset.i, 0); } else ovEl.classList.remove('show');
+    });
+    ovEl.addEventListener('submit', e => {
+      e.preventDefault();
+      const v = Math.round(+ovEl.querySelector('#ovNum').value);
+      if (v >= 1 && v <= Deck.list.length) { ovEl.classList.remove('show'); show(v - 1, 0); }
+      else { const inp = ovEl.querySelector('#ovNum'); inp.value = ''; inp.placeholder = `1~${Deck.list.length}`; inp.focus(); }
+    });
+    // 무대 클릭·밀기
+    let down = null;
+    viewport.addEventListener('pointerdown', e => { down = { x: e.clientX, y: e.clientY, t: performance.now(), inter: !!e.target.closest('button,a,input,select,textarea,label,[data-interactive]') }; pokeHud(); });
+    viewport.addEventListener('pointerup', e => {
+      if (!down) return; const dx = e.clientX - down.x, dy = e.clientY - down.y; const d0 = down; down = null;
+      if (d0.inter) return;
+      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.3) { dx < 0 ? Deck.next() : Deck.prev(); return; }
+      if (Math.abs(dx) < 12 && Math.abs(dy) < 12 && e.button === 0) {
+        const r = stage.getBoundingClientRect();
+        (e.clientX - r.left < r.width * 0.12) ? Deck.prev() : Deck.next();
+      }
+    });
+    viewport.addEventListener('contextmenu', e => { if (e.target.closest('[data-interactive]')) return; e.preventDefault(); Deck.prev(); });
+    document.addEventListener('mousemove', pokeHud, { passive: true });
+    window.addEventListener('resize', fit);
+  }
+
+  function boot() {
+    viewport = document.getElementById('viewport'); stage = document.getElementById('stage');
+    Deck.list = Array.from(stage.querySelectorAll(':scope > section.slide'));
+    // 한 번만: 장면별 build(root) → 처음 상태 저장
+    Deck.list.forEach(sec => {
+      const def = defOf(sec);
+      if (def.build) { try { def.build(sec, U); } catch (e) { console.error(`[build ${sec.id}]`, e); } }
+      sec.querySelectorAll('[data-fx="draw"]').forEach(g => {
+        const geo = g.matches(GEOM) ? [g] : Array.from(g.querySelectorAll(GEOM));
+        geo.forEach(x => { if (!x.hasAttribute('pathLength')) x.setAttribute('pathLength', '1'); });
+      });
+      sec.__pristine = sec.innerHTML;
+      sec.innerHTML = '';
+    });
+    buildChrome(); fit(); bind();
+    const h = (location.hash || '').replace('#', '').split('.');
+    let si = Q.has('p') ? (+Q.get('p') - 1) : (h[0] ? +h[0] - 1 : 0);
+    let sk = Q.has('k') ? +Q.get('k') : (h[1] ? +h[1] : 0);
+    if (Q.has('id')) { const j = Deck.list.findIndex(s => s.id === Q.get('id')); if (j >= 0) si = j; }
+    si = Number.isFinite(si) ? Math.max(0, Math.min(Deck.list.length - 1, Math.trunc(si))) : 0;
+    const maxStep = stepsOf(Deck.list[si]);
+    if (sk === -1 || Q.get('k') === 'last') sk = maxStep;
+    sk = Number.isFinite(sk) ? Math.max(0, Math.min(maxStep, Math.trunc(sk))) : 0;
+    if (Q.get('play') === '1' && sk > 0 && !STILL) { show(si, sk - 1, { instant: true }).then(() => stepTo(sk)); }
+    else show(si, sk, { instant: sk > 0 });
+    if (!STILL) setTimeout(pokeHud, 400);
+  }
+  Deck.boot = boot;
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(boot, 0));
+  else setTimeout(boot, 0);
+})();
+
+
+</script><script>
+/* ── 03_sfx.js ── */
+try{
+/* ═══════════════════════════════════════════════════════════════
+   03_sfx.js — 효과음(WebAudio 합성). 소리 파일 0개 · 오프라인 OK
+   · 장면에서는 c.sfx('blank', 지연ms) · c.sfxLoop('fan') 로 부른다(core.js 가 순간 모드·건너뛰기·장면 나감을 알아서 처리)
+   · 브라우저 정책상 첫 클릭·키 입력 뒤부터 소리가 난다. M 키·HUD 단추로 켜고 끔(기기에 기억). 학생 모드(?s=1)는 기본 꺼짐
+   · 점검: ?sfx=demo → 모든 소리를 눌러 들어 보는 패널 / SFX.analyze('blank') → 오프라인 렌더로 세기·길이 점검
+   · 주소 도우미: ?sound=1|0 강제 켜기·끄기 · ?nosfx=1 완전 끔 · ?sfxtest=1 클릭 없이 잠금 해제(자동 점검용)
+   ═══════════════════════════════════════════════════════════════ */
+window.SFX = (function () {
+  'use strict';
+  const Q = new URLSearchParams(location.search);
+  const D = window.Deck || {};
+  const OFF = !!D.STILL || Q.get('nosfx') === '1';
+  const KEY = 'sc_sfx';
+  const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+  let on = !D.STUDENT;
+  try { const s = localStorage.getItem(KEY); if (s === '1' || s === '0') on = s === '1'; } catch (e) {}
+  if (Q.get('sound') === '1') on = true; else if (Q.get('sound') === '0') on = false;
+  let ac = null, out = null, X = null, unlocked = Q.get('sfxtest') === '1', broken = false;
+  const pending = new Set();
+
+  /* ── 잡음(결정적) ── */
+  function noiseBuf(actx) {
+    const n = Math.floor(actx.sampleRate * 2), b = actx.createBuffer(1, n, actx.sampleRate), d = b.getChannelData(0);
+    let s = 12345;
+    for (let i = 0; i < n; i++) { s = (s * 1664525 + 1013904223) >>> 0; d[i] = s / 2147483648 - 1; }
+    return b;
+  }
+  function ensure() {
+    if (OFF || broken || !unlocked) return null;
+    if (!ac) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) { broken = true; return null; }
+      try { ac = new AC(); } catch (e) { broken = true; return null; }
+      const comp = ac.createDynamicsCompressor();
+      comp.threshold.value = -14; comp.knee.value = 18; comp.ratio.value = 4; comp.attack.value = .004; comp.release.value = .18;
+      out = ac.createGain(); out.gain.value = on ? .9 : 0;
+      out.connect(comp); comp.connect(ac.destination);
+      X = { ac, dest: out, nz: noiseBuf(ac) };
+    }
+    if (ac.state === 'suspended' && on && !document.hidden) ac.resume().catch(() => {});
+    return X;
+  }
+
+  /* ── 소리 부품 ── */
+  function env(g, t, a, d, peak) {
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(Math.max(0.0002, peak), t + a);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + a + d);
+  }
+  function route(x, node, pan) {
+    if (pan && x.ac.createStereoPanner) { const p = x.ac.createStereoPanner(); p.pan.value = clamp(pan, -1, 1); node.connect(p); p.connect(x.dest); return; }
+    node.connect(x.dest);
+  }
+  /** 톤: f(→f2) Hz, a 올림 s, d 사라짐 s, g 세기, type, vib[Hz, 깊이Hz], lp 저역통과, pan */
+  function tone(x, t, o) {
+    const ac = x.ac, osc = ac.createOscillator(), g = ac.createGain();
+    const a = o.a ?? .004, d = o.d ?? .3;
+    osc.type = o.type || 'sine';
+    osc.frequency.setValueAtTime(o.f, t);
+    if (o.f2) osc.frequency.exponentialRampToValueAtTime(o.f2, t + a + d);
+    if (o.vib) {
+      const l = ac.createOscillator(), lg = ac.createGain();
+      l.frequency.value = o.vib[0]; lg.gain.value = o.vib[1]; l.connect(lg); lg.connect(osc.frequency); l.start(t); l.stop(t + a + d + .06);
+    }
+    env(g, t, a, d, o.g ?? .2);
+    osc.connect(g);
+    let last = g;
+    if (o.lp) { const f = ac.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = o.lp; g.connect(f); last = f; }
+    route(x, last, o.pan);
+    osc.start(t); osc.stop(t + a + d + .07);
+  }
+  /** 잡음: type(bandpass|highpass|lowpass), f(→f2) Hz, q */
+  function noise(x, t, o) {
+    const ac = x.ac, s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+    const a = o.a ?? .003, d = o.d ?? .1;
+    s.buffer = x.nz; s.loop = true;
+    f.type = o.type || 'bandpass'; f.frequency.setValueAtTime(o.f || 2000, t);
+    if (o.f2) f.frequency.exponentialRampToValueAtTime(o.f2, t + a + d);
+    f.Q.value = o.q ?? 1;
+    env(g, t, a, d, o.g ?? .15);
+    s.connect(f); f.connect(g); route(x, g, o.pan);
+    s.start(t, (t * 7.13) % 1.5); s.stop(t + a + d + .07);
+  }
+  const PART = [[1, 1, 1], [2.76, .3, .55], [5.4, .1, .3], [8.93, .04, .18]];
+  function bell(x, t, f, g = .3, d = 1.1) { PART.forEach(([r, w, k]) => tone(x, t, { f: f * r, a: .002, d: d * k, g: g * w })); }
+  function tickAt(x, t, f, g) {
+    tone(x, t, { f, a: .001, d: .014, g });
+    noise(x, t, { a: .001, d: .006, g: g * .9, type: 'bandpass', f: f * 1.6, q: 1.5 });
+  }
+
+  /* ═════════ 소리 목록: (x, t, a, b) ═════════ */
+  const SCALE = [0, 2, 4, 7, 9, 12, 9, 7, 4, 2];       // 빈칸이 채워질 때마다 음계가 오르내린다
+  const S = {
+    /** 빈칸이 채워짐 — 마림바 같은 「띠링」. i = 몇 번째 빈칸(음 높이 순서) */
+    blank(x, t, i) {
+      const f = 659.25 * Math.pow(2, SCALE[(i | 0) % 10] / 12);
+      tone(x, t, { f, a: .003, d: .34, g: .24 });
+      tone(x, t, { f: f * 2, a: .002, d: .16, g: .07 });
+      tone(x, t, { f: f * 4.02, a: .001, d: .05, g: .025 });
+      noise(x, t, { a: .001, d: .012, g: .05, type: 'highpass', f: 3500 });
+    },
+    /** 무언가 톡 나타남 */
+    pop(x, t) {
+      tone(x, t, { f: 420, f2: 840, a: .002, d: .1, g: .2 });
+      noise(x, t, { a: .001, d: .02, g: .05, type: 'highpass', f: 3000 });
+    },
+    /** 클릭으로 다음 단계 — 아주 작은 톡 */
+    step(x, t) { tone(x, t, { f: 1500, f2: 900, type: 'triangle', a: .001, d: .045, g: .075 }); noise(x, t, { a: .001, d: .01, g: .03, f: 3000, q: 1.5 }); },
+    /** 다음 장으로 — 부드러운 슥 */
+    slide(x, t) {
+      noise(x, t, { a: .12, d: .5, g: .2, f: 400, f2: 2600, q: .8 });
+      tone(x, t, { f: 220, f2: 110, a: .005, d: .25, g: .09 });
+    },
+    /** 휙 — dur ms, gain */
+    whoosh(x, t, dur = 700, g = 1) {
+      const d = (dur || 700) / 1000;
+      noise(x, t, { a: d * .4, d: d * .6, g: .2 * (g ?? 1), f: 350, f2: 2400, q: .7 });
+    },
+    /** 숫자 굴러감 — 오르는 째깍째깍 */
+    counter(x, t, dur = 1200) {
+      const n = clamp(Math.round((dur || 1200) / 70), 4, 22), sp = (dur || 1200) / 1000 / n;
+      for (let i = 0; i < n; i++) tickAt(x, t + i * sp, 1500 + i * (900 / n), .07);
+    },
+    /** 세는 선을 조각이 지나감(가이거처럼) — p 음높이, g 세기 */
+    tick(x, t, p = 1, g = 1) { tickAt(x, t, 2100 * (p || 1), .1 * (g ?? 1)); },
+    /** 1초가 지남 — 나무 시계 */
+    clock(x, t) {
+      tone(x, t, { f: 1050, f2: 620, type: 'triangle', a: .001, d: .06, g: .17 });
+      noise(x, t, { a: .001, d: .012, g: .08, f: 2600, q: 2 });
+    },
+    /** 쾅(도장) */
+    thunk(x, t) {
+      tone(x, t, { f: 150, f2: 44, a: .002, d: .24, g: .5 });
+      noise(x, t, { a: .002, d: .1, g: .28, type: 'lowpass', f: 700, f2: 200 });
+    },
+    /** 땡 */
+    ding(x, t, k = 1) { bell(x, t, 1318.5 * (k || 1), .32, 1.1); },
+    /** 딩동딩동 ↑ (정답·완성) */
+    chime(x, t) { [1046.5, 1318.5, 1568, 2093].forEach((f, i) => bell(x, t + i * .085, f, .3, .9)); },
+    /** 명판 뒤집기 */
+    flip(x, t) {
+      noise(x, t, { a: .002, d: .03, g: .18, f: 3200, q: 1.5 });
+      noise(x, t + .12, { a: .002, d: .03, g: .18, f: 2600, q: 1.5 });
+      noise(x, t + .02, { a: .03, d: .16, g: .09, f: 900, f2: 2600 });
+    },
+    /** 토스터 레버 내림 — 철컥 */
+    lever(x, t) {
+      tone(x, t, { f: 260, f2: 75, type: 'triangle', a: .002, d: .14, g: .4 });
+      noise(x, t, { a: .002, d: .06, g: .22, type: 'lowpass', f: 1200, f2: 400 });
+      tone(x, t + .01, { f: 1900, f2: 1200, a: .001, d: .05, g: .04 });
+    },
+    /** 토스터 빵 튀어 오름 — 텅~ 팅! */
+    toasterPop(x, t) {
+      tone(x, t, { f: 150, f2: 55, a: .002, d: .12, g: .32 });
+      tone(x, t + .02, { f: 210, f2: 640, type: 'triangle', a: .005, d: .32, g: .11, vib: [22, 26] });
+      noise(x, t + .02, { a: .01, d: .2, g: .05, f: 2400, q: 1.2 });
+      bell(x, t + .16, 2637, .22, .9);
+    },
+    /** 열선이 달아오르며 탁탁 — dur ms */
+    sizzle(x, t, dur = 2000) {
+      const d = (dur || 2000) / 1000, n = Math.round(d * 34);
+      for (let i = 0; i < n; i++) noise(x, t + Math.random() * d, { a: .001, d: .009, g: .11 * (1 - i / n * .3), f: 2500 + Math.random() * 3500, q: 1.4, pan: (Math.random() - .5) * .6 });
+    },
+    /** 스피커 박 — strong 이면 큰 북, 아니면 작은 북 + 심벌 */
+    kick(x, t, strong, lv) {
+      const k = lv == null ? 1 : lv, g = (strong ? .5 : .3) * k;
+      tone(x, t, { f: strong ? 150 : 130, f2: 44, a: .002, d: strong ? .2 : .14, g });
+      noise(x, t, { a: .001, d: .05, g: g * .5, type: 'lowpass', f: 900, f2: 300 });
+      if (!strong) noise(x, t + .02, { a: .001, d: .04, g: .045, type: 'highpass', f: 7000 });
+    },
+    /** 백열전구 켜짐 — 딸깍 · 웅 · 팅 */
+    bulbOn(x, t) {
+      noise(x, t, { a: .001, d: .006, g: .12, f: 3000, q: 1.5 });
+      tone(x, t + .02, { f: 98, type: 'triangle', a: .05, d: .55, g: .08, lp: 500 });
+      noise(x, t + .03, { a: .08, d: .5, g: .05, type: 'lowpass', f: 300, f2: 3000 });
+      bell(x, t + .05, 1760, .12, .8);
+    },
+    /** LED 켜짐 — 딸깍 · 띠링 */
+    ledOn(x, t) {
+      noise(x, t, { a: .001, d: .006, g: .1, f: 3400, q: 1.5 });
+      tone(x, t + .01, { f: 1568, f2: 2093, a: .003, d: .2, g: .1 });
+      bell(x, t + .03, 2349, .1, .7);
+    },
+    /** 집 창문 켜짐 — 딸깍 · 띵띵띵 */
+    lightsOn(x, t) {
+      noise(x, t, { a: .001, d: .01, g: .08, f: 2600, q: 1.5 });
+      [1568, 1760, 1976].forEach((f, i) => bell(x, t + .04 + i * .09, f, .15, .7));
+    },
+    /** 송전선을 타고 전달 — 웅~ + 쉬익 + 지직, 소리가 왼쪽에서 오른쪽으로 움직임 */
+    zap(x, t, dur = 2400) {
+      const ac = x.ac, d = (dur || 2400) / 1000;
+      const o = ac.createOscillator(), lp = ac.createBiquadFilter(), g = ac.createGain();
+      o.type = 'sawtooth'; o.frequency.setValueAtTime(55, t); o.frequency.exponentialRampToValueAtTime(230, t + d * .8);
+      lp.type = 'lowpass'; lp.frequency.setValueAtTime(260, t); lp.frequency.exponentialRampToValueAtTime(1400, t + d);
+      g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(.15, t + d * .15); g.gain.setValueAtTime(.15, t + d * .7); g.gain.exponentialRampToValueAtTime(.0001, t + d + .5);
+      o.connect(lp); lp.connect(g);
+      if (ac.createStereoPanner) { const p = ac.createStereoPanner(); p.pan.setValueAtTime(-.85, t); p.pan.linearRampToValueAtTime(.85, t + d); g.connect(p); p.connect(x.dest); } else g.connect(x.dest);
+      o.start(t); o.stop(t + d + .6);
+      noise(x, t, { a: d * .3, d: d * .7, g: .07, f: 600, f2: 4200, q: .6 });
+      for (let i = 0, n = Math.round(d * 22); i < n; i++) noise(x, t + Math.random() * d, { a: .001, d: .008, g: .045, type: 'highpass', f: 5000, pan: -1 + 2 * Math.random() });
+    },
+    /** 열 보기 훑기 — 스캐너 */
+    scan(x, t, dur = 900) {
+      const d = (dur || 900) / 1000;
+      tone(x, t, { f: 280, f2: 1250, a: .04, d, g: .09, vib: [9, 14] });
+      tone(x, t, { f: 283, f2: 1262, type: 'triangle', a: .04, d, g: .04, pan: .4 });
+    },
+    /** 온도계가 오름 — 조용한 상승음 */
+    rise(x, t, dur = 2400) { tone(x, t, { f: 260, f2: 640, a: .15, d: (dur || 2400) / 1000, g: .07, vib: [5, 6] }); },
+    /** 바늘이 내려옴 — 슬라이드 휘슬 + 톡 */
+    sweepDown(x, t, dur = 1300) {
+      const d = (dur || 1300) / 1000;
+      tone(x, t, { f: 1100, f2: 380, a: .02, d, g: .09 });
+      tickAt(x, t + d, 1800, .08);
+    },
+    /** 푸슉(연기) */
+    puff(x, t) { noise(x, t, { a: .05, d: .5, g: .22, type: 'lowpass', f: 1000, f2: 300, q: .4 }); },
+    /** 싹둑 싹둑 */
+    snip(x, t) {
+      [0, .07, .14].forEach(o => { noise(x, t + o, { a: .001, d: .012, g: .18, f: 5000, q: 2 }); tone(x, t + o, { f: 3000, a: .001, d: .02, g: .03 }); });
+    },
+    /** 슥(선 그리기) */
+    zip(x, t, dur = 500) { noise(x, t, { a: .02, d: Math.min(.3, (dur || 500) / 1000 * .5), g: .12, f: 1500, f2: 4200, q: 1 }); },
+    /** 반짝 */
+    spark(x, t) { for (let i = 0; i < 4; i++) tone(x, t + i * .04 + Math.random() * .02, { f: 2200 + Math.random() * 2000, a: .001, d: .08, g: .04 }); },
+  };
+
+  /* ═════════ 이어지는 소리(선풍기·발전소·끓는 물) — level(0..1) 로 세기 조종 ═════════ */
+  function buildFan(x) {
+    const ac = x.ac, out = ac.createGain(); out.gain.value = 0; out.connect(x.dest);
+    const ns = ac.createBufferSource(); ns.buffer = x.nz; ns.loop = true;
+    const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 500; bp.Q.value = .7;
+    const gw = ac.createGain(); gw.gain.value = 0;
+    const lfo = ac.createOscillator(), lg = ac.createGain(); lfo.frequency.value = 3; lg.gain.value = 0; lfo.connect(lg); lg.connect(gw.gain);   // 날개가 바람을 자르는 울렁임
+    ns.connect(bp); bp.connect(gw); gw.connect(out);
+    const m1 = ac.createOscillator(), m2 = ac.createOscillator(), gm = ac.createGain(), lp = ac.createBiquadFilter();   // 모터 웅~
+    m1.type = 'triangle'; m1.frequency.value = 50; m2.type = 'sine'; m2.frequency.value = 100; gm.gain.value = 0;
+    lp.type = 'lowpass'; lp.frequency.value = 700; m1.connect(gm); m2.connect(gm); gm.connect(lp); lp.connect(out);
+    ns.start(0, .3); lfo.start(); m1.start(); m2.start();
+    let lv = 0, wh = 0;
+    const apply = () => {
+      const T = ac.currentTime, v = clamp(lv, 0, 1.1), tc = .07;
+      gw.gain.setTargetAtTime(v * v * .095, T, tc); lg.gain.setTargetAtTime(v * v * .035, T, tc);
+      lfo.frequency.setTargetAtTime(2 + 7 * v, T, tc);
+      bp.frequency.setTargetAtTime(380 + 900 * v, T, tc);
+      m1.frequency.setTargetAtTime(46 + 70 * v, T, tc); m2.frequency.setTargetAtTime(92 + 140 * v, T, tc);
+      gm.gain.setTargetAtTime(v > .02 ? .01 + .034 * v + wh * .04 : 0, T, tc);
+      out.gain.setTargetAtTime(v > .01 ? 1 : 0, T, .05);
+    };
+    return {
+      level(v) { lv = v; apply(); }, whine(v) { wh = v; apply(); },
+      stop() {
+        const T = ac.currentTime; out.gain.cancelScheduledValues(T); out.gain.setTargetAtTime(0, T, .08);
+        setTimeout(() => { try { ns.stop(); lfo.stop(); m1.stop(); m2.stop(); out.disconnect(); } catch (e) {} }, 500);
+      },
+    };
+  }
+  function buildHum(x) {   // 발전소 웅~
+    const ac = x.ac, out = ac.createGain(); out.gain.value = 0; out.connect(x.dest);
+    const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 220; lp.connect(out);
+    const o1 = ac.createOscillator(), o2 = ac.createOscillator(); o1.type = 'sawtooth'; o1.frequency.value = 50; o2.type = 'sine'; o2.frequency.value = 100;
+    const g2 = ac.createGain(); g2.gain.value = .5; o1.connect(lp); o2.connect(g2); g2.connect(lp);
+    const ns = ac.createBufferSource(); ns.buffer = x.nz; ns.loop = true; const nl = ac.createBiquadFilter(); nl.type = 'lowpass'; nl.frequency.value = 380; const ng = ac.createGain(); ng.gain.value = .5;
+    ns.connect(nl); nl.connect(ng); ng.connect(lp);
+    o1.start(); o2.start(); ns.start(0, .7);
+    return {
+      level(v) { const T = ac.currentTime; out.gain.setTargetAtTime(clamp(v, 0, 1.1) * .06, T, .15); o1.frequency.setTargetAtTime(44 + 8 * v, T, .3); },
+      stop() { const T = ac.currentTime; out.gain.setTargetAtTime(0, T, .1); setTimeout(() => { try { o1.stop(); o2.stop(); ns.stop(); out.disconnect(); } catch (e) {} }, 500); },
+    };
+  }
+  function buildBoil(x) {   // 주전자 끓는 소리: 쉬이~ + 보글보글
+    const ac = x.ac, out = ac.createGain(); out.gain.value = 0; out.connect(x.dest);
+    const ns = ac.createBufferSource(); ns.buffer = x.nz; ns.loop = true; const hp = ac.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 3200;
+    const gh = ac.createGain(); gh.gain.value = 0; ns.connect(hp); hp.connect(gh); gh.connect(out); ns.start(0, .2);
+    let lv = 0; const rnd = U_rng(7);
+    const id = setInterval(() => {
+      if (lv < .05 || !on) return;
+      if (rnd() < .15 + lv * .5) { const T = ac.currentTime + .005, f0 = 260 + rnd() * 260; tone({ ac, dest: out, nz: x.nz }, T, { f: f0, f2: f0 * 1.9, a: .003, d: .07, g: .1 * lv, pan: (rnd() - .5) * .8 }); }
+    }, 70);
+    return {
+      level(v) { lv = clamp(v, 0, 1); const T = ac.currentTime; gh.gain.setTargetAtTime(lv * .05, T, .4); out.gain.setTargetAtTime(lv > .01 ? 1 : 0, T, .1); },
+      stop() { clearInterval(id); const T = ac.currentTime; out.gain.setTargetAtTime(0, T, .1); setTimeout(() => { try { ns.stop(); out.disconnect(); } catch (e) {} }, 500); },
+    };
+  }
+  function U_rng(seed) { let s = seed >>> 0 || 1; return () => { s ^= s << 13; s >>>= 0; s ^= s >> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; }; }
+  const LOOPS = { fan: buildFan, hum: buildHum, boil: buildBoil };
+  const NULL_LOOP = { level() {}, whine() {}, stop() {} };
+
+  /* ═════════ 바깥 API ═════════ */
+  let blankN = 0;
+  const tickLog = [];
+  function play(name, a, b) {
+    if (OFF || !on) return;
+    const x = ensure(); if (!x) return;
+    const f = S[name]; if (!f) { console.warn('[SFX] 없는 소리:', name); return; }
+    if (name === 'blank') a = blankN++;
+    if (name === 'tick') {   // 빽빽할수록(100 W 레인) 톡톡이 작고 높은 지지직으로 — 촘촘한 정도에 따라 세기·음높이 자동 조절
+      const now = performance.now(); tickLog.push(now); while (tickLog.length && now - tickLog[0] > 250) tickLog.shift();
+      const n = tickLog.length;
+      b = (b ?? 1) / (1 + n * .22); a = (a ?? 1) * (1 + Math.min(n, 30) * .012);
+    }
+    try { f(x, x.ac.currentTime + .008, a, b); } catch (e) { console.error('[SFX]', name, e); }
+  }
+  function loop(kind, o) {
+    const build = LOOPS[kind];
+    if (OFF || !build) return NULL_LOOP;
+    const h = {
+      built: null, lvl: 0, wh: 0, dead: false,
+      level(v) { h.lvl = v; if (h.built) h.built.level(v); },
+      whine(v) { h.wh = v; if (h.built && h.built.whine) h.built.whine(v); },
+      stop() { h.dead = true; pending.delete(h); if (h.built) { h.built.stop(); h.built = null; } },
+      tryBuild() {
+        if (h.built || h.dead) return;
+        const x = ensure(); if (!x) return;
+        try { h.built = build(x, o || {}); h.built.level(h.lvl); if (h.wh && h.built.whine) h.built.whine(h.wh); }
+        catch (e) { console.error('[SFX loop]', kind, e); h.dead = true; }
+      },
+    };
+    pending.add(h); h.tryBuild();
+    return h;
+  }
+  function unlock() {
+    if (unlocked) return;
+    unlocked = true;
+    if (!OFF) { ensure(); pending.forEach(h => h.tryBuild()); }
+  }
+  ['pointerdown', 'keydown', 'touchstart'].forEach(ev => document.addEventListener(ev, unlock, { capture: true, once: false, passive: true }));
+  document.addEventListener('visibilitychange', () => {
+    if (!ac) return;
+    if (document.hidden) ac.suspend().catch(() => {}); else if (on) ac.resume().catch(() => {});
+  });
+
+  let toastEl = null, toastT = 0;
+  function toast(v) {
+    if (!document.body) return;
+    if (!toastEl) { toastEl = document.createElement('div'); toastEl.id = 'sfxToast'; document.body.appendChild(toastEl); }
+    toastEl.textContent = v ? '소리 켜짐' : '소리 꺼짐';
+    toastEl.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => toastEl.classList.remove('show'), 1400);
+  }
+  function toggle(v) {
+    on = v == null ? !on : !!v;
+    try { localStorage.setItem(KEY, on ? '1' : '0'); } catch (e) {}
+    unlock();
+    const x = ensure();
+    if (x && out) out.gain.setTargetAtTime(on ? .9 : 0, ac.currentTime, .03);
+    toast(on);
+    if (on) play('pop');
+    return on;
+  }
+
+  /* ═════════ 점검 도구 ═════════ */
+  function measure(buf) {
+    let peak = 0, sum = 0, n = 0, last = 0, first = -1, zc = 0, prev = 0;
+    const ch = buf.getChannelData(0), ch2 = buf.numberOfChannels > 1 ? buf.getChannelData(1) : ch, sr = buf.sampleRate;
+    for (let i = 0; i < ch.length; i++) {
+      const v = Math.max(Math.abs(ch[i]), Math.abs(ch2[i]));
+      if (v > peak) peak = v;
+      sum += ch[i] * ch[i]; n++;
+      if (v > .003) { last = i; if (first < 0) first = i; }
+      if ((ch[i] >= 0) !== (prev >= 0)) zc++; prev = ch[i];
+    }
+    const active = Math.max(1, last - Math.max(0, first)) / sr;
+    return { peak: +peak.toFixed(3), rms: +Math.sqrt(sum / n).toFixed(4), attack: first < 0 ? null : +(first / sr).toFixed(3), length: +(last / sr).toFixed(2), approxHz: Math.round(zc / 2 / active), clipped: peak >= .98, silent: peak < .01 };
+  }
+  async function analyze(name, a, b, secs = 3) {
+    const OA = window.OfflineAudioContext || window.webkitOfflineAudioContext, sr = 44100;
+    const oc = new OA(2, Math.floor(sr * secs), sr), g = oc.createGain(); g.gain.value = .9; g.connect(oc.destination);
+    const x = { ac: oc, dest: g, nz: noiseBuf(oc) };
+    S[name](x, .02, a, b);
+    return measure(await oc.startRendering());
+  }
+  async function analyzeLoop(kind, level = 1, secs = 1.5) {
+    const OA = window.OfflineAudioContext || window.webkitOfflineAudioContext, sr = 44100;
+    const oc = new OA(2, Math.floor(sr * secs), sr), g = oc.createGain(); g.gain.value = .9; g.connect(oc.destination);
+    const h = LOOPS[kind]({ ac: oc, dest: g, nz: noiseBuf(oc) }); h.level(level);
+    const r = measure(await oc.startRendering()); try { h.stop(); } catch (e) {} return r;
+  }
+
+  /** ?sfx=demo — 모든 소리를 눌러 들어 보는 패널 */
+  function demoPanel() {
+    const box = document.createElement('div');
+    box.style.cssText = 'position:fixed;left:12px;top:12px;z-index:200;max-width:340px;max-height:92vh;overflow:auto;background:rgba(29,29,31,.94);color:#f5f5f7;border-radius:14px;padding:14px;font:600 13px/1.3 system-ui,sans-serif';
+    const btn = (t, fn) => { const b = document.createElement('button'); b.textContent = t; b.style.cssText = 'margin:3px;padding:6px 10px;border-radius:9999px;border:0;background:#0066cc;color:#fff;font:600 13px system-ui'; b.onclick = () => { unlock(); fn(); }; return b; };
+    box.appendChild(Object.assign(document.createElement('div'), { textContent: '효과음 듣기 (F2 로 닫기)', style: 'margin-bottom:8px;font-size:14px' }));
+    Object.keys(S).forEach(k => box.appendChild(btn(k, () => { if (!on) toggle(true); play(k, k === 'kick' ? true : undefined, 1); })));
+    let fan = null;
+    box.appendChild(btn('fan 0→1→0', () => { if (!on) toggle(true); if (fan) fan.stop(); fan = loop('fan'); let v = 0, dir = 1; const id = setInterval(() => { v += dir * .05; if (v >= 1) dir = -1; fan.level(clamp(v)); if (v <= 0 && dir < 0) { clearInterval(id); fan.stop(); fan = null; } }, 60); }));
+    box.appendChild(btn('boil', () => { if (!on) toggle(true); const h = loop('boil'); h.level(1); setTimeout(() => h.stop(), 4000); }));
+    box.appendChild(btn('hum', () => { if (!on) toggle(true); const h = loop('hum'); h.level(1); setTimeout(() => h.stop(), 3000); }));
+    document.body.appendChild(box);
+    document.addEventListener('keydown', e => { if (e.key === 'F2') box.remove(); });
+  }
+  if (Q.get('sfx') === 'demo') { const go = () => demoPanel(); if (document.body) go(); else document.addEventListener('DOMContentLoaded', go); }
+
+  return { play, loop, toggle, unlock, analyze, analyzeLoop, names: () => Object.keys(S), isOn: () => on, isOff: () => OFF, S, debug: () => ({ pendingLoops: pending.size, unlocked, state: ac ? ac.state : 'none' }) };
+})();
+
+}catch(e){console.error("[object 03_sfx.js]",e)}
+
+</script><script>
+'use strict';
+/* ── 과학기술의 발전과 우리 생활 덱 · 그림 도우미 ── */
+function txt(x,y,s,size=28,color='var(--t2)',anchor='middle',extra=''){return `<text x="${x}" y="${y}" text-anchor="${anchor}" font-size="${size}" fill="${color}" ${extra}>${s}</text>`;}
+function line(x1,y1,x2,y2,color='var(--hl)',width=2,extra=''){return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="${width}" ${extra}/>`;}
+const f1=v=>Math.round(v*10)/10;
+const sfxAt=(map)=>(c,k)=>{const f=map[k];if(f)f(c);};
+function arrow(x1,y1,x2,y2,col='var(--t3)',w=4,extra=''){const a=Math.atan2(y2-y1,x2-x1),h=16;
+  return `<g ${extra}><line x1="${x1}" y1="${y1}" x2="${f1(x2-Math.cos(a)*6)}" y2="${f1(y2-Math.sin(a)*6)}" stroke="${col}" stroke-width="${w}" stroke-linecap="round"/><path d="M${x2} ${y2}L${f1(x2-h*Math.cos(a-0.45))} ${f1(y2-h*Math.sin(a-0.45))}L${f1(x2-h*Math.cos(a+0.45))} ${f1(y2-h*Math.sin(a+0.45))}Z" fill="${col}"/></g>`;}
+
+/* 아이콘(중심 0,0 · 약 44px) */
+const IC={
+  ac:c=>`<rect x="-22" y="-14" width="44" height="18" rx="5" fill="none" stroke="${c}" stroke-width="4"/><path d="M-14 12q4 6 0 12M0 12q4 6 0 12M14 12q4 6 0 12" fill="none" stroke="${c}" stroke-width="3" stroke-linecap="round"/>`,
+  speaker:c=>`<rect x="-12" y="-22" width="24" height="44" rx="10" fill="none" stroke="${c}" stroke-width="4"/><circle cx="0" cy="-8" r="3" fill="${c}"/><circle cx="0" cy="8" r="6" fill="none" stroke="${c}" stroke-width="3"/>`,
+  bulb:c=>`<circle cx="0" cy="-6" r="14" fill="none" stroke="${c}" stroke-width="4"/><path d="M-7 10h14M-6 17h12" stroke="${c}" stroke-width="4" stroke-linecap="round"/>`,
+  energy:c=>`<rect x="-22" y="-20" width="44" height="40" rx="6" fill="none" stroke="${c}" stroke-width="4"/><path d="M-12 12v-8M-2 12v-16M8 12v-10" stroke="${c}" stroke-width="5" stroke-linecap="round"/>`,
+  fridge:c=>`<rect x="-14" y="-24" width="28" height="48" rx="5" fill="none" stroke="${c}" stroke-width="4"/><path d="M-14 -4h28M8 -16v6M8 4v8" stroke="${c}" stroke-width="3" stroke-linecap="round"/>`,
+  vacuum:c=>`<circle r="20" fill="none" stroke="${c}" stroke-width="4"/><circle r="7" fill="${c}"/><path d="M-14 -14l-6 -6M14 -14l6 -6" stroke="${c}" stroke-width="3" stroke-linecap="round"/>`,
+  hospital:c=>`<rect x="-20" y="-20" width="40" height="40" rx="8" fill="none" stroke="${c}" stroke-width="4"/><path d="M0 -10v20M-10 0h20" stroke="${c}" stroke-width="6" stroke-linecap="round"/>`,
+  car:c=>`<path d="M-22 6v-8l8-12h28l8 12v8z" fill="none" stroke="${c}" stroke-width="4" stroke-linejoin="round"/><circle cx="-12" cy="10" r="5" fill="${c}"/><circle cx="12" cy="10" r="5" fill="${c}"/>`,
+  farm:c=>`<path d="M0 20V-4M0 4q-16 0 -18 -18q16 0 18 18M0 -4q14 -2 16 -18q-14 2 -16 18" fill="none" stroke="${c}" stroke-width="4" stroke-linejoin="round"/>`,
+  surgery:c=>`<path d="M-18 20V4l14 -14 14 6" fill="none" stroke="${c}" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/><path d="M10 -4l8 10M10 -4l-2 12" stroke="${c}" stroke-width="3" stroke-linecap="round"/><circle cx="-4" cy="-10" r="4" fill="${c}"/>`,
+  drone:c=>`<path d="M-14 -14L14 14M14 -14L-14 14" stroke="${c}" stroke-width="4"/><circle cx="-16" cy="-16" r="7" fill="none" stroke="${c}" stroke-width="3"/><circle cx="16" cy="-16" r="7" fill="none" stroke="${c}" stroke-width="3"/><circle cx="-16" cy="16" r="7" fill="none" stroke="${c}" stroke-width="3"/><circle cx="16" cy="16" r="7" fill="none" stroke="${c}" stroke-width="3"/><rect x="-6" y="-6" width="12" height="12" fill="${c}"/>`,
+  factory:c=>`<path d="M-22 20V-2l12 -8v8l12 -8v8l12 -8v30z" fill="none" stroke="${c}" stroke-width="4" stroke-linejoin="round"/><rect x="10" y="-22" width="6" height="16" fill="${c}"/>`,
+  sensor:c=>`<circle r="8" fill="${c}"/><path d="M-16 -12a20 20 0 0 0 0 24M16 -12a20 20 0 0 1 0 24M-24 -20a32 32 0 0 0 0 40M24 -20a32 32 0 0 1 0 40" fill="none" stroke="${c}" stroke-width="3" stroke-linecap="round"/>`,
+  cloud:c=>`<path d="M-20 12h40a12 12 0 0 0 0 -24a16 16 0 0 0 -30 -4a12 12 0 0 0 -10 28z" fill="none" stroke="${c}" stroke-width="4" stroke-linejoin="round"/>`,
+  brain:c=>`<path d="M0 -20v40M0 -20q-20 -2 -20 14q-6 10 4 18q4 10 16 8M0 -20q20 -2 20 14q6 10 -4 18q-4 10 -16 8" fill="none" stroke="${c}" stroke-width="4" stroke-linejoin="round"/>`,
+  arm:c=>`<path d="M-20 22h24M-8 22V2l18 -14" fill="none" stroke="${c}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 -12l10 2M10 -12l4 -10" stroke="${c}" stroke-width="4" stroke-linecap="round"/><circle cx="-8" cy="2" r="4" fill="${c}"/>`,
+  phone:c=>`<rect x="-13" y="-22" width="26" height="44" rx="6" fill="none" stroke="${c}" stroke-width="4"/><path d="M-4 15h8" stroke="${c}" stroke-width="3" stroke-linecap="round"/>`,
+  gear:c=>`<circle r="10" fill="none" stroke="${c}" stroke-width="4"/>${[0,1,2,3,4,5,6,7].map(i=>{const a=i*Math.PI/4;return `<line x1="${f1(Math.cos(a)*14)}" y1="${f1(Math.sin(a)*14)}" x2="${f1(Math.cos(a)*21)}" y2="${f1(Math.sin(a)*21)}" stroke="${c}" stroke-width="6" stroke-linecap="round"/>`;}).join('')}`
+};
+const icon=(k,x,y,c,s=1)=>`<g transform="translate(${x} ${y}) scale(${s})">${IC[k](c)}</g>`;
+
+/* 둘러보기(핫스폿) 장면: 표시 누르기 + 클릭 단계로 하나씩 */
+function hsMarker(it,i){return `<g class="hs" data-i="${i}" data-interactive="" style="cursor:pointer;pointer-events:all" role="button" tabindex="0" aria-pressed="false" aria-label="${it.name}"><g class="hs-in" style="transform-origin:${it.x}px ${it.y}px"><circle class="hs-halo" cx="${it.x}" cy="${it.y}" r="64" fill="${it.c}"/><circle class="hs-ring" cx="${it.x}" cy="${it.y}" r="44" fill="none" stroke="${it.c}" stroke-width="5" style="transform-origin:${it.x}px ${it.y}px"/><circle class="hs-bg" cx="${it.x}" cy="${it.y}" r="36" fill="#1d1d1f" stroke="${it.c}" stroke-width="3"/><g class="hs-ic">${icon(it.ic,it.x,it.y,it.c,.9)}</g><g class="hs-ic2">${icon(it.ic,it.x,it.y,'#fff',.9)}</g>${txt(it.x,it.y+68,it.name,24,'#f5f5f7','middle','class="hs-lb" font-weight="600" paint-order="stroke" stroke="#000" stroke-width="6"')}</g></g>`;}
+function hsShow(root,items,pid,i){
+  const it=items[i],p=root.querySelector('#'+pid);
+  p.style.borderColor=it.c;p.style.boxShadow=`0 0 0 2px ${it.c}, 0 0 60px color-mix(in srgb,${it.c} 35%,transparent)`;
+  p.innerHTML=`<svg class="hs-big" viewBox="-50 -50 100 100" aria-hidden="true"><circle r="46" fill="${it.c}"/>${icon(it.ic,0,0,'#fff',1.25)}</svg><span class="echip" style="color:${it.c};background:color-mix(in srgb,${it.c} 16%,transparent)">${i+1} / ${items.length}</span><h3>${it.name}</h3>${it.see?`<div class="hs-row"><span>알아차리는 것</span><p>${it.see}</p></div>`:''}<div class="hs-row"><span>하는 일</span><p>${it.does}</p></div>`;
+  root.querySelectorAll('.hs').forEach(g=>{const on=+g.dataset.i===i;g.classList.toggle('on',on);g.classList.toggle('dim',!on);g.setAttribute('aria-pressed',String(on));
+    g.querySelector('.hs-bg').setAttribute('fill',on?it.c:'#1d1d1f');});
+}
+function hsScene(id,gid,pid,items,bg){
+  Deck.scene(id,{steps:items.length,
+    build(root){root.querySelector('#'+gid).innerHTML=bg()+items.map(hsMarker).join('');},
+    enter(c){c.$$('.hs').forEach(g=>{
+      const select=e=>{
+        e.stopPropagation();
+        hsShow(c.root,items,pid,+g.dataset.i);
+        c.sfx('pop');
+      };
+      g.addEventListener('click',select);
+      g.addEventListener('keydown',e=>{
+        if(e.key==='Enter'||e.key===' '){e.preventDefault();select(e);}
+      });
+    });},
+    go(c,k){hsShow(c.root,items,pid,k-1);if(!c.instant)c.sfx('pop');}
+  });
+}
+
+/* ═════════ 장면 ═════════ */
+
+/* 표지: 연결되는 사물들 */
+const HN=(()=>{const R=U.rng(17),n=[];const keys=['ac','speaker','bulb','fridge','car','drone','hospital','vacuum','phone','energy','farm','factory'];
+  for(let i=0;i<12;i++)n.push({x:260+(i%6)*280+(R()-.5)*90,y:200+Math.floor(i/6)*230+(R()-.5)*70,k:keys[i]});return n;})();
+const HE=(()=>{const e=[];HN.forEach((a,i)=>HN.forEach((b,j)=>{if(j>i&&Math.hypot(a.x-b.x,a.y-b.y)<330)e.push([i,j]);}));return e;})();
+Deck.scene('cover',{steps:0,
+  build(root){let s='';
+    HE.forEach(([i,j],k)=>s+=`<line class="he" x1="${f1(HN[i].x)}" y1="${f1(HN[i].y)}" x2="${f1(HN[j].x)}" y2="${f1(HN[j].y)}" stroke="var(--elec)" stroke-width="2" opacity=".35" data-in="${400+k*60}" data-fx="draw"/>`);
+    s+='<g id="pulses"></g>';
+    HN.forEach((n,i)=>s+=`<g data-in="${100+i*60}" data-fx="pop"><circle cx="${f1(n.x)}" cy="${f1(n.y)}" r="40" fill="#1d1d1f" stroke="var(--elec)" stroke-width="2"/>${icon(n.k,f1(n.x),f1(n.y),'#f5f5f7',.85)}</g>`);
+    root.querySelector('#hero-g').innerHTML=s;},
+  enter(c){if(c.still||c.reduced)return;const g=c.$('#pulses');
+    const P=[0,1,2,3,4,5].map(i=>{const el=document.createElementNS('http://www.w3.org/2000/svg','circle');el.setAttribute('r','6');el.setAttribute('fill','var(--elec)');g.appendChild(el);return {el,e:HE[(i*5)%HE.length],o:i/6};});
+    c.loop(t=>P.forEach((p,i)=>{let u=(t*0.35+p.o)%1;if(u<0.02){p.e=HE[Math.floor((t*7+i*3))%HE.length];}const [a,b]=p.e.map(k=>HN[k]);p.el.setAttribute('cx',f1(a.x+(b.x-a.x)*u));p.el.setAttribute('cy',f1(a.y+(b.y-a.y)*u));p.el.setAttribute('opacity',(Math.sin(u*Math.PI)).toFixed(2));}));}
+});
+
+/* 사물 인터넷 흐름 */
+Deck.scene('iot',{steps:4,
+  build(root){let s='';const y=680,bh=200;
+    const box=(x,w,k,t1,t2,col,step)=>`<g data-step="${step}" data-fx="rise"><rect x="${x}" y="${y-bh/2}" width="${w}" height="${bh}" rx="22" fill="#fff" stroke="${col}" stroke-width="3"/>${icon(k,x+w/2,y-38,col,1.2)}${txt(x+w/2,y+36,t1,32,'#1d1d1f','middle','font-weight="700"')}${txt(x+w/2,y+74,t2,24,'var(--t2)')}</g>`;
+    s+=box(120,330,'sensor','센서로 감지','온도·빛·움직임 등','var(--elec)',2);
+    s+=`<g data-step="2" data-fx="fade" data-delay="200">${arrow(462,y,548,y,'var(--t3)')}</g>`;
+    s+=box(560,330,'cloud','인터넷에 연결','통신 기능','var(--kin)',2);
+    s+=`<g data-step="3" data-fx="fade">${arrow(902,y,988,y,'var(--t3)')}</g>`;
+    s+=box(1000,330,'gear','정보 수집·교환','물건끼리 주고받음','var(--sound)',3);
+    s+=`<g data-step="4" data-fx="fade">${arrow(1342,y-30,1450,y-95,'var(--t3)')}${arrow(1342,y+30,1450,y+95,'var(--t3)')}</g>`;
+    s+=`<g data-step="4" data-fx="rise" data-delay="150"><rect x="1460" y="${y-170}" width="340" height="130" rx="20" fill="#fff" stroke="var(--light)" stroke-width="3"/>${icon('vacuum',1530,y-105,'var(--light)')}${txt(1580,y-93,'스스로 작동',30,'#1d1d1f','start','font-weight="700"')}</g>`;
+    s+=`<g data-step="4" data-fx="rise" data-delay="300"><rect x="1460" y="${y+40}" width="340" height="130" rx="20" fill="#fff" stroke="var(--heat)" stroke-width="3"/>${icon('phone',1530,y+105,'var(--heat)')}${txt(1580,y+117,'원격으로 조절',30,'#1d1d1f','start','font-weight="700"')}</g>`;
+    const br=(x1,x2,yy,label,col,step,d=0)=>`<g data-step="${step}" data-fx="fade" data-delay="${d}"><path d="M${x1} ${yy-14}v14h${x2-x1}v-14" fill="none" stroke="${col}" stroke-width="3"/>${txt((x1+x2)/2,yy+40,label,28,col,'middle','font-weight="700"')}</g>`;
+    s+=br(120,890,y+bh/2+26,'① 사물 인터넷이란? (위의 정의)','var(--act)',2,400);
+    s+=br(1000,1800,y+bh/2+96,'② 사물 인터넷의 특징: 연결된 물건이 할 수 있는 일','var(--sound)',4,500);
+    root.querySelector('#iot-g').innerHTML=s;}
+});
+
+/* 미래 스마트 홈 */
+const HOME=[
+  {name:'냉난방 장치',ic:'ac',x:330,y:345,c:'var(--elec)',see:'기온과 습도',does:'쾌적한 환경을 자동으로 관리한다.'},
+  {name:'인공지능 비서',ic:'speaker',x:560,y:560,c:'var(--sound)',see:'사람의 목소리',does:'목소리를 인식해 작업을 수행한다.'},
+  {name:'조명',ic:'bulb',x:930,y:740,c:'var(--light)',see:'수면 일정 또는 생활 패턴',does:'설정한 일정이나 연동한 정보에 맞춰 밝기를 조절할 수 있다.'},
+  {name:'에너지 관리 시스템',ic:'energy',x:280,y:820,c:'var(--kin)',see:'에너지 사용량(분석)',does:'에너지 절약을 돕는다.'},
+  {name:'냉장고',ic:'fridge',x:1030,y:370,c:'var(--chem)',see:'보관 기간 등 식품 관련 정보',does:'신선도를 추정해 요리법을 안내하는 미래의 활용 예다.'},
+  {name:'청소 로봇',ic:'vacuum',x:380,y:620,c:'var(--heat)',see:'공간의 형태',does:'공간을 인지해 스스로 청소한다.'}];
+hsScene('home','home-g','homePanel',HOME,()=>{
+  const W='#3a3a3c';let s=`<rect x="140" y="290" width="1000" height="650" rx="14" fill="#141416" stroke="${W}" stroke-width="8"/>`;
+  s+=line(760,290,760,560,W,8)+line(760,640,760,940,W,8)+line(760,620,1140,620,W,8)+line(140,720,560,720,W,8)+line(640,720,760,720,W,8);
+  s+=txt(450,330+0,'',1)+txt(200,700,'거실',26,'#6e6e73','start')+txt(1100,600,'주방',26,'#6e6e73','end')+txt(1100,920,'침실',26,'#6e6e73','end')+txt(200,920,'현관',26,'#6e6e73','start');
+  s+=`<rect x="200" y="420" width="90" height="220" rx="16" fill="#2c2c2e"/><rect x="430" y="420" width="220" height="80" rx="10" fill="#2c2c2e"/>`;
+  s+=`<rect x="830" y="420" width="190" height="110" rx="10" fill="#2c2c2e"/><rect x="800" y="660" width="200" height="240" rx="16" fill="#2c2c2e"/><rect x="815" y="672" width="170" height="60" rx="10" fill="#3a3a3c"/>`;
+  return s;});
+
+/* 인공지능 · 로봇 벤 다이어그램 */
+Deck.scene('venn',{steps:3,
+  build(root){let s='';const cy=620;
+    s+=`<g data-step="1" data-fx="fade"><circle cx="520" cy="${cy}" r="260" fill="var(--elec)" fill-opacity=".10" stroke="var(--elec)" stroke-width="4"/>${txt(380,cy-270+10,'인공지능',34,'var(--elec)','middle','font-weight="700"')}${txt(400,cy-6,'생성형',30,'#1d1d1f','middle','font-weight="600"')}${txt(400,cy+34,'인공지능',30,'#1d1d1f','middle','font-weight="600"')}</g>`;
+    s+=`<g data-step="2" data-fx="fade"><circle cx="860" cy="${cy}" r="260" fill="var(--heat)" fill-opacity=".10" stroke="var(--heat)" stroke-width="4"/>${txt(1000,cy-270+10,'로봇',34,'var(--heat)','middle','font-weight="700"')}${txt(990,cy-6,'제조 분야',30,'#1d1d1f','middle','font-weight="600"')}${txt(990,cy+34,'자동화 로봇',30,'#1d1d1f','middle','font-weight="600"')}</g>`;
+    s+=`<g data-step="3" data-fx="pop"><path d="M690 ${cy-196}A260 260 0 0 1 690 ${cy+196}A260 260 0 0 1 690 ${cy-196}Z" fill="var(--kin)" fill-opacity=".28"/>${txt(690,cy-6,'자율주행',30,'#1d1d1f','middle','font-weight="700"')}${txt(690,cy+34,'자동차',30,'#1d1d1f','middle','font-weight="700"')}${txt(690,cy+300,'인공지능 로봇',30,'var(--kin)','middle','font-weight="700"')}</g>`;
+    root.querySelector('#venn-g').innerHTML=s;}
+});
+
+/* 함께 일하는 기술 */
+Deck.scene('together',{steps:5,
+  build(root){let s='';const y=405,xs=[330,750,1170,1590];
+    const D=[['sensor','감지','센서로 상태 측정','var(--elec)'],['cloud','연결','인터넷으로 정보 공유','var(--kin)'],['brain','판단','규칙 또는 인공지능 적용','var(--sound)'],['arm','작동','기계가 물리적 행동 수행','var(--heat)']];
+    D.forEach(([k,t,tag,col],i)=>{const x=xs[i];
+      s+=`<g data-step="${i+1}" data-fx="rise"><circle cx="${x}" cy="${y}" r="70" fill="#1d1d1f" stroke="${col}" stroke-width="4"/>${icon(k,x,y,col,1.4)}${txt(x,y+112,t,30,'#f5f5f7','middle','font-weight="700"')}${txt(x,y+150,tag,24,col,'middle','font-weight="600"')}</g>`;
+    });
+    root.querySelector('#flow-g').innerHTML=s;}
+});
+
+/* 미래 과학 도시 */
+const CITY=[
+  {name:'스마트 병원',ic:'hospital',x:310,y:390,c:'var(--heat)',does:'측정 정보를 의료진과 공유해 환자 상태의 원격 확인을 돕는다.'},
+  {name:'자율주행 자동차',ic:'car',x:660,y:530,c:'var(--elec)',does:'주변 차량과 차선 등을 감지해 주행 속도와 방향을 제어한다.'},
+  {name:'스마트팜 로봇',ic:'farm',x:1000,y:860,c:'var(--kin)',does:'작물의 상태를 판단하여 수확한다.'},
+  {name:'수술용 로봇',ic:'surgery',x:680,y:390,c:'var(--chem)',does:'의사가 조종하는 기구로 정밀한 수술을 돕는다.'},
+  {name:'배송 드론',ic:'drone',x:310,y:640,c:'var(--light)',does:'기상과 비행 조건이 맞을 때 물건을 운반한다.'},
+  {name:'산업 로봇',ic:'factory',x:680,y:860,c:'var(--sound)',does:'부품 조립이나 운반 등을 수행한다. 일부는 사람과 함께 작업한다.'}];
+hsScene('city','city-g','cityPanel',CITY,()=>{
+  let s=`<rect x="140" y="290" width="1000" height="650" rx="14" fill="#141416"/>`;
+  const road='#2c2c2e';
+  s+=`<rect x="140" y="500" width="1000" height="56" fill="${road}"/><rect x="140" y="740" width="1000" height="56" fill="${road}"/><rect x="460" y="290" width="56" height="650" fill="${road}"/><rect x="840" y="290" width="56" height="650" fill="${road}"/>`;
+  s+=line(140,528,1140,528,'#6e6e73',3,'stroke-dasharray="18 16"')+line(140,768,1140,768,'#6e6e73',3,'stroke-dasharray="18 16"');
+  const B=(x,y,w,h,fill='#232326')=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10" fill="${fill}"/>`;
+  s+=B(170,310,270,170)+B(540,310,280,170)+B(920,310,200,170)+B(170,576,270,144)+B(540,576,280,144)+B(920,576,200,144)+B(170,816,270,110)+B(540,816,280,110);
+  s+=`<rect x="920" y="816" width="200" height="110" rx="10" fill="#17351f"/>`+[0,1,2,3].map(i=>line(935,832+i*26,1105,832+i*26,'#2f6b3f',8,'stroke-linecap="round"')).join('');
+  s+=txt(1110,340,'',1)+txt(1020,420,'주거',24,'#6e6e73')+txt(1020,660,'학교',24,'#6e6e73')+txt(680,640,'상가',24,'#6e6e73');
+  return s;});
+
+/* 탐구 표지: 로봇 얼굴 */
+Deck.scene('inq-title',{
+  build(root){const x=1560,y=600;root.querySelector('#inq-hero').innerHTML=`<line x1="${x}" y1="${y-190}" x2="${x}" y2="${y-140}" stroke="var(--kin)" stroke-width="6"/><circle cx="${x}" cy="${y-200}" r="14" fill="var(--kin)"/><rect x="${x-150}" y="${y-140}" width="300" height="240" rx="50" fill="#1d1d1f" stroke="var(--kin)" stroke-width="4"/><rect x="${x-110}" y="${y-100}" width="220" height="130" rx="30" fill="#0b0b0c"/><circle class="eye" cx="${x-50}" cy="${y-40}" r="18" fill="var(--kin)"/><circle class="eye" cx="${x+50}" cy="${y-40}" r="18" fill="var(--kin)"/><path d="M${x-40} ${y+60}q40 24 80 0" fill="none" stroke="var(--kin)" stroke-width="6" stroke-linecap="round"/>`;},
+  enter(c){if(c.still||c.reduced)return;const e=c.$$('#inq-hero .eye');c.loop(t=>{const b=(t%3.2)<0.15;e.forEach(el=>el.setAttribute('r',b?3:18));});}
+});
+
+/* 로봇 그림 */
+function drawPet(x,y,col){return `<ellipse cx="${x}" cy="${y+20}" rx="110" ry="60" fill="#e8e8ed"/><circle cx="${x+110}" cy="${y-50}" r="56" fill="#e8e8ed"/><path d="M${x+76} ${y-96}l-12 -40 36 22zM${x+140} ${y-98}l14 -40 -36 22z" fill="#c7c7cc"/><rect x="${x+86}" y="${y-62}" width="60" height="26" rx="13" fill="#1d1d1f"/><circle cx="${x+102}" cy="${y-49}" r="6" fill="${col}"/><circle cx="${x+130}" cy="${y-49}" r="6" fill="${col}"/>${[-70,-30,40,80].map(d=>`<rect x="${x+d}" y="${y+60}" width="26" height="70" rx="12" fill="#c7c7cc"/>`).join('')}<path d="M${x-110} ${y}q-40 -30 -30 -70" fill="none" stroke="#c7c7cc" stroke-width="12" stroke-linecap="round"/>`;}
+function drawSurgery(x,y,col){return `<rect x="${x-120}" y="${y+90}" width="240" height="30" rx="8" fill="#3a3a3c"/><rect x="${x-90}" y="${y+60}" width="180" height="30" rx="10" fill="#636366"/><rect x="${x-160}" y="${y-160}" width="34" height="290" rx="10" fill="#c7c7cc"/><rect x="${x-160}" y="${y-170}" width="320" height="34" rx="12" fill="#c7c7cc"/>${[-80,0,80].map((d,i)=>`<path d="M${x+d} ${y-136}v60l${i===1?0:(i?-20:20)} 40v40" fill="none" stroke="#e8e8ed" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${x+d+(i===1?0:(i?-20:20))}" cy="${y+4}" r="8" fill="${col}"/>`).join('')}`;}
+function drawBarista(x,y,col){return `<rect x="${x-150}" y="${y+60}" width="300" height="80" rx="10" fill="#3a3a3c"/><rect x="${x+40}" y="${y-60}" width="100" height="120" rx="10" fill="#636366"/><rect x="${x+60}" y="${y-30}" width="60" height="16" rx="4" fill="#1d1d1f"/><rect x="${x-120}" y="${y+30}" width="60" height="30" rx="8" fill="#c7c7cc"/><path d="M${x-90} ${y+30}V${y-60}L${x-10} ${y-120}L${x+20} ${y-60}" fill="none" stroke="#e8e8ed" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${x-90}" cy="${y-60}" r="12" fill="${col}"/><circle cx="${x-10}" cy="${y-120}" r="12" fill="${col}"/><path d="M${x+6} ${y-50}h34l-5 40h-24z" fill="#fff"/><path d="M${x+40} ${y-42}q14 0 10 16" fill="none" stroke="#fff" stroke-width="4"/>`;}
+function drawServing(x,y,col,legs=false){let s=`<rect x="${x-80}" y="${y-160}" width="160" height="${legs?280:300}" rx="34" fill="#e8e8ed"/><rect x="${x-50}" y="${y-140}" width="100" height="56" rx="20" fill="#1d1d1f"/><circle cx="${x-20}" cy="${y-116}" r="7" fill="${col}"/><circle cx="${x+20}" cy="${y-116}" r="7" fill="${col}"/><path d="M${x-14} ${y-100}q14 8 28 0" fill="none" stroke="${col}" stroke-width="4" stroke-linecap="round"/>`;
+  [-50,20,90].forEach((d,i)=>{s+=`<rect x="${x-96}" y="${y+d}" width="192" height="14" rx="6" fill="#8e8e93"/>`;s+=i===0?`<path d="M${x-30} ${y+d}h40l-6 -34h-28z" fill="#ff9f0a"/>`:i===1?`<ellipse cx="${x+10}" cy="${y+d-12}" rx="44" ry="12" fill="#fff"/><circle cx="${x+10}" cy="${y+d-26}" r="16" fill="#c2873e"/>`:`<rect x="${x-50}" y="${y+d-30}" width="30" height="30" rx="4" fill="#fff"/><rect x="${x+10}" y="${y+d-40}" width="34" height="40" rx="6" fill="#ff6a3d" opacity=".8"/>`;});
+  if(!legs)s+=`<circle cx="${x-50}" cy="${y+150}" r="14" fill="#3a3a3c"/><circle cx="${x+50}" cy="${y+150}" r="14" fill="#3a3a3c"/>`;
+  return s;}
+Deck.scene('robots',{steps:5,
+  build(root){let s='';
+    const C=[[120,390,'반려 로봇','var(--light)',drawPet,0,-20],[540,390,'의료 수술 로봇','var(--heat)',drawSurgery,0,10],[960,390,'바리스타 로봇','var(--chem)',drawBarista,0,10],[1380,420,'서빙 로봇','var(--elec)',drawServing,0,0]];
+    C.forEach(([x,w,n,col,fn,dx,dy],i)=>{const cx=x+w/2-(fn===drawPet?50:0),cy=560+dy;
+      s+=`<g data-step="${i+1}" data-fx="rise"><rect x="${x}" y="290" width="${w}" height="560" rx="22" fill="#232326"/><g transform="translate(${cx} ${cy}) scale(.82) translate(${-cx} ${-cy})">${fn(cx,cy,col)}</g>${txt(x+28,345,n,34,'#f5f5f7','start','font-weight="700"')}${txt(x+28,820,'용도는? 기능은?',26,col,'start','font-weight="600"')}</g>`;});
+    root.querySelector('#robots-g').innerHTML=s;}
+});
+Deck.scene('serving',{
+  build(root){root.querySelector('#serve-g').innerHTML=`<g data-in="100" data-fx="rise">${drawServing(300,600,'var(--elec)')}</g><g data-step="3" data-fx="fade">${icon('sensor',420,450,'var(--elec)',.9)}${icon('cloud',190,420,'var(--kin)',1)}</g>`;}
+});
+
+/* 개선: 다리를 단 서빙 로봇 */
+Deck.scene('improve',{
+  build(root){let s='';const sx=1100,sy=900,W=110,H=80;
+    let d=`M${sx} ${sy}`;for(let i=0;i<6;i++)d+=` h${W} v-${H}`;d+=` h${W-30}`;
+    s+=`<path d="${d}" fill="none" stroke="var(--t3)" stroke-width="6" stroke-linejoin="round"/>`;
+    s+=txt(1790,sy-6*H-24,'2층',28,'var(--t2)','end','font-weight="600"')+txt(sx+10,sy+40,'1층',28,'var(--t2)','start','font-weight="600"');
+    const rx=1430,ry=sy-2*H-130-84;
+    s+=`<g data-step="3" data-fx="rise"><g transform="translate(${rx} ${ry}) scale(.7) translate(${-rx} ${-ry})">${drawServing(rx,ry,'var(--elec)',true)}</g>`;
+    const by=ry+84;
+    s+=`<path d="M${rx-28} ${by}l-26 60 6 ${sy-2*H-by-60}M${rx+28} ${by}l34 40 -4 ${sy-3*H-by-40}" fill="none" stroke="var(--heat)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/></g>`;
+    root.querySelector('#imp-g').innerHTML=s;}
+});
+
+/* 대비: 저울 */
+Deck.scene('prepare',{steps:3,
+  build(root){const cx=560,cy=480;let s='';
+    s+=`<path d="M${cx-90} 900h180l-60 -40h-60z" fill="#3a3a3c"/><rect x="${cx-8}" y="${cy}" width="16" height="390" fill="#636366"/>`;
+    s+=`<g id="beam" transform="rotate(0 ${cx} ${cy})">`+line(cx-340,cy,cx+340,cy,'#c7c7cc',10,'stroke-linecap="round"');
+    [[-1,'var(--kin)','긍정적 효과','극대화'],[1,'var(--heat)','부정적 효과','예방']].forEach(([sg,col,a,b])=>{const x=cx+sg*320;
+      s+=line(x,cy,x-90,cy+160,'#8e8e93',3)+line(x,cy,x+90,cy+160,'#8e8e93',3)+`<path d="M${x-120} ${cy+160}h240q-20 50 -120 50q-100 0 -120 -50z" fill="${col}" fill-opacity=".25" stroke="${col}" stroke-width="3"/>`+txt(x,cy+250,a,30,col,'middle','font-weight="700"')+txt(x,cy+290,b,28,'#f5f5f7');});
+    s+=`</g><circle cx="${cx}" cy="${cy}" r="16" fill="#e8e8ed"/>`;
+    root.querySelector('#scale-g').innerHTML=s;},
+  go(c,k){if(k===2){const b=c.$('#beam');c.tween(c.instant?0:900,p=>b.setAttribute('transform',`rotate(${f1(-6*p)} 560 480)`),{ease:'inOut'});}}
+});
+
+</script></body></html>
