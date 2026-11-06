@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>콩새 · 우리 반 타임라인</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐦</text></svg>">
+<style>
+  :root{
+    --bg:#f5f7fa; --card:#fff; --line:#e6e9ef; --text:#1c2430; --sub:#6b7686;
+    --main:#1d9bf0; --main-d:#1580c9; --like:#f91880; --warn:#e8590c; --ok:#2f9e44;
+    --r:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Noto Sans KR","Malgun Gothic",sans-serif;
+    font-size:16px;line-height:1.5;-webkit-text-size-adjust:100%}
+  button{font:inherit;cursor:pointer}
+  input,textarea{font:inherit;color:inherit}
+  .wrap{max-width:640px;margin:0 auto;min-height:100vh;background:var(--card);border-left:1px solid var(--line);border-right:1px solid var(--line)}
+  header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:10px;padding:10px 14px}
+  header .logo{font-size:24px}
+  header .title{font-weight:800;font-size:18px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  header .title small{display:block;font-weight:500;font-size:12px;color:var(--sub)}
+  .iconbtn{border:none;background:none;font-size:20px;padding:6px 8px;border-radius:999px}
+  .iconbtn:hover{background:#eef3f8}
+  .tabs{display:flex;border-bottom:1px solid var(--line);position:sticky;top:57px;background:#fff;z-index:9}
+  .tabs button{flex:1;border:none;background:none;padding:12px 4px;font-weight:700;color:var(--sub);border-bottom:3px solid transparent}
+  .tabs button.on{color:var(--text);border-bottom-color:var(--main)}
+  .pad{padding:16px}
+  .btn{white-space:nowrap;border:none;background:var(--main);color:#fff;font-weight:700;padding:10px 18px;border-radius:999px}
+  .btn:hover{background:var(--main-d)}
+  .btn:disabled{opacity:.45;cursor:default}
+  .btn.ghost{background:#fff;color:var(--text);border:1px solid var(--line)}
+  .btn.ghost:hover{background:#f3f5f8}
+  .btn.danger{background:#fff;color:#c92a2a;border:1px solid #f1c0c0}
+  .btn.sm{padding:6px 12px;font-size:14px}
+  .field{display:block;margin:10px 0}
+  .field span{display:block;font-size:13px;color:var(--sub);margin-bottom:4px}
+  .field input,.field textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff}
+  .field input:focus,.field textarea:focus,.composer textarea:focus{outline:2px solid #bfe0fb;border-color:var(--main)}
+  .box{border:1px solid var(--line);border-radius:var(--r);padding:16px;margin:14px 0;background:#fff}
+  .box h3{margin:0 0 6px;font-size:17px}
+  .muted{color:var(--sub);font-size:14px}
+  .center{text-align:center}
+  .hero{padding:56px 24px;text-align:center}
+  .hero .big{font-size:64px}
+  .hero h1{margin:8px 0 4px;font-size:28px}
+  .gbtn{display:inline-flex;align-items:center;gap:10px;background:#fff;border:1px solid #dadce0;border-radius:999px;padding:11px 20px;font-weight:700;margin-top:22px}
+  .gbtn:hover{background:#f8f9fa}
+  .classitem{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);cursor:pointer}
+  .classitem:hover{background:#f7f9fb}
+  .classitem .em{font-size:26px}
+  .classitem b{display:block}
+  .badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px;background:#e7f3fe;color:var(--main-d);vertical-align:middle}
+  .badge.gray{background:#eef0f3;color:var(--sub)}
+  .badge.warn{background:#fff0e6;color:var(--warn)}
+  .composer{display:flex;gap:12px;padding:14px 16px;border-bottom:8px solid var(--bg)}
+  .composer textarea{flex:1;border:none;resize:none;min-height:64px;font-size:17px;padding:6px 2px;background:transparent}
+  .composer .row{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:6px}
+  .count{font-size:13px;color:var(--sub)} .count.over{color:#c92a2a;font-weight:700}
+  .av{width:44px;height:44px;flex:none;border-radius:50%;background:#eef3f8;display:flex;align-items:center;justify-content:center;font-size:24px}
+  .post{display:flex;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line)}
+  .post.hid{background:#fffaf5}
+  .post .main{flex:1;min-width:0}
+  .post .who{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+  .post .who .nm{font-weight:800;cursor:pointer}
+  .post .who .nm:hover{text-decoration:underline}
+  .post .who .t{color:var(--sub);font-size:14px}
+  .post .body{white-space:pre-wrap;word-break:break-word;margin:2px 0 8px;font-size:16px}
+  .acts{display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin-left:-8px}
+  .act{border:none;background:none;color:var(--sub);padding:5px 8px;border-radius:999px;font-size:14px;display:inline-flex;gap:5px;align-items:center}
+  .act:hover{background:#eef3f8;color:var(--main)}
+  .act.like.on{color:var(--like)} .act.like:hover{background:#feecf4;color:var(--like)}
+  .act.right{margin-left:auto}
+  .cmts{margin-top:8px;border-left:3px solid var(--line);padding-left:10px}
+  .cmt{font-size:15px;margin:6px 0;word-break:break-word}
+  .cmt b{margin-right:4px}
+  .cmt .t{color:var(--sub);font-size:12px;margin-left:4px}
+  .cmt .x{border:none;background:none;color:var(--sub);font-size:12px;padding:0 4px}
+  .cform{display:flex;gap:6px;margin-top:6px}
+  .cform input{flex:1;border:1px solid var(--line);border-radius:999px;padding:7px 12px;font-size:15px}
+  .edit textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:8px;min-height:80px;resize:vertical}
+  .filterbar{display:flex;align-items:center;gap:8px;padding:10px 16px;background:#e7f3fe;font-size:14px}
+  .filterbar button{margin-left:auto}
+  .empty{padding:48px 20px;text-align:center;color:var(--sub)}
+  .codebig{font-size:40px;font-weight:900;letter-spacing:.18em;font-family:ui-monospace,Menlo,monospace;margin:6px 0}
+  .switch{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+  .switch:first-of-type{border-top:none}
+  .switch input{width:22px;height:22px}
+  .mem{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+  .mem .info{flex:1;min-width:0}
+  .mem .info small{display:block;color:var(--sub);font-size:12px;overflow:hidden;text-overflow:ellipsis}
+  .emojis{display:flex;flex-wrap:wrap;gap:6px}
+  .emojis button{font-size:24px;border:2px solid transparent;background:#f4f6f9;border-radius:12px;width:44px;height:44px}
+  .emojis button.on{border-color:var(--main);background:#e7f3fe}
+  .profilehead{display:flex;gap:14px;align-items:center;padding:18px 16px;border-bottom:1px solid var(--line)}
+  .profilehead .av{width:64px;height:64px;font-size:36px}
+  .stat{color:var(--sub);font-size:14px}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#1c2430;color:#fff;padding:10px 18px;border-radius:999px;
+    font-size:14px;z-index:100;max-width:90vw;box-shadow:0 6px 20px rgba(0,0,0,.2);opacity:0;transition:opacity .2s;pointer-events:none}
+  .toast.show{opacity:1}
+  .live{display:inline-block;width:8px;height:8px;border-radius:50%;background:#adb5bd;margin-left:6px;vertical-align:middle}
+  .live.on{background:var(--ok)}
+  .spinner{padding:40px;text-align:center;color:var(--sub)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="logo">🐦</span>
+    <div class="title" id="hTitle">콩새</div>
+    <button class="iconbtn" id="hHome" title="내 반 목록" hidden>🏠</button>
+    <button class="iconbtn" id="hOut" title="로그아웃" hidden>↪</button>
+  </header>
+  <div id="app"><div class="spinner">불러오는 중…</div></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+let createClient;
+try {
+  ({ createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/+esm'));
+} catch {
+  document.querySelector('#app').textContent = '연결에 필요한 파일을 불러오지 못했어요. 인터넷을 확인하고 새로고침해 주세요.';
+  throw new Error('Supabase client failed to load');
+}
+
+// ===== 설정 =====
+const SUPABASE_URL = 'https://emynsoshduocpermxlfg.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVteW5zb3NoZHVvY3Blcm14bGZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI3NDU5NjMsImV4cCI6MjEwODMyMTk2M30.lheHARS3NsydUWEpWinjrnkS_3pT18ReIDr6cfCUVX8';
+const MAX_POST = 280, MAX_CMT = 140;
+const EMOJIS = ['🐣','🐥','🐦','🦉','🐧','🦊','🐱','🐶','🐼','🐨','🐯','🐸','🐙','🦄','🐳','🌱','🌻','⭐','🔥','⚡','🧪','🔬','🚀','🎧'];
+
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: { flowType: 'pkce', detectSessionInUrl: true, persistSession: true }
+});
+
+// ===== 상태 =====
+const S = {
+  user: null, isTeacherAccount: false,
+  cid: null, tab: 'feed', filterAuthor: null,
+  cls: null, me: null, members: new Map(), posts: [], likes: [], comments: [], emails: new Map(),
+  openCmts: new Set(), cmtDraft: {}, editing: null, editDraft: '', composer: '',
+  channel: null, live: false, reloadTimer: null, loadVersion: 0, snapshot: '',
+};
+
+const $ = (s, el = document) => el.querySelector(s);
+const app = $('#app');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+
+function toast(msg) {
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 2600);
+}
+function errMsg(e) {
+  const m = e?.message || String(e);
+  if (/row-level security|permission denied/i.test(m)) return '권한이 없어요. (반 구성원이 아니거나 내 글이 아니에요)';
+  if (/check constraint/i.test(m)) return '글자 수를 확인해 주세요.';
+  if (/JWT|session/i.test(m)) return '로그인이 만료됐어요. 다시 로그인해 주세요.';
+  if (/Failed to fetch|NetworkError/i.test(m)) return '인터넷 연결을 확인해 주세요.';
+  return m;
+}
+function ago(ts) {
+  const d = (Date.now() - new Date(ts).getTime()) / 1000;
+  if (d < 60) return '방금';
+  if (d < 3600) return Math.floor(d / 60) + '분';
+  if (d < 86400) return Math.floor(d / 3600) + '시간';
+  const dt = new Date(ts);
+  return (dt.getMonth() + 1) + '월 ' + dt.getDate() + '일';
+}
+function charLen(s) { return [...(s || '')].length; }
+
+// ===== 라우팅 (#c=<반id>&t=feed|me|admin) =====
+function readHash() {
+  const p = new URLSearchParams(location.hash.slice(1));
+  return { cid: p.get('c'), tab: p.get('t') || 'feed' };
+}
+function go(cid, tab = 'feed') {
+  const h = cid ? `#c=${cid}&t=${tab}` : '#';
+  if (location.hash !== h) location.hash = h; else route();
+}
+window.addEventListener('hashchange', route);
+
+$('#hHome').onclick = () => go(null);
+$('#hOut').onclick = async () => {
+  const { error } = await sb.auth.signOut({ scope: 'local' });
+  if (error) return toast(errMsg(error));
+  go(null);
+};
+
+// ===== 시작 =====
+// 참여 링크(?join=CODE)는 로그인 전에 기억해 둔다
+const appUrl = location.origin + location.pathname.replace(/\/index\.html$/, '/');
+const qs = new URLSearchParams(location.search);
+const linkCode = qs.get('join')?.trim().toUpperCase();
+if (/^[A-Z0-9]{6}$/.test(linkCode || '')) sessionStorage.setItem('ks_join', linkCode);
+const authReturned = qs.has('code') || qs.has('error') ||
+  new URLSearchParams(location.hash.slice(1)).has('error');
+
+async function boot() {
+  const { data: { session }, error } = await sb.auth.getSession();
+  S.user = session?.user || null;
+  if (authReturned || (S.user && location.search)) {
+    history.replaceState(null, '', location.pathname + (readHash().cid ? location.hash : ''));
+  }
+  if (!S.user) {
+    renderLogin();
+    if (authReturned || error) toast('구글 로그인을 마치지 못했어요. 처음 시작한 브라우저에서 다시 로그인해 주세요.');
+    return;
+  }
+  $('#hOut').hidden = false;
+  const { data } = await sb.rpc('ks_am_teacher');
+  S.isTeacherAccount = !!data;
+  route();
+}
+sb.auth.onAuthStateChange((ev, session) => {
+  if (ev === 'SIGNED_OUT' && S.user) {
+    S.user = null;
+    leaveClass();
+    renderLogin();
+  }
+  if (ev === 'TOKEN_REFRESHED' && session) S.user = session.user;
+});
+
+async function route() {
+  if (!S.user) return renderLogin();
+  const { cid, tab } = readHash();
+  if (!cid) { leaveClass(); return renderHome(); }
+  if (cid !== S.cid) { leaveClass(); S.cid = cid; S.filterAuthor = null; await enterClass(); if (S.cid !== cid) return; }
+  S.tab = ['feed', 'me', 'admin'].includes(tab) ? tab : 'feed';
+  if (S.tab === 'admin' && S.me?.role !== 'teacher') S.tab = 'feed';
+  renderClass();
+}
+
+// ===== 로그인 화면 =====
+function renderLogin() {
+  $('#hTitle').textContent = '콩새'; $('#hHome').hidden = true; $('#hOut').hidden = true;
+  const joinCode = sessionStorage.getItem('ks_join');
+  app.innerHTML = `
+    <div class="hero">
+      <div class="big">🐦</div>
+      <h1>콩새</h1>
+      <p class="muted">우리 수업 사람들만 보는 작은 타임라인</p>
+      ${joinCode ? `<p><span class="badge">참여 코드 ${esc(joinCode)}</span> 로그인하면 참여 코드가 자동으로 채워져요.</p>` : ''}
+      <button class="gbtn" id="gLogin">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
+        구글 계정으로 시작하기
+      </button>
+      <p class="muted" style="margin-top:28px">선생님이 알려 준 참여 코드가 있어야 반에 들어갈 수 있어요.</p>
+      <p class="muted">카카오톡에서 열었다면 참여 링크를 크롬이나 사파리에 열고 로그인해 주세요.</p>
+    </div>`;
+  $('#gLogin').onclick = async () => {
+    const { error } = await sb.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: appUrl, queryParams: { prompt: 'select_account' } }
+    });
+    if (error) toast(errMsg(error));
+  };
+}
+
+// ===== 내 반 목록 =====
+async function renderHome() {
+  $('#hTitle').innerHTML = '콩새<small>' + esc(S.user.email) + '</small>';
+  $('#hHome').hidden = true;
+  app.innerHTML = '<div class="spinner">내 반을 불러오는 중…</div>';
+  const { data, error } = await sb.from('ks_members')
+    .select('class_id, role, display_name, emoji, ks_classes(name, locked)')
+    .eq('user_id', S.user.id).order('joined_at', { ascending: false });
+  if (error) { app.innerHTML = `<div class="empty">${esc(errMsg(error))}</div>`; return; }
+
+  const gName = S.user.user_metadata?.full_name || S.user.user_metadata?.name || '';
+  const pending = sessionStorage.getItem('ks_join') || '';
+  app.innerHTML = `
+    ${data.length ? `<div>${data.map(r => `
+      <div class="classitem" data-cid="${r.class_id}">
+        <span class="em">${esc(r.emoji)}</span>
+        <div style="flex:1;min-width:0"><b>${esc(r.ks_classes?.name)}</b>
+          <span class="muted">${esc(r.display_name)} ${r.role === 'teacher' ? '<span class="badge">선생님</span>' : ''}
+          ${r.ks_classes?.locked ? '<span class="badge warn">잠김</span>' : ''}</span></div>
+        <span class="muted">›</span>
+      </div>`).join('')}</div>` : `<div class="empty">아직 들어간 반이 없어요.<br>아래에 참여 코드를 넣어 주세요.</div>`}
+    <div class="pad">
+      <div class="box">
+        <h3>반에 참여하기</h3>
+        <p class="muted" style="margin:0">선생님이 알려 준 6자리 코드를 넣어 주세요.</p>
+        <label class="field"><span>참여 코드</span><input id="jCode" maxlength="6" autocapitalize="characters" placeholder="예: K7P2QX" value="${esc(pending)}" style="text-transform:uppercase;letter-spacing:.15em;font-weight:700"></label>
+        <label class="field"><span>이름 (선생님이 알아볼 수 있게)</span><input id="jName" maxlength="20" value="${esc(gName)}"></label>
+        <button class="btn" id="jBtn">참여하기</button>
+      </div>
+      ${S.isTeacherAccount ? `
+      <div class="box">
+        <h3>🧑‍🏫 새 반 만들기</h3>
+        <label class="field"><span>반 이름</span><input id="cName" maxlength="40" placeholder="예: 3-2 통합과학"></label>
+        <label class="field"><span>내 표시 이름</span><input id="cTName" maxlength="20" value="선생님"></label>
+        <button class="btn" id="cBtn">반 만들기</button>
+      </div>` : ''}
+    </div>`;
+  app.querySelectorAll('.classitem').forEach(el => el.onclick = () => go(el.dataset.cid));
+  $('#jBtn').onclick = async () => {
+    const code = $('#jCode').value.trim().toUpperCase(), name = $('#jName').value.trim();
+    if (code.length !== 6) return toast('참여 코드는 6자리예요.');
+    if (!name) return toast('이름을 넣어 주세요.');
+    $('#jBtn').disabled = true;
+    const { data: cid, error } = await sb.rpc('ks_join', { p_code: code, p_name: name });
+    $('#jBtn').disabled = false;
+    if (error) return toast(errMsg(error));
+    sessionStorage.removeItem('ks_join');
+    go(cid);
+  };
+  if (S.isTeacherAccount) $('#cBtn').onclick = async () => {
+    const name = $('#cName').value.trim();
+    if (!name) return toast('반 이름을 넣어 주세요.');
+    $('#cBtn').disabled = true;
+    const { data: cid, error } = await sb.rpc('ks_create_class', { p_name: name, p_teacher_name: $('#cTName').value.trim() });
+    $('#cBtn').disabled = false;
+    if (error) return toast(errMsg(error));
+    go(cid, 'admin');
+  };
+}
+
+// ===== 반 입장 / 실시간 =====
+async function enterClass() {
+  app.innerHTML = '<div class="spinner">타임라인을 불러오는 중…</div>';
+  const cid = S.cid;
+  const ok = await loadClass();
+  if (!ok || S.cid !== cid) return;
+  const onChange = () => {
+    if (S.cid !== cid) return;
+    clearTimeout(S.reloadTimer);
+    S.reloadTimer = setTimeout(refreshFromServer, 300);
+  };
+  S.channel = sb.channel('ks-' + cid)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'ks_posts', filter: `class_id=eq.${cid}` }, onChange)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'ks_likes', filter: `class_id=eq.${cid}` }, onChange)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'ks_comments', filter: `class_id=eq.${cid}` }, onChange)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'ks_members', filter: `class_id=eq.${cid}` }, onChange)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'ks_classes', filter: `id=eq.${cid}` }, onChange)
+    .subscribe(status => {
+      if (S.cid !== cid) return;
+      S.live = status === 'SUBSCRIBED';
+      $('#liveDot')?.classList.toggle('on', S.live);
+      if (S.live) onChange();
+    });
+}
+function leaveClass() {
+  if (S.channel) { sb.removeChannel(S.channel); S.channel = null; }
+  clearTimeout(S.reloadTimer);
+  S.loadVersion++;
+  S.cid = null; S.cls = null; S.me = null; S.live = false; S.snapshot = '';
+  S.openCmts.clear(); S.cmtDraft = {}; S.editing = null; S.composer = ''; S.emails.clear();
+}
+// 삭제·숨김·구성원 내보내기 이벤트를 받지 못한 탭도 주기적으로 맞춘다.
+async function refreshFromServer() {
+  if (!S.cid || !S.cls || document.visibilityState !== 'visible') return;
+  const previous = S.snapshot;
+  if (!await loadClass() || (previous === S.snapshot && S.tab !== 'admin')) return;
+  if (S.tab === 'me' && $('#pBox')?.open) { renderHeader(); return; }
+  if (S.tab === 'admin' && document.activeElement?.id === 'aName') { renderHeader(); return; }
+  renderClassBody();
+}
+document.addEventListener('visibilitychange', refreshFromServer);
+setInterval(refreshFromServer, 15000);
+
+async function loadClass() {
+  const cid = S.cid, version = ++S.loadVersion;
+  const [cls, mem, posts, likes, cmts] = await Promise.all([
+    sb.from('ks_classes').select('id,name,owner_id,locked,join_open').eq('id', cid).maybeSingle(),
+    sb.from('ks_members').select('*').eq('class_id', cid),
+    sb.from('ks_posts').select('*').eq('class_id', cid).order('created_at', { ascending: false }).limit(300),
+    sb.from('ks_likes').select('post_id,user_id').eq('class_id', cid),
+    sb.from('ks_comments').select('*').eq('class_id', cid).order('created_at', { ascending: true }),
+  ]);
+  if (S.cid !== cid || S.loadVersion !== version) return false;
+  const err = cls.error || mem.error || posts.error || likes.error || cmts.error;
+  if (err) {
+    if (!S.cls) {
+      app.innerHTML = `<div class="empty">${esc(errMsg(err))}<br><button class="btn ghost" id="retryClass">다시 불러오기</button></div>`;
+      $('#retryClass').onclick = () => { leaveClass(); route(); };
+    } else toast(errMsg(err));
+    return false;
+  }
+  if (!cls.data) { toast('이 반에 들어갈 수 없어요. (내보내졌거나 반이 지워졌어요)'); go(null); return false; }
+  S.cls = cls.data;
+  S.members = new Map(mem.data.map(m => [m.user_id, m]));
+  S.me = S.members.get(S.user.id) || null;
+  if (!S.me) { toast('이 반의 구성원이 아니에요.'); go(null); return false; }
+  S.posts = posts.data; S.likes = likes.data; S.comments = cmts.data;
+  S.snapshot = JSON.stringify([cls.data, mem.data, posts.data, likes.data, cmts.data]);
+  return true;
+}
+
+// ===== 반 화면 =====
+function renderClass() {
+  if (!S.cls) return;
+  $('#hHome').hidden = false;
+  const isT = S.me.role === 'teacher';
+  app.innerHTML = `
+    <nav class="tabs">
+      <button data-t="feed" class="${S.tab === 'feed' ? 'on' : ''}">타임라인</button>
+      <button data-t="me" class="${S.tab === 'me' ? 'on' : ''}">내 프로필</button>
+      ${isT ? `<button data-t="admin" class="${S.tab === 'admin' ? 'on' : ''}">반 관리</button>` : ''}
+    </nav>
+    <div id="body"></div>`;
+  app.querySelectorAll('.tabs button').forEach(b => b.onclick = () => go(S.cid, b.dataset.t));
+  renderClassBody();
+}
+function renderHeader() {
+  $('#hTitle').innerHTML = `${esc(S.cls.name)}<span class="live ${S.live ? 'on' : ''}" id="liveDot" title="실시간 연결"></span>
+    <small>${S.members.size}명 ${S.cls.locked ? '· <span style="color:var(--warn)">글쓰기 잠김</span>' : ''}</small>`;
+}
+function renderClassBody() {
+  if (!S.cls || !$('#body')) return;
+  renderHeader();
+  if (S.tab === 'feed') renderFeed();
+  else if (S.tab === 'me') renderMe();
+  else renderAdmin();
+}
+
+// ----- 글 하나 -----
+function who(uid) {
+  const m = S.members.get(uid);
+  return m ? { name: m.display_name, emoji: m.emoji, teacher: m.role === 'teacher' } : { name: '(나간 사람)', emoji: '👤', teacher: false };
+}
+function postHTML(p) {
+  const a = who(p.author_id), mine = p.author_id === S.user.id, isT = S.me.role === 'teacher';
+  const likes = S.likes.filter(l => l.post_id === p.id), liked = likes.some(l => l.user_id === S.user.id);
+  const cmts = S.comments.filter(c => c.post_id === p.id), open = S.openCmts.has(p.id);
+  const canWrite = !S.cls.locked || isT;
+  const editing = canWrite && S.editing === p.id;
+  return `
+  <article class="post ${p.hidden ? 'hid' : ''}" data-id="${p.id}">
+    <div class="av">${esc(a.emoji)}</div>
+    <div class="main">
+      <div class="who">
+        <span class="nm" data-author="${p.author_id}">${esc(a.name)}</span>
+        ${a.teacher ? '<span class="badge">선생님</span>' : ''}
+        <span class="t">· ${ago(p.created_at)}${p.edited_at ? ' · 수정됨' : ''}</span>
+        ${p.hidden ? '<span class="badge warn">숨김 (선생님과 작성자만 보여요)</span>' : ''}
+      </div>
+      ${editing ? `
+        <div class="edit">
+          <textarea data-edit>${esc(S.editDraft)}</textarea>
+          <div class="acts" style="margin:4px 0 0;justify-content:flex-end">
+            <span class="count" data-editcount>${charLen(S.editDraft)}/${MAX_POST}</span>
+            <button class="btn ghost sm" data-do="editCancel">취소</button>
+            <button class="btn sm" data-do="editSave">저장</button>
+          </div>
+        </div>` : `<div class="body">${esc(p.body)}</div>`}
+      <div class="acts">
+        <button class="act like ${liked ? 'on' : ''}" data-do="like">${liked ? '♥' : '♡'} <span>${likes.length || ''}</span></button>
+        <button class="act" data-do="cmts">💬 <span>${cmts.length || ''}</span></button>
+        <span class="act right" style="padding:0"></span>
+        ${canWrite && mine && !editing ? '<button class="act" data-do="edit">수정</button>' : ''}
+        ${isT ? `<button class="act" data-do="hide">${p.hidden ? '보이기' : '숨기기'}</button>` : ''}
+        ${mine || isT ? '<button class="act" data-do="del">삭제</button>' : ''}
+      </div>
+      ${open ? `
+      <div class="cmts">
+        ${cmts.map(c => {
+          const ca = who(c.author_id);
+          return `<div class="cmt"><b>${esc(ca.emoji)} ${esc(ca.name)}</b>${esc(c.body)}<span class="t">${ago(c.created_at)}</span>
+            ${c.author_id === S.user.id || isT ? `<button class="x" data-do="cdel" data-cid="${c.id}">삭제</button>` : ''}</div>`;
+        }).join('') || '<div class="muted" style="font-size:14px">첫 댓글을 남겨 보세요.</div>'}
+        ${canWrite ? `<form class="cform" data-cform>
+          <input data-cinput placeholder="댓글 (${MAX_CMT}자까지)" value="${esc(S.cmtDraft[p.id] || '')}">
+          <button class="btn sm">달기</button>
+        </form>` : ''}
+      </div>` : ''}
+    </div>
+  </article>`;
+}
+function bindPosts(root) {
+  root.querySelectorAll('.post').forEach(el => {
+    const id = el.dataset.id;
+    el.querySelector('.nm').onclick = e => { S.filterAuthor = e.target.dataset.author; go(S.cid, 'feed'); renderClassBody(); window.scrollTo(0, 0); };
+    el.querySelectorAll('[data-do]').forEach(b => b.onclick = e => { e.preventDefault(); postAction(id, b.dataset.do, b); });
+    const ed = el.querySelector('[data-edit]');
+    if (ed) {
+      ed.oninput = () => { S.editDraft = ed.value; const c = el.querySelector('[data-editcount]'); const n = charLen(ed.value); c.textContent = `${n}/${MAX_POST}`; c.classList.toggle('over', n > MAX_POST); };
+    }
+    const ci = el.querySelector('[data-cinput]');
+    if (ci) ci.oninput = () => { S.cmtDraft[id] = ci.value; };
+    const cf = el.querySelector('[data-cform]');
+    if (cf) cf.onsubmit = async e => {
+      e.preventDefault();
+      const body = ci.value.trim();
+      if (!body) return;
+      if (charLen(body) > MAX_CMT) return toast(`댓글은 ${MAX_CMT}자까지 쓸 수 있어요.`);
+      const cid = S.cid;
+      cf.querySelector('button').disabled = true;
+      const { error } = await sb.from('ks_comments').insert({ post_id: id, body });
+      cf.querySelector('button').disabled = false;
+      if (S.cid !== cid) return;
+      if (error) return toast(errMsg(error));
+      if (S.cmtDraft[id]?.trim() === body) S.cmtDraft[id] = '';
+      await refresh();
+    };
+  });
+}
+async function refresh() { if (await loadClass()) renderClassBody(); }
+
+async function postAction(id, act, btn) {
+  const p = S.posts.find(x => x.id === id); if (!p) return;
+  let r;
+  switch (act) {
+    case 'like': {
+      const liked = S.likes.some(l => l.post_id === id && l.user_id === S.user.id);
+      // 화면을 먼저 바꾸고(빠르게 보이도록) 저장
+      if (liked) S.likes = S.likes.filter(l => !(l.post_id === id && l.user_id === S.user.id));
+      else S.likes.push({ post_id: id, user_id: S.user.id });
+      renderClassBody();
+      r = liked ? await sb.from('ks_likes').delete().eq('post_id', id).eq('user_id', S.user.id)
+                : await sb.from('ks_likes').insert({ post_id: id });
+      if (r.error && !/duplicate/i.test(r.error.message)) toast(errMsg(r.error));
+      return refresh();
+    }
+    case 'cmts':
+      S.openCmts.has(id) ? S.openCmts.delete(id) : S.openCmts.add(id);
+      return renderClassBody();
+    case 'edit': {
+      S.editing = id; S.editDraft = p.body; renderClassBody();
+      const editor = $('[data-edit]');
+      if (editor) { editor.focus(); editor.setSelectionRange(editor.value.length, editor.value.length); }
+      return;
+    }
+    case 'editCancel': S.editing = null; return renderClassBody();
+    case 'editSave': {
+      const body = S.editDraft.trim();
+      if (!body) return toast('내용을 넣어 주세요.');
+      if (charLen(body) > MAX_POST) return toast(`${MAX_POST}자까지 쓸 수 있어요.`);
+      btn.disabled = true;
+      r = await sb.from('ks_posts').update({ body }).eq('id', id).select();
+      if (r.error) { btn.disabled = false; return toast(errMsg(r.error)); }
+      if (!r.data?.length) { btn.disabled = false; return toast('고치지 못했어요. 권한을 확인해 주세요.'); }
+      S.editing = null; return refresh();
+    }
+    case 'hide':
+      r = await sb.from('ks_posts').update({ hidden: !p.hidden }).eq('id', id);
+      if (r.error) return toast(errMsg(r.error));
+      toast(p.hidden ? '다시 보이게 했어요.' : '숨겼어요. 작성자와 선생님만 볼 수 있어요.');
+      return refresh();
+    case 'del':
+      if (!confirm('이 글을 지울까요? 댓글과 좋아요도 함께 지워져요.')) return;
+      r = await sb.from('ks_posts').delete().eq('id', id).select();
+      if (r.error) return toast(errMsg(r.error));
+      if (!r.data?.length) return toast('지우지 못했어요. 권한을 확인해 주세요.');
+      return refresh();
+    case 'cdel':
+      if (!confirm('댓글을 지울까요?')) return;
+      r = await sb.from('ks_comments').delete().eq('id', btn.dataset.cid);
+      if (r.error) return toast(errMsg(r.error));
+      return refresh();
+  }
+}
+
+// ----- 타임라인 -----
+function renderFeed() {
+  const body = $('#body');
+  const canWrite = !S.cls.locked || S.me.role === 'teacher';
+  // 다시 그려도 쓰던 글이 남도록 composer는 한 번만 만든다
+  if (!$('#composer', body)) {
+    body.innerHTML = `
+      <div id="composer"></div>
+      <div id="filter"></div>
+      <div id="list"></div>`;
+  }
+  const comp = $('#composer');
+  const compKey = canWrite ? 'w' : 'l';
+  if (comp.dataset.k !== compKey) {
+    comp.dataset.k = compKey;
+    comp.innerHTML = canWrite ? `
+      <div class="composer">
+        <div class="av">${esc(S.me.emoji)}</div>
+        <div style="flex:1">
+          <textarea id="cText" placeholder="무슨 생각을 하고 있나요?">${esc(S.composer)}</textarea>
+          <div class="row"><span class="count" id="cCount">0/${MAX_POST}</span><button class="btn" id="cPost">올리기</button></div>
+        </div>
+      </div>` : `<div class="composer" style="justify-content:center;color:var(--warn)">🔒 선생님이 지금은 글쓰기를 잠가 두었어요. 읽기만 할 수 있어요.</div>`;
+    if (canWrite) {
+      const ta = $('#cText'), cnt = $('#cCount'), btn = $('#cPost');
+      const upd = () => { S.composer = ta.value; const n = charLen(ta.value.trim()); cnt.textContent = `${n}/${MAX_POST}`; cnt.classList.toggle('over', n > MAX_POST); btn.disabled = n === 0 || n > MAX_POST; };
+      ta.oninput = () => { upd(); ta.style.height = 'auto'; ta.style.height = Math.max(64, ta.scrollHeight) + 'px'; };
+      upd();
+      btn.onclick = async () => {
+        const text = ta.value.trim();
+        if (!text || charLen(text) > MAX_POST) return;
+        const cid = S.cid;
+        btn.disabled = true;
+        const { error } = await sb.from('ks_posts').insert({ class_id: cid, body: text });
+        if (S.cid !== cid) return;
+        if (error) { upd(); return toast(errMsg(error)); }
+        if (S.composer.trim() === text) {
+          const current = $('#cText');
+          S.composer = '';
+          if (current) { current.value = ''; current.style.height = ''; }
+        }
+        if (ta.isConnected) upd();
+        await refresh();
+      };
+    }
+  } else {
+    const av = comp.querySelector('.av'); if (av) av.textContent = S.me.emoji;
+  }
+
+  const f = $('#filter');
+  if (S.filterAuthor) {
+    const a = who(S.filterAuthor);
+    f.innerHTML = `<div class="filterbar">${esc(a.emoji)} <b>${esc(a.name)}</b>의 글만 보는 중 <button class="btn ghost sm" id="fClear">전체 보기</button></div>`;
+    $('#fClear').onclick = () => { S.filterAuthor = null; renderClassBody(); };
+  } else f.innerHTML = '';
+
+  const list = $('#list');
+  // 수정·댓글 입력 중에는 포커스를 지키기 위해 입력값을 상태에 저장해 두고 다시 그린다
+  const posts = S.filterAuthor ? S.posts.filter(p => p.author_id === S.filterAuthor) : S.posts;
+  renderPostList(list, posts, `<div class="empty">아직 글이 없어요.${canWrite ? '<br>첫 글을 올려 보세요! ✍️' : ''}</div>`);
+}
+
+function renderPostList(list, posts, empty) {
+  const active = document.activeElement;
+  const field = active?.matches('[data-cinput]') ? 'data-cinput' : 'data-edit';
+  const post = active?.matches('[data-cinput], [data-edit]') && active.closest('.post')?.dataset.id;
+  const selection = post ? [active.selectionStart, active.selectionEnd] : null;
+  list.innerHTML = posts.length ? posts.map(postHTML).join('') : empty;
+  bindPosts(list);
+  const replacement = post && list.querySelector(`.post[data-id="${post}"] [${field}]`);
+  if (replacement) {
+    replacement.focus({ preventScroll: true });
+    replacement.setSelectionRange(...selection);
+  }
+}
+
+// ----- 내 프로필 (책 7장: 내가 쓴 글만 보기 + 프로필 수정) -----
+function renderMe() {
+  const body = $('#body');
+  const mine = S.posts.filter(p => p.author_id === S.user.id);
+  const likeGot = S.likes.filter(l => mine.some(p => p.id === l.post_id)).length;
+  let emoji = S.me.emoji;
+  body.innerHTML = `
+    <div class="profilehead">
+      <div class="av" id="pAv">${esc(S.me.emoji)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:800;font-size:20px">${esc(S.me.display_name)} ${S.me.role === 'teacher' ? '<span class="badge">선생님</span>' : ''}</div>
+        <div class="muted">${esc(S.me.bio || '한 줄 소개가 아직 없어요.')}</div>
+        <div class="stat">글 ${mine.length} · 받은 좋아요 ${likeGot}</div>
+      </div>
+    </div>
+    <div class="pad">
+      <details class="box" id="pBox">
+        <summary style="font-weight:700;cursor:pointer">프로필 바꾸기</summary>
+        <div class="field"><span>캐릭터</span><div class="emojis" id="pEmo">${EMOJIS.map(e => `<button type="button" class="${e === emoji ? 'on' : ''}">${e}</button>`).join('')}</div></div>
+        <label class="field"><span>이름 (이 반에서만 쓰여요)</span><input id="pName" maxlength="20" value="${esc(S.me.display_name)}"></label>
+        <label class="field"><span>한 줄 소개</span><input id="pBio" maxlength="80" value="${esc(S.me.bio)}" placeholder="예: 화학을 좋아하는 학생"></label>
+        <button class="btn" id="pSave">저장</button>
+        ${S.me.role !== 'teacher' ? '<button class="btn danger" id="pLeave" style="margin-left:6px">이 반에서 나가기</button>' : ''}
+      </details>
+    </div>
+    <div style="border-top:8px solid var(--bg)"><div class="pad" style="padding-bottom:4px;font-weight:800">내가 쓴 글</div><div id="list"></div></div>`;
+  $('#pEmo').querySelectorAll('button').forEach(b => b.onclick = () => {
+    emoji = b.textContent; $('#pEmo').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); $('#pAv').textContent = emoji;
+  });
+  $('#pSave').onclick = async () => {
+    const name = $('#pName').value.trim(); if (!name) return toast('이름을 넣어 주세요.');
+    const { error } = await sb.from('ks_members').update({ display_name: name, bio: $('#pBio').value.trim(), emoji })
+      .eq('class_id', S.cid).eq('user_id', S.user.id);
+    if (error) return toast(errMsg(error));
+    toast('프로필을 바꿨어요.');
+    $('#composer') && ($('#composer').dataset.k = '');
+    await refresh();
+  };
+  const lv = $('#pLeave');
+  if (lv) lv.onclick = async () => {
+    if (!confirm('이 반에서 나갈까요? 다시 들어오려면 참여 코드가 필요해요. (쓴 글은 남아요)')) return;
+    const { error } = await sb.from('ks_members').delete().eq('class_id', S.cid).eq('user_id', S.user.id);
+    if (error) return toast(errMsg(error));
+    go(null);
+  };
+  const list = $('#list');
+  list.innerHTML = mine.length ? mine.map(postHTML).join('') : '<div class="empty">아직 쓴 글이 없어요.</div>';
+  bindPosts(list);
+}
+
+// ----- 반 관리 (선생님) -----
+async function renderAdmin() {
+  const body = $('#body');
+  const cid = S.cid;
+  const isOwner = S.cls.owner_id === S.user.id;
+  const [code, emails] = await Promise.all([
+    sb.rpc('ks_join_code', { p_class: cid }),
+    [...S.members.keys()].some(id => !S.emails.has(id))
+      ? sb.rpc('ks_member_emails', { p_class: cid }) : null,
+  ]);
+  if (S.cid !== cid || S.tab !== 'admin' || body !== $('#body') ||
+      document.activeElement?.id === 'aName') return;
+  const link = appUrl + '?join=' + code.data;
+  (emails?.data || []).forEach(r => S.emails.set(r.user_id, r.email));
+  if (code.error || emails?.error) toast(errMsg(code.error || emails.error));
+  const mems = [...S.members.values()].sort((a, b) => (a.role === 'teacher' ? -1 : 0) - (b.role === 'teacher' ? -1 : 0) || a.display_name.localeCompare(b.display_name, 'ko'));
+  const postCount = uid => S.posts.filter(p => p.author_id === uid).length;
+  body.innerHTML = `
+    <div class="pad">
+      <div class="box center">
+        <div class="muted">참여 코드</div>
+        <div class="codebig">${esc(code.data || '코드를 불러오지 못했어요')}</div>
+        <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap">
+          <button class="btn sm" id="aCopy" ${code.data ? '' : 'disabled'}>참여 링크 복사</button>
+          <button class="btn ghost sm" id="aNew">코드 새로 만들기</button>
+        </div>
+        <p class="muted" style="margin:10px 0 0">링크로 들어온 학생은 구글 로그인 뒤 코드가 자동으로 채워져요.</p>
+      </div>
+      <div class="box">
+        <h3>반 설정</h3>
+        <div class="switch"><div><b>새 학생 참여 받기</b><div class="muted">끄면 코드가 있어도 들어올 수 없어요.</div></div><input type="checkbox" id="aOpen" ${S.cls.join_open ? 'checked' : ''}></div>
+        <div class="switch"><div><b>글쓰기 잠금</b><div class="muted">켜면 학생은 글·댓글을 쓰거나 글을 수정할 수 없어요. 좋아요는 가능해요.</div></div><input type="checkbox" id="aLock" ${S.cls.locked ? 'checked' : ''}></div>
+        <label class="field"><span>반 이름</span><input id="aName" maxlength="40" value="${esc(S.cls.name)}"></label>
+        <button class="btn ghost sm" id="aRename">이름 저장</button>
+      </div>
+      <div class="box">
+        <h3>구성원 ${mems.length}명</h3>
+        ${mems.map(m => `
+          <div class="mem">
+            <span style="font-size:24px">${esc(m.emoji)}</span>
+            <div class="info"><b>${esc(m.display_name)}</b> ${m.role === 'teacher' ? '<span class="badge">선생님</span>' : `<span class="badge gray">글 ${postCount(m.user_id)}</span>`}
+              <small>${esc(S.emails.get(m.user_id) || '')}</small></div>
+            ${m.role === 'student' ? `<button class="btn danger sm" data-kick="${m.user_id}">내보내기</button>` : ''}
+          </div>`).join('')}
+      </div>
+      ${isOwner ? `
+      <div class="box">
+        <h3>반 지우기</h3>
+        <p class="muted">글·댓글·좋아요·구성원이 모두 지워지고 되돌릴 수 없어요.</p>
+        <button class="btn danger sm" id="aDel">이 반 지우기</button>
+      </div>` : ''}
+    </div>`;
+  $('#aCopy').onclick = async () => {
+    try { await navigator.clipboard.writeText(link); toast('참여 링크를 복사했어요.'); }
+    catch { prompt('아래 링크를 복사해 주세요.', link); }
+  };
+  $('#aNew').onclick = async () => {
+    if (!confirm('코드를 새로 만들면 예전 코드와 링크로는 들어올 수 없어요. (이미 들어온 학생은 그대로)')) return;
+    const { error } = await sb.rpc('ks_new_code', { p_class: S.cid });
+    if (error) return toast(errMsg(error));
+    await refresh();
+  };
+  const upd = async (patch, msg) => {
+    const { error } = await sb.rpc('ks_update_class', { p_class: S.cid, p_name: patch.name ?? null, p_locked: patch.locked ?? null, p_join_open: patch.open ?? null });
+    if (error) { toast(errMsg(error)); return refresh(); }
+    toast(msg); await refresh();
+  };
+  $('#aOpen').onchange = e => upd({ open: e.target.checked }, e.target.checked ? '참여를 열었어요.' : '참여를 닫았어요.');
+  $('#aLock').onchange = e => upd({ locked: e.target.checked }, e.target.checked ? '글쓰기를 잠갔어요.' : '글쓰기를 다시 열었어요.');
+  $('#aRename').onclick = () => { const n = $('#aName').value.trim(); if (n) upd({ name: n }, '반 이름을 바꿨어요.'); };
+  body.querySelectorAll('[data-kick]').forEach(b => b.onclick = async () => {
+    const m = S.members.get(b.dataset.kick);
+    if (!confirm(`${m.display_name} 학생을 내보낼까요? 쓴 글은 남고 참여 코드는 새로 발급돼요. 기존 참여 링크도 만료돼요.`)) return;
+    const { error } = await sb.rpc('ks_remove_student', { p_class: cid, p_student: b.dataset.kick });
+    if (error) return toast(errMsg(error));
+    toast('학생을 내보내고 참여 코드를 바꿨어요.');
+    await refresh();
+  });
+  const del = $('#aDel');
+  if (del) del.onclick = async () => {
+    const typed = prompt(`정말 지우려면 반 이름 "${S.cls.name}"을(를) 그대로 입력해 주세요.`);
+    if (typed !== S.cls.name) return typed !== null && toast('반 이름이 달라서 지우지 않았어요.');
+    const { error } = await sb.rpc('ks_delete_class', { p_class: S.cid });
+    if (error) return toast(errMsg(error));
+    toast('반을 지웠어요.'); go(null);
+  };
+}
+
+// '방금/3분' 같은 시간 표시를 1분마다 갱신 (입력 중일 땐 건너뜀)
+setInterval(() => {
+  const a = document.activeElement;
+  if (S.cid && S.tab !== 'admin' && !(a && /TEXTAREA|INPUT/.test(a.tagName))) renderClassBody();
+}, 60000);
+
+boot().catch(e => { app.innerHTML = `<div class="empty">시작하지 못했어요.<br>${esc(errMsg(e))}</div>`; });
+</script>
+</body>
+</html>
