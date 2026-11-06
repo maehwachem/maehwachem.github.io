@@ -28,6 +28,22 @@
   .tabs{display:flex;border-bottom:1px solid var(--line);position:sticky;top:57px;background:#fff;z-index:9}
   .tabs button{flex:1;border:none;background:none;padding:12px 4px;font-weight:700;color:var(--sub);border-bottom:3px solid transparent}
   .tabs button.on{color:var(--text);border-bottom-color:var(--main)}
+  .sub-panel{padding:16px;border-bottom:1px solid var(--line)}
+  .sub-panel h2{font-size:17px;margin:0 0 6px}
+  .sub-form{border:0;margin:12px 0 0;padding:0;min-width:0;display:grid;gap:8px}
+  .sub-form textarea{width:100%;min-height:60px}
+  .sub-picker{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .sub-picker input{max-width:100%;min-height:36px}
+  .sub-preview{display:flex;flex-wrap:wrap;gap:8px}
+  .sub-preview div{display:grid;gap:4px}
+  .sub-preview img{width:76px;height:76px;object-fit:cover;border-radius:8px;background:#f6f1eb}
+  .sub-entry{padding:12px 0;border-top:1px solid var(--line)}
+  .sub-entry:first-child{margin-top:12px}
+  .sub-entry p{white-space:pre-wrap;overflow-wrap:anywhere;margin:6px 0}
+  .sub-entry summary{cursor:pointer;color:var(--sub);padding:8px 0}
+  .sub-gallery img{display:block;max-width:100%;max-height:75vh;object-fit:contain;margin:4px 0 12px;border-radius:8px;background:#f6f1eb}
+  .sub-row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+  .sub-status{margin:0;color:var(--sub);font-size:14px}
   .pad{padding:16px}
   .btn{white-space:nowrap;border:none;background:var(--main);color:#fff;font-weight:700;padding:10px 18px;border-radius:999px}
   .btn:hover{background:var(--main-d)}
@@ -204,7 +220,7 @@ function ago(ts) {
 }
 function charLen(s) { return [...(s || '')].length; }
 
-// ===== 라우팅 (#c=<반id>&t=feed|me|admin) =====
+// ===== 라우팅 (#c=<반id>&t=feed|submit|me|admin) =====
 function readHash() {
   const p = new URLSearchParams(location.hash.slice(1));
   return { cid: p.get('c'), tab: p.get('t') || 'feed' };
@@ -260,7 +276,7 @@ async function route() {
   const { cid, tab } = readHash();
   if (!cid) { leaveClass(); return renderHome(); }
   if (cid !== S.cid) { leaveClass(); S.cid = cid; S.filterAuthor = null; await enterClass(); if (S.cid !== cid) return; }
-  S.tab = ['feed', 'me', 'admin'].includes(tab) ? tab : 'feed';
+  S.tab = ['feed', 'submit', 'me', 'admin'].includes(tab) ? tab : 'feed';
   if (S.tab === 'admin' && S.me?.role !== 'teacher') S.tab = 'feed';
   renderClass();
 }
@@ -433,6 +449,7 @@ function leaveClass() {
   S.loadVersion++;
   S.cid = null; S.cls = null; S.me = null; S.live = false; S.snapshot = '';
   S.openCmts.clear(); S.cmtDraft = {}; S.editing = null; S.composer = ''; S.emails.clear();
+  submissionDraft = newSubmissionDraft();
 }
 // 삭제·숨김·구성원 내보내기 이벤트를 받지 못한 탭도 주기적으로 맞춘다.
 async function refreshFromServer() {
@@ -482,6 +499,7 @@ function renderClass() {
   app.innerHTML = `
     <nav class="tabs">
       <button data-t="feed" class="${S.tab === 'feed' ? 'on' : ''}">타임라인</button>
+      <button data-t="submit" class="${S.tab === 'submit' ? 'on' : ''}">제출함</button>
       <button data-t="me" class="${S.tab === 'me' ? 'on' : ''}">내 프로필</button>
       ${isT ? `<button data-t="admin" class="${S.tab === 'admin' ? 'on' : ''}">반 관리</button>` : ''}
     </nav>
@@ -497,6 +515,7 @@ function renderClassBody() {
   if (!S.cls || !$('#body')) return;
   renderHeader();
   if (S.tab === 'feed') renderFeed();
+  else if (S.tab === 'submit') renderSubmissions();
   else if (S.tab === 'me') renderMe();
   else renderAdmin();
 }
@@ -797,6 +816,252 @@ function renderMe() {
 }
 
 // ----- 반 관리 (선생님) -----
+// ===== 사진 제출함 =====
+const SUBMISSION_PAGE_SIZE = 20;
+const PHOTO_PREFIX = 'data:image/jpeg;base64,';
+let submissionDraft = newSubmissionDraft();
+
+function newSubmissionDraft() {
+  return { photos: [], note: '', requestId: null, busy: false, message: '' };
+}
+
+async function prepareSubmissionPhoto(file) {
+  if (file.size > 20 * 1024 * 1024) throw new Error('원본은 장당 20MB까지 선택할 수 있어요.');
+  if (!/^(image\/(jpeg|png|webp|heic|heif))$/i.test(file.type)
+      && !(!file.type && /\.(jpe?g|png|webp|heic|heif)$/i.test(file.name))) {
+    throw new Error('JPG, PNG, WebP 또는 기기에서 열 수 있는 HEIC 사진을 선택해 주세요.');
+  }
+
+  const url = URL.createObjectURL(file);
+  const image = new Image();
+  try {
+    image.src = url;
+    try { await image.decode(); }
+    catch { throw new Error('이 사진을 열 수 없어요. JPG나 PNG로 저장해 다시 선택해 주세요.'); }
+
+    const canvas = document.createElement('canvas');
+    for (const maxEdge of [1600, 1200, 900]) {
+      const scale = Math.min(1, maxEdge / Math.max(image.naturalWidth, image.naturalHeight));
+      canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+      canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+      const ctx = canvas.getContext('2d', { alpha: false });
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+      const data = canvas.toDataURL('image/jpeg', 0.82);
+      if (data.startsWith(PHOTO_PREFIX) && data.length - PHOTO_PREFIX.length <= 699048) {
+        return data.slice(PHOTO_PREFIX.length);
+      }
+    }
+    throw new Error('사진을 줄이지 못했어요. 더 작은 사진을 선택해 주세요.');
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+function renderSubmissions() {
+  const body = $('#body');
+  if ($('#submissionList', body)) {
+    $('#submissionForm', body)?.syncSubmission();
+    return;
+  }
+
+  const cid = S.cid;
+  const isTeacher = S.me.role === 'teacher';
+  const draft = submissionDraft;
+  body.innerHTML = (isTeacher ? '' : [
+    '<section class="sub-panel"><h2>사진 제출</h2>',
+    '<p class="sub-status">사진은 나와 담당 반 선생님만 볼 수 있어요.</p>',
+    '<form id="submissionForm"><fieldset class="sub-form">',
+    '<div class="sub-picker"><label for="submissionFiles">사진 선택 (최대 3장)</label>',
+    '<input id="submissionFiles" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif" multiple></div>',
+    '<div class="sub-preview"></div><label for="submissionNote">메모 (선택)</label>',
+    '<textarea id="submissionNote" maxlength="500" placeholder="어떤 활동 사진인지 적어 주세요."></textarea>',
+    '<div><button class="btn primary" type="submit">사진 제출하기</button></div></fieldset>',
+    '<p class="sub-status" role="status"></p></form></section>',
+  ].join('')) + [
+    '<section class="sub-panel"><div class="sub-row"><h2>', isTeacher ? '학생 제출물' : '내 제출물',
+    '</h2><button type="button" class="btn ghost" id="submissionRefresh">새로고침</button></div>',
+    '<div id="submissionList"></div></section>',
+  ].join('');
+
+  const list = $('#submissionList', body);
+  let requestVersion = 0;
+  const load = async (page = 0) => {
+    const version = ++requestVersion;
+    list.textContent = '제출물을 불러오는 중…';
+    const first = page * SUBMISSION_PAGE_SIZE;
+    const { data, error } = await sb.from('ks_submissions')
+      .select('id,author_id,author_name,note,photo_count,created_at').eq('class_id', cid)
+      .order('created_at', { ascending: false }).order('id', { ascending: false })
+      .range(first, first + SUBMISSION_PAGE_SIZE);
+    if (!list.isConnected || version !== requestVersion) return;
+    if (error) { list.textContent = errMsg(error); return; }
+    if (!data.length && page > 0) { await load(page - 1); return; }
+    list.innerHTML = data.slice(0, SUBMISSION_PAGE_SIZE).map(item => [
+      '<article class="sub-entry"><div class="sub-row"><b>',
+      esc(item.author_name), '</b><time class="sub-status">',
+      esc(new Date(item.created_at).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' })),
+      '</time></div>', item.note ? '<p>' + esc(item.note) + '</p>' : '',
+      '<details><summary>사진 ', item.photo_count, '장 보기</summary><div class="sub-gallery"></div></details>',
+      isTeacher ? '' : '<button type="button" class="btn ghost" data-withdraw>제출 취소</button>', '</article>',
+    ].join('')).join('') || '<p class="sub-status">아직 제출한 사진이 없어요.</p>';
+
+    list.querySelectorAll('.sub-entry').forEach((entry, index) => {
+      const item = data[index];
+      const details = $('details', entry);
+      const gallery = $('.sub-gallery', entry);
+      let fetching = false;
+      details.ontoggle = async () => {
+        if (!details.open || fetching || gallery.dataset.loaded) return;
+        fetching = true;
+        gallery.textContent = '사진을 불러오는 중…';
+        const { data: photos, error: photoError } = await sb.rpc('ks_submission_images', { p_submission: item.id });
+        fetching = false;
+        if (!gallery.isConnected) return;
+        if (photoError || !photos.length) {
+          gallery.textContent = photoError ? errMsg(photoError) + ' 닫았다 열어 다시 시도해 주세요.' : '사진을 볼 수 없어요.';
+          return;
+        }
+        gallery.replaceChildren();
+        for (const photo of photos) {
+          const img = new Image();
+          img.alt = '제출 사진 ' + photo.photo_number;
+          img.onerror = () => img.replaceWith(document.createTextNode('열 수 없는 사진이에요.'));
+          img.src = PHOTO_PREFIX + photo.jpeg;
+          gallery.append(img);
+        }
+        gallery.dataset.loaded = 'true';
+      };
+      const withdraw = $('[data-withdraw]', entry);
+      if (withdraw) withdraw.onclick = async () => {
+        if (!confirm('제출을 취소할까요? 사진과 메모가 삭제돼요.')) return;
+        withdraw.disabled = true;
+        const { error: withdrawError } = await sb.rpc('ks_withdraw_submission', { p_submission: item.id });
+        if (!list.isConnected) return;
+        if (withdrawError) {
+          withdraw.disabled = false;
+          toast(errMsg(withdrawError));
+          return;
+        }
+        toast('제출을 취소했어요.');
+        await load(page);
+      };
+    });
+
+    if (page > 0 || data.length > SUBMISSION_PAGE_SIZE) {
+      const nav = document.createElement('div');
+      nav.className = 'sub-row';
+      for (const [label, target, show] of [['이전', page - 1, page > 0], ['다음', page + 1, data.length > SUBMISSION_PAGE_SIZE]]) {
+        if (!show) continue;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn ghost';
+        btn.textContent = label;
+        btn.onclick = () => load(target);
+        nav.append(btn);
+      }
+      list.append(nav);
+    }
+  };
+
+  $('#submissionRefresh', body).onclick = () => load();
+  load();
+  if (isTeacher) return;
+
+  const form = $('#submissionForm', body);
+  const files = $('#submissionFiles', form);
+  const note = $('#submissionNote', form);
+  const status = $('[role="status"]', form);
+  note.value = draft.note;
+  form.syncSubmission = () => {
+    $('fieldset', form).disabled = S.cls.locked || draft.busy;
+    $('button[type="submit"]', form).disabled = !draft.photos.length;
+    status.textContent = S.cls.locked ? '선생님이 사진 제출을 잠가 두었어요.' : draft.message;
+  };
+
+  const renderPreview = () => {
+    const preview = $('.sub-preview', form);
+    preview.replaceChildren();
+    draft.photos.forEach((photo, index) => {
+      const tile = document.createElement('div');
+      const img = new Image();
+      img.src = PHOTO_PREFIX + photo;
+      img.alt = '첨부 사진 ' + (index + 1);
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn ghost';
+      btn.textContent = '빼기';
+      btn.setAttribute('aria-label', img.alt + ' 빼기');
+      btn.onclick = () => {
+        draft.photos.splice(index, 1);
+        draft.requestId = null;
+        draft.message = '';
+        renderPreview();
+      };
+      tile.append(img, btn);
+      preview.append(tile);
+    });
+    form.syncSubmission();
+  };
+  renderPreview();
+
+  note.oninput = () => { draft.note = note.value; draft.requestId = null; };
+  files.onchange = async () => {
+    const selected = Array.from(files.files);
+    files.value = '';
+    if (!selected.length || draft.busy) return;
+    if (draft.photos.length + selected.length > 3) {
+      draft.message = '한 번에 최대 3장까지 제출할 수 있어요.';
+      form.syncSubmission();
+      return;
+    }
+
+    draft.busy = true;
+    draft.message = '사진을 준비하는 중…';
+    form.syncSubmission();
+    const errors = new Set();
+    for (const file of selected) {
+      try {
+        draft.photos.push(await prepareSubmissionPhoto(file));
+        draft.requestId = null;
+      } catch (error) {
+        errors.add(error.message);
+      }
+    }
+    draft.busy = false;
+    draft.message = [...errors].join(' ');
+    const activeForm = $('#submissionForm');
+    if (submissionDraft === draft && activeForm) activeForm.renderPreview();
+  };
+  form.renderPreview = renderPreview;
+
+  form.onsubmit = async event => {
+    event.preventDefault();
+    if (draft.busy || !draft.photos.length || S.cls.locked) return;
+    draft.requestId ??= crypto.randomUUID();
+    draft.busy = true;
+    draft.message = '사진을 제출하는 중…';
+    form.syncSubmission();
+    const { error } = await sb.rpc('ks_submit_photos', {
+      p_class: cid, p_id: draft.requestId, p_note: draft.note, p_photos: draft.photos,
+    });
+    draft.busy = false;
+    draft.message = error ? errMsg(error) : '사진을 제출했어요.';
+    if (!error) {
+      draft.note = '';
+      draft.photos = [];
+      draft.requestId = null;
+    }
+    const activeForm = $('#submissionForm');
+    if (submissionDraft !== draft || !activeForm) return;
+    $('#submissionNote', activeForm).value = draft.note;
+    activeForm.renderPreview();
+    if (!error) $('#submissionRefresh').click();
+  };
+}
+
+
 async function renderAdmin() {
   const body = $('#body');
   const cid = S.cid;
@@ -827,7 +1092,7 @@ async function renderAdmin() {
       <div class="box">
         <h3>반 설정</h3>
         <div class="switch"><div><b>새 학생 참여 받기</b><div class="muted">끄면 코드가 있어도 들어올 수 없어요.</div></div><input type="checkbox" id="aOpen" ${S.cls.join_open ? 'checked' : ''}></div>
-        <div class="switch"><div><b>글쓰기 잠금</b><div class="muted">켜면 학생은 글·댓글을 쓰거나 글을 수정할 수 없어요. 좋아요는 가능해요.</div></div><input type="checkbox" id="aLock" ${S.cls.locked ? 'checked' : ''}></div>
+        <div class="switch"><div><b>글쓰기 잠금</b><div class="muted">켜면 학생의 글·댓글 작성, 글 수정, 새 사진 제출을 잠가요. 좋아요는 가능해요.</div></div><input type="checkbox" id="aLock" ${S.cls.locked ? 'checked' : ''}></div>
         <label class="field"><span>반 이름</span><input id="aName" maxlength="40" value="${esc(S.cls.name)}"></label>
         <button class="btn ghost sm" id="aRename">이름 저장</button>
       </div>
@@ -882,7 +1147,7 @@ async function renderAdmin() {
   });
   const del = $('#aDel');
   if (del) del.onclick = async () => {
-    const typed = prompt(`정말 지우려면 반 이름 "${S.cls.name}"을(를) 그대로 입력해 주세요.`);
+    const typed = prompt(`반과 사진 제출물이 함께 삭제돼요. 계속하려면 반 이름 "${S.cls.name}"을(를) 그대로 입력해 주세요.`);
     if (typed !== S.cls.name) return typed !== null && toast('반 이름이 달라서 지우지 않았어요.');
     const { error } = await sb.rpc('ks_delete_class', { p_class: S.cid });
     if (error) return toast(errMsg(error));
@@ -894,7 +1159,7 @@ async function renderAdmin() {
 setInterval(() => {
   const a = document.activeElement;
   if (S.tab === 'me' && $('#pBox')?.open) return;
-  if (S.cid && S.tab !== 'admin' && !(a && /TEXTAREA|INPUT/.test(a.tagName))) renderClassBody();
+  if (S.cid && ['feed', 'me'].includes(S.tab) && !(a && /TEXTAREA|INPUT/.test(a.tagName))) renderClassBody();
 }, 60000);
 
 boot().catch(e => { app.innerHTML = `<div class="empty">시작하지 못했어요.<br>${esc(errMsg(e))}</div>`; });
