@@ -154,6 +154,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
   #practiceCard{position:fixed;z-index:10;top:10px;left:50%;transform:translateX(-50%);width:min(370px,calc(100vw - 116px));box-sizing:border-box;padding:9px 12px;border-radius:14px;background:rgba(20,32,55,.78);color:#fff;text-align:center;pointer-events:none}
   #practiceTitle{color:#ffe1a3;font-size:17px}
   #practiceText{margin:4px 0 0;font-size:13px;line-height:1.4;word-break:keep-all}
+  #practiceCue{margin:5px 0 0;color:#ffe1a3;font-size:13px;line-height:1.4;word-break:keep-all}
   #prompt{position:fixed;left:50%;bottom:22%;transform:translateX(-50%);z-index:10;background:rgba(20,32,55,.6);color:#fff;padding:8px 16px;border-radius:14px;font-size:17px;pointer-events:none;white-space:nowrap}
   #gbar{display:block;height:5px;background:rgba(255,255,255,.25);border-radius:3px;margin-top:5px;overflow:hidden}
   #gbar i{display:block;height:100%;width:0;background:#9fd0ff}
@@ -173,6 +174,8 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
   #bThrow{width:94px;height:94px;right:22px;bottom:26px;font-size:20px;background:rgba(214,72,72,.6)}
   #bCrouch{width:66px;height:66px;right:34px;bottom:140px;font-size:15px}
   #bGather{width:66px;height:66px;right:132px;bottom:30px;font-size:15px}
+  #bGather.ready{background:rgba(37,106,151,.85)}
+  #bGather.on{background:rgba(25,136,156,.95)}
   #bFocus{width:66px;height:66px;right:126px;bottom:118px;font-size:14px}
   #bFocus.on{background:rgba(145,86,18,.9);border-color:#ffe1a3}
   .off{position:fixed;top:46%;z-index:10;color:#fff;font-size:18px;background:rgba(214,72,72,.75);padding:8px 12px;border-radius:14px;pointer-events:none;transform:translateY(-50%)}
@@ -203,6 +206,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <div id="practiceCard" class="hidden" role="status">
   <div id="practiceTitle"></div>
   <p id="practiceText"></p>
+  <p id="practiceCue" class="hidden"></p>
 </div>
 <button id="pauseBtn" class="hidden">Ⅱ</button>
 <div id="prompt" class="hidden"><span id="ptext"></span><span id="gbar"><i></i></span></div>
@@ -289,6 +293,7 @@ const $ = id => document.getElementById(id);
 // ================= 상수 =================
 const G = 9.8, VTHROW = 15, R_CHAR = 0.4, STAND_H = 1.62, CROUCH_H = 1.0, BALL_R = 0.12;
 const WALL_H = 1.15, WIN = 3, MAX_AMMO = 3, GATHER_T = 0.75, PILE_RANGE = 1.9, HAND_Y = 1.55;
+const PRACTICE_SHOT_STEP = 1 / 120;
 const isTouch = matchMedia('(pointer: coarse)').matches || ('ontouchstart' in window && navigator.maxTouchPoints > 0);
 
 const DIFFS = {
@@ -395,7 +400,7 @@ for (const s of [-1, 1]) {
 box(-6, 6, 22, 24, BH, 'bld');
 box(-6, 6, -24, -22, BH, 'bld');
 const WL = (x1, x2, z) => box(x1, x2, z - 0.25, z + 0.25, WALL_H, 'wall');
-const practiceWall = WL(-5, -1.5, 12); WL(1.5, 5, 11.5);
+WL(-5, -1.5, 12); WL(1.5, 5, 11.5);
 WL(-3, 1.5, 6);
 WL(-5.5, -2.5, 0); WL(2.5, 5.5, 0);
 WL(-1.5, 3, -6);
@@ -507,7 +512,7 @@ function handPos(c, yaw = c.yaw) {
 }
 
 // ================= 눈사람 연습장 =================
-const practiceWallZ = (practiceWall.minZ + practiceWall.maxZ) / 2;
+const practiceWalls = obstacles.filter(o => o.type === 'wall');
 const snowmanBody = [[0.44, 0.44], [1.02, 0.35], [1.52, 0.27]];
 const coal = new THREE.MeshStandardMaterial({ color: 0x242e37 });
 const carrot = new THREE.MeshStandardMaterial({ color: 0xf88932 });
@@ -552,12 +557,17 @@ function showGuardTargets(visible) {
 }
 
 function crossedPracticeWall(p, v, dt) {
-  if (v.z >= 0 || p.z > practiceWallZ) return false;
-  const sinceCrossing = (p.z - practiceWallZ) / v.z;
-  if (sinceCrossing >= dt) return false;
-  const x = p.x - v.x * sinceCrossing;
-  const y = p.y - v.y * sinceCrossing;
-  return x > practiceWall.minX && x < practiceWall.maxX && y > practiceWall.h + BALL_R;
+  if (v.z === 0) return false;
+  const startZ = p.z - v.z * dt;
+  const minZ = Math.min(startZ, p.z), maxZ = Math.max(startZ, p.z);
+  return practiceWalls.some(wall => {
+    const z = (wall.minZ + wall.maxZ) / 2;
+    if (z < minZ || z > maxZ) return false;
+    const elapsed = (p.z - z) / v.z;
+    const x = p.x - v.x * elapsed;
+    const y = p.y - v.y * elapsed;
+    return x >= wall.minX && x <= wall.maxX && y >= wall.h + BALL_R;
+  });
 }
 
 // ================= 충돌 =================
@@ -604,7 +614,7 @@ function hitTarget(c, p) {
   return Math.hypot(p.x - c.pos.x, p.z - c.pos.z) < R_CHAR + BALL_R - 0.04 && p.y > 0 && p.y < heightOf(c) + BALL_R;
 }
 function simulate(p0, v0, chars, maxT, pts) {
-  const p = p0.clone(), v = v0.clone(), dt = 1 / 60;
+  const p = p0.clone(), v = v0.clone(), dt = practiceStep === null ? 1 / 60 : PRACTICE_SHOT_STEP;
   const requiresArc = practiceStep === 1 && chars[0] === snowman;
   let overWall = false;
   if (pts) pts.push(p.x, p.y, p.z);
@@ -951,7 +961,7 @@ canvas.addEventListener('mousedown', e => {
 });
 
 // 터치
-const touch = { moveId: null, ox: 0, oy: 0, mx: 0, my: 0, aimId: null, ax: 0, ay: 0, turnDrag: 0, gather: false };
+const touch = { moveId: null, ox: 0, oy: 0, mx: 0, my: 0, aimId: null, ax: 0, ay: 0, turnDrag: 0, gather: false, gatherOnce: false };
 const joyBase = $('joyBase'), joyKnob = $('joyKnob');
 const tLayer = $('touch');
 function resetMoveTouch() {
@@ -966,8 +976,8 @@ function resetTouchInput() {
   resetMoveTouch();
   touch.aimId = null;
   touch.turnDrag = 0;
-  touch.gather = false;
-  $('bGather').classList.remove('on');
+  touch.gather = touch.gatherOnce = false;
+  $('bGather').classList.remove('on', 'ready');
 }
 tLayer.addEventListener('touchstart', e => {
   e.preventDefault();
@@ -1010,18 +1020,26 @@ const tEnd = e => {
   }
 };
 tLayer.addEventListener('touchend', tEnd); tLayer.addEventListener('touchcancel', tEnd);
-function tbtn(id, down, up) {
+function tbtn(id, down, up, cancel = up) {
   const el = $(id);
   el.addEventListener('touchstart', e => { e.preventDefault(); e.stopPropagation(); down(); }, { passive: false });
   el.addEventListener('touchend', e => { e.preventDefault(); e.stopPropagation(); up && up(); }, { passive: false });
-  el.addEventListener('touchcancel', e => { up && up(); });
+  el.addEventListener('touchcancel', () => { cancel && cancel(); });
   el.addEventListener('mousedown', e => { e.preventDefault(); down(); });
   el.addEventListener('mouseup', e => { up && up(); });
 }
 tbtn('bThrow', () => { if (state === 'play') playerThrow(); });
 tbtn('bCrouch', () => { if (state === 'play') { crouchToggle = !crouchToggle; $('bCrouch').classList.toggle('on', crouchToggle); } });
 tbtn('bFocus', () => { if (state === 'play' || state === 'countdown') setFollowingOpponent(!followingOpponent); });
-tbtn('bGather', () => { touch.gather = true; $('bGather').classList.add('on'); }, () => { touch.gather = false; $('bGather').classList.remove('on'); });
+const canPlayerGather = () => !P.winding && P.stun <= 0 && nearPile(P) && P.ammo < MAX_AMMO;
+tbtn('bGather', () => {
+  if (state !== 'play') return;
+  touch.gather = true;
+  if (canPlayerGather()) touch.gatherOnce = true;
+  else if (practiceStep === 0 || practiceStep === 1) showHint('3단계에서 눈 뭉치기를 연습해요');
+  else if (P.ammo >= MAX_AMMO) showHint('눈덩이가 가득 찼어요');
+  else if (!nearPile(P)) showHint('파란 원 안으로 들어가 눈을 뭉쳐요');
+}, () => { touch.gather = false; }, () => { touch.gather = touch.gatherOnce = false; });
 
 function playerThrow() {
   if (state !== 'play') return;
@@ -1043,10 +1061,10 @@ function clearBalls() {
 const practiceLessons = [
   { title: '가까운 눈사람 맞히기', x: 0, z: 18.5, target: [0.3, 14.2], pitch: 0.03,
     text: '점선이 주황색이면 눈사람에 닿아요. 눈덩이를 던져보세요.' },
-  { title: '담 너머로 던지기', x: -3.3, z: 18.4, target: [-3, 9.3], pitch: 0,
-    text: '담 뒤의 눈사람이 목표예요. 조준을 조금씩 높여 담 위로 던져보세요.' },
+  { title: '담 너머로 던지기', x: -3.3, z: 18.4, target: [-3, 9.3], pitch: 0.09,
+    text: isTouch ? '오른쪽 화면을 위로 조금씩 밀어 담 너머 눈사람을 겨눠요.' : '마우스를 조금씩 위로 움직여 담 너머 눈사람을 겨눠요.' },
   { title: '눈덩이 다시 뭉치기', x: -3, z: 19.4, pitch: 0.03,
-    text: '앞쪽 파란 원 안으로 이동해 눈덩이 하나를 뭉쳐보세요.' },
+    text: isTouch ? '앞쪽 파란 원 안으로 이동한 뒤 눈 뭉치기 버튼을 한 번 눌러요.' : '앞쪽 파란 원 안으로 이동한 뒤 R 키를 누르고 있어요.' },
 ];
 
 function setPracticeStep(step) {
@@ -1068,6 +1086,7 @@ function setPracticeStep(step) {
   }
   $('practiceTitle').textContent = (step + 1) + '/3  ' + lesson.title;
   $('practiceText').textContent = lesson.text;
+  $('practiceCue').classList.toggle('hidden', step !== 1);
 }
 
 function resetRound() {
@@ -1250,7 +1269,11 @@ function updateFighter(c, dt) {
   if (c.winding) { c.windup -= dt; if (c.windup <= 0) release(c); }
   if (c.gathering && nearPile(c) && c.ammo < MAX_AMMO && c.stun <= 0) {
     c.gatherT += dt;
-    if (c.gatherT >= GATHER_T * (c.isPlayer ? 1 : 1.15)) { c.ammo++; c.gatherT = 0; if (c.isPlayer) sfx.pop(); updateHUD(); }
+    if (c.gatherT >= GATHER_T * (c.isPlayer ? 1 : 1.15)) {
+      c.ammo++; c.gatherT = 0;
+      if (c.isPlayer) { touch.gatherOnce = false; sfx.pop(); }
+      updateHUD();
+    }
   } else c.gatherT = 0;
   c.throwAnim = Math.max(0, c.throwAnim - dt);
   // 속도 측정
@@ -1286,8 +1309,9 @@ function updatePlayer(dt) {
     if (canTrackTarget(target)) turnTo(P, yawTo(P.pos, target.pos), dt, 12);
   }
   P.crouch = !!(kd('shift') || crouchToggle);
-  P.gathering = !!(kd('r') || kd('e') || touch.gather) && !P.winding &&
-    P.stun <= 0 && nearPile(P) && P.ammo < MAX_AMMO;
+  const canGather = canPlayerGather();
+  if (!canGather) touch.gatherOnce = false;
+  P.gathering = canGather && !!(kd('r') || kd('e') || touch.gather || touch.gatherOnce);
   if (P.stun > 0 || P.gathering) mx = my = 0;
   const speed = P.crouchAmt > 0.5 ? 2.0 : 4.6;
   const f = fwd(P.yaw), r = rightV(P.yaw);
@@ -1483,7 +1507,12 @@ function aiUpdate(dt) {
 // ================= 눈덩이 갱신 =================
 function updateBalls(dt) {
   for (let i = balls.length - 1; i >= 0; i--) {
-    const b = balls[i]; let dead = false; const n = 3, h = dt / n;
+    const b = balls[i]; let dead = false;
+    const previousAge = b.age;
+    b.age += dt;
+    // The practice preview and the thrown ball sample the same trajectory.
+    const h = practiceStep === null ? dt / 3 : PRACTICE_SHOT_STEP;
+    const n = practiceStep === null ? 3 : Math.floor(b.age / h) - Math.floor(previousAge / h);
     for (let s = 0; s < n && !dead; s++) {
       b.vel.y -= G * h; b.pos.addScaledVector(b.vel, h);
       if (practiceStep === null) {
@@ -1508,7 +1537,7 @@ function updateBalls(dt) {
       const o = hitObstacle(b.pos); if (o) { splatAt(b, o); dead = true; break; }
       if (b.pos.y < BALL_R) { b.pos.y = BALL_R; splatAt(b, null); dead = true; }
     }
-    b.age += dt; if (b.age > 6) dead = true;
+    if (b.age > 6) dead = true;
     if (dead) { scene.remove(b.mesh); balls.splice(i, 1); } else b.mesh.position.copy(b.pos);
   }
 }
@@ -1551,6 +1580,14 @@ function updateAim() {
   }
   aimLine.count = cnt; aimLine.instanceMatrix.needsUpdate = true;
   const validHit = r.type === 'char' && (practiceStep !== 1 || r.overWall);
+  if (practiceStep === 1) {
+    let cue = '점선이 주황색이 될 때까지 조준해요.';
+    if (validHit) cue = '주황색 점선이 보이면 던져요!';
+    else if (r.type === 'char') cue = '담 위를 지나야 해요. 담 반대편에서 던져 보세요.';
+    else if (r.obs?.type === 'wall') cue = '담에 막혀요. 조준을 조금 더 높여 보세요.';
+    const practiceCue = $('practiceCue');
+    if (practiceCue.textContent !== cue) practiceCue.textContent = cue;
+  }
   const col = validHit ? (guardMode && r.char === C ? 0xffcf70 : 0xff6a2a) : 0x2f6fd1;
   aimRing.material.color.setHex(col); aimDot.material.color.setHex(col); aimLine.material.color.setHex(col);
   if (r.type === 'ground' || r.type === 'char') {
@@ -1562,10 +1599,15 @@ function updatePrompt(dt) {
   const el = $('prompt');
   if (state !== 'play') { el.classList.add('hidden'); return; }
   let text = '', prog = -1;
-  const canGather = nearPile(P) && P.ammo < MAX_AMMO;
-  if (isTouch) $('bGather').classList.toggle('dim', !canGather);
+  const canGather = canPlayerGather();
+  if (isTouch) {
+    const button = $('bGather');
+    button.classList.toggle('dim', !canGather);
+    button.classList.toggle('ready', canGather);
+    button.classList.toggle('on', canGather && P.gathering);
+  }
   if (canGather) {
-    text = isTouch ? '눈 뭉치기 버튼을 누르고 있어요' : 'R 키를 누르고 있으면 눈 뭉치기';
+    text = isTouch ? '눈 뭉치기를 한 번 눌러요' : 'R 키를 누르고 있으면 눈 뭉치기';
     if (P.gathering) { text = '눈 뭉치는 중…'; prog = P.gatherT / GATHER_T; }
   } else if (P.ammo === 0) text = '눈덩이가 없어요 — 파란 원이 있는 눈더미로!';
   if (!text) { el.classList.add('hidden'); return; }
