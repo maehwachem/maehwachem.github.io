@@ -821,6 +821,16 @@ const SUBMISSION_PAGE_SIZE = 20;
 const PHOTO_PREFIX = 'data:image/jpeg;base64,';
 let submissionDraft = newSubmissionDraft();
 
+async function driveSubmission(body) {
+  const result = await sb.functions.invoke('ks-drive', { body });
+  if (!result.error) return result;
+  try {
+    const details = await result.error.context?.json();
+    if (details?.message) return { error: { message: details.message } };
+  } catch { /* Use the normal connection message below. */ }
+  return { error: { message: '사진 저장소에 연결하지 못했어요. 잠시 뒤 다시 시도해 주세요.' } };
+}
+
 function newSubmissionDraft() {
   return { photos: [], note: '', requestId: null, busy: false, message: '' };
 }
@@ -916,7 +926,7 @@ function renderSubmissions() {
         if (!details.open || fetching || gallery.dataset.loaded) return;
         fetching = true;
         gallery.textContent = '사진을 불러오는 중…';
-        const { data: photos, error: photoError } = await sb.rpc('ks_submission_images', { p_submission: item.id });
+        const { data: photos, error: photoError } = await driveSubmission({ action: 'get', id: item.id });
         fetching = false;
         if (!gallery.isConnected) return;
         if (photoError || !photos.length) {
@@ -1043,8 +1053,8 @@ function renderSubmissions() {
     draft.busy = true;
     draft.message = '사진을 제출하는 중…';
     form.syncSubmission();
-    const { error } = await sb.rpc('ks_submit_photos', {
-      p_class: cid, p_id: draft.requestId, p_note: draft.note, p_photos: draft.photos,
+    const { error } = await driveSubmission({
+      action: 'submit', classId: cid, id: draft.requestId, note: draft.note, photos: draft.photos,
     });
     draft.busy = false;
     draft.message = error ? errMsg(error) : '사진을 제출했어요.';
