@@ -128,6 +128,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
   .btn{font:inherit;font-size:21px;border:0;border-radius:14px;padding:12px 30px;background:#3b6fb6;color:#fff;cursor:pointer;margin:6px;box-shadow:0 3px 0 #27508a}
   .btn:active{transform:translateY(2px);box-shadow:0 1px 0 #27508a}
   .btn.ghost{background:#e5ecf6;color:#2a4d7a;box-shadow:0 3px 0 #c3cfdf}
+  .btn:disabled{opacity:.55;cursor:default;transform:none}
   .diff{display:flex;gap:6px;justify-content:center;margin:12px 0 6px}
   .diff button{white-space:nowrap;font:inherit;font-size:17px;border:2px solid #3b6fb6;background:#fff;color:#3b6fb6;border-radius:12px;padding:6px 14px;cursor:pointer}
   .diff button.on{background:#3b6fb6;color:#fff}
@@ -215,6 +216,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     <div class="col">
       <h1>골목 눈싸움</h1>
       <p class="sub">눈 쌓인 골목, 1 대 1. 먼저 세 번 맞히면 이겨요.</p>
+      <p id="graphicsError" class="hidden" role="alert">이 브라우저에서 3D 그래픽을 시작하지 못했어요. WebGL을 사용할 수 있는 브라우저에서 다시 열어 주세요.</p>
       <div class="diff" id="diff">
         <button data-d="easy">쉬움</button><button data-d="normal" class="on">보통</button><button data-d="hard">어려움</button>
       </div>
@@ -307,7 +309,14 @@ const angDiff = (a, b) => { let d = b - a; while (d > Math.PI) d -= 2 * Math.PI;
 const dist2 = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
 
 // ================= 렌더러 =================
-const renderer = new THREE.WebGLRenderer({ antialias: !isTouch });
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ antialias: !isTouch });
+} catch (error) {
+  $('graphicsError').classList.remove('hidden');
+  for (const id of ['startBtn', 'guardBtn', 'practiceBtn']) $(id).disabled = true;
+  throw error;
+}
 renderer.setPixelRatio(Math.min(devicePixelRatio, isTouch ? 1.5 : 2));
 renderer.setSize(innerWidth, innerHeight);
 renderer.shadowMap.enabled = true;
