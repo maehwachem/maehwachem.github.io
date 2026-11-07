@@ -72,10 +72,8 @@
 
 #kje-portfolio .kje-category-count{display:inline-block;margin-left:7px;font-size:11px;opacity:.8;font-variant-numeric:tabular-nums}
 @media(max-width:650px){
- #kje-portfolio .kje-category-picker{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
- #kje-portfolio .kje-category{grid-column:span 2;min-height:48px;padding:10px 5px;display:flex;justify-content:center;align-items:center;text-align:center}
- #kje-portfolio .kje-category:nth-child(4),#kje-portfolio .kje-category:nth-child(5){grid-column:span 3}
- #kje-portfolio .kje-category:last-child{grid-column:span 3}
+ #kje-portfolio .kje-category-picker{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+ #kje-portfolio .kje-category{min-height:48px;padding:10px 5px;display:flex;justify-content:center;align-items:center;text-align:center}
  #kje-portfolio .kje-category-hint{display:none}
  #kje-portfolio .kje-category-name{font-size:12px;line-height:1.6;white-space:normal;word-break:keep-all}
  #kje-portfolio .kje-category-count{font-size:10px;margin-left:5px}

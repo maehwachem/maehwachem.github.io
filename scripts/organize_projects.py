@@ -5,7 +5,7 @@ import json
 import sys
 from pathlib import Path
 
-KINDS = ('lab', 'real', 'game', 'tool', 'lesson')
+KINDS = ('lab', 'real', 'game', 'play', 'tool', 'lesson')
 
 
 def organize(data):

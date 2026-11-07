@@ -144,9 +144,8 @@
     #kje-portfolio .kje-background{margin-top:3px}
     #kje-portfolio .kje-profile{padding:46px 0 42px}
     #kje-portfolio .kje-project-section{border-top:1px solid var(--kje-line)}
-    #kje-portfolio .kje-category-picker{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:27px 0 29px}
+    #kje-portfolio .kje-category-picker{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin:27px 0 29px}
     @media(max-width:900px) and (min-width:651px){#kje-portfolio .kje-category-picker{grid-template-columns:repeat(3,minmax(0,1fr))}}
-    @media(max-width:650px){#kje-portfolio .kje-category:last-child{grid-column:1/-1}}
     #kje-portfolio .kje-category{padding:16px 14px;border:1px solid var(--kje-line);background:var(--kje-white);min-width:0;transition:background .15s}
     #kje-portfolio .kje-category[aria-pressed="true"]{background:var(--kje-button);color:var(--kje-button-text);border-color:var(--kje-button)}
     #kje-portfolio .kje-category-name{font-size:14px;font-weight:500;display:block;line-height:1.6;word-break:keep-all}
@@ -230,7 +229,7 @@ html{color-scheme:only light;scroll-behavior:smooth}body{margin:0;background:lig
     #kje-portfolio .kje-project[data-subject="environment"]{--kje-category-bg:#e4edda;--kje-category-ink:#43572b}
     #kje-portfolio .kje-project[data-subject="tools"]{--kje-category-bg:#e7eaed;--kje-category-ink:#3f4e5a}
   </style>
-  <link rel="stylesheet" href="assets/content.css?v=20261031-no-previews">
+  <link rel="stylesheet" href="assets/content.css?v=20261107-games">
 </head>
 <body>
 <div id="kje-portfolio">
@@ -253,6 +252,7 @@ html{color-scheme:only light;scroll-behavior:smooth}body{margin:0;background:lig
         <button type="button" class="kje-category cursor-interaction" data-category="lab" aria-pressed="true" aria-controls="kje-project-list"><span class="kje-category-name">가상실험</span><span class="kje-category-hint">조건을 바꾸며 관찰하기</span></button>
         <button type="button" class="kje-category cursor-interaction" data-category="real" aria-pressed="false" aria-controls="kje-project-list"><span class="kje-category-name">실제 실험 수업</span><span class="kje-category-hint">실험하고 기록하기</span></button>
         <button type="button" class="kje-category cursor-interaction" data-category="game" aria-pressed="false" aria-controls="kje-project-list"><span class="kje-category-name">학습 게임</span><span class="kje-category-hint">미션을 풀며 탐험하기</span></button>
+        <button type="button" class="kje-category cursor-interaction" data-category="play" aria-pressed="false" aria-controls="kje-project-list"><span class="kje-category-name">게임</span><span class="kje-category-hint">혼자 또는 함께 즐기기</span></button>
         <button type="button" class="kje-category cursor-interaction" data-category="tool" aria-pressed="false" aria-controls="kje-project-list"><span class="kje-category-name">교육 도구</span><span class="kje-category-hint">기록하고 연습하기</span></button>
         <button type="button" class="kje-category cursor-interaction" data-category="lesson" aria-pressed="false" aria-controls="kje-project-list"><span class="kje-category-name">수업 자료</span><span class="kje-category-hint">개념과 탐구를 연결하기</span></button>
       </div>
@@ -296,6 +296,11 @@ html{color-scheme:only light;scroll-behavior:smooth}body{margin:0;background:lig
     </article><article class="kje-project" data-kind="game" data-subject="physics">
       <div class="kje-poster kje-poster-power kje-game-cover" aria-hidden="true"><img class="kje-project-cover" src="assets/uploads/electricity-room-gameplay.webp" alt="" loading="lazy"><span class="kje-poster-cap">실제 플레이 화면</span><span class="kje-poster-word">전기요금 챌린지</span></div>
       <p class="kje-project-tag">에너지 · 생활 속 과학</p><h3 class="kje-project-title">전기요금 챌린지</h3><p class="kje-project-desc">가전제품을 선택하고 배치하며 전기 사용과 비용을 생각하는 게임.</p><p class="kje-project-level"><span class="kje-project-level-label">대상</span>중학교 과학</p><div class="kje-project-links"><a class="kje-project-go" href="https://my-first-room-energy.kjeung.chatgpt.site/">게임 열기 <span aria-hidden="true">↗</span></a></div>
+    </article><article class="kje-project" data-kind="play" data-subject="tools">
+      <div class="kje-poster kje-game-cover" aria-hidden="true"><img class="kje-project-cover" src="/assets/covers/snowball-alley-gameplay.webp" alt="" loading="lazy" width="900" height="600"><span class="kje-poster-cap">실제 플레이 화면</span><span class="kje-poster-word">골목 눈싸움</span></div>
+      <p class="kje-project-tag">3D · 눈싸움</p><h3 class="kje-project-title">골목 눈싸움</h3><p class="kje-project-desc">눈 쌓인 3D 골목에서 담 너머로 눈덩이를 던지고 눈사람을 지킵니다. 혼자 대결과 연습을 할 수 있고, 팀전은 같은 와이파이에서 방장 PC로 방을 열어 플레이합니다.</p>
+      <p class="kje-post-meta"><time datetime="2026-11-07">게시일 2026.11.07</time></p>
+      <div class="kje-project-links"><a class="kje-project-go" href="/games/snowball-alley/">혼자 하기</a><a class="kje-project-go" href="/games/snowball-alley/snowball-alley-team.zip" download>팀전 ZIP 다운로드</a></div>
     </article><article class="kje-project" data-kind="tool" data-subject="tools"><div class="kje-poster kje-poster-note" aria-hidden="true"><div class="kje-notepaper"><b>▶</b><span></span><span></span><span></span></div><span class="kje-poster-word">콩 영상<br>작업실</span></div><p class="kje-project-tag">영상·소리 · 로컬 편집</p><h3 class="kje-project-title">콩 영상 작업실</h3><p class="kje-project-desc">파일을 서버로 보내지 않고 영상·자막·소리를 같은 시간축에서 편집합니다. 다중 레이어, 투명도, 페이드와 장면 전환, 소리만 WAV 저장을 지원합니다. 영상 저장은 실시간 녹화 시험판입니다.</p><p class="kje-project-level"><span class="kje-project-level-label">대상</span>교사·학생 누구나</p><p class="kje-post-meta"><time datetime="2026-10-30">게시일 2026.10.30</time></p><div class="kje-project-links"><a class="kje-project-go" href="/video-editor/">편집기 열기 ↗</a><a class="kje-project-go" href="/video-editor/kong-video-editor.html" download="콩_영상_작업실.html">HTML 저장 ↓</a></div></article><article class="kje-project" data-kind="tool" data-subject="tools"><div class="kje-poster kje-watercolor-cover" aria-hidden="true"><img class="kje-project-cover" src="/assets/uploads/cover-series-qr-generator-v3.webp" alt="" loading="lazy" width="960" height="640"></div><p class="kje-project-tag">자료 공유 · QR코드</p><h3 class="kje-project-title">QR코드 만들기</h3><p class="kje-project-desc">참고 자료·영상·설문 링크를 QR코드로 만들고 PNG·SVG로 저장합니다. 자료 제목과 함께 교실 화면에 크게 띄우거나 인쇄할 수 있습니다.</p><p class="kje-project-level"><span class="kje-project-level-label">대상</span>교사·학생 누구나</p><p class="kje-post-meta"><time datetime="2026-10-28">게시일 2026.10.28</time></p><div class="kje-project-links"><a class="kje-project-go" href="/qr/">QR코드 만들기 <span aria-hidden="true">↗</span></a></div></article><article class="kje-project" data-kind="tool" data-subject="tools">
       <div class="kje-poster kje-watercolor-cover" aria-hidden="true"><img class="kje-project-cover" src="assets/uploads/cover-watercolor-sensor-recorder-v2.webp" alt="" loading="lazy" width="1536" height="1024"></div>
       <p class="kje-project-tag">센서 · 웹 블루투스</p><h3 class="kje-project-title">마이크로비트 센서 기록기</h3><p class="kje-project-desc">전압과 온도 값을 받아 그래프로 살펴보고, 실험 조건별 기록을 CSV로 저장하는 도구.</p><div class="kje-project-links"><a class="kje-project-go" href="https://maehwachem.github.io/science-tools/sensor/">전압 기록기 <span aria-hidden="true">↗</span></a><a class="kje-project-go" href="https://maehwachem.github.io/science-tools/sensor/temp.html">온도 기록기 <span aria-hidden="true">↗</span></a><a class="kje-project-go" href="https://github.com/maehwachem/microbit-web-visualizer" target="_blank" rel="noopener noreferrer">이전 프로젝트 (GitHub) <span aria-hidden="true">↗</span></a></div>
@@ -370,7 +375,7 @@ html{color-scheme:only light;scroll-behavior:smooth}body{margin:0;background:lig
   </main>
   <footer class="kje-wrap kje-footer" id="contact"><strong>KJE의 작업실</strong><div class="kje-footer-links"><a class="kje-contact-email" href="mailto:kjechem@naver.com">kjechem@naver.com</a><a href="https://github.com/maehwachem" target="_blank" rel="noopener noreferrer">GitHub</a><a href="https://maehwachem.github.io/science-tools/battery/privacy.html">수업 도구 개인정보 처리방침</a><a href="admin/">관리</a><a href="#top">맨 위로 ↑</a></div><span>© KJE</span></footer>
 </div>
-<script src="assets/content.js?v=20261031-no-previews" defer></script>
+<script src="assets/content.js?v=20261107-games" defer></script>
 <script src="assets/office-site-tools.js?v=20261023" defer></script>
 </body>
 </html>

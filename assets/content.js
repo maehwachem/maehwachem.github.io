@@ -6,6 +6,7 @@
     lab: ['가상실험', '현상과 변화를 화면에서 살펴보는 실험 콘텐츠.'],
     real: ['실제 실험 수업', '실험실에서 직접 측정하고, 기록을 근거로 판단하는 조별 실험 수업.'],
     game: ['학습 게임', '탐험과 미션, 선택을 통해 과학을 만나는 게임.'],
+    play: ['게임', '브라우저에서 즐기는 게임과 친구와 함께하는 대결.'],
     tool: ['교육 도구', '측정과 기록, 학습 지도에 활용하는 도구.'],
     lesson: ['수업 자료', '과학 개념을 이해하고 탐구로 이어가는 자료.']
   };
@@ -109,8 +110,8 @@
   function projectCard(item,data,hobby=false) {
       const card=node('article','kje-project'+(hobby?' kje-hobby-card':''));if(!hobby)card.dataset.kind=item.kind;card.dataset.subject=own(categories,item.subject)&&item.subject!=='all'?item.subject:'tools';
       const posterName=own(art,item.poster)?item.poster:'note';const poster=node('div','kje-poster kje-poster-'+posterName);poster.setAttribute('aria-hidden','true');
-      const cover=safeURL(item.cover,true);
-      if(cover){if(/\/cover-(?:watercolor|series)-/.test(cover))poster.classList.add('kje-watercolor-cover');if(item.kind!=='lab'&&item.kind!=='game'&&/-illustrated(?:-v\d+)?\.webp$/.test(cover))poster.classList.add('kje-editorial-illustrated');if(item.kind==='lab'&&/lab-[a-z-]+-illustrated\.webp$/.test(cover))poster.classList.add('kje-lab-illustrated');const img=node('img','kje-project-cover');img.src=cover;img.alt='';img.loading='lazy';poster.append(img);if(item.kind==='game'){poster.classList.add('kje-game-cover');poster.append(node('span','kje-poster-cap',/gameplay\.webp$/.test(cover)?'실제 플레이 화면':categories[card.dataset.subject][0]+' · '+formats[item.kind][0]),node('span','kje-poster-word',item.title));}}
+      const cover=safeURL(item.cover,true), isGame=item.kind==='game'||item.kind==='play';
+      if(cover){if(/\/cover-(?:watercolor|series)-/.test(cover))poster.classList.add('kje-watercolor-cover');if(item.kind!=='lab'&&!isGame&&/-illustrated(?:-v\d+)?\.webp$/.test(cover))poster.classList.add('kje-editorial-illustrated');if(item.kind==='lab'&&/lab-[a-z-]+-illustrated\.webp$/.test(cover))poster.classList.add('kje-lab-illustrated');const img=node('img','kje-project-cover');img.src=cover;img.alt='';img.loading='lazy';poster.append(img);if(isGame){poster.classList.add('kje-game-cover');poster.append(node('span','kje-poster-cap',/gameplay\.webp$/.test(cover)?'실제 플레이 화면':categories[card.dataset.subject][0]+' · '+formats[item.kind][0]),node('span','kje-poster-word',item.title));}}
       else{poster.innerHTML=art[posterName];poster.prepend(node('span','kje-poster-cap',hobby?'취미 · 천문관측':categories[card.dataset.subject][0]+' · '+formats[item.kind][0]));poster.append(node('span','kje-poster-word',item.words||item.title));}
       card.append(poster);const copy=hobby?node('div','kje-hobby-copy'):card;
       copy.append(node('p','kje-project-tag',item.tag),node(hobby?'h4':'h3','kje-project-title',item.title),node('p','kje-project-desc',item.desc));
