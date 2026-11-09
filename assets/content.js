@@ -63,7 +63,7 @@
     if(Array.isArray(site.interests)){const list=root.querySelector('.kje-interests');list.replaceChildren(...site.interests.map(value=>{const link=value==='천문관측';const item=node(link?'a':'span','',value);if(link)item.href='#hobby-astronomy';return item;}));}
   }
   let selectedCategory='lab';
-  function selectCategory(key,writeHash=false) {
+  function selectCategory(key) {
     if(!own(formats,key))return;
     selectedCategory=key;
     root.querySelectorAll('[data-category]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.category===key)));
@@ -72,7 +72,6 @@
     root.querySelectorAll('[data-category]').forEach(button=>{let countLabel=button.querySelector('.kje-category-count');if(!countLabel){countLabel=node('span','kje-category-count');button.querySelector('.kje-category-name')?.append(countLabel);}if(countLabel)countLabel.textContent=' '+root.querySelectorAll('.kje-project[data-kind="'+button.dataset.category+'"]').length+'개';});
     const meta=formats[key];setText('#kje-category-description',meta[1]);setText('#kje-category-status',meta[0]+' · '+count+'개');
     const empty=root.querySelector('#kje-project-empty');if(empty){empty.hidden=count>0;empty.textContent=meta[0]+' 콘텐츠는 아직 등록되지 않았습니다.';}
-    if(writeHash)history.replaceState(null,'','#projects-'+key);
   }
   function projectItems(data) {
     if(data && data.groups && typeof data.groups==='object' && !Array.isArray(data.groups)) {
@@ -172,7 +171,7 @@
     meta.hidden=!meta.childNodes.length;return meta;
   }
   function postURL(id) {const url=new URL(location.href);url.searchParams.set('post',id);url.hash='journal';return url;}
-  function postLink(post){const link=node('a');link.href=postURL(post.id);link.addEventListener('click',event=>{if(event.button!==0||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;event.preventDefault();history.pushState(null,'',link.href);showPost(true);});return link;}
+  function postLink(post){const link=node('a');link.href=postURL(post.id);link.addEventListener('click',event=>{if(event.button!==0||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;event.preventDefault();history.pushState(null,'',link.href);applyRoute();});return link;}
   function renderPostList() {
     const list=root.querySelector('#kje-post-list');list.replaceChildren();
     const visible=posts.filter(post=>postCategory==='전체'||post.category===postCategory);
@@ -190,35 +189,76 @@
     if(!values.includes(postCategory))postCategory='전체';
     values.forEach(value=>{const button=node('button','kje-post-filter',value);button.type='button';button.setAttribute('aria-pressed',String(value===postCategory));button.addEventListener('click',()=>{postCategory=value;renderPostFilters();renderPostList();});wrap.append(button);});wrap.hidden=posts.length===0;
   }
-  function showPost(scroll=false) {
+  function showPost() {
     if(!postsReady)return;
     const id=new URL(location.href).searchParams.get('post');const reader=root.querySelector('#kje-post-reader');const listing=root.querySelector('#kje-post-listing');
     if(!id){reader.hidden=true;listing.hidden=false;return;}
     const post=posts.find(item=>item.id===id);reader.replaceChildren();
     const back=node('a','kje-reader-back','← 글 목록으로');const url=new URL(location.href);url.searchParams.delete('post');url.hash='journal';back.href=url;
-    back.addEventListener('click',event=>{if(event.button!==0||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;event.preventDefault();history.pushState(null,'',back.href);showPost();});reader.append(back);
+    back.addEventListener('click',event=>{if(event.button!==0||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;event.preventDefault();history.pushState(null,'',back.href);applyRoute();});reader.append(back);
     if(!post){reader.append(node('h2','','글을 찾을 수 없습니다.'),node('p','','글이 삭제되었거나 주소가 변경되었습니다.'));}
     else{
       reader.append(postMeta(post),node('h2','',post.title));
       const cover=safeURL(post.cover,true);if(cover){const img=node('img','kje-post-cover');img.src=cover;img.alt=text(post.cover_alt);reader.append(img);}
       const body=node('div','kje-rich-content');body.append(safeRichText(post.body));reader.append(body);
     }
-    listing.hidden=true;reader.hidden=false;if(scroll)reader.scrollIntoView({block:'start'});
+    listing.hidden=true;reader.hidden=false;
   }
-  function applyHash() {
-    const hash=location.hash.slice(1);
-    if(hash.startsWith('projects-')&&own(formats,hash.slice(9))){selectCategory(hash.slice(9));document.getElementById('projects').scrollIntoView({block:'start'});}
-    const old={works:'projects',career:'about'};if(own(old,hash))document.getElementById(old[hash]).scrollIntoView({block:'start'});
+  const views = new Map(Array.from(root.querySelectorAll('[data-portfolio-view]'), view => [view.id, view]));
+  const menuLinks = root.querySelectorAll('.kje-menu a[href^="/#"]');
+  const legacyViews = new Map([['works', 'projects'], ['career', 'about']]);
+  let appliedURL;
+
+  function applyRoute(move = true) {
+    const url = new URL(location.href);
+    if (appliedURL === url.href) return;
+    const isNavigation = appliedURL !== undefined;
+    appliedURL = url.href;
+
+    const hash = url.hash.slice(1);
+    const projectCategory = hash.startsWith('projects-') && own(formats, hash.slice(9)) ? hash.slice(9) : null;
+    const anchor = document.getElementById(hash);
+    const anchorView = anchor?.closest('[data-portfolio-view]');
+    const defaultView = !hash && url.searchParams.has('post') ? 'journal' : 'about';
+    const viewId = projectCategory ? 'projects' : anchorView?.id ?? legacyViews.get(hash) ?? defaultView;
+    const activeView = views.get(viewId);
+
+    for (const view of views.values()) view.hidden = view !== activeView;
+    for (const link of menuLinks) {
+      if (link.hash === '#' + viewId) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    }
+
+    if (viewId === 'projects' && selectedCategory !== (projectCategory ?? 'lab')) selectCategory(projectCategory ?? 'lab');
+    if (viewId === 'journal') showPost();
+    if (!move) return;
+
+    if (isNavigation) activeView.focus({preventScroll: true});
+    if (anchor && anchor !== activeView && (anchorView === activeView || anchor.id === 'contact')) {
+      anchor.scrollIntoView({block: 'start', behavior: 'instant'});
+    } else {
+      window.scrollTo({top: 0, behavior: 'instant'});
+    }
   }
-  root.querySelectorAll('[data-category]').forEach(button=>button.addEventListener('click',()=>selectCategory(button.dataset.category,true)));
-  root.addEventListener('click',event=>{const link=event.target.closest('a[data-select-category]');if(link)selectCategory(link.dataset.selectCategory);});
-  window.addEventListener('hashchange',applyHash);window.addEventListener('popstate',()=>{applyHash();showPost();});
-  selectCategory('lab');applyHash();
+  root.querySelectorAll('[data-category]').forEach(button => button.addEventListener('click', () => {
+    history.replaceState(null, '', '#projects-' + button.dataset.category);
+    applyRoute(false);
+  }));
+  root.querySelector('[data-back-to-top]').addEventListener('click', event => {
+    if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    root.querySelector('.kje-brand').focus({preventScroll: true});
+    window.scrollTo({top: 0, behavior: 'instant'});
+  });
+  window.addEventListener('hashchange', () => applyRoute());
+  window.addEventListener('popstate', () => applyRoute());
+  selectCategory('lab');
+  applyRoute();
   async function read(path){const response=await fetch(path,{cache:'no-cache',credentials:'omit'});if(!response.ok)throw new Error('Content load failed');return response.json();}
   Promise.allSettled([
     read('content/site.json').then(applySite),
     read('content/projects.json').then(renderProjects),
-    read('content/posts.json').then(data=>{posts=sortedPosts(data);showPostDates=data.show_dates!==false;postsReady=true;renderPostFilters();renderPostList();showPost(Boolean(new URL(location.href).searchParams.get('post')));}).catch(()=>{setText('#kje-post-empty','글을 불러오지 못했습니다. 잠시 후 새로고침해 주세요.');})
+    read('content/posts.json').then(data=>{posts=sortedPosts(data);showPostDates=data.show_dates!==false;postsReady=true;renderPostFilters();renderPostList();showPost();}).catch(()=>{setText('#kje-post-empty','글을 불러오지 못했습니다. 잠시 후 새로고침해 주세요.');})
   ]);
 })();
 
