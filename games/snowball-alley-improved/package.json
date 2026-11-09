@@ -1,0 +1,8 @@
+{
+  "name": "snowball-alley-online",
+  "version": "0.1.0",
+  "private": true,
+  "engines": { "node": "24.x" },
+  "scripts": { "start": "node server.cjs" },
+  "dependencies": { "ws": "8.21.3" }
+}
