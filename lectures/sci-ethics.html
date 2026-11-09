@@ -1,0 +1,1593 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#000000"><title>강의 · 과학 관련 사회적 쟁점과 과학 윤리 · KJE</title><style>
+/* ═══════════════════════════════════════════════════════════════
+   core.css — 소비 전력 강의 덱 공통 (Apple DESIGN.md 언어)
+   무대 1920×1080 · 면 색이 구획 · 액션 블루 하나 · UI 그림자 없음
+   ═══════════════════════════════════════════════════════════════ */
+:root{
+  /* 면 */
+  --c-white:#ffffff; --c-parchment:#f5f5f7; --c-black:#000000; --c-dark:#1d1d1f; --c-graphite:#272729;
+  /* 글자 */
+  --ink:#1d1d1f; --ink-2:#6e6e73; --ink-3:#86868b; --on-dark:#f5f5f7; --on-dark-2:#a1a1a6; --on-dark-3:#6e6e73;
+  --hair:#e0e0e0; --hair-dark:#3a3a3c;
+  /* 행동 */
+  --action:#0066cc; --action-dark:#2997ff;
+  /* 에너지 — 어두운 면 기본값(밝은 면에서 아래 .slide[data-tile] 규칙이 덮어씀) */
+  --elec:#64D2FF; --light:#FFD60A; --heat:#FF6A3D; --sound:#BF5AF2; --kin:#30D158;
+  /* 에너지 — 면과 무관하게 고정된 두 벌(그림 속에서 직접 고를 때) */
+  --elec-hi:#64D2FF; --light-hi:#FFD60A; --heat-hi:#FF6A3D; --sound-hi:#BF5AF2; --kin-hi:#30D158;
+  --elec-lo:#0077B6; --light-lo:#9A7400; --heat-lo:#C4391B; --sound-lo:#8A3FC0; --kin-lo:#1E8B3E;
+  /* 글꼴 */
+  --font:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"SF Pro Display","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+  /* 움직임 */
+  --ease-out:cubic-bezier(.2,.8,.2,1); --ease-inout:cubic-bezier(.65,0,.35,1); --ease-spring:cubic-bezier(.34,1.56,.64,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:#000}
+body{font-family:var(--font);color:var(--ink);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  word-break:keep-all;overflow-wrap:break-word;-webkit-user-select:none;user-select:none;font-feature-settings:"ss03"}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+
+/* ── 무대 ── */
+#viewport{position:fixed;inset:0;overflow:hidden;background:#000}
+#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden;background:#000;contain:layout paint}
+.slide{position:absolute;inset:0;display:none;overflow:hidden;isolation:isolate}
+.slide.is-on{display:block}
+.slide.is-out{display:block;z-index:1}
+.slide.is-on{z-index:2}
+
+/* ── 면(타일) ── 다크: 에너지가 빛나는 무대 / 라이트: 정의와 타이포 */
+.slide[data-tile="black"]{background:var(--c-black);color:var(--on-dark)}
+.slide[data-tile="dark"]{background:var(--c-dark);color:var(--on-dark)}
+.slide[data-tile="graphite"]{background:var(--c-graphite);color:var(--on-dark)}
+.slide[data-tile="light"]{background:var(--c-white);color:var(--ink)}
+.slide[data-tile="parchment"]{background:var(--c-parchment);color:var(--ink)}
+.slide[data-tile="light"],.slide[data-tile="parchment"]{
+  --elec:var(--elec-lo); --light:var(--light-lo); --heat:var(--heat-lo); --sound:var(--sound-lo); --kin:var(--kin-lo);
+  --t2:var(--ink-2); --t3:var(--ink-3); --hl:var(--hair); --act:var(--action);
+}
+.slide[data-tile="black"],.slide[data-tile="dark"],.slide[data-tile="graphite"]{
+  --t2:var(--on-dark-2); --t3:var(--on-dark-3); --hl:var(--hair-dark); --act:var(--action-dark);
+}
+
+/* ── 글자 체계 (무대 px) — 최소 24px ── */
+.t-hero{font-size:168px;font-weight:600;line-height:1.02;letter-spacing:-.035em}
+.t-display{font-size:120px;font-weight:600;line-height:1.05;letter-spacing:-.03em}
+.t-title{font-size:84px;font-weight:600;line-height:1.1;letter-spacing:-.025em}
+.t-head{font-size:60px;font-weight:600;line-height:1.14;letter-spacing:-.022em}
+.t-lead{font-size:44px;font-weight:400;line-height:1.3;letter-spacing:-.012em}
+.t-airy{font-size:40px;font-weight:300;line-height:1.4;letter-spacing:-.005em}
+.t-label{font-size:34px;font-weight:600;line-height:1.2;letter-spacing:-.01em}
+.t-body{font-size:32px;font-weight:400;line-height:1.47;letter-spacing:-.01em}
+.t-cap{font-size:26px;font-weight:400;line-height:1.35;letter-spacing:-.005em}
+.t-eyebrow{font-size:30px;font-weight:600;line-height:1.2;letter-spacing:.01em;color:var(--t2)}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum","ss03";letter-spacing:-.02em}
+.mute{color:var(--t2)} .mute2{color:var(--t3)}
+.c-elec{color:var(--elec)} .c-light{color:var(--light)} .c-heat{color:var(--heat)} .c-sound{color:var(--sound)} .c-kin{color:var(--kin)}
+.unit{font-weight:400;letter-spacing:0;margin-left:.12em}
+.center{text-align:center}
+
+/* 배치 도우미 — 슬라이드 조각이 자유롭게 쓴다 */
+.abs{position:absolute}
+.fill{position:absolute;inset:0}
+.full-svg{position:absolute;inset:0;width:1920px;height:1080px;overflow:visible}
+.row{display:flex;align-items:center}
+.col{display:flex;flex-direction:column}
+.pill{display:inline-flex;align-items:center;gap:12px;border-radius:9999px;padding:12px 26px;font-size:28px;font-weight:600}
+.pill.ghost{border:2px solid currentColor}
+.chip-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;border-radius:9999px;padding:16px 34px;font-size:30px;font-weight:600;
+  background:var(--act);color:#fff;transition:transform .15s var(--ease-out)}
+.chip-btn:active{transform:scale(.95)}
+.card{border-radius:18px;border:1px solid var(--hl);padding:32px}
+svg text{font-family:var(--font)}
+
+/* ── 선언형 등장: data-in(들어올 때) / data-step="k"(k번째 클릭) / data-out="k" ── */
+[data-in],[data-step]{opacity:0}
+[data-fx="draw"],[data-fx="draw"] :is(path,line,polyline,polygon,circle,ellipse,rect){stroke-dasharray:1 1;stroke-dashoffset:1}
+[data-fx="draw"]{opacity:1}
+svg [data-in],svg [data-step],svg .tb{transform-box:fill-box;transform-origin:center}
+.tb{transform-box:fill-box;transform-origin:center}
+.tb-bl{transform-box:fill-box;transform-origin:left bottom}
+.tb-b{transform-box:fill-box;transform-origin:center bottom}
+
+/* ── HUD (Apple 원형 칩) ── */
+#hud{position:fixed;right:22px;bottom:18px;display:flex;align-items:center;gap:8px;z-index:50;opacity:0;transform:translateY(8px);
+  transition:opacity .35s var(--ease-out),transform .35s var(--ease-out);pointer-events:none}
+#hud.show{opacity:1;transform:none;pointer-events:auto}
+#hud button{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:rgba(210,210,215,.64);color:#1d1d1f;
+  -webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);transition:transform .15s var(--ease-out)}
+#hud button:active{transform:scale(.92)}
+#hud button svg{width:20px;height:20px}
+#hud .count{min-width:84px;height:44px;border-radius:9999px;display:grid;place-items:center;padding:0 16px;background:rgba(210,210,215,.64);color:#1d1d1f;
+  font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px)}
+#progress{position:fixed;left:0;right:0;bottom:0;height:3px;z-index:40;background:transparent}
+#progress i{display:block;height:100%;width:0;background:rgba(255,255,255,.38);transition:width .5s var(--ease-out),background .4s}
+body.on-light #progress i{background:rgba(0,0,0,.22)}
+#stepdots{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:9px;z-index:40;opacity:0;transition:opacity .35s}
+#stepdots.show{opacity:1}
+#stepdots i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.28);transition:background .3s,transform .3s}
+#stepdots i.on{background:rgba(255,255,255,.9);transform:scale(1.15)}
+body.on-light #stepdots i{background:rgba(0,0,0,.16)} body.on-light #stepdots i.on{background:rgba(0,0,0,.62)}
+
+/* ── 덮개(노트·전체보기·도움말) ── */
+.overlay{position:fixed;inset:0;z-index:60;display:none}
+.overlay.show{display:block}
+#notes{position:fixed;left:0;right:0;bottom:0;height:36vh;z-index:55;transform:translateY(102%);transition:transform .45s var(--ease-out);
+  background:rgba(22,22,23,.86);color:#f5f5f7;-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);
+  padding:22px 40px 26px;overflow:auto;border-top:1px solid rgba(255,255,255,.08)}
+#notes.show{transform:none}
+#notes .nh{display:flex;align-items:baseline;gap:14px;margin-bottom:10px;font-size:15px;color:#a1a1a6;font-weight:600;letter-spacing:.01em}
+#notes .nh b{color:#f5f5f7;font-size:18px}
+#notes .nh .nx{margin-left:auto;font-weight:400}
+#notes p{font-size:clamp(17px,1.55vw,24px);line-height:1.6;margin:0 0 .7em;color:#e8e8ed;max-width:1500px}
+#notes p .pn{display:inline-block;font-size:.66em;font-weight:700;color:#2997ff;margin-right:.6em;vertical-align:.12em}
+#notes p b{color:#fff;font-weight:700}
+#notes p .cue{display:inline-block;margin-top:.3em;padding:2px 12px;border-radius:9999px;background:rgba(41,151,255,.18);color:#8cc8ff;font-size:.85em}
+
+#overview{background:rgba(0,0,0,.72);-webkit-backdrop-filter:saturate(180%) blur(24px);backdrop-filter:saturate(180%) blur(24px);overflow:auto;padding:56px 5vw}
+#overview h2{color:#f5f5f7;font-size:28px;font-weight:600;letter-spacing:-.01em;margin-bottom:22px}
+#overview .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+#overview .ov{position:relative;aspect-ratio:16/9;border-radius:11px;padding:14px 16px;display:flex;flex-direction:column;justify-content:space-between;text-align:left;
+  border:1px solid rgba(255,255,255,.1);transition:transform .2s var(--ease-out)}
+#overview .ov:active{transform:scale(.97)}
+#overview .ov.cur{outline:3px solid #2997ff;outline-offset:3px}
+#overview .ov .n{font-size:14px;font-weight:700;opacity:.6;font-variant-numeric:tabular-nums}
+#overview .ov .tt{font-size:19px;font-weight:600;line-height:1.25;letter-spacing:-.01em}
+#overview .ov[data-tile="black"],#overview .ov[data-tile="dark"],#overview .ov[data-tile="graphite"]{background:#1d1d1f;color:#f5f5f7}
+#overview .ov[data-tile="light"]{background:#fff;color:#1d1d1f}
+#overview .ov[data-tile="parchment"]{background:#f5f5f7;color:#1d1d1f}
+
+#help{background:rgba(0,0,0,.6);display:none;place-items:center}
+#help.show{display:grid}
+#help .box{background:#fff;color:#1d1d1f;border-radius:18px;padding:34px 40px;min-width:520px}
+#help h3{font-size:24px;font-weight:600;margin-bottom:16px;letter-spacing:-.01em}
+#help table{border-collapse:collapse;font-size:17px}
+#help td{padding:7px 18px 7px 0;border-bottom:1px solid #f0f0f0}
+#help kbd{display:inline-block;min-width:30px;padding:3px 9px;border-radius:8px;background:#f5f5f7;border:1px solid #e0e0e0;font:600 15px var(--font);text-align:center}
+#blank{position:fixed;inset:0;z-index:70;display:none}
+#blank.black{display:block;background:#000} #blank.white{display:block;background:#fff}
+
+/* 정지 화면(검증 스크린샷) — 크롬 UI 숨김 */
+html.still #hud,html.still #progress,html.still #stepdots{display:none!important}
+html.still *{cursor:none!important}
+/* 격자 보기(?grid=1) */
+#gridov{position:absolute;inset:0;z-index:30;pointer-events:none;display:none;
+  background-image:linear-gradient(rgba(255,0,80,.25) 1px,transparent 1px),linear-gradient(90deg,rgba(255,0,80,.25) 1px,transparent 1px);
+  background-size:120px 120px}
+html.grid #gridov{display:block}
+html.grid #gridov::after{content:"";position:absolute;inset:80px 120px;border:2px dashed rgba(255,0,80,.6)}
+
+@media (prefers-reduced-motion: reduce){ .slide *{scroll-behavior:auto} }
+
+/* ── 소리 단추·알림 ── */
+#hud button.off{opacity:.55}
+#sfxToast{position:fixed;left:50%;bottom:78px;transform:translate(-50%,8px);z-index:80;padding:10px 22px;border-radius:9999px;background:rgba(29,29,31,.86);color:#f5f5f7;
+  font-size:16px;font-weight:600;letter-spacing:-.01em;opacity:0;pointer-events:none;transition:opacity .25s var(--ease-out),transform .25s var(--ease-out);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px)}
+#sfxToast.show{opacity:1;transform:translate(-50%,0)}
+html.still #sfxToast{display:none}
+
+/* ── 학생 모드(?s=1): 대본 숨김 ── */
+html.student #notes{display:none!important}
+
+/* ── 장면 머리(제목) ── */
+.hd{position:absolute;left:120px;top:78px;right:120px;z-index:3}
+.hd .eb{font-size:28px;font-weight:600;letter-spacing:.01em;color:var(--t2);margin-bottom:10px}
+.hd .eb b{color:var(--act);font-weight:700;margin-right:.35em}
+.hd h2{font-size:66px;font-weight:600;line-height:1.1;letter-spacing:-.028em}
+.hd h2 .soft{color:var(--t2);font-weight:400}
+
+/* ── 개념정리 학습지 카드 · 빈칸(번호 = 학습지 빈칸 번호 ①~㉖) ── */
+.ws-card{position:absolute;border-radius:18px;padding:30px 44px 26px;background:#f5f5f7;z-index:3}
+.slide[data-tile="parchment"] .ws-card{background:#fff}
+.slide[data-tile="black"] .ws-card,.slide[data-tile="dark"] .ws-card,.slide[data-tile="graphite"] .ws-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
+.ws-card .ws-h{display:flex;align-items:baseline;gap:18px;margin-bottom:6px}
+.ws-card .ws-h b{font-size:40px;font-weight:700;letter-spacing:-.02em}
+.ws-card .ws-h span{font-size:28px;color:var(--t2)}
+.ws-row{display:grid;grid-template-columns:110px 1fr;gap:22px;align-items:baseline;font-size:38px;line-height:1.55;padding:12px 0;border-top:1px solid var(--hl)}
+.ws-row:first-of-type{border-top:0}
+.ws-row .tm{font-size:26px;font-weight:600;color:var(--t2);letter-spacing:.01em}
+.ws-line{font-size:38px;line-height:1.6}
+.bk{position:relative;display:inline-block;min-width:3.4em;margin:0 .2em;padding:0 .3em;text-align:center;line-height:1.3;white-space:nowrap;
+  border-bottom:4px solid #c7c7cc}
+.slide[data-tile="black"] .bk,.slide[data-tile="dark"] .bk,.slide[data-tile="graphite"] .bk{border-bottom-color:#48484a}
+.bk .a{display:inline-block;font-weight:700;color:var(--act)}
+.bk .n{position:absolute;left:-.62em;top:-.5em;min-width:1.25em;height:1.25em;padding:0 .2em;border-radius:9999px;background:var(--act);color:#fff;
+  font-size:.46em;font-weight:700;line-height:1.25em;text-align:center;font-variant-numeric:tabular-nums}
+.bk.wide{min-width:5.6em}
+.qbox{position:absolute;border-radius:18px;border:1px solid var(--hl);padding:26px 34px;font-size:32px;line-height:1.5}
+.qbox .qh{font-size:26px;font-weight:600;color:var(--t2);margin-bottom:6px}
+.say-line{position:absolute;left:120px;right:120px;text-align:center;font-size:44px;font-weight:600;letter-spacing:-.02em;z-index:3}
+.fine{position:absolute;left:120px;bottom:40px;font-size:24px;color:var(--t3);z-index:3}
+
+
+:root{--font:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",NanumGothic,sans-serif}
+.slide{--acid:#edaa55;--base:#67bdff;--na:#b9c1cf;--anion:#b9a5eb;--glass:rgba(220,235,255,.55);--liquid:rgba(186,212,242,.055)}
+.slide[data-tile="light"],.slide[data-tile="parchment"]{--acid:#a95708;--base:#0070b5;--na:#647184;--anion:#7955a8;--glass:rgba(50,72,94,.42);--liquid:rgba(93,139,175,.055)}
+.acid{color:var(--acid)}.base{color:var(--base)}.anion{color:var(--anion)}.neutral{color:var(--t2)}
+.hd{top:78px}.hd h2{font-size:68px;line-height:1.2}.hd .eb{font-size:28px;margin-bottom:18px}
+.fine{position:absolute;bottom:60px;left:120px;right:120px;font-size:25px;line-height:1.45;color:var(--t2)}
+.statement{font-size:62px;line-height:1.35;letter-spacing:-.035em;font-weight:600}
+.eq{font-size:76px;letter-spacing:-.02em;white-space:nowrap;line-height:1.4}
+.eq small{font-size:.42em;font-weight:400;color:var(--t2)}
+.abs.eq{position:absolute}
+sub,sup{font-size:.58em;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.22em}sup{top:-.5em}
+.big-number{font-size:150px;font-weight:600;letter-spacing:-.05em;line-height:1.2}
+.keyline{border-top:2px solid var(--hl);padding-top:26px}
+.body-copy{font-size:36px;line-height:1.6}.mini{font-size:28px;line-height:1.5;color:var(--t2)}
+.tagline{font-size:44px;line-height:1.5}.note-line{font-size:30px;line-height:1.5;color:var(--t2)}
+.value{font-variant-numeric:tabular-nums;white-space:nowrap}
+.callout{padding:28px 36px;border-radius:18px;background:rgba(127,127,127,.075);font-size:34px;line-height:1.5}
+.col-rule{position:absolute;top:310px;bottom:245px;border-left:2px solid var(--hl)}
+.legend{display:flex;gap:28px;align-items:center;font-size:27px;color:var(--t2)}.legend span{display:flex;align-items:center;gap:12px}.legend svg{width:52px;height:52px;overflow:visible}
+.lab-controls{position:absolute;left:1140px;top:295px;width:660px;font-size:32px}
+.lab-controls label{display:flex;align-items:baseline;justify-content:space-between;margin:30px 0 22px}.lab-controls output{font-size:58px;line-height:1;font-weight:600;font-variant-numeric:tabular-nums;color:var(--base)}
+input[type=range]{width:100%;height:42px;accent-color:var(--base);cursor:pointer;touch-action:pan-y}input[type=range]::-webkit-slider-thumb{width:32px;height:32px}
+.controls-row{display:flex;gap:16px;margin-top:22px}.smallbtn{border:1px solid var(--hl);border-radius:99px;padding:14px 24px;font-size:27px}.smallbtn:focus-visible,.chip-btn:focus-visible{outline:4px solid var(--act);outline-offset:4px}.smallbtn:hover{background:rgba(127,127,127,.1)}
+.live-table{margin-top:32px;border-top:2px solid var(--hl)}.live-row{display:flex;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--hl);font-size:31px}.live-row b{font-variant-numeric:tabular-nums}
+.status{font-size:65px;letter-spacing:-.04em;font-weight:600;margin-bottom:12px}.status-sub{font-size:30px;color:var(--t2);line-height:1.5;min-height:90px}
+.check-row{display:grid;grid-template-columns:64px 1fr 240px;align-items:center;gap:20px;font-size:37px;padding:30px 0;border-bottom:1px solid var(--hl)}.check-row b{font-size:48px}.check-row .answer{color:var(--act);font-size:36px}
+#reflect .check-row{grid-template-columns:64px 1fr;line-height:1.5}
+#reflect .reflect-mark{width:24px;height:24px;border:2px solid var(--elec)}
+.source-copy{font-size:28px;color:var(--t2);line-height:1.7}
+.progress-hint{position:absolute;right:120px;bottom:60px;font-size:25px;color:var(--t2)}
+.slide svg{font-family:var(--font)}.beaker-outline{fill:none;stroke:var(--glass);stroke-width:4;stroke-linecap:round}.water-surface{stroke:var(--glass);stroke-width:2;opacity:.65}
+#hud{gap:7px}#hud .count{min-width:70px}#hud button{width:44px;height:44px}
+#alwaysNav{position:fixed;left:18px;bottom:18px;z-index:45;display:flex;gap:6px}#alwaysNav button{font-size:14px;padding:10px 14px;color:#ddd;background:rgba(45,45,49,.8);border-radius:99px;backdrop-filter:blur(12px)}
+html.still #alwaysNav{display:none}#stepdots{bottom:23px}
+@media(max-width:600px){#hud{right:10px;bottom:10px;gap:4px}#hud button{width:36px;height:36px}#hud .count{height:36px;font-size:13px;min-width:60px;padding:0 10px}#alwaysNav{left:10px;bottom:56px}#alwaysNav button{font-size:12px;padding:8px 12px}#help .box{min-width:0;width:92vw;padding:22px}#help td{font-size:14px;padding:5px}#notes{padding:18px;height:45vh}#notes .nx{display:none}#stepdots{bottom:17px;left:60px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ── 에너지 효율 덱 ── 에너지 색은 core.css 의 --elec --light --heat --sound --kin(면에 따라 저절로 바뀜) + 화학 --chem */
+.slide{--chem:#FF7AB6}
+.slide[data-tile="light"],.slide[data-tile="parchment"]{--chem:#B8306E}
+.c-chem{color:var(--chem)}
+.e-elec{--ec:var(--elec)} .e-light{--ec:var(--light)} .e-heat{--ec:var(--heat)} .e-sound{--ec:var(--sound)} .e-kin{--ec:var(--kin)} .e-chem{--ec:var(--chem)}
+.echip{display:inline-flex;align-items:center;gap:12px;padding:10px 22px;border-radius:9999px;font-size:30px;font-weight:600;color:var(--ec);
+  background:color-mix(in srgb,var(--ec) 14%,transparent);white-space:nowrap}
+.echip::before{content:"";width:14px;height:14px;border-radius:50%;background:var(--ec)}
+.dev-card{position:absolute;top:300px;width:520px;height:560px;border-radius:18px;padding:40px 40px 34px;background:rgba(127,127,127,.075);display:flex;flex-direction:column;gap:22px}
+.dev-card h3{font-size:50px;font-weight:600;letter-spacing:-.025em;line-height:1.15}
+.dev-card .flowcol{display:flex;flex-direction:column;align-items:flex-start;gap:16px}
+.dev-card .arrow{font-size:40px;color:var(--t2);line-height:1;padding-left:20px}
+.dev-card .outs{display:flex;flex-wrap:wrap;gap:12px}
+.dev-card p{font-size:30px;line-height:1.5;color:var(--t2);margin-top:auto}
+.dev-card .lead2{font-size:32px;line-height:1.5;color:inherit}
+.sk-lab{font-weight:600}
+.lab-controls .smallbtn.on{background:var(--act);color:#fff;border-color:transparent}
+.lab-controls output{color:var(--elec)}
+.lab-controls input[type=range]{accent-color:var(--act)}
+.devbtns{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
+.devbtns .smallbtn{padding:12px 20px;font-size:26px}
+.effbig{font-size:120px;font-weight:600;letter-spacing:-.05em;line-height:1.1;font-variant-numeric:tabular-nums}
+.grade-row{display:flex;align-items:center;gap:18px;height:62px}
+.grade-row b{width:44px;font-size:34px;text-align:center;font-variant-numeric:tabular-nums}
+.grade-row i{display:block;height:46px;border-radius:0 23px 23px 0}
+.tip-list{display:flex;flex-direction:column;gap:26px}
+.tip{display:grid;grid-template-columns:72px 1fr;gap:20px;align-items:baseline;font-size:36px;line-height:1.45}
+.tip .no{font-size:30px;font-weight:700;color:var(--act)}
+.tip small{display:block;font-size:28px;color:var(--t2);line-height:1.45;margin-top:4px}
+.ws-card .ws-line.big{font-size:46px;line-height:1.8}
+.sk-in{fill:#000}
+.slide[data-tile="light"] .sk-in,.slide[data-tile="parchment"] .sk-in{fill:#fff}
+/* ── 보강 ── */
+.dev-card>.echip,.dev-card>.chips{align-self:flex-start}
+.chips{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.chips .to,.chain-row .to{font-size:34px;color:var(--t2)}
+.stack{display:flex;flex-direction:column;align-items:flex-start;gap:18px}
+.colh{font-size:44px;font-weight:600;letter-spacing:-.02em;line-height:1.2;margin-bottom:6px}
+.colsub{font-size:28px;color:var(--t2);margin-bottom:28px}
+.colh+.tip-list{margin-top:22px}
+.chain-row{display:flex;align-items:center;gap:16px}
+.rowlab{width:120px;font-size:44px;font-weight:600;letter-spacing:-.02em}
+.tip .no{white-space:nowrap}
+.tip{grid-template-columns:96px 1fr}
+.elabel{position:absolute;width:360px;border-radius:14px;background:#fff;color:#1d1d1f;border:3px solid #1d1d1f;padding-bottom:18px}
+.elabel .eh{background:#1d1d1f;color:#fff;font-size:24px;font-weight:600;padding:10px 18px;border-radius:10px 10px 0 0}
+.elabel .eg{display:flex;align-items:baseline;gap:10px;padding:14px 18px 6px}
+.elabel .eg b{font-size:96px;line-height:1;font-weight:700}
+.elabel .eg span{font-size:32px;font-weight:600}
+.elabel .ebars{padding:6px 18px 4px;display:flex;flex-direction:column;gap:6px}
+.elabel .ebars i{display:block;height:20px;border-radius:0 10px 10px 0;position:relative;opacity:.45}
+.elabel .ebars i.on{opacity:1}
+.elabel .ebars i.on::after{content:"◀";position:absolute;left:calc(100% + 8px);top:-5px;font-size:22px;font-style:normal;color:#1d1d1f}
+.elabel .em{padding:12px 18px 0;font-size:24px;color:#555}
+.elabel .em b{display:block;font-size:46px;color:#1d1d1f;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+/* 분수 */
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 .15em;line-height:1.25}
+.frac>span{display:block;padding:.06em .3em;text-align:center;white-space:nowrap}
+.frac>span:first-child{border-bottom:.07em solid currentColor;padding-bottom:.14em}
+.frac>span:last-child{padding-top:.18em}
+.frac .bk{margin:0}
+.ws-line.big .frac{font-size:1em}
+/* 쪽 바로 가기 */
+#alwaysNav #navPage{font-variant-numeric:tabular-nums;min-width:74px}
+#count{cursor:pointer}
+#overview .ovhead{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px;margin-bottom:22px}
+#overview .ovhead h2{margin:0}
+.ovjump{display:flex;align-items:center;gap:8px}
+.ovjump label{color:#a1a1a6;font-size:15px;font-weight:600}
+.ovjump input{width:84px;height:40px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#f5f5f7;font:600 18px var(--font);text-align:center;font-variant-numeric:tabular-nums}
+.ovjump input:focus{outline:2px solid #2997ff;outline-offset:2px}
+.ovjump button{height:40px;padding:0 16px;border-radius:9999px;background:#2997ff;color:#fff;font-size:15px;font-weight:600}
+.ovjump .ovclose{background:rgba(255,255,255,.12)}
+@media(max-width:600px){#overview{padding:24px 14px}#overview .grid{grid-template-columns:repeat(2,1fr);gap:10px}#overview .ov .tt{font-size:15px}#alwaysNav #navPage{min-width:60px}}
+/* Keep controls outside the scaled slide, including its bottom captions. */
+:root{--controls-height:calc(80px + env(safe-area-inset-bottom,0px))}
+#viewport{bottom:var(--controls-height)}
+body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:var(--controls-height);background:#101012;border-top:1px solid #303034;z-index:39;pointer-events:none}
+#hud{bottom:calc(12px + env(safe-area-inset-bottom,0px))}
+#alwaysNav{bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+#stepdots{bottom:calc(64px + env(safe-area-inset-bottom,0px));left:50%}
+body.on-light #stepdots i{background:rgba(255,255,255,.28)}
+body.on-light #stepdots i.on{background:rgba(255,255,255,.9)}
+body.on-light #progress i{background:rgba(255,255,255,.38)}
+@media(max-width:900px){
+  :root{--controls-height:calc(124px + env(safe-area-inset-bottom,0px))}
+  #alwaysNav{left:12px;bottom:calc(64px + env(safe-area-inset-bottom,0px))}
+  #stepdots{bottom:calc(112px + env(safe-area-inset-bottom,0px));left:50%}
+}
+@media(max-width:380px){
+  #hud button{width:32px;height:36px}
+  #hud .count{min-width:40px;padding:0 6px;font-size:12px}
+}
+html.still{--controls-height:0px}
+html.still body::after{display:none}
+/* ── 빅데이터 덱 ── */
+.slide{--chem:#FF7AB6}
+.slide[data-tile="light"],.slide[data-tile="parchment"]{--chem:#B8306E}
+.c-chem{color:var(--chem)} .c-act{color:var(--act)}
+.use-card{border-radius:18px;background:#fff;padding:20px 26px;display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+.use-card p{font-size:30px;line-height:1.42}
+.ds-card{font:inherit;color:inherit;text-align:left;border-radius:18px;background:rgba(255,255,255,.06);border:3px solid rgba(255,255,255,.1);padding:26px 30px;height:250px;display:flex;flex-direction:column;align-items:flex-start;gap:14px;cursor:pointer;transition:border-color .4s}
+.ds-card:hover{background:rgba(255,255,255,.09)}
+.ds-card .ds-h{font-size:36px;font-weight:600;letter-spacing:-.02em;line-height:1.25}
+.ds-card .ds-i{font-size:29px;line-height:1.45;color:var(--t2)}
+.ds-card .ds-p{margin-top:auto;display:inline-flex;align-items:center;gap:10px;padding:8px 18px;border-radius:9999px;font-size:25px;font-weight:600;color:var(--sound);background:color-mix(in srgb,var(--sound) 16%,transparent)}
+.ds-card.pi{border-color:var(--sound)}
+.sum-row{display:flex;align-items:center;gap:30px;font-size:40px;line-height:1.4}
+.sum-row .echip{min-width:200px;justify-content:center;font-size:32px}
+.dtab{width:100%;border-collapse:collapse;font-size:31px}
+.dtab th{font-size:26px;font-weight:600;color:var(--t2);text-align:left;padding:10px 16px;border-bottom:2px solid var(--hl)}
+.dtab td{padding:12px 16px;border-bottom:1px solid var(--hl)}
+.qbox .qh{font-size:30px;color:inherit;margin-bottom:10px}
+.qbox>div:last-child{font-size:31px;line-height:1.5}
+.lab-controls .smallbtn.on{background:var(--act);color:#fff;border-color:transparent}
+.lab-controls output{color:var(--elec)}
+.lab-controls input[type=range]{accent-color:var(--act)}
+.devbtns{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
+.devbtns .smallbtn{padding:12px 22px;font-size:27px}
+.lab-controls label{margin:24px 0 16px}
+.live-row{font-size:29px;padding:13px 0}
+
+.card-art{width:100%;height:190px;display:block;margin:6px 0 0;overflow:visible}
+.hs-panel{position:absolute;border-radius:22px;background:#1d1d1f;border:1px solid #2c2c2e;padding:34px 36px;min-height:420px;display:flex;flex-direction:column;gap:18px;align-items:flex-start}
+.hs-panel h3{font-size:46px;font-weight:700;letter-spacing:-.02em;color:#f5f5f7}
+.hs-panel .hs-row{display:flex;flex-direction:column;gap:6px}
+.hs-panel .hs-row span{font-size:24px;font-weight:600;color:#86868b}
+.hs-panel .hs-row p{font-size:32px;line-height:1.45;color:#f5f5f7}
+.hs-panel .hs-empty{font-size:30px;line-height:1.5;color:#86868b;margin:auto 0}
+.pill.ex{font-size:24px;padding:4px 16px;margin-right:12px;background:rgba(0,102,204,.1)}
+
+.hs .hs-in{transition:transform .45s cubic-bezier(.3,1.5,.5,1),opacity .3s}
+.hs .hs-halo,.hs .hs-ring,.hs .hs-ic2{opacity:0;transition:opacity .3s}
+.hs.dim{opacity:.28}
+.hs.on .hs-in{transform:scale(1.45)}
+.hs.on .hs-halo{opacity:.28}
+.hs.on .hs-ic{opacity:0}.hs.on .hs-ic2{opacity:1}
+.hs.on .hs-ring{opacity:1;animation:hsPulse 1.6s ease-out infinite}
+.hs.on .hs-lb{font-size:26px;font-weight:800}
+@keyframes hsPulse{0%{transform:scale(1);opacity:.9}100%{transform:scale(1.9);opacity:0}}
+html.still .hs.on .hs-ring,html.reduced .hs.on .hs-ring{animation:none;opacity:.6}
+.hs-panel{transition:box-shadow .3s,border-color .3s}
+.hs-panel .hs-big{position:absolute;right:30px;top:28px;width:96px;height:96px}
+.is-card{height:240px}
+.is-card .ds-h{font-size:34px;line-height:1.35}
+.is-card .pk{opacity:0;transition:opacity .25s}
+.is-card.picked{border-color:var(--light);background:rgba(255,214,10,.10)}
+.is-card.picked .pk{opacity:1;color:var(--light);background:color-mix(in srgb,var(--light) 18%,transparent)}
+.film{border-radius:18px;background:#232326;padding:26px 30px;height:270px;display:flex;flex-direction:column;align-items:flex-start;gap:12px;border-left:10px solid #3a3a3c;border-right:10px solid #3a3a3c;background-image:repeating-linear-gradient(180deg,transparent 0 22px,#1d1d1f 22px 34px);background-size:10px 100%;background-repeat:repeat-y;background-position:left top}
+.film b{font-size:38px;font-weight:700;color:#f5f5f7;letter-spacing:-.02em}
+.film p{font-size:28px;line-height:1.45;color:#c7c7cc}
+.card-art.fa{position:absolute;right:30px;top:24px;width:120px;height:100px;margin:0}
+.ssi-card{border-radius:18px;background:#f5f5f7;padding:24px 20px;height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center}.ssi-card svg{width:130px;height:120px}.ssi-card span{font-size:28px;font-weight:600;line-height:1.35}
+
+
+/* 모바일에서도 읽을 수 있는 탐구 자료 */
+#alwaysNav #openInquiry{background:#215ea5;color:#fff}
+#inquiryReader{position:fixed;inset:0;margin:auto;width:min(840px,calc(100vw - 32px));max-width:none;max-height:calc(100dvh - 32px);border:1px solid #454550;border-radius:18px;background:#f5f5f7;color:#1d1d1f;font:17px/1.6 var(--font);overflow:auto;overscroll-behavior:contain;user-select:text;-webkit-user-select:text}
+#inquiryReader::backdrop{background:#000b}
+.inquiry-bar{position:sticky;top:0;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 24px;border-bottom:1px solid #d2d2d7;background:#fff}
+.inquiry-bar h2{font-size:23px}
+.inquiry-bar button{min-height:44px;padding:5px 17px;border-radius:100px;background:#215ea5;color:#fff;font-weight:700}
+.inquiry-body{padding:24px}
+.inquiry-body section{margin-bottom:30px}
+.inquiry-body h3{font-size:21px;margin-bottom:8px}
+.inquiry-body p+p{margin-top:9px}
+.inquiry-body ul,.inquiry-body ol{padding-left:1.5em;margin:10px 0}
+.inquiry-body li+li{margin-top:6px}
+.inquiry-body details{margin:8px 0;padding:10px 14px;border:1px solid #d2d2d7;border-radius:10px;background:#fff}
+.inquiry-body summary{font-weight:700;cursor:pointer;min-height:32px}
+.inquiry-body summary+p{margin-top:8px}
+.inquiry-body a{color:#0053a7;overflow-wrap:anywhere}
+.inquiry-body :focus-visible,#openInquiry:focus-visible,.is-card:focus-visible,.mt-card:focus-visible{outline:3px solid #2997ff;outline-offset:4px}
+.evidence-table{width:100%;margin-top:12px;border-collapse:collapse;text-align:left}
+.evidence-table th,.evidence-table td{padding:.26em .5em;border-bottom:1px solid #c7c7cc}
+.evidence-table thead{background:#e9ecf1}
+.inquiry-evidence{font-size:29px;line-height:1.4}
+.inquiry-evidence .evidence-table{font-size:28px}
+@media(max-width:600px){
+  #inquiryReader{width:100vw;height:100dvh;max-height:none;border:0;border-radius:0}
+  .inquiry-bar{padding:10px 16px}
+  .inquiry-body{padding:16px}
+}
+
+</style></head><body><div id="viewport"><main id="stage"><section class="slide" id="cover" data-title="과학 관련 사회적 쟁점과 과학 윤리의 중요성" data-tile="black"><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="hero-g"></g></svg><div class="abs t-eyebrow center" style="left:120px;top:684px;width:1680px;" data-in="200">통합과학2 · Ⅲ. 과학과 미래 사회 · 04</div><div class="abs t-display center" style="left:60px;top:746px;width:1800px;font-size:100px" data-in="450">과학 관련 사회적 쟁점과 과학 윤리</div><div class="abs t-lead center mute" style="left:120px;top:899px;width:1680px;" data-in="800">과학기술이 던진 질문에 우리는 어떻게 답할까?</div><div class="abs t-lead center mute" style="left:0;width:1920px;top:990px;font-size:30px;letter-spacing:.06em" data-in="1100">제작 · KJE</div><div class="progress-hint">클릭 또는 → 로 시작</div></section><section class="slide" id="goals" data-title="학습 목표와 수업 흐름" data-tile="parchment"><div class="hd" data-in><div class="eb"><b>01</b>학습 목표</div><h2>과학이 만든 쟁점을 토론하고, 과학 윤리가 왜 필요한지 따진다</h2></div><div class="ws-card" style="left:120px;top:330px;width:1680px" data-in="200"><div class="ws-row"><span class="tm">목표 1</span><span>과학기술의 발전 과정에서 생길 수 있는 과학 관련 사회적 쟁점을 알고 토론할 수 있다.</span></div><div class="ws-row"><span class="tm">목표 2</span><span>과학기술을 이용할 때 과학 윤리의 중요성을 논증할 수 있다.</span></div></div><div class="abs" style="left:120px;top:690px;width:820px" data-step="1"><div class="colh"><span class="c-elec">1차시</span> 쟁점 알아보기</div><div class="body-copy mute">과학기술과 함께 새로 떠오르는 사회적 쟁점을 살펴보고, 구체적인 예를 논의한다.</div></div><div class="abs" style="left:980px;top:690px;width:820px" data-step="2"><div class="colh"><span class="c-kin">2차시</span> 영화로 토론하기</div><div class="body-copy mute">작품 속 쟁점을 현실 자료와 연결하고, 모둠 토의에서 나온 근거로 정책 한 가지를 제안한다.</div></div><div class="fine">교과서 148~151쪽 · 2차시 수업</div></section><section class="slide" id="asimov" data-title="아시모프의 「아이, 로봇」" data-tile="light"><div class="hd" data-in><div class="eb"><b>02</b>과학 관련 사회적 쟁점에는 무엇이 있을까?</div><h2>1950년 출간 · 로봇과 함께 사는 미래를 그린 단편집</h2></div><div class="abs" style="left:120px;top:310px;width:820px" data-in="200"><div class="t-label mute">아시모프(Asimov, I., 1920~1992)</div><div class="t-head" style="margin-top:10px">단편집 『아이, 로봇』</div><div class="body-copy" style="margin-top:24px">로봇이 사람과 함께 살아가는 미래 사회를 그렸다.</div></div><div class="dev-card" style="left:1000px;top:300px;width:800px;height:150px" data-step="1"><span class="echip e-elec">일을 대신한다</span><svg class="card-art fa" style="width:140px;height:110px;top:20px" viewBox="0 0 140 110" aria-hidden="true"><rect x="30" y="18" width="40" height="30" rx="8" fill="none" stroke="var(--elec)" stroke-width="4"/><circle cx="42" cy="33" r="3" fill="var(--elec)"/><circle cx="58" cy="33" r="3" fill="var(--elec)"/><rect x="32" y="52" width="36" height="44" rx="8" fill="none" stroke="var(--elec)" stroke-width="4"/><rect x="78" y="56" width="40" height="30" rx="4" fill="none" stroke="var(--elec)" stroke-width="4"/><path d="M68 60h12" stroke="var(--elec)" stroke-width="4"/></svg></div><div class="dev-card" style="left:1000px;top:480px;width:800px;height:150px" data-step="2"><span class="echip e-kin">친구가 된다</span><svg class="card-art fa" style="width:140px;height:110px;top:20px" viewBox="0 0 140 110" aria-hidden="true"><rect x="20" y="18" width="40" height="30" rx="8" fill="none" stroke="var(--kin)" stroke-width="4"/><circle cx="32" cy="33" r="3" fill="var(--kin)"/><circle cx="48" cy="33" r="3" fill="var(--kin)"/><rect x="22" y="52" width="36" height="44" rx="8" fill="none" stroke="var(--kin)" stroke-width="4"/><circle cx="100" cy="32" r="13" fill="var(--kin)"/><path d="M78 96v-28q0-20 22-20q22 0 22 20v28z" fill="var(--kin)"/><path d="M60 70h18" stroke="var(--kin)" stroke-width="5" stroke-linecap="round"/></svg></div><div class="dev-card" style="left:1000px;top:660px;width:800px;height:150px" data-step="3"><span class="echip e-heat">때로는 갈등을 겪는다</span><svg class="card-art fa" style="width:140px;height:110px;top:20px" viewBox="0 0 140 110" aria-hidden="true"><rect x="12" y="18" width="40" height="30" rx="8" fill="none" stroke="var(--heat)" stroke-width="4"/><circle cx="24" cy="33" r="3" fill="var(--heat)"/><circle cx="40" cy="33" r="3" fill="var(--heat)"/><rect x="14" y="52" width="36" height="44" rx="8" fill="none" stroke="var(--heat)" stroke-width="4"/><circle cx="108" cy="32" r="13" fill="var(--heat)"/><path d="M86 96v-28q0-20 22-20q22 0 22 20v28z" fill="var(--heat)"/><path d="M64 40l8 10-6 4 10 12" fill="none" stroke="var(--heat)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="abs callout" style="left:120px;top:690px;width:820px" data-step="4">그래서 아시모프는 로봇이 지켜야 할 <b>세 가지 원칙</b>을 제시하였다.</div><div class="fine">교과서 148쪽</div></section><section class="slide" id="laws" data-title="로봇 3원칙" data-tile="dark"><div class="hd" data-in><div class="eb"><b>03</b>아시모프의 로봇 3원칙</div><h2>세 원칙 사이에는 순서가 있다</h2></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="laws-g"></g></svg><div class="fine"><b>원작 제1원칙에 포함된 조건</b> · 아무 행동도 하지 않아 사람이 피해를 입도록 내버려 두어서도 안 된다.<br>교과서 148쪽은 3원칙의 요약 · 세 원칙은 1942년 단편 「런어라운드」에 명시됨</div></section><section class="slide" id="lawquiz" data-title="생각해 보기 · 로봇 3원칙 적용" data-tile="parchment"><div class="hd" data-in><div class="eb"><b>04</b>생각해 보기</div><h2>로봇은 어떻게 행동해야 할까?</h2></div><div class="qbox" style="left:120px;top:300px;width:820px;height:480px" data-in="200"><div class="qh">상황 A</div><div style="font-size:34px;line-height:1.5">어떤 사람이 로봇에게 "저 사람을 밀어 넘어뜨려!"라고 명령했다.</div><div data-step="1" class="mini" style="margin-top:26px">부딪치는 원칙: ② 명령을 따른다 ↔ ① 사람을 해치지 않는다</div><div data-step="2" class="c-act" style="font-size:34px;margin-top:20px;font-weight:600">→ 명령을 거부한다. ①이 ②보다 먼저이다.</div></div><div class="qbox" style="left:980px;top:300px;width:820px;height:625px" data-in="300"><div class="qh">상황 B</div><div style="font-size:34px;line-height:1.5">"불이 난 방에서 사람을 구해 와!" 로봇은 다른 사람을 위험에 빠뜨리지 않고 구조할 수 있지만, 자신은 망가질 수 있다.</div><div data-step="3" class="mini" style="margin-top:26px">교과서 요약으로 적용하기 · ② 명령을 따른다 ↔ ③ 자신을 보호한다</div><div data-step="4" class="c-act" style="font-size:34px;margin-top:20px;font-weight:600">→ 들어가서 구한다. ②가 ③보다 먼저이다.</div><div class="mini" style="margin-top:25px" data-step="5"><b>아무도 명령하지 않았다면?</b> 교과서 요약의 ①에는 구조 의무가 제시되지 않는다. 아시모프 단편의 ①에 따르면 이 상황에서는 구조한다.</div></div><div class="fine">수업용 가상 상황 · 교과서 요약과 원작의 제1원칙을 비교해 보자.</div></section><section class="slide" id="aiissues" data-title="인공지능·로봇으로 인한 사회적 문제" data-tile="dark"><div class="hd" data-in><div class="eb"><b>05</b>70여 년이 지난 지금</div><h2>인공지능·로봇과 함께하는 일상, 어떤 문제가 생길까?</h2></div><div class="abs" id="issuegrid" style="left:120px;top:290px;width:1680px;display:grid;grid-template-columns:repeat(3,1fr);gap:22px" data-interactive><button class="ds-card is-card" type="button" data-issue="1" aria-pressed="false" inert data-step="1"><span class="ds-h">전쟁에서 로봇 사용을 허용해도 될까?</span><span class="ds-p pk">관심 쟁점</span></button><button class="ds-card is-card" type="button" data-issue="2" aria-pressed="false" inert data-step="1" data-delay="120"><span class="ds-h">자율주행 자동차가 사고를 내면 누구의 책임일까?</span><span class="ds-p pk">관심 쟁점</span></button><button class="ds-card is-card" type="button" data-issue="3" aria-pressed="false" inert data-step="1" data-delay="240"><span class="ds-h">인공지능 로봇에게 인간의 일자리를 빼앗기지 않을까?</span><span class="ds-p pk">관심 쟁점</span></button><button class="ds-card is-card" type="button" data-issue="4" aria-pressed="false" inert data-step="2"><span class="ds-h">인공지능이 만든 글이나 그림을 창작물로 인정할 수 있을까?</span><span class="ds-p pk">관심 쟁점</span></button><button class="ds-card is-card" type="button" data-issue="5" aria-pressed="false" inert data-step="2" data-delay="120"><span class="ds-h">인공지능이 성별이나 인종에 편향된 자료로 학습하면 어떤 판단을 내릴까?</span><span class="ds-p pk">관심 쟁점</span></button><button class="ds-card is-card" type="button" data-issue="6" aria-pressed="false" inert data-step="2" data-delay="240"><span class="ds-h">법 집행이나 의료 진단에서 인공지능의 판단을 얼마나 믿을 수 있을까?</span><span class="ds-p pk">관심 쟁점</span></button></div><div class="abs mini center" style="left:120px;top:880px;width:1680px" data-step="3">가장 관심 가는 쟁점을 눌러 표시해 보자. 표시한 쟁점을 중심으로 토론한다.</div><div class="fine">교과서 148쪽 「인공지능, 로봇으로 인한 사회적 문제」</div></section><section class="slide" id="ssi" data-title="과학 관련 사회적 쟁점(SSI)" data-tile="light"><div class="hd" data-in><div class="eb"><b>06</b>과학 관련 사회적 쟁점</div><h2>과학기술의 발전이 늘 긍정적인 것은 아니다</h2></div><div class="ws-card" style="left:120px;top:300px;width:1680px" data-in="200"><div class="ws-h"><b>정의</b><span>Socioscientific Issues, SSI</span></div><div class="ws-line">과학기술의 발전과 함께 생겨나는 과학과 관련된 다양한 사회 문화적 쟁점 → <span class="bk wide"><span class="a" data-step="1" data-fx="pop">과학 관련 사회적 쟁점</span></span></div></div><div class="abs t-label mute" style="left:120px;top:560px;width:1680px" data-step="2">대표적인 예</div><div class="abs" style="left:120px;top:610px;width:1680px;display:grid;grid-template-columns:repeat(5,1fr);gap:20px"><div class="ssi-card" data-step="2" data-delay="0"><svg viewBox="0 0 120 110" aria-hidden="true"><rect x="52" y="10" width="16" height="62" rx="8" fill="none" stroke="var(--heat)" stroke-width="5"/><circle cx="60" cy="80" r="14" fill="var(--heat)"/><path d="M60 40v34" stroke="var(--heat)" stroke-width="6"/></svg><span class="c-heat">기후 변화에 따른 기후 위기</span></div><div class="ssi-card" data-step="2" data-delay="120"><svg viewBox="0 0 120 110" aria-hidden="true"><path d="M24 92l10-62h20l10 62zM66 92l8-44h18l8 44z" fill="none" stroke="var(--light)" stroke-width="5" stroke-linejoin="round"/><path d="M36 22q6-12 18-4" fill="none" stroke="var(--t3)" stroke-width="4" stroke-linecap="round"/></svg><span class="c-light">원자력 발전소 안전성에 대한 걱정</span></div><div class="ssi-card" data-step="2" data-delay="240"><svg viewBox="0 0 120 110" aria-hidden="true"><path d="M40 8q40 22 0 44q-40 22 0 44M80 8q-40 22 0 44q40 22 0 44" fill="none" stroke="var(--kin)" stroke-width="5"/><path d="M46 22h28M46 52h28M46 82h28" stroke="var(--t3)" stroke-width="4"/></svg><span class="c-kin">유전자조작의 위험성</span></div><div class="ssi-card" data-step="2" data-delay="360"><svg viewBox="0 0 120 110" aria-hidden="true"><path d="M46 10h28M50 10v28l-24 48q-4 10 8 10h52q12 0 8-10l-24-48V10" fill="none" stroke="var(--chem)" stroke-width="5" stroke-linejoin="round"/><path d="M38 70h44" stroke="var(--chem)" stroke-width="4"/><circle cx="96" cy="100" r="6" fill="var(--chem)"/></svg><span class="c-chem">화학 물질의 유출</span></div><div class="ssi-card" data-step="2" data-delay="480"><svg viewBox="0 0 120 110" aria-hidden="true"><rect x="32" y="26" width="56" height="56" rx="10" fill="none" stroke="var(--elec)" stroke-width="5"/><text x="60" y="64" text-anchor="middle" font-size="22" font-weight="800" fill="var(--elec)">AI</text><path d="M44 14v12M60 14v12M76 14v12M44 82v12M60 82v12M76 82v12" stroke="var(--elec)" stroke-width="4"/></svg><span class="c-elec">인공지능 윤리 문제</span></div></div><div class="fine">교과서 149쪽</div></section><section class="slide" id="fields" data-title="분야별 과학 관련 사회적 쟁점" data-tile="parchment"><div class="hd" data-in><div class="eb"><b>07</b>분야별 쟁점</div><h2>우리 생활 곳곳에 과학 관련 사회적 쟁점이 있다</h2></div><div class="dev-card" style="left:120px;top:290px;width:820px;height:300px" data-step="1"><span class="echip e-light">에너지 분야</span><svg class="card-art fa" viewBox="0 0 120 100" aria-hidden="true"><path d="M20 95l10-70h22l10 70z" fill="none" stroke="var(--light)" stroke-width="5" stroke-linejoin="round"/><path d="M58 95l8-50h18l8 50z" fill="none" stroke="var(--light)" stroke-width="5" stroke-linejoin="round"/><path d="M34 18q6-12 16-6q8-10 18 0" fill="none" stroke="var(--t3)" stroke-width="4" stroke-linecap="round"/></svg><p class="lead2">원자력 발전소, 방사성 폐기물, 해양 자원 이용</p></div><div class="dev-card" style="left:980px;top:290px;width:820px;height:300px" data-step="2"><span class="echip e-sound">생명윤리</span><svg class="card-art fa" viewBox="0 0 120 100" aria-hidden="true"><path d="M40 10q40 20 0 40q-40 20 0 40M80 10q-40 20 0 40q40 20 0 40" fill="none" stroke="var(--sound)" stroke-width="5"/><path d="M46 22h28M46 50h28M46 78h28" stroke="var(--t3)" stroke-width="4"/></svg><p class="lead2">안락사, 동물 실험, 배아 연구, 맞춤 아기, 인간 복제</p></div><div class="dev-card" style="left:120px;top:620px;width:820px;height:300px" data-step="3"><span class="echip e-heat">건강 분야</span><svg class="card-art fa" viewBox="0 0 120 100" aria-hidden="true"><rect x="22" y="38" width="76" height="30" rx="15" transform="rotate(-30 60 53)" fill="none" stroke="var(--heat)" stroke-width="5"/><path d="M48 32l24 42" stroke="var(--heat)" stroke-width="5" transform="rotate(0)"/></svg><p class="lead2">식품 첨가물, 가습기 살균제, 항생제 남용, 비만과 다이어트</p></div><div class="dev-card" style="left:980px;top:620px;width:820px;height:300px" data-step="4"><span class="echip e-kin">환경 분야</span><svg class="card-art fa" viewBox="0 0 120 100" aria-hidden="true"><circle cx="60" cy="52" r="38" fill="none" stroke="var(--kin)" stroke-width="5"/><path d="M30 40q14 6 20-6q12 4 14 18q-10 10 -4 24M70 20q6 12 18 10q6 14 -6 22" fill="none" stroke="var(--kin)" stroke-width="4" stroke-linecap="round"/></svg><p class="lead2">화학 물질, 미세 먼지, 기후 변화, 간척 사업, 지구 온난화, 원시림 벌목, 미세 플라스틱</p></div><div class="fine" style="bottom:28px">교과서 149쪽 그림 Ⅲ-6 「과학 관련 사회적 쟁점」</div></section><section class="slide" id="decide" data-title="쟁점을 다루는 방법" data-tile="dark"><div class="hd" data-in><div class="eb"><b>08</b>왜 어려울까?</div><h2>하나의 쟁점에 여러 입장과 이해관계가 얽혀 있다</h2></div><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="decide-g"></g></svg><div class="fine">교과서 149쪽</div></section><section class="slide" id="ethics" data-title="과학 윤리" data-tile="light"><div class="hd" data-in><div class="eb"><b>09</b>과학 윤리</div><h2>과학 연구와 기술 이용에도 지켜야 할 원칙이 있다</h2></div><div class="ws-card" style="left:120px;top:290px;width:1680px" data-in="200"><div class="ws-h"><b>정의</b></div><div class="ws-line">과학 연구를 수행하거나 과학기술을 이용할 때 지켜야 할 윤리적 원칙과 기준 → <span class="bk wide"><span class="a" data-step="1" data-fx="pop">과학 윤리</span></span></div></div><div class="dev-card" style="left:120px;top:520px;width:390px;height:330px" data-step="2"><span class="echip e-heat">생명 존중</span><svg class="card-art" style="height:150px" viewBox="0 0 120 100" aria-hidden="true"><path d="M60 88C20 60 14 40 24 26c10-14 28-10 36 6c8-16 26-20 36-6c10 14 4 34-36 62z" fill="var(--heat)" opacity=".85"/></svg></div><div class="dev-card" style="left:540px;top:520px;width:390px;height:330px" data-step="2" data-delay="120"><span class="echip e-elec">공정성</span><svg class="card-art" style="height:150px" viewBox="0 0 120 100" aria-hidden="true"><path d="M60 14v74M30 88h60M20 30h80" stroke="var(--elec)" stroke-width="5" stroke-linecap="round"/><path d="M20 30l-12 30h24zM100 30l-12 30h24z" fill="none" stroke="var(--elec)" stroke-width="4" stroke-linejoin="round"/></svg></div><div class="dev-card" style="left:960px;top:520px;width:390px;height:330px" data-step="2" data-delay="240"><span class="echip e-light">안전</span><svg class="card-art" style="height:150px" viewBox="0 0 120 100" aria-hidden="true"><path d="M60 8l38 14v28c0 24-16 38-38 46c-22-8-38-22-38-46V22z" fill="none" stroke="var(--light)" stroke-width="5" stroke-linejoin="round"/><path d="M42 52l12 12 24-26" fill="none" stroke="var(--light)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="dev-card" style="left:1380px;top:520px;width:420px;height:330px" data-step="2" data-delay="360"><span class="echip e-kin">환경적 책임</span><svg class="card-art" style="height:150px" viewBox="0 0 120 100" aria-hidden="true"><path d="M60 92V50M60 62q-30 0 -34 -36q32 0 34 36M60 50q4 -30 34 -34q0 34 -34 34" fill="none" stroke="var(--kin)" stroke-width="5" stroke-linejoin="round"/></svg></div><div class="abs tagline center" style="left:120px;top:890px;width:1680px;font-size:38px" data-step="3">과학기술이 <span class="bk wide"><span class="a" data-step="3" data-fx="pop" data-delay="200">인류 전체</span></span>에게 이익이 되도록 하는 <b>최소한의 원칙</b>이다.</div><div class="fine" style="bottom:28px">교과서 149쪽</div></section><section class="slide" id="match" data-title="쟁점과 과학 윤리 연결하기" data-tile="dark"><div class="hd" data-in><div class="eb"><b>10</b>연결해 보기</div><h2>이 쟁점에서는 어떤 과학 윤리가 특히 중요할까?</h2></div><div class="abs" style="left:120px;top:290px;width:1680px;display:grid;grid-template-columns:repeat(2,1fr);gap:24px" data-interactive><button class="ds-card mt-card" style="height:250px"><span class="ds-h">동물 실험</span><span class="ds-i" data-step="1"><b class="c-heat">생명 존중</b> · 실험동물의 고통을 줄이고 꼭 필요한 만큼만 하고 있을까?</span></button><button class="ds-card mt-card" style="height:250px"><span class="ds-h">가습기 살균제</span><span class="ds-i" data-step="2"><b class="c-light">안전</b> · 제품을 팔기 전에 사람에게 해가 없는지 충분히 확인했을까?</span></button><button class="ds-card mt-card" style="height:250px"><span class="ds-h">미세 플라스틱</span><span class="ds-i" data-step="3"><b class="c-kin">환경적 책임</b> · 만들고 버리는 과정이 환경에 남길 영향을 생각했을까?</span></button><button class="ds-card mt-card" style="height:250px"><span class="ds-h">인공지능의 차별적 학습</span><span class="ds-i" data-step="4"><b class="c-elec">공정성</b> · 특정 성별이나 인종에게 불리한 판단을 하지 않을까?</span></button></div><div class="abs mini center" style="left:120px;top:870px;width:1680px" data-step="5">한 쟁점에 여러 원칙이 함께 관련될 수 있다. 다른 원칙도 찾아보자.</div><div class="fine">교과서 149쪽 내용을 바탕으로 만든 연결 활동 · 카드를 눌러 하나씩 열 수 있다.</div></section><section class="slide" id="inq-title" data-title="탐구 · 과학 관련 사회적 쟁점 토론" data-tile="black"><svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="inq-hero"></g></svg><div class="abs t-eyebrow" style="left:120px;top:300px;width:1680px;" data-in="100"><span class="c-kin">탐구</span> · 2차시 · 문제 상황에 적용 | 과학적 의사 결정</div><div class="abs t-title" style="left:120px;top:370px;width:1100px;" data-in="300">과학 관련 사회적 쟁점 토론하기</div><div class="abs t-lead" style="left:120px;top:560px;width:1100px;" data-in="600">과학기술이 발전하면서 다가올 미래에 우리는 어떤 새로운 문제를 만나게 될까?</div><div class="abs t-lead c-kin" style="left:120px;top:730px;width:1100px;" data-step="1">이런 문제를 풀 때 사회적 논의와 합의 과정은 어떠해야 할까?</div><div class="fine">교과서 150쪽 · 50분 · 작품 선택 5분 → 자료 읽기 10분 → 토의 15분 → 정책 1개 작성 12분 → 공유 8분</div></section><section class="slide" id="films" data-title="탐구 1 · 영화 속 쟁점" data-tile="dark"><div class="hd" data-in><div class="eb"><b>11</b>탐구하기 1</div><h2>작품 한 편을 골라 쟁점과 두 입장을 찾자</h2></div><div class="abs" style="left:120px;top:280px;width:1680px;display:grid;grid-template-columns:repeat(3,1fr);gap:22px"><div class="film" data-step="1"><span class="echip e-elec">인공지능</span><b>아이, 로봇 (2004)</b><p>형사는 로봇 써니가 사건에 연루됐다고 의심한다.</p></div><div class="film" data-step="1" data-delay="120"><span class="echip e-sound">생명윤리</span><b>마이 시스터즈 키퍼</b><p>안나는 자신의 몸에 관한 결정을 스스로 내리려 한다.</p></div><div class="film" data-step="1" data-delay="240"><span class="echip e-elec">인공지능</span><b>2001 스페이스 오디세이</b><p>우주선을 관리하는 AI HAL의 판단과 승무원의 안전이 충돌한다.</p></div><div class="film" data-step="2"><span class="echip e-kin">환경</span><b>비포 더 플러드</b><p>기후 변화의 영향과 대응을 여러 지역에서 살펴보는 다큐멘터리</p></div><div class="film" data-step="2" data-delay="120"><span class="echip e-sound">생명윤리</span><b>옥자</b><p>기업이 키운 슈퍼돼지 옥자를 데려가자 미자가 옥자를 찾으러 나선다.</p></div><div class="film" data-step="2" data-delay="240"><span class="echip e-kin">환경</span><b>승리호</b><p>우주 쓰레기를 수거하는 승리호 선원들이 도로시를 발견한다.</p></div></div><div class="fine">교과서 150~151쪽 · 하단의 「탐구 읽기」에서 작품별 상황, 토의 질문과 현실 자료를 확인하자.</div></section><section class="slide" id="example" data-title="정리 예시 · 아이, 로봇" data-tile="light"><div class="hd" data-in><div class="eb"><b>12</b>정리 예시</div><h2>「아이, 로봇」에는 어떤 쟁점과 입장이 있을까?</h2></div><div class="ws-card" style="left:120px;top:290px;width:1680px" data-in="200"><div class="ws-h"><b>탐구 정리</b><span>예시 · 영화 「아이, 로봇」</span></div><div class="ws-row"><span class="tm">쟁점</span><span><span class="a" data-step="1">· 인공지능 로봇이 인간에게 위험이 될 수 있는가?<br>· 인공지능 로봇에게 자율성을 허락할 수 있는가?</span></span></div><div class="ws-row"><span class="tm">로봇 주인공</span><span><span class="a" data-step="2">자신의 존재 의미와 자유, 인간과 로봇이 함께 살 수 있는지를 고민한다.</span></span></div><div class="ws-row"><span class="tm">형사</span><span><span class="a" data-step="3">로봇을 깊이 불신하며, 로봇이 인간을 위협할 수 있다고 생각한다.</span></span></div></div><div class="abs mini" style="left:120px;top:880px;width:1680px" data-step="4">현실로 이어지는 질문 · 기계에 판단을 어디까지 맡길까? 판단이 틀렸을 수 있다면 누가 확인하고 바로잡을까?</div><div class="fine">교과서 150쪽 「탐구하기」 1 예시 · 「모둠 활동 유의점」</div></section><section class="slide" id="lens" data-title="탐구 2·3 · 자료 읽기와 토의" data-tile="parchment">
+  <div class="hd" data-in><div class="eb"><b>13</b>탐구하기 2 · 3</div><h2>일반 도로에서 자율주행차 시험을 허용할까?</h2></div>
+  <div class="qbox inquiry-evidence" style="left:120px;top:255px;width:1020px" data-in="200">
+    <div class="qh"><b>실제 조사 자료</b> · 2018년 미국 템피 사고</div>
+    <p>자율주행 기능을 시험하던 차량이 길을 건너던 보행자와 충돌했다. 미국 국가교통안전위원회(NTSB)는 차량 기록과 시험 운영 방식을 조사했다.</p>
+    <table class="evidence-table"><thead><tr><th scope="col">차량 시스템</th><th scope="col">조사에서 확인한 사실</th></tr></thead><tbody><tr><th scope="row">대상 감지</th><td>충돌 5.6초 전에 대상이 있음을 감지</td></tr><tr><th scope="row">분류·예측</th><td>보행자 분류와 이동 경로 예측에 실패</td></tr></tbody></table>
+  </div>
+  <div class="qbox inquiry-evidence" style="left:1160px;top:255px;width:640px" data-step="1">
+    <div class="qh"><b>시험 운영에서 드러난 문제</b></div>
+    <p>충돌이 임박한 상황에서는 비상 제동을 작동시키지 않고 운전자가 개입하도록 설계됐다. 조사에서는 운전자의 감시 실패와 업체의 위험 평가 부족도 확인했다.</p>
+    <p class="mini" style="margin-top:14px">보고서 요약과 원문은 하단 「탐구 읽기」에서 확인</p>
+  </div>
+  <div class="abs" style="left:120px;top:697px;width:1680px" data-step="2">
+    <p class="t-label">가상 상황 · 우리 시가 일반 도로 시험 운행을 검토한다면?</p>
+    <p class="t-body" style="margin-top:14px">다양한 교통 상황에서 기술을 검증하려는 <b>시험 업체</b>와 안전하게 다니려는 <b>보행자</b>의 입장을 비교하자.</p>
+    <p class="t-body" style="margin-top:14px">사고 한 건에서 확인한 사실을 바탕으로, 우리 시의 시험을 결정하기 전에 더 확인할 자료를 찾아보자.</p>
+  </div>
+  <div class="fine">교과서 151쪽 「탐구하기」 2 · 3 · 출처는 미국 국가교통안전위원회 템피 사고 조사 보고서 (2019)</div>
+</section><section class="slide" id="policy" data-title="탐구 4 · 정책 제안서" data-tile="light">
+  <div class="hd" data-in><div class="eb"><b>14</b>탐구하기 4</div><h2>모둠에서 정책 한 가지를 제안해 보자</h2></div>
+  <svg class="full-svg" viewBox="0 0 1920 1080" aria-hidden="true"><g id="doc-g"></g></svg>
+  <div class="qbox" style="left:1040px;top:300px;width:760px" data-step="5">
+    <div class="qh"><b>작성 예시</b> · 자율주행차의 일반 도로 시험</div>
+    <p class="mini"><b>자료와 원칙</b> · 템피 사고의 시험 차량은 대상을 감지했지만 보행자로 분류하지 못했다. 시험 중에는 보행자의 안전을 보호해야 한다.</p>
+    <p class="mini" style="margin-top:20px"><b>제안</b> · 시험 업체가 통제된 시험장에서 보행자 대응과 운전자 개입 절차를 검증한 뒤 일반 도로 시험을 검토한다.</p>
+    <p class="mini" style="margin-top:20px"><b>점검</b> · 가상 시의 검토팀이 시험 결과가 사전에 정한 기준을 충족하는지와 위험이 생겼을 때의 시험 중단 계획을 확인한다.</p>
+  </div>
+  <div class="fine">교과서 151쪽 「탐구하기」 4 · 서로 다른 입장을 비교한 뒤, 정책의 실행·점검 주체를 적자.</div>
+</section><section class="slide" id="wrap" data-title="정리하기 · 과학 윤리가 중요한 까닭" data-tile="dark"><div class="hd" data-in><div class="eb"><b>15</b>정리하기</div><h2>과학 윤리는 왜 중요할까?</h2></div><div class="abs t-lead" style="left:120px;top:300px;width:1680px" data-in="200">모둠별로 발표하고, 쟁점에 대응할 때 과학 윤리가 중요한 까닭을 논증해 보자.</div><div class="dev-card" style="left:120px;top:440px;width:820px;height:400px" data-step="1"><span class="echip e-heat">까닭 ①</span><h3 style="font-size:40px">기술이 합의보다 빠를 때</h3><p class="lead2">기술 개발 속도가 사회적 합의나 인식을 앞서면, 입장 차이로 쟁점이 생기고 사건·사고가 일어날 수 있다.</p></div><div class="dev-card" style="left:980px;top:440px;width:820px;height:400px" data-step="2"><span class="echip e-kin">까닭 ②</span><h3 style="font-size:40px">인간의 존엄성과 권리</h3><p class="lead2">예측하기 어려운 미래에도 인간의 존엄성과 권리를 지키려면, 개발과 사용 과정에서 과학 윤리를 반드시 고려해야 한다.</p></div><div class="fine">교과서 151쪽 「정리하기」 예시 답</div></section><section class="slide" id="reflect" data-title="평가하고 성찰하기" data-tile="parchment"><div class="hd" data-in><div class="eb"><b>16</b>평가하고 성찰하기</div><h2>탐구를 돌아보자</h2></div><div class="abs" style="left:120px;top:300px;width:1680px"><div class="check-row" data-step="1"><span class="reflect-mark" aria-hidden="true"></span><span>작품 속에서 쟁점이 될 만한 주제를 발견하였는가?</span></div><div class="check-row" data-step="2"><span class="reflect-mark" aria-hidden="true"></span><span>과학 관련 사회적 쟁점에 대한 나의 생각을 논리적으로 전달하였는가?</span></div><div class="check-row" data-step="3"><span class="reflect-mark" aria-hidden="true"></span><span>과학기술의 이용에서 과학 윤리의 중요성을 이해하였는가?</span></div></div><div class="fine">교과서 151쪽 「평가하고 성찰하기」</div></section><section class="slide" id="check" data-title="확인하기 · 근거를 들어 판단하기" data-tile="light">
+  <div class="hd" data-in><div class="eb"><b>17</b>확인하기</div><h2>개념을 확인하고 근거를 들어 판단해 보자</h2></div>
+  <div class="abs" style="left:120px;top:245px;width:1680px">
+    <div class="check-row" style="grid-template-columns:64px 1fr 380px"><b>1</b><span>과학기술의 발전 과정에서 생기는 과학 관련 사회·문화적 쟁점은?</span><span class="answer" data-step="1">과학 관련 사회적 쟁점(SSI)</span></div>
+    <div class="check-row" style="grid-template-columns:64px 1fr 380px"><b>2</b><span>과학 연구나 기술 이용에서 지켜야 할 윤리적 원칙과 기준은?</span><span class="answer" data-step="2">과학 윤리</span></div>
+  </div>
+  <div class="qbox" style="left:120px;top:500px;width:1680px" data-step="3">
+    <div class="qh"><b>3 · 근거를 들어 논증하기</b></div>
+    <p>템피 사고의 시험 차량은 대상을 감지했지만 보행자 분류와 이동 경로 예측에 실패했다. 우리 시의 일반 도로 시험을 허용할지, 조건을 붙일지, 보류할지 판단해 보자.</p>
+    <p class="mini" style="margin-top:14px">자료의 사실 하나와 과학 윤리 원칙 하나를 들어, 누가 어떤 조치를 해야 하는지 2~3문장으로 설명하자.</p>
+    <p class="mini c-act" style="margin-top:18px" data-step="4"><b>답안 예시</b> · 대상 감지가 곧 정확한 판단을 뜻하지는 않는다. 보행자의 안전을 위해, 시의 검토팀이 통제된 시험장에서 보행자 대응을 검증한 결과를 확인한 뒤에 시험을 허용하자.</p>
+  </div>
+  <div class="fine">[10통과2-03-04] · 자료에서 읽은 사실을 윤리 원칙과 연결하여 제안의 이유를 설명했는지 확인하자.</div>
+</section><section class="slide" id="summary" data-title="정리" data-tile="black"><div class="hd" data-in><div class="eb"><b>18</b>정리</div><h2>오늘 배운 것</h2></div><div class="abs" style="left:120px;top:290px;width:1680px;display:flex;flex-direction:column;gap:34px"><div class="sum-row" data-step="1"><span class="echip e-elec">쟁점</span><span>과학기술의 발전은 이전에 없던 사회적 쟁점(SSI)을 만든다.</span></div><div class="sum-row" data-step="2"><span class="echip e-light">의사 결정</span><span>다양한 관점을 이해하고 충분히 협의해 합리적으로 결정한다.</span></div><div class="sum-row" data-step="3"><span class="echip e-kin">과학 윤리</span><span>생명 존중, 공정성, 안전, 환경적 책임</span></div><div class="sum-row" data-step="4"><span class="echip e-heat">까닭</span><span>기술이 합의보다 앞설 때에도 인간의 존엄성과 권리를 지키기 위해</span></div></div><div class="abs callout" style="left:120px;top:830px;width:1680px;background:rgba(41,151,255,.12)" data-step="5"><b class="c-elec">Ⅲ단원을 마치며</b> · 빅데이터, 사물 인터넷, 인공지능을 쓸 때 우리는 어떤 과학 윤리를 지켜야 할까?</div></section>
+</main></div><div id="alwaysNav"><button onclick="Deck.prev()" aria-label="이전 단계">← 이전</button><button onclick="Deck.next()" aria-label="다음 단계">다음 →</button><button id="navPage" onclick="Deck.toggleOverview()" aria-label="쪽 목록 열기">1 / 20</button><button type="button" id="openInquiry" aria-haspopup="dialog">탐구 읽기</button></div>
+<dialog id="inquiryReader" aria-labelledby="inquiryTitle">
+  <header class="inquiry-bar">
+    <h2 id="inquiryTitle">과학 윤리 · 탐구 읽기</h2>
+    <form method="dialog"><button type="submit" autofocus>닫기</button></form>
+  </header>
+  <div class="inquiry-body">
+    <section aria-labelledby="activityFlow">
+      <h3 id="activityFlow">2차시 모둠 활동 · 50분</h3>
+      <ol>
+        <li><b>선택 5분</b> · 작품 한 편을 고르고 읽기, 기록, 발표 역할을 나눈다.</li>
+        <li><b>읽기 10분</b> · 작품 속 상황과 현실 자료를 읽는다. 자료에서 확인한 사실과 더 알아볼 점을 각각 적는다.</li>
+        <li><b>토의 15분</b> · 이해관계자 두 사람의 입장을 비교한다. 어떤 이익과 피해가 있고, 어떤 과학 윤리 원칙을 고려해야 할지 이야기한다.</li>
+        <li><b>제안 12분</b> · 모둠이 합의한 조건 한 가지를 적고 실행할 사람과 점검할 사람을 정한다.</li>
+        <li><b>공유 8분</b> · 모둠별 조건과 근거를 짧게 공유한다. 각자 수업이 끝나기 전 자신의 판단과 근거를 2~3문장으로 남긴다.</li>
+      </ol>
+    </section>
+    <section aria-labelledby="workCards">
+      <h3 id="workCards">작품 카드 · 한 편 고르기</h3>
+      <details>
+        <summary>아이, 로봇 (2004) · 로봇의 자율성과 책임</summary>
+        <p><b>작품 속 상황</b> · 로봇 설계자의 죽음을 조사하던 형사는 로봇 써니를 의심한다. 써니는 명령을 수행하는 것만으로 설명하기 어려운 행동을 한다.</p>
+        <p><b>토의 질문</b> · 로봇에 어떤 판단을 맡겨도 될까? 안전을 우선하는 형사와 로봇의 자율성을 고려하는 입장을 비교하자.</p>
+        <p><b>현실 자료</b> · 미국 국가교통안전위원회는 2018년 시험 자율주행차 사고에서 운전자의 감시 실패와 기업의 불충분한 안전 점검 절차를 조사했다. 시험 운행의 안전을 누가 어떻게 확인해야 할까?</p>
+        <p><a href="https://www.ntsb.gov/investigations/Pages/HWY18MH010.aspx" target="_blank" rel="noopener noreferrer">출처 · 미국 NTSB 사고 조사</a></p>
+      </details>
+      <details>
+        <summary>마이 시스터즈 키퍼 · 치료와 자기 결정</summary>
+        <p><b>작품 속 상황</b> · 언니에게 조직을 기증할 수 있도록 태어난 안나는 자신의 몸에 관한 결정권을 요구한다.</p>
+        <p><b>토의 질문</b> · 아픈 자녀의 치료 기회와 기증을 요청받은 아이의 의사를 어떻게 함께 보호할까?</p>
+        <p><b>현실 자료</b> · 미국생식의학회는 일부 질환에서 조직 적합성이 맞는 형제자매가 필요할 때, 적합성을 확인하는 배아 검사가 고려되는 상황을 설명한다. 기증을 요청받은 아이의 의사는 어떤 절차로 확인해야 할까?</p>
+        <p><a href="https://www.asrm.org/practice-guidance/practice-committee-documents/indications-and-management-of-preimplantation-genetic-testing-for-monogenic-conditions-a-committee-opinion-2023/" target="_blank" rel="noopener noreferrer">출처 · 미국생식의학회 위원회 의견 (2023)</a></p>
+      </details>
+      <details>
+        <summary>2001 스페이스 오디세이 · 자동화와 제어권</summary>
+        <p><b>작품 속 상황</b> · 우주선을 관리하는 HAL의 장비 고장 예측이 빗나간다. 우주비행사들은 HAL의 판단을 계속 따를지 고민한다.</p>
+        <p><b>토의 질문</b> · 임무를 효율적으로 수행하는 자동화 시스템과 비상시에 개입해야 하는 승무원 사이에 제어권을 어떻게 나눌까?</p>
+        <p><b>현실 자료</b> · 미국 국립표준기술연구소의 AI 위험 관리 체계는 제품의 설계·개발·사용·평가에서 위험을 관리하도록 돕는 자발적 지침이다. 사람의 개입이 필요한 기준과 그 기준을 시험하는 방법을 제안하자.</p>
+        <p><a href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank" rel="noopener noreferrer">출처 · 미국 NIST AI 위험 관리 체계</a></p>
+      </details>
+      <details>
+        <summary>비포 더 플러드 · 기후 대응과 비용 분담</summary>
+        <p><b>다큐멘터리 속 상황</b> · 여러 지역의 기후 변화 영향을 살펴보고 과학자와 정책 결정자의 설명을 듣는다.</p>
+        <p><b>토의 질문</b> · 국가마다 배출량과 경제적 여건이 다를 때 감축 부담과 지원을 어떻게 나눌까?</p>
+        <p><b>현실 자료</b> · 파리협정 당사국은 각자의 온실가스 감축 목표를 마련하고 제출한다. 협정은 선진국이 개발도상국의 기후 대응을 재정적으로 지원하도록 한다.</p>
+        <p><a href="https://unfccc.int/most-requested/key-aspects-of-the-paris-agreement" target="_blank" rel="noopener noreferrer">출처 · 유엔기후변화협약 파리협정 핵심 내용</a></p>
+      </details>
+      <details>
+        <summary>옥자 · 축산 기술과 동물 복지</summary>
+        <p><b>작품 속 상황</b> · 기업이 옥자를 데려가자 미자는 옥자를 되찾으려 한다. 두 쪽은 옥자를 대하는 기준이 다르다.</p>
+        <p><b>토의 질문</b> · 생산성을 높이는 축산 기술을 도입할 때, 기업은 동물의 건강과 복지를 어떻게 확인하고 공개해야 할까?</p>
+        <p><b>현실 자료</b> · 세계동물보건기구는 돼지 사육의 복지를 평가할 때 행동과 건강 상태 같은 지표를 고려한다. 사육 환경을 평가할 지표 한 가지를 골라 보자.</p>
+        <p><a href="https://www.woah.org/fileadmin/Home/eng/Health_standards/tahc/2024/en_chapitre_aw_pigs.htm" target="_blank" rel="noopener noreferrer">출처 · 세계동물보건기구 육상동물보건규약 7.13장 (2024)</a></p>
+      </details>
+      <details>
+        <summary>승리호 · 우주 쓰레기와 환경적 책임</summary>
+        <p><b>작품 속 상황</b> · 승리호 선원들은 우주 쓰레기를 수거하며 일한다. 이들이 도로시를 발견하면서 사건이 벌어진다.</p>
+        <p><b>토의 질문</b> · 우주 쓰레기를 줄이고 처리하는 비용은 위성을 운영하는 기업과 정부가 어떻게 나눠야 할까?</p>
+        <p><b>현실 자료</b> · 유럽우주국과 여러 기관이 참여한 제로 데브리 헌장은 우주 쓰레기 발생을 줄이기 위한 공동 목표를 제시한다. 헌장 참여는 자발적이다.</p>
+        <p><a href="https://www.esa.int/Space_Safety/Clean_Space/Zero_Debris_Charter_-_Frequently_Asked_Questions" target="_blank" rel="noopener noreferrer">출처 · 유럽우주국 제로 데브리 헌장 설명</a></p>
+      </details>
+    </section>
+    <section aria-labelledby="classroomExample">
+      <h3 id="classroomExample">공통 예시 · 일반 도로에서 자율주행차 시험을 허용할까?</h3>
+      <p><b>수업 상황</b> · 가상의 시가 보행자가 다니는 일반 도로에서 자율주행차 시험을 허용할지 검토한다. 허용, 조건부 허용, 보류 중 하나를 골라 이유를 말해 보자.</p>
+      <p><b>실제 조사 자료</b> · 2018년 미국 템피에서 시험 차량이 횡단보도가 없는 곳에서 길을 건너던 보행자와 충돌했다. 미국 국가교통안전위원회(NTSB)에 따르면 시스템은 충돌 5.6초 전에 대상을 감지했지만, 보행자로 정확히 분류하거나 이동 경로를 예측하지 못했다. 시스템은 충돌이 임박한 상황에서 비상 제동을 작동시키도록 설계되지 않아 운전자 개입에 의존했다. 조사에서는 운전자의 감시 실패와 업체의 위험 평가 및 운전자 관리 부족도 확인했다.</p>
+      <p><b>자료 읽기</b> · 5.6초는 차량 시스템에 남은 감지 기록이다. 운전자가 위험을 언제 알아차릴 수 있었는지는 별도의 자료로 살펴야 한다.</p>
+      <p><b>자료의 한계</b> · 이 사고는 한 시험 시스템과 그 운영에서 어떤 문제가 함께 나타났는지 보여 준다. 우리 시의 시험을 판단하려면 도입하려는 차량이 다양한 조건에서 보행자에게 어떻게 반응하는지, 운전자가 도로를 계속 살피고 필요할 때 개입할 수 있는지 더 확인해야 한다. 시험장 결과는 그곳에서 재현한 조건을 바탕으로 해석한다.</p>
+      <p><a href="https://www.ntsb.gov/investigations/Pages/HWY18MH010.aspx" target="_blank" rel="noopener noreferrer">출처 · 미국 국가교통안전위원회 템피 사고 조사 (보고서 2019)</a></p>
+      <p><b>두 입장</b> · 시험 업체는 실제 교통 상황에서 기술을 검증하고 싶다. 보행자는 시험 구간에서도 안전하게 다니고 싶다.</p>
+      <p><b>정책 예시</b> · 시험 업체가 통제된 시험장에서 보행자 대응과 운전자 개입 절차를 검증한 결과를 제출하면 일반 도로 시험을 검토한다. 시의 검토팀은 결과가 사전에 정한 기준을 충족하는지, 운전자의 주의 상태를 어떻게 확인하는지, 위험이 생겼을 때의 시험 중단 계획이 있는지 살핀다.</p>
+      <p><b>더 토의하기</b> · 시험장에서는 보기 어려운 실제 교통 상황이 있을까? 시험으로 얻는 정보와 보행자의 안전을 함께 고려해 시험 조건을 제안해 보자.</p>
+    </section>
+    <section aria-labelledby="groupPolicy">
+      <h3 id="groupPolicy">모둠 제안서 · 네 줄</h3>
+      <ol>
+        <li>우리 쟁점과 이해관계자 두 사람의 입장은 ______이다.</li>
+        <li>자료에서 확인한 사실은 ______이고, 더 알아볼 점은 ______이다.</li>
+        <li>우리는 ______ 원칙을 지키기 위해 ______ 조건을 제안한다.</li>
+        <li>______이 실행하고, ______이 ______ 방법으로 점검한다.</li>
+      </ol>
+      <p><b>개별 마무리</b> · 수업에서 확인한 자료와 과학 윤리 원칙을 들어, 내가 선택한 조건을 2~3문장으로 설명하자.</p>
+    </section>
+  </div>
+</dialog>
+<script>
+
+/* ═══════════════════════════════════════════════════════════════
+   core.js — 강의 덱 엔진
+   · 1920×1080 무대를 화면에 맞춰 배율(레터박스)
+   · 장면(scene) = 도입(enter, 저절로) + 빌드 단계(go(k), 클릭마다)
+   · 되돌아가기·건너뛰기는 "처음 상태로 복원 → 순간 재생"이라 언제나 같은 모습
+   · 애니메이션 도구는 ctx 가 쥐고 있어 장면을 떠나면 저절로 정리됨
+   ═══════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+  const SW = 1920, SH = 1080;
+  const Q = new URLSearchParams(location.search);
+  const STILL = Q.get('still') === '1';
+  // 공개 자료는 항상 학생용으로 제공한다.
+  const STUDENT = true;
+  if (STUDENT) document.documentElement.classList.add('student');
+  const REDUCED = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  if (STILL || Q.get('clean') === '1') document.documentElement.classList.add('still');
+  if (Q.get('grid') === '1') document.documentElement.classList.add('grid');
+  if (Q.get('log') === '1') {   // 검증용: 콘솔 수준을 앞머리로 남김(console.py 가 읽음)
+    const oe = console.error.bind(console), ow = console.warn.bind(console);
+    const txt = a => a.map(x => (x && x.stack) ? String(x.stack).split(String.fromCharCode(10)).slice(0, 2).join(' | ') : (typeof x === 'object' ? (() => { try { return JSON.stringify(x); } catch (e) { return String(x); } })() : String(x))).join(' ');
+    console.error = (...a) => oe('[ERR] ' + txt(a));
+    console.warn = (...a) => ow('[WARN] ' + txt(a));
+    window.addEventListener('error', e => oe('[ERR] uncaught ' + (e.message || '') + ' @' + (e.lineno || '')));
+    window.addEventListener('unhandledrejection', e => oe('[ERR] rejection ' + ((e.reason && e.reason.stack) || e.reason)));
+  }
+
+  /* ── 곡선 ── */
+  const EASE = {
+    out: 'cubic-bezier(.2,.8,.2,1)', outQuint: 'cubic-bezier(.22,1,.36,1)', inOut: 'cubic-bezier(.65,0,.35,1)',
+    in: 'cubic-bezier(.55,0,.75,.1)', spring: 'cubic-bezier(.34,1.56,.64,1)', soft: 'cubic-bezier(.25,.1,.25,1)', linear: 'linear',
+  };
+  const JE = {
+    linear: t => t,
+    out: t => 1 - Math.pow(1 - t, 3),
+    outQuint: t => 1 - Math.pow(1 - t, 5),
+    inOut: t => (t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2),
+    in: t => t * t * t,
+    soft: t => t * t * (3 - 2 * t),
+    spring: t => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); },
+    elastic: t => (t === 0 || t === 1) ? t : Math.pow(2, -10 * t) * Math.sin((t * 10 - .75) * (2 * Math.PI) / 3) + 1,
+  };
+
+  /* ── 등장 모양(선언형·ctx.reveal 공용) ── svg 요소에는 blur(필터) 빼고 */
+  const REVEAL = {
+    rise:  { k: [{ opacity: 0, transform: 'translateY(28px)', filter: 'blur(12px)' }, { opacity: 1, transform: 'translateY(0px)', filter: 'blur(0px)' }], dur: 900 },
+    fade:  { k: [{ opacity: 0 }, { opacity: 1 }], dur: 700 },
+    blur:  { k: [{ opacity: 0, transform: 'scale(1.06)', filter: 'blur(24px)' }, { opacity: 1, transform: 'scale(1)', filter: 'blur(0px)' }], dur: 1100 },
+    scale: { k: [{ opacity: 0, transform: 'scale(.92)' }, { opacity: 1, transform: 'scale(1)' }], dur: 900 },
+    pop:   { k: [{ opacity: 0, transform: 'scale(.5)' }, { opacity: 1, transform: 'scale(1)' }], dur: 750, ease: 'spring' },
+    left:  { k: [{ opacity: 0, transform: 'translateX(-64px)' }, { opacity: 1, transform: 'translateX(0px)' }], dur: 900 },
+    right: { k: [{ opacity: 0, transform: 'translateX(64px)' }, { opacity: 1, transform: 'translateX(0px)' }], dur: 900 },
+    down:  { k: [{ opacity: 0, transform: 'translateY(-28px)' }, { opacity: 1, transform: 'translateY(0px)' }], dur: 900 },
+    up:    { k: [{ opacity: 0, transform: 'translateY(72px)' }, { opacity: 1, transform: 'translateY(0px)' }], dur: 1000 },
+    draw:  { k: [{ opacity: 1, strokeDashoffset: 1 }, { opacity: 1, strokeDashoffset: 0 }], dur: 1200, ease: 'inOut' },
+    wipe:  { k: [{ opacity: 1, clipPath: 'inset(0 100% 0 0)' }, { opacity: 1, clipPath: 'inset(0 0% 0 0)' }], dur: 1000, ease: 'inOut' },
+    none:  { k: [{ opacity: 1 }, { opacity: 1 }], dur: 1 },
+  };
+  const isSVG = el => el instanceof SVGElement && !(el instanceof SVGSVGElement);
+  const GEOM = 'path,line,polyline,polygon,circle,ellipse,rect';
+  const noFilter = k => k.map(f => { const g = Object.assign({}, f); delete g.filter; return g; });
+
+  const STUB = { finished: Promise.resolve(), cancel() {}, finish() {}, pause() {}, play() {}, playbackRate: 1, effect: null };
+
+  /* ═════════ 장면 도구 상자 ═════════ */
+  class Ctx {
+    constructor(root, idx) {
+      this.root = root; this.idx = idx; this.instant = false; this.alive = true;
+      this.reduced = REDUCED; this.still = STILL; this.E = EASE; this.JE = JE; this.data = {};
+      this._anims = []; this._loops = []; this._timers = []; this._waits = []; this._tweens = []; this._sfxT = []; this._disp = [];
+    }
+    /** 효과음: SFX.play(name, a, b) 를 delay ms 뒤에. 순간 모드(되돌리기·복원)·건너뛰기·장면 나감이면 조용히 */
+    sfx(name, delay = 0, a, b) {
+      if (STILL || this.instant || !this.alive || !window.SFX) return;
+      if (delay > 0) { const id = setTimeout(() => { if (this.alive && !this.instant) SFX.play(name, a, b); }, delay); this._sfxT.push(id); }
+      else SFX.play(name, a, b);
+    }
+    /** 이어지는 소리('fan'|'hum'|'boil') — 장면을 떠나면 저절로 멎는다. 반환: {level(v), whine(v), stop()} */
+    sfxLoop(kind, o) { const h = window.SFX ? SFX.loop(kind, o) : null; if (h) this._disp.push(() => h.stop()); return h; }
+    onDispose(fn) { this._disp.push(fn); }
+    $(s) { return this.root.querySelector(s); }
+    $$(s) { return Array.from(this.root.querySelectorAll(s)); }
+    _el(el) { return typeof el === 'string' ? this.$(el) : el; }
+    _els(els) { if (typeof els === 'string') return this.$$(els); if (!els) return []; return (els.length !== undefined && !(els instanceof Element)) ? Array.from(els) : [els]; }
+
+    /** Web Animations 한 방. o: {dur, delay, ease, fill, iter, dir, composite}. 순간 모드면 바로 끝 상태 */
+    a(el, kf, o = {}) {
+      el = this._el(el);
+      if (!el || !this.alive) return STUB;
+      const infinite = o.iter === Infinity;
+      const inst = (this.instant || this.reduced) && !infinite;
+      const an = el.animate(kf, {
+        duration: inst ? 0 : (o.dur ?? 700), delay: inst ? 0 : (o.delay ?? 0),
+        easing: EASE[o.ease] || o.ease || EASE.out, fill: o.fill || 'both',
+        iterations: o.iter ?? 1, direction: o.dir || 'normal', composite: o.composite || 'replace',
+      });
+      if (inst) { try { an.finish(); } catch (e) {} }
+      this._anims.push(an);
+      return an;
+    }
+    /** 여러 요소에 시차(stagger ms)를 두고 같은 애니 */
+    all(els, kf, o = {}) {
+      return this._els(els).map((e, i) => this.a(e, typeof kf === 'function' ? kf(e, i) : kf, Object.assign({}, o, { delay: (o.delay || 0) + i * (o.stagger || 0) })));
+    }
+    /** 등장: fx = rise|fade|blur|scale|pop|left|right|down|up|draw|wipe */
+    reveal(el, fx = 'rise', o = {}) {
+      const els = this._els(el); const out = [];
+      els.forEach((e, i) => {
+        const P = REVEAL[fx] || REVEAL.rise;
+        const d = Object.assign({ dur: P.dur, ease: P.ease || 'out' }, o);
+        if (o.stagger) d.delay = (o.delay || 0) + i * o.stagger;
+        // 효과음: 학습지 빈칸 답이 채워지면 「띠링」, pop·up 등장이면 「톡」
+        if (!this.instant) {
+          const sk = (e.classList && e.classList.contains('a') && e.parentElement && e.parentElement.classList.contains('bk')) ? 'blank' : ((fx === 'pop' || fx === 'up') ? 'pop' : null);
+          if (sk) this.sfx(sk, d.delay || 0);
+        }
+        if (fx === 'draw') {
+          const geo = (e.matches && e.matches(GEOM)) ? [e] : Array.from(e.querySelectorAll(GEOM));
+          this.a(e, [{ opacity: 1 }, { opacity: 1 }], { dur: 1, delay: d.delay });
+          geo.forEach(g => { if (!g.hasAttribute('pathLength')) g.setAttribute('pathLength', '1'); out.push(this.a(g, P.k, d)); });
+        } else {
+          out.push(this.a(e, isSVG(e) ? noFilter(P.k) : P.k, d));
+        }
+      });
+      return out.length === 1 ? out[0] : { finished: Promise.all(out.map(x => x.finished)), list: out };
+    }
+    /** 사라짐(기본: 흐려지며 살짝 위로) */
+    hide(el, o = {}) {
+      return this.all(el, isSVG(this._els(el)[0] || document.body) ? [{ opacity: 1 }, { opacity: 0 }] : [{ opacity: 1, filter: 'blur(0px)' }, { opacity: 0, filter: 'blur(8px)' }],
+        Object.assign({ dur: 500, ease: 'out' }, o));
+    }
+    /** 기다리기(순간 모드면 곧장) */
+    wait(ms) {
+      if (this.instant || !this.alive) return Promise.resolve();
+      return new Promise(res => { const w = { res }; w.t = setTimeout(() => { const i = this._waits.indexOf(w); if (i >= 0) this._waits.splice(i, 1); res(); }, ms); this._waits.push(w); });
+    }
+    /** JS 트윈 — WAAPI 로 못 움직이는 것(속성·viewBox·path d·숫자). fn(p, rawT) */
+    tween(dur, fn, o = {}) {
+      const ease = typeof o.ease === 'function' ? o.ease : (JE[o.ease] || JE.out);
+      if (this.instant || !this.alive) { if (this.alive) fn(1, 1); return Promise.resolve(); }
+      const delay = o.delay || 0;
+      return new Promise(res => {
+        let start = null, done = false, id = 0;
+        const tw = {
+          finish: () => { if (done) return; done = true; cancelAnimationFrame(id); try { fn(1, 1); } catch (e) { console.error(e); } res(); },
+          kill: () => { if (done) return; done = true; cancelAnimationFrame(id); res(); },
+        };
+        this._tweens.push(tw);
+        if (!o.noInit) { try { fn(0, 0); } catch (e) { console.error(e); } }
+        const tick = now => {
+          if (done) return;
+          if (start === null) start = now + delay;
+          const t = (now - start) / dur;
+          if (t < 0) { id = requestAnimationFrame(tick); return; }
+          if (t >= 1) { tw.finish(); return; }
+          try { fn(ease(t), t); } catch (e) { console.error(e); tw.kill(); return; }
+          id = requestAnimationFrame(tick);
+        };
+        id = requestAnimationFrame(tick);
+      });
+    }
+    /** 숫자 굴리기. o.fmt(v) 로 모양 */
+    count(el, from, to, o = {}) {
+      el = this._el(el); if (!el) return Promise.resolve();
+      const fmt = o.fmt || (v => Math.round(v).toLocaleString('ko-KR'));
+      if (to !== from) this.sfx('counter', o.delay || 0, o.dur ?? 1200);
+      return this.tween(o.dur ?? 1200, p => { el.textContent = fmt(from + (to - from) * p); }, Object.assign({ ease: 'outQuint' }, o));
+    }
+    /** 선 그리기(pathLength=1 을 붙여 stroke-dashoffset 1→0) */
+    draw(el, o = {}) { return this.reveal(el, 'draw', o); }
+    /** SVG 카메라 — viewBox 를 [x,y,w,h] 로 옮김 */
+    camera(svg, to, o = {}) {
+      svg = this._el(svg); if (!svg) return Promise.resolve();
+      const from = (svg.getAttribute('viewBox') || `0 0 ${SW} ${SH}`).split(/[\s,]+/).map(Number);
+      this.sfx('whoosh', o.delay || 0, o.dur ?? 1400, .55);
+      return this.tween(o.dur ?? 1400, p => { svg.setAttribute('viewBox', from.map((v, i) => (v + (to[i] - v) * p).toFixed(2)).join(' ')); }, Object.assign({ ease: 'inOut' }, o));
+    }
+    /** 장면이 살아 있는 동안 도는 고리. fn(t초, dt초). 반환값.stop() */
+    loop(fn) {
+      const L = { on: true, t: 0, last: null, id: 0 };
+      const tick = now => {
+        if (!L.on || !this.alive) return;
+        const dt = L.last === null ? 0 : Math.min(0.05, (now - L.last) / 1000);
+        L.last = now; L.t += dt;
+        try { fn(L.t, dt); } catch (e) { console.error('[loop]', e); L.on = false; return; }
+        L.id = requestAnimationFrame(tick);
+      };
+      L.stop = () => { L.on = false; cancelAnimationFrame(L.id); };
+      L.id = requestAnimationFrame(tick);
+      this._loops.push(L);
+      return L;
+    }
+    timer(fn, ms) { const id = setTimeout(() => { if (this.alive) fn(); }, this.instant ? 0 : ms); this._timers.push(id); return id; }
+    every(fn, ms) { const id = setInterval(() => { if (this.alive) fn(); }, ms); this._timers.push(id); return id; }
+    /** 지금 도는 것을 끝 상태로(클릭이 애니 도중에 오면) */
+    hurry() {
+      this.instant = true;
+      this._sfxT.splice(0).forEach(id => clearTimeout(id));      // 아직 울리기 전인 효과음은 접는다
+      this._anims.forEach(a => { try { const t = a.effect && a.effect.getComputedTiming(); if (t && t.iterations !== Infinity && a.playState !== 'finished') a.finish(); } catch (e) {} });
+      this._tweens.slice().forEach(tw => tw.finish());
+      this._waits.splice(0).forEach(w => { clearTimeout(w.t); w.res(); });
+    }
+    dispose() {
+      this.alive = false;
+      this._sfxT.splice(0).forEach(id => clearTimeout(id));
+      this._disp.splice(0).forEach(fn => { try { fn(); } catch (e) {} });
+      this._loops.forEach(l => l.stop());
+      this._timers.forEach(id => clearTimeout(id));
+      this._tweens.slice().forEach(tw => tw.kill());
+      this._waits.splice(0).forEach(w => { clearTimeout(w.t); w.res(); });
+    }
+  }
+
+  /* ═════════ SVG 도우미 ═════════ */
+  const NS = 'http://www.w3.org/2000/svg';
+  const U = {
+    NS,
+    el(tag, attrs = {}, parent) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; },
+    lerp: (a, b, t) => a + (b - a) * t,
+    clamp: (v, a = 0, b = 1) => Math.max(a, Math.min(b, v)),
+    rand: (a = 0, b = 1) => a + Math.random() * (b - a),
+    /** 결정적 난수(검증 화면이 매번 같게): U.rng(seed)() */
+    rng(seed = 1) { let s = seed >>> 0 || 1; return () => { s ^= s << 13; s >>>= 0; s ^= s >> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; }; },
+    uid: (() => { let n = 0; return (p = 'u') => `${p}${(++n).toString(36)}`; })(),
+    E: EASE, JE,
+  };
+
+  /* ═════════ 덱 ═════════ */
+  const scenes = {};
+  const Deck = {
+    scene(id, def) { scenes[id] = def; },
+    list: [], i: -1, k: 0, ctx: null, busy: null, U, EASE, JE, Ctx, STILL, REDUCED, STUDENT,
+  };
+  window.Deck = Deck; window.U = U;
+
+  let stage, viewport, hud, prog, dots, ovEl, helpEl, blankEl;
+  const fit = () => {
+    const vw = viewport.clientWidth, vh = viewport.clientHeight;
+    const s = Math.min(vw / SW, vh / SH);
+    stage.style.transform = `translate(${(vw - SW * s) / 2 - vw / 2}px, ${(vh - SH * s) / 2 - vh / 2}px) scale(${s})`;
+    Deck.scale = s;
+  };
+  const defOf = sec => scenes[sec.id] || {};
+  const stepsOf = sec => {
+    if (sec.__steps != null) return sec.__steps;
+    let m = +(defOf(sec).steps || 0);
+    const tmp = document.createElement('div'); tmp.innerHTML = sec.__pristine;
+    tmp.querySelectorAll('[data-step]').forEach(e => { m = Math.max(m, +e.getAttribute('data-step') || 0); });
+    tmp.querySelectorAll('[data-out]').forEach(e => { m = Math.max(m, +e.getAttribute('data-out') || 0); });
+    return (sec.__steps = m);
+  };
+  const safe = async (fn, c) => { try { await fn(); } catch (e) { if (c && c.alive) console.error(`[scene ${c.root.id}]`, e); } };
+
+  function runDecl(c, k) {
+    if (k === 0) {
+      c.$$('[data-in]').forEach(el => {
+        const v = el.getAttribute('data-in'); const delay = +(el.dataset.delay || (v && !isNaN(+v) ? v : 0));
+        c.reveal(el, el.dataset.fx || 'rise', { delay, dur: el.dataset.dur ? +el.dataset.dur : undefined, ease: el.dataset.ease || undefined });
+      });
+    } else {
+      c.$$(`[data-step="${k}"]`).forEach(el => {
+        el.removeAttribute('inert');
+        c.reveal(el, el.dataset.fx || 'rise', { delay: +(el.dataset.delay || 0), dur: el.dataset.dur ? +el.dataset.dur : undefined, ease: el.dataset.ease || undefined });
+      });
+      c.$$(`[data-out="${k}"]`).forEach(el => c.hide(el, { delay: +(el.dataset.outDelay || 0) }));
+    }
+  }
+
+  async function show(i, k = 0, opt = {}) {
+    const n = Deck.list.length; if (!n) return;
+    i = Math.max(0, Math.min(n - 1, i));
+    const to = Deck.list[i]; const from = Deck.i >= 0 ? Deck.list[Deck.i] : null;
+    k = Math.max(0, Math.min(stepsOf(to), k));
+    const instant = !!opt.instant || STILL || REDUCED;
+    if (Deck.ctx) { Deck.ctx.hurry(); Deck.ctx.dispose(); }
+    Deck.busy = null;
+
+    if (from && from !== to) {
+      from.classList.remove('is-on');
+      if (instant || opt.cut) { from.classList.remove('is-out'); from.innerHTML = ''; }
+      else {
+        from.classList.add('is-out');
+        const done = () => { if (!from.classList.contains('is-on')) { from.classList.remove('is-out'); from.innerHTML = ''; } };
+        setTimeout(done, 700);
+      }
+    }
+    to.getAnimations && to.getAnimations().forEach(a => a.cancel());
+    to.innerHTML = to.__pristine;
+    to.classList.remove('is-out'); to.classList.add('is-on');
+    Deck.i = i; Deck.k = k;
+    const tile = to.getAttribute('data-tile') || 'dark';
+    document.body.classList.toggle('on-light', tile === 'light' || tile === 'parchment');
+    if (from && from !== to && !instant && !opt.cut) {
+      to.animate([{ opacity: 0, transform: 'scale(1.015)' }, { opacity: 1, transform: 'scale(1)' }], { duration: 620, easing: EASE.out });
+      if (window.SFX) SFX.play('slide');
+    }
+    const c = new Ctx(to, i); Deck.ctx = c;
+    const def = defOf(to);
+    const run = (async () => {
+      c.instant = instant;
+      runDecl(c, 0);
+      if (def.enter) await safe(() => def.enter(c), c);
+      for (let s = 1; s <= k; s++) {
+        if (!c.alive) return;
+        c.instant = true; runDecl(c, s);
+        if (def.go) await safe(() => def.go(c, s), c);
+      }
+      c.instant = STILL;
+    })();
+    Deck.busy = run; ui();
+    await run;
+    if (Deck.busy === run) Deck.busy = null;
+    markReady();
+    try { history.replaceState(null, '', `#${i + 1}${k ? '.' + k : ''}`); } catch (e) {}
+  }
+  async function stepTo(k) {
+    const c = Deck.ctx, sec = Deck.list[Deck.i]; if (!c) return;
+    Deck.k = k; ui();
+    if (window.SFX && !STILL) SFX.play('step');
+    c.instant = STILL; runDecl(c, k);
+    const def = defOf(sec);
+    const run = def.go ? safe(() => def.go(c, k), c) : Promise.resolve();
+    Deck.busy = run;
+    await run;
+    if (Deck.busy === run) { Deck.busy = null; c.instant = STILL; }
+    try { history.replaceState(null, '', `#${Deck.i + 1}${k ? '.' + k : ''}`); } catch (e) {}
+  }
+  Deck.next = () => {
+    if (Deck.busy && Deck.ctx) { Deck.ctx.hurry(); return; }
+    const sec = Deck.list[Deck.i];
+    if (Deck.k < stepsOf(sec)) stepTo(Deck.k + 1);
+    else if (Deck.i < Deck.list.length - 1) show(Deck.i + 1, 0);
+  };
+  Deck.prev = () => {
+    if (Deck.k > 0) show(Deck.i, Deck.k - 1, { instant: true });
+    else if (Deck.i > 0) show(Deck.i - 1, stepsOf(Deck.list[Deck.i - 1]), { instant: true });
+  };
+  Deck.go = (i, k = 0, opt) => show(i, k, opt);
+  Deck.goId = (id, k = 0) => { const i = Deck.list.findIndex(s => s.id === id); if (i >= 0) show(i, k); };
+  /** 지금 단계 다시 보기(R) */
+  Deck.replay = async () => {
+    const k = Deck.k;
+    if (k === 0) { const i = Deck.i; Deck.i = -1; await show(i, 0, { cut: true }); }
+    else { await show(Deck.i, k - 1, { instant: true }); stepTo(k); }
+  };
+  Deck.steps = sec => stepsOf(sec || Deck.list[Deck.i]);
+
+  function markReady() {
+    const fin = () => { document.documentElement.dataset.ready = '1'; };
+    (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(() => setTimeout(fin, 60));
+  }
+
+  /* ── 화면 바깥 UI ── */
+  const ICON = {
+    prev: '<svg viewBox="0 0 20 20"><path d="M12.5 4 6.5 10l6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    next: '<svg viewBox="0 0 20 20"><path d="M7.5 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    grid: '<svg viewBox="0 0 20 20"><g fill="currentColor"><rect x="3" y="3" width="6" height="6" rx="1.5"/><rect x="11" y="3" width="6" height="6" rx="1.5"/><rect x="3" y="11" width="6" height="6" rx="1.5"/><rect x="11" y="11" width="6" height="6" rx="1.5"/></g></svg>',
+    full: '<svg viewBox="0 0 20 20"><path d="M3.5 8V3.5H8M12 3.5h4.5V8M16.5 12v4.5H12M8 16.5H3.5V12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    replay: '<svg viewBox="0 0 20 20"><path d="M4.5 10a5.5 5.5 0 1 0 1.8-4.1M4.5 3.8v3.4h3.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    sound: '<svg viewBox="0 0 20 20"><path d="M3.5 8h3l4-3.5v11L6.5 12h-3z" fill="currentColor"/><path d="M13.5 7.2a4 4 0 0 1 0 5.6M15.6 5a7 7 0 0 1 0 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+    mute: '<svg viewBox="0 0 20 20"><path d="M3.5 8h3l4-3.5v11L6.5 12h-3z" fill="currentColor"/><path d="M13.5 7.5l4.5 5M18 7.5l-4.5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  };
+  function syncSound() {
+    const b = hud && hud.querySelector('[data-a="sound"]'); if (!b) return;
+    const on = !window.SFX || SFX.isOn();
+    b.innerHTML = on ? ICON.sound : ICON.mute; b.classList.toggle('off', !on); b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  }
+  function buildChrome() {
+    hud = document.createElement('div'); hud.id = 'hud';
+    hud.innerHTML = `<button data-a="replay" aria-label="이 단계 다시 보기(R)">${ICON.replay}</button><button data-a="grid" aria-label="전체 보기(O)">${ICON.grid}</button><button data-a="prev" aria-label="이전">${ICON.prev}</button><span class="count" id="count">1 / 1</span><button data-a="next" aria-label="다음">${ICON.next}</button><button data-a="sound" aria-label="소리 켜기/끄기(M)">${ICON.sound}</button><button data-a="full" aria-label="전체 화면(F)">${ICON.full}</button>`;
+    document.body.appendChild(hud); syncSound();
+    hud.addEventListener('click', e => { if (e.target.closest('#count')) { e.stopPropagation(); toggleOverview(); return; } const b = e.target.closest('button'); if (!b) return; e.stopPropagation(); act(b.dataset.a); });
+    prog = document.createElement('div'); prog.id = 'progress'; prog.innerHTML = '<i></i>'; document.body.appendChild(prog);
+    dots = document.createElement('div'); dots.id = 'stepdots'; document.body.appendChild(dots);
+    ovEl = document.createElement('div'); ovEl.id = 'overview'; ovEl.className = 'overlay'; document.body.appendChild(ovEl);
+    helpEl = document.createElement('div'); helpEl.id = 'help'; helpEl.className = 'overlay';
+    helpEl.innerHTML = `<div class="box"><h3>강의 조작</h3><table>
+      <tr><td><kbd>→</kbd> <kbd>Space</kbd> 화면 클릭</td><td>다음(빌드 단계 → 다음 장)</td></tr>
+      <tr><td><kbd>←</kbd> 오른쪽 클릭</td><td>이전</td></tr>
+      <tr><td><kbd>R</kbd></td><td>이 단계 애니메이션 다시 보기</td></tr>
+      <tr><td><kbd>O</kbd></td><td>전체 보기</td></tr>
+      <tr><td><kbd>F</kbd></td><td>전체 화면</td></tr>
+      <tr><td><kbd>M</kbd></td><td>소리 켜기/끄기</td></tr>
+      
+      <tr><td><kbd>B</kbd> / <kbd>W</kbd></td><td>검은 화면 / 흰 화면</td></tr>
+      <tr><td>숫자 + <kbd>Enter</kbd></td><td>그 장으로 이동</td></tr>
+      <tr><td>아래쪽 쪽 번호 단추</td><td>전체 보기에서 골라 이동</td></tr>
+      <tr><td>탐구 읽기</td><td>작품 자료와 활동 안내를 세로로 읽기</td></tr>
+      <tr><td>좌우로 밀기</td><td>전자칠판에서 넘기기</td></tr></table></div>`;
+    document.body.appendChild(helpEl);
+    helpEl.addEventListener('click', () => helpEl.classList.remove('show'));
+    blankEl = document.createElement('div'); blankEl.id = 'blank'; document.body.appendChild(blankEl);
+    blankEl.addEventListener('click', () => { blankEl.className = ''; });
+  }
+  function act(a) {
+    if (a === 'next') Deck.next(); else if (a === 'prev') Deck.prev();
+    else if (a === 'grid') toggleOverview();
+    else if (a === 'full') toggleFull(); else if (a === 'replay') Deck.replay();
+    else if (a === 'sound') { if (window.SFX) SFX.toggle(); syncSound(); }
+  }
+  function ui() {
+    const n = Deck.list.length, sec = Deck.list[Deck.i]; if (!sec || !hud) return;
+    const st = stepsOf(sec);
+    hud.querySelector('#count').textContent = `${Deck.i + 1} / ${n}`;
+    const np = document.getElementById('navPage'); if (np) np.textContent = `${Deck.i + 1} / ${n}`;
+    prog.firstChild.style.width = `${((Deck.i + (st ? Deck.k / (st + 1) : 0)) / Math.max(1, n - 1)) * 100}%`;
+    dots.innerHTML = st ? Array.from({ length: st + 1 }, (_, j) => `<i class="${j <= Deck.k ? 'on' : ''}"></i>`).join('') : '';
+    if (ovEl.classList.contains('show')) renderOverview();
+  }
+  function md(s) { return s.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>'); }
+  function renderOverview() {
+    ovEl.innerHTML = `<div class="ovhead"><h2>전체 보기 · ${Deck.list.length}장</h2><form class="ovjump" autocomplete="off"><label for="ovNum">번호로 이동</label><input id="ovNum" type="number" inputmode="numeric" min="1" max="${Deck.list.length}" placeholder="${Deck.i + 1}"><button type="submit">이동</button><button type="button" class="ovclose" aria-label="닫기">닫기</button></form></div><div class="grid">` + Deck.list.map((s, i) =>
+      `<button class="ov ${i === Deck.i ? 'cur' : ''}" data-i="${i}" data-tile="${s.getAttribute('data-tile') || 'dark'}"><span class="n">${String(i + 1).padStart(2, '0')}</span><span class="tt">${s.dataset.title || s.id}</span></button>`).join('') + '</div>';
+  }
+  function toggleOverview() {
+    const on = !ovEl.classList.contains('show');
+    ovEl.classList.toggle('show', on);
+    if (on) { renderOverview(); const cur = ovEl.querySelector('.ov.cur'); if (cur) cur.scrollIntoView({ block: 'center' }); }
+  }
+  Deck.toggleOverview = toggleOverview;
+  function toggleFull() {
+    const d = document;
+    if (!d.fullscreenElement) (d.documentElement.requestFullscreen || d.documentElement.webkitRequestFullscreen || (() => {})).call(d.documentElement);
+    else (d.exitFullscreen || d.webkitExitFullscreen).call(d);
+  }
+
+  let hudTimer = 0;
+  function pokeHud() { if (STILL) return; hud.classList.add('show'); dots.classList.add('show'); clearTimeout(hudTimer); hudTimer = setTimeout(() => { hud.classList.remove('show'); dots.classList.remove('show'); }, 2600); }
+
+  function bind() {
+    let jump = '';
+    document.addEventListener('keydown', e => {
+      if (e.target.closest && e.target.closest('input,textarea,select,[contenteditable]')) return;
+      if (e.ctrlKey || e.metaKey || e.altKey || document.getElementById('inquiryReader').open) return;
+      const key = e.key;
+      if ((key === 'Enter' || key === ' ') && e.target.closest?.('button,a[href]')) return;
+      if (helpEl.classList.contains('show')) { helpEl.classList.remove('show'); e.preventDefault(); return; }
+      if (blankEl.className && key !== 'b' && key !== 'B' && key !== 'w' && key !== 'W') { blankEl.className = ''; e.preventDefault(); return; }
+      if (/^[0-9]$/.test(key)) { jump += key; return; }
+      if (key === 'Enter' && jump) { show(+jump - 1, 0); jump = ''; e.preventDefault(); return; }
+      jump = '';
+      if (ovEl.classList.contains('show') && (key === 'Escape' || key === 'o' || key === 'O')) { toggleOverview(); e.preventDefault(); return; }
+      switch (key) {
+        case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown': case 'Enter': Deck.next(); break;
+        case 'ArrowLeft': case 'ArrowUp': case 'PageUp': case 'Backspace': Deck.prev(); break;
+        case 'Home': show(0, 0); break;
+        case 'End': show(Deck.list.length - 1, 0); break;
+        case 'o': case 'O': toggleOverview(); break;
+        case 'f': case 'F': toggleFull(); break;
+        case 'm': case 'M': act('sound'); break;
+        case 'r': case 'R': Deck.replay(); break;
+        case 'b': case 'B': blankEl.className = blankEl.className === 'black' ? '' : 'black'; break;
+        case 'w': case 'W': blankEl.className = blankEl.className === 'white' ? '' : 'white'; break;
+        case 'h': case 'H': case '?': helpEl.classList.add('show'); break;
+        default: return;
+      }
+      e.preventDefault();
+    });
+    ovEl.addEventListener('click', e => {
+      if (e.target.closest('.ovclose')) { ovEl.classList.remove('show'); return; }
+      if (e.target.closest('.ovjump')) return;
+      const b = e.target.closest('.ov'); if (b) { ovEl.classList.remove('show'); show(+b.dataset.i, 0); } else ovEl.classList.remove('show');
+    });
+    ovEl.addEventListener('submit', e => {
+      e.preventDefault();
+      const v = Math.round(+ovEl.querySelector('#ovNum').value);
+      if (v >= 1 && v <= Deck.list.length) { ovEl.classList.remove('show'); show(v - 1, 0); }
+      else { const inp = ovEl.querySelector('#ovNum'); inp.value = ''; inp.placeholder = `1~${Deck.list.length}`; inp.focus(); }
+    });
+    const reader = document.getElementById('inquiryReader');
+    document.getElementById('openInquiry').addEventListener('click', () => reader.showModal());
+
+    // 무대 클릭·밀기
+    let down = null;
+    viewport.addEventListener('pointerdown', e => { down = { x: e.clientX, y: e.clientY, t: performance.now(), inter: !!e.target.closest('button,a,input,select,textarea,label,[data-interactive]') }; pokeHud(); });
+    viewport.addEventListener('pointerup', e => {
+      if (!down) return; const dx = e.clientX - down.x, dy = e.clientY - down.y; const d0 = down; down = null;
+      if (d0.inter) return;
+      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.3) { dx < 0 ? Deck.next() : Deck.prev(); return; }
+      if (Math.abs(dx) < 12 && Math.abs(dy) < 12 && e.button === 0) {
+        const r = stage.getBoundingClientRect();
+        (e.clientX - r.left < r.width * 0.12) ? Deck.prev() : Deck.next();
+      }
+    });
+    viewport.addEventListener('contextmenu', e => { if (e.target.closest('[data-interactive]')) return; e.preventDefault(); Deck.prev(); });
+    document.addEventListener('mousemove', pokeHud, { passive: true });
+    window.addEventListener('resize', fit);
+  }
+
+  function boot() {
+    viewport = document.getElementById('viewport'); stage = document.getElementById('stage');
+    Deck.list = Array.from(stage.querySelectorAll(':scope > section.slide'));
+    // 한 번만: 장면별 build(root) → 처음 상태 저장
+    Deck.list.forEach(sec => {
+      const def = defOf(sec);
+      if (def.build) { try { def.build(sec, U); } catch (e) { console.error(`[build ${sec.id}]`, e); } }
+      sec.querySelectorAll('[data-fx="draw"]').forEach(g => {
+        const geo = g.matches(GEOM) ? [g] : Array.from(g.querySelectorAll(GEOM));
+        geo.forEach(x => { if (!x.hasAttribute('pathLength')) x.setAttribute('pathLength', '1'); });
+      });
+      sec.__pristine = sec.innerHTML;
+      sec.innerHTML = '';
+    });
+    buildChrome(); fit(); bind();
+    const h = (location.hash || '').replace('#', '').split('.');
+    let si = Q.has('p') ? (+Q.get('p') - 1) : (h[0] ? +h[0] - 1 : 0);
+    let sk = Q.has('k') ? +Q.get('k') : (h[1] ? +h[1] : 0);
+    if (Q.has('id')) { const j = Deck.list.findIndex(s => s.id === Q.get('id')); if (j >= 0) si = j; }
+    if (!(si >= 0)) si = 0;
+    if (sk === -1 || Q.get('k') === 'last') sk = 99;
+    if (Q.get('play') === '1' && sk > 0 && !STILL) { show(si, sk - 1, { instant: true }).then(() => stepTo(Math.min(sk, stepsOf(Deck.list[si])))); }
+    else show(si, sk, { instant: sk > 0 });
+    if (!STILL) setTimeout(pokeHud, 400);
+  }
+  Deck.boot = boot;
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(boot, 0));
+  else setTimeout(boot, 0);
+})();
+
+
+</script><script>
+/* ── 03_sfx.js ── */
+try{
+/* ═══════════════════════════════════════════════════════════════
+   03_sfx.js — 효과음(WebAudio 합성). 소리 파일 0개 · 오프라인 OK
+   · 장면에서는 c.sfx('blank', 지연ms) · c.sfxLoop('fan') 로 부른다(core.js 가 순간 모드·건너뛰기·장면 나감을 알아서 처리)
+   · 브라우저 정책상 첫 클릭·키 입력 뒤부터 소리가 난다. M 키·HUD 단추로 켜고 끔(기기에 기억). 학생 모드(?s=1)는 기본 꺼짐
+   · 점검: ?sfx=demo → 모든 소리를 눌러 들어 보는 패널 / SFX.analyze('blank') → 오프라인 렌더로 세기·길이 점검
+   · 주소 도우미: ?sound=1|0 강제 켜기·끄기 · ?nosfx=1 완전 끔 · ?sfxtest=1 클릭 없이 잠금 해제(자동 점검용)
+   ═══════════════════════════════════════════════════════════════ */
+window.SFX = (function () {
+  'use strict';
+  const Q = new URLSearchParams(location.search);
+  const D = window.Deck || {};
+  const OFF = !!D.STILL || Q.get('nosfx') === '1';
+  const KEY = 'sc_sfx';
+  const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+  let on = !D.STUDENT;
+  try { const s = localStorage.getItem(KEY); if (s === '1' || s === '0') on = s === '1'; } catch (e) {}
+  if (Q.get('sound') === '1') on = true; else if (Q.get('sound') === '0') on = false;
+  let ac = null, out = null, X = null, unlocked = Q.get('sfxtest') === '1', broken = false;
+  const pending = new Set();
+
+  /* ── 잡음(결정적) ── */
+  function noiseBuf(actx) {
+    const n = Math.floor(actx.sampleRate * 2), b = actx.createBuffer(1, n, actx.sampleRate), d = b.getChannelData(0);
+    let s = 12345;
+    for (let i = 0; i < n; i++) { s = (s * 1664525 + 1013904223) >>> 0; d[i] = s / 2147483648 - 1; }
+    return b;
+  }
+  function ensure() {
+    if (OFF || broken || !unlocked) return null;
+    if (!ac) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) { broken = true; return null; }
+      try { ac = new AC(); } catch (e) { broken = true; return null; }
+      const comp = ac.createDynamicsCompressor();
+      comp.threshold.value = -14; comp.knee.value = 18; comp.ratio.value = 4; comp.attack.value = .004; comp.release.value = .18;
+      out = ac.createGain(); out.gain.value = on ? .9 : 0;
+      out.connect(comp); comp.connect(ac.destination);
+      X = { ac, dest: out, nz: noiseBuf(ac) };
+    }
+    if (ac.state === 'suspended' && on && !document.hidden) ac.resume().catch(() => {});
+    return X;
+  }
+
+  /* ── 소리 부품 ── */
+  function env(g, t, a, d, peak) {
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(Math.max(0.0002, peak), t + a);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + a + d);
+  }
+  function route(x, node, pan) {
+    if (pan && x.ac.createStereoPanner) { const p = x.ac.createStereoPanner(); p.pan.value = clamp(pan, -1, 1); node.connect(p); p.connect(x.dest); return; }
+    node.connect(x.dest);
+  }
+  /** 톤: f(→f2) Hz, a 올림 s, d 사라짐 s, g 세기, type, vib[Hz, 깊이Hz], lp 저역통과, pan */
+  function tone(x, t, o) {
+    const ac = x.ac, osc = ac.createOscillator(), g = ac.createGain();
+    const a = o.a ?? .004, d = o.d ?? .3;
+    osc.type = o.type || 'sine';
+    osc.frequency.setValueAtTime(o.f, t);
+    if (o.f2) osc.frequency.exponentialRampToValueAtTime(o.f2, t + a + d);
+    if (o.vib) {
+      const l = ac.createOscillator(), lg = ac.createGain();
+      l.frequency.value = o.vib[0]; lg.gain.value = o.vib[1]; l.connect(lg); lg.connect(osc.frequency); l.start(t); l.stop(t + a + d + .06);
+    }
+    env(g, t, a, d, o.g ?? .2);
+    osc.connect(g);
+    let last = g;
+    if (o.lp) { const f = ac.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = o.lp; g.connect(f); last = f; }
+    route(x, last, o.pan);
+    osc.start(t); osc.stop(t + a + d + .07);
+  }
+  /** 잡음: type(bandpass|highpass|lowpass), f(→f2) Hz, q */
+  function noise(x, t, o) {
+    const ac = x.ac, s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+    const a = o.a ?? .003, d = o.d ?? .1;
+    s.buffer = x.nz; s.loop = true;
+    f.type = o.type || 'bandpass'; f.frequency.setValueAtTime(o.f || 2000, t);
+    if (o.f2) f.frequency.exponentialRampToValueAtTime(o.f2, t + a + d);
+    f.Q.value = o.q ?? 1;
+    env(g, t, a, d, o.g ?? .15);
+    s.connect(f); f.connect(g); route(x, g, o.pan);
+    s.start(t, (t * 7.13) % 1.5); s.stop(t + a + d + .07);
+  }
+  const PART = [[1, 1, 1], [2.76, .3, .55], [5.4, .1, .3], [8.93, .04, .18]];
+  function bell(x, t, f, g = .3, d = 1.1) { PART.forEach(([r, w, k]) => tone(x, t, { f: f * r, a: .002, d: d * k, g: g * w })); }
+  function tickAt(x, t, f, g) {
+    tone(x, t, { f, a: .001, d: .014, g });
+    noise(x, t, { a: .001, d: .006, g: g * .9, type: 'bandpass', f: f * 1.6, q: 1.5 });
+  }
+
+  /* ═════════ 소리 목록: (x, t, a, b) ═════════ */
+  const SCALE = [0, 2, 4, 7, 9, 12, 9, 7, 4, 2];       // 빈칸이 채워질 때마다 음계가 오르내린다
+  const S = {
+    /** 빈칸이 채워짐 — 마림바 같은 「띠링」. i = 몇 번째 빈칸(음 높이 순서) */
+    blank(x, t, i) {
+      const f = 659.25 * Math.pow(2, SCALE[(i | 0) % 10] / 12);
+      tone(x, t, { f, a: .003, d: .34, g: .24 });
+      tone(x, t, { f: f * 2, a: .002, d: .16, g: .07 });
+      tone(x, t, { f: f * 4.02, a: .001, d: .05, g: .025 });
+      noise(x, t, { a: .001, d: .012, g: .05, type: 'highpass', f: 3500 });
+    },
+    /** 무언가 톡 나타남 */
+    pop(x, t) {
+      tone(x, t, { f: 420, f2: 840, a: .002, d: .1, g: .2 });
+      noise(x, t, { a: .001, d: .02, g: .05, type: 'highpass', f: 3000 });
+    },
+    /** 클릭으로 다음 단계 — 아주 작은 톡 */
+    step(x, t) { tone(x, t, { f: 1500, f2: 900, type: 'triangle', a: .001, d: .045, g: .075 }); noise(x, t, { a: .001, d: .01, g: .03, f: 3000, q: 1.5 }); },
+    /** 다음 장으로 — 부드러운 슥 */
+    slide(x, t) {
+      noise(x, t, { a: .12, d: .5, g: .2, f: 400, f2: 2600, q: .8 });
+      tone(x, t, { f: 220, f2: 110, a: .005, d: .25, g: .09 });
+    },
+    /** 휙 — dur ms, gain */
+    whoosh(x, t, dur = 700, g = 1) {
+      const d = (dur || 700) / 1000;
+      noise(x, t, { a: d * .4, d: d * .6, g: .2 * (g ?? 1), f: 350, f2: 2400, q: .7 });
+    },
+    /** 숫자 굴러감 — 오르는 째깍째깍 */
+    counter(x, t, dur = 1200) {
+      const n = clamp(Math.round((dur || 1200) / 70), 4, 22), sp = (dur || 1200) / 1000 / n;
+      for (let i = 0; i < n; i++) tickAt(x, t + i * sp, 1500 + i * (900 / n), .07);
+    },
+    /** 세는 선을 조각이 지나감(가이거처럼) — p 음높이, g 세기 */
+    tick(x, t, p = 1, g = 1) { tickAt(x, t, 2100 * (p || 1), .1 * (g ?? 1)); },
+    /** 1초가 지남 — 나무 시계 */
+    clock(x, t) {
+      tone(x, t, { f: 1050, f2: 620, type: 'triangle', a: .001, d: .06, g: .17 });
+      noise(x, t, { a: .001, d: .012, g: .08, f: 2600, q: 2 });
+    },
+    /** 쾅(도장) */
+    thunk(x, t) {
+      tone(x, t, { f: 150, f2: 44, a: .002, d: .24, g: .5 });
+      noise(x, t, { a: .002, d: .1, g: .28, type: 'lowpass', f: 700, f2: 200 });
+    },
+    /** 땡 */
+    ding(x, t, k = 1) { bell(x, t, 1318.5 * (k || 1), .32, 1.1); },
+    /** 딩동딩동 ↑ (정답·완성) */
+    chime(x, t) { [1046.5, 1318.5, 1568, 2093].forEach((f, i) => bell(x, t + i * .085, f, .3, .9)); },
+    /** 명판 뒤집기 */
+    flip(x, t) {
+      noise(x, t, { a: .002, d: .03, g: .18, f: 3200, q: 1.5 });
+      noise(x, t + .12, { a: .002, d: .03, g: .18, f: 2600, q: 1.5 });
+      noise(x, t + .02, { a: .03, d: .16, g: .09, f: 900, f2: 2600 });
+    },
+    /** 토스터 레버 내림 — 철컥 */
+    lever(x, t) {
+      tone(x, t, { f: 260, f2: 75, type: 'triangle', a: .002, d: .14, g: .4 });
+      noise(x, t, { a: .002, d: .06, g: .22, type: 'lowpass', f: 1200, f2: 400 });
+      tone(x, t + .01, { f: 1900, f2: 1200, a: .001, d: .05, g: .04 });
+    },
+    /** 토스터 빵 튀어 오름 — 텅~ 팅! */
+    toasterPop(x, t) {
+      tone(x, t, { f: 150, f2: 55, a: .002, d: .12, g: .32 });
+      tone(x, t + .02, { f: 210, f2: 640, type: 'triangle', a: .005, d: .32, g: .11, vib: [22, 26] });
+      noise(x, t + .02, { a: .01, d: .2, g: .05, f: 2400, q: 1.2 });
+      bell(x, t + .16, 2637, .22, .9);
+    },
+    /** 열선이 달아오르며 탁탁 — dur ms */
+    sizzle(x, t, dur = 2000) {
+      const d = (dur || 2000) / 1000, n = Math.round(d * 34);
+      for (let i = 0; i < n; i++) noise(x, t + Math.random() * d, { a: .001, d: .009, g: .11 * (1 - i / n * .3), f: 2500 + Math.random() * 3500, q: 1.4, pan: (Math.random() - .5) * .6 });
+    },
+    /** 스피커 박 — strong 이면 큰 북, 아니면 작은 북 + 심벌 */
+    kick(x, t, strong, lv) {
+      const k = lv == null ? 1 : lv, g = (strong ? .5 : .3) * k;
+      tone(x, t, { f: strong ? 150 : 130, f2: 44, a: .002, d: strong ? .2 : .14, g });
+      noise(x, t, { a: .001, d: .05, g: g * .5, type: 'lowpass', f: 900, f2: 300 });
+      if (!strong) noise(x, t + .02, { a: .001, d: .04, g: .045, type: 'highpass', f: 7000 });
+    },
+    /** 백열전구 켜짐 — 딸깍 · 웅 · 팅 */
+    bulbOn(x, t) {
+      noise(x, t, { a: .001, d: .006, g: .12, f: 3000, q: 1.5 });
+      tone(x, t + .02, { f: 98, type: 'triangle', a: .05, d: .55, g: .08, lp: 500 });
+      noise(x, t + .03, { a: .08, d: .5, g: .05, type: 'lowpass', f: 300, f2: 3000 });
+      bell(x, t + .05, 1760, .12, .8);
+    },
+    /** LED 켜짐 — 딸깍 · 띠링 */
+    ledOn(x, t) {
+      noise(x, t, { a: .001, d: .006, g: .1, f: 3400, q: 1.5 });
+      tone(x, t + .01, { f: 1568, f2: 2093, a: .003, d: .2, g: .1 });
+      bell(x, t + .03, 2349, .1, .7);
+    },
+    /** 집 창문 켜짐 — 딸깍 · 띵띵띵 */
+    lightsOn(x, t) {
+      noise(x, t, { a: .001, d: .01, g: .08, f: 2600, q: 1.5 });
+      [1568, 1760, 1976].forEach((f, i) => bell(x, t + .04 + i * .09, f, .15, .7));
+    },
+    /** 송전선을 타고 전달 — 웅~ + 쉬익 + 지직, 소리가 왼쪽에서 오른쪽으로 움직임 */
+    zap(x, t, dur = 2400) {
+      const ac = x.ac, d = (dur || 2400) / 1000;
+      const o = ac.createOscillator(), lp = ac.createBiquadFilter(), g = ac.createGain();
+      o.type = 'sawtooth'; o.frequency.setValueAtTime(55, t); o.frequency.exponentialRampToValueAtTime(230, t + d * .8);
+      lp.type = 'lowpass'; lp.frequency.setValueAtTime(260, t); lp.frequency.exponentialRampToValueAtTime(1400, t + d);
+      g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(.15, t + d * .15); g.gain.setValueAtTime(.15, t + d * .7); g.gain.exponentialRampToValueAtTime(.0001, t + d + .5);
+      o.connect(lp); lp.connect(g);
+      if (ac.createStereoPanner) { const p = ac.createStereoPanner(); p.pan.setValueAtTime(-.85, t); p.pan.linearRampToValueAtTime(.85, t + d); g.connect(p); p.connect(x.dest); } else g.connect(x.dest);
+      o.start(t); o.stop(t + d + .6);
+      noise(x, t, { a: d * .3, d: d * .7, g: .07, f: 600, f2: 4200, q: .6 });
+      for (let i = 0, n = Math.round(d * 22); i < n; i++) noise(x, t + Math.random() * d, { a: .001, d: .008, g: .045, type: 'highpass', f: 5000, pan: -1 + 2 * Math.random() });
+    },
+    /** 열 보기 훑기 — 스캐너 */
+    scan(x, t, dur = 900) {
+      const d = (dur || 900) / 1000;
+      tone(x, t, { f: 280, f2: 1250, a: .04, d, g: .09, vib: [9, 14] });
+      tone(x, t, { f: 283, f2: 1262, type: 'triangle', a: .04, d, g: .04, pan: .4 });
+    },
+    /** 온도계가 오름 — 조용한 상승음 */
+    rise(x, t, dur = 2400) { tone(x, t, { f: 260, f2: 640, a: .15, d: (dur || 2400) / 1000, g: .07, vib: [5, 6] }); },
+    /** 바늘이 내려옴 — 슬라이드 휘슬 + 톡 */
+    sweepDown(x, t, dur = 1300) {
+      const d = (dur || 1300) / 1000;
+      tone(x, t, { f: 1100, f2: 380, a: .02, d, g: .09 });
+      tickAt(x, t + d, 1800, .08);
+    },
+    /** 푸슉(연기) */
+    puff(x, t) { noise(x, t, { a: .05, d: .5, g: .22, type: 'lowpass', f: 1000, f2: 300, q: .4 }); },
+    /** 싹둑 싹둑 */
+    snip(x, t) {
+      [0, .07, .14].forEach(o => { noise(x, t + o, { a: .001, d: .012, g: .18, f: 5000, q: 2 }); tone(x, t + o, { f: 3000, a: .001, d: .02, g: .03 }); });
+    },
+    /** 슥(선 그리기) */
+    zip(x, t, dur = 500) { noise(x, t, { a: .02, d: Math.min(.3, (dur || 500) / 1000 * .5), g: .12, f: 1500, f2: 4200, q: 1 }); },
+    /** 반짝 */
+    spark(x, t) { for (let i = 0; i < 4; i++) tone(x, t + i * .04 + Math.random() * .02, { f: 2200 + Math.random() * 2000, a: .001, d: .08, g: .04 }); },
+  };
+
+  /* ═════════ 이어지는 소리(선풍기·발전소·끓는 물) — level(0..1) 로 세기 조종 ═════════ */
+  function buildFan(x) {
+    const ac = x.ac, out = ac.createGain(); out.gain.value = 0; out.connect(x.dest);
+    const ns = ac.createBufferSource(); ns.buffer = x.nz; ns.loop = true;
+    const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 500; bp.Q.value = .7;
+    const gw = ac.createGain(); gw.gain.value = 0;
+    const lfo = ac.createOscillator(), lg = ac.createGain(); lfo.frequency.value = 3; lg.gain.value = 0; lfo.connect(lg); lg.connect(gw.gain);   // 날개가 바람을 자르는 울렁임
+    ns.connect(bp); bp.connect(gw); gw.connect(out);
+    const m1 = ac.createOscillator(), m2 = ac.createOscillator(), gm = ac.createGain(), lp = ac.createBiquadFilter();   // 모터 웅~
+    m1.type = 'triangle'; m1.frequency.value = 50; m2.type = 'sine'; m2.frequency.value = 100; gm.gain.value = 0;
+    lp.type = 'lowpass'; lp.frequency.value = 700; m1.connect(gm); m2.connect(gm); gm.connect(lp); lp.connect(out);
+    ns.start(0, .3); lfo.start(); m1.start(); m2.start();
+    let lv = 0, wh = 0;
+    const apply = () => {
+      const T = ac.currentTime, v = clamp(lv, 0, 1.1), tc = .07;
+      gw.gain.setTargetAtTime(v * v * .095, T, tc); lg.gain.setTargetAtTime(v * v * .035, T, tc);
+      lfo.frequency.setTargetAtTime(2 + 7 * v, T, tc);
+      bp.frequency.setTargetAtTime(380 + 900 * v, T, tc);
+      m1.frequency.setTargetAtTime(46 + 70 * v, T, tc); m2.frequency.setTargetAtTime(92 + 140 * v, T, tc);
+      gm.gain.setTargetAtTime(v > .02 ? .01 + .034 * v + wh * .04 : 0, T, tc);
+      out.gain.setTargetAtTime(v > .01 ? 1 : 0, T, .05);
+    };
+    return {
+      level(v) { lv = v; apply(); }, whine(v) { wh = v; apply(); },
+      stop() {
+        const T = ac.currentTime; out.gain.cancelScheduledValues(T); out.gain.setTargetAtTime(0, T, .08);
+        setTimeout(() => { try { ns.stop(); lfo.stop(); m1.stop(); m2.stop(); out.disconnect(); } catch (e) {} }, 500);
+      },
+    };
+  }
+  function buildHum(x) {   // 발전소 웅~
+    const ac = x.ac, out = ac.createGain(); out.gain.value = 0; out.connect(x.dest);
+    const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 220; lp.connect(out);
+    const o1 = ac.createOscillator(), o2 = ac.createOscillator(); o1.type = 'sawtooth'; o1.frequency.value = 50; o2.type = 'sine'; o2.frequency.value = 100;
+    const g2 = ac.createGain(); g2.gain.value = .5; o1.connect(lp); o2.connect(g2); g2.connect(lp);
+    const ns = ac.createBufferSource(); ns.buffer = x.nz; ns.loop = true; const nl = ac.createBiquadFilter(); nl.type = 'lowpass'; nl.frequency.value = 380; const ng = ac.createGain(); ng.gain.value = .5;
+    ns.connect(nl); nl.connect(ng); ng.connect(lp);
+    o1.start(); o2.start(); ns.start(0, .7);
+    return {
+      level(v) { const T = ac.currentTime; out.gain.setTargetAtTime(clamp(v, 0, 1.1) * .06, T, .15); o1.frequency.setTargetAtTime(44 + 8 * v, T, .3); },
+      stop() { const T = ac.currentTime; out.gain.setTargetAtTime(0, T, .1); setTimeout(() => { try { o1.stop(); o2.stop(); ns.stop(); out.disconnect(); } catch (e) {} }, 500); },
+    };
+  }
+  function buildBoil(x) {   // 주전자 끓는 소리: 쉬이~ + 보글보글
+    const ac = x.ac, out = ac.createGain(); out.gain.value = 0; out.connect(x.dest);
+    const ns = ac.createBufferSource(); ns.buffer = x.nz; ns.loop = true; const hp = ac.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 3200;
+    const gh = ac.createGain(); gh.gain.value = 0; ns.connect(hp); hp.connect(gh); gh.connect(out); ns.start(0, .2);
+    let lv = 0; const rnd = U_rng(7);
+    const id = setInterval(() => {
+      if (lv < .05 || !on) return;
+      if (rnd() < .15 + lv * .5) { const T = ac.currentTime + .005, f0 = 260 + rnd() * 260; tone({ ac, dest: out, nz: x.nz }, T, { f: f0, f2: f0 * 1.9, a: .003, d: .07, g: .1 * lv, pan: (rnd() - .5) * .8 }); }
+    }, 70);
+    return {
+      level(v) { lv = clamp(v, 0, 1); const T = ac.currentTime; gh.gain.setTargetAtTime(lv * .05, T, .4); out.gain.setTargetAtTime(lv > .01 ? 1 : 0, T, .1); },
+      stop() { clearInterval(id); const T = ac.currentTime; out.gain.setTargetAtTime(0, T, .1); setTimeout(() => { try { ns.stop(); out.disconnect(); } catch (e) {} }, 500); },
+    };
+  }
+  function U_rng(seed) { let s = seed >>> 0 || 1; return () => { s ^= s << 13; s >>>= 0; s ^= s >> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; }; }
+  const LOOPS = { fan: buildFan, hum: buildHum, boil: buildBoil };
+  const NULL_LOOP = { level() {}, whine() {}, stop() {} };
+
+  /* ═════════ 바깥 API ═════════ */
+  let blankN = 0;
+  const tickLog = [];
+  function play(name, a, b) {
+    if (OFF || !on) return;
+    const x = ensure(); if (!x) return;
+    const f = S[name]; if (!f) { console.warn('[SFX] 없는 소리:', name); return; }
+    if (name === 'blank') a = blankN++;
+    if (name === 'tick') {   // 빽빽할수록(100 W 레인) 톡톡이 작고 높은 지지직으로 — 촘촘한 정도에 따라 세기·음높이 자동 조절
+      const now = performance.now(); tickLog.push(now); while (tickLog.length && now - tickLog[0] > 250) tickLog.shift();
+      const n = tickLog.length;
+      b = (b ?? 1) / (1 + n * .22); a = (a ?? 1) * (1 + Math.min(n, 30) * .012);
+    }
+    try { f(x, x.ac.currentTime + .008, a, b); } catch (e) { console.error('[SFX]', name, e); }
+  }
+  function loop(kind, o) {
+    const build = LOOPS[kind];
+    if (OFF || !build) return NULL_LOOP;
+    const h = {
+      built: null, lvl: 0, wh: 0, dead: false,
+      level(v) { h.lvl = v; if (h.built) h.built.level(v); },
+      whine(v) { h.wh = v; if (h.built && h.built.whine) h.built.whine(v); },
+      stop() { h.dead = true; pending.delete(h); if (h.built) { h.built.stop(); h.built = null; } },
+      tryBuild() {
+        if (h.built || h.dead) return;
+        const x = ensure(); if (!x) return;
+        try { h.built = build(x, o || {}); h.built.level(h.lvl); if (h.wh && h.built.whine) h.built.whine(h.wh); }
+        catch (e) { console.error('[SFX loop]', kind, e); h.dead = true; }
+      },
+    };
+    pending.add(h); h.tryBuild();
+    return h;
+  }
+  function unlock() {
+    if (unlocked) return;
+    unlocked = true;
+    if (!OFF) { ensure(); pending.forEach(h => h.tryBuild()); }
+  }
+  ['pointerdown', 'keydown', 'touchstart'].forEach(ev => document.addEventListener(ev, unlock, { capture: true, once: false, passive: true }));
+  document.addEventListener('visibilitychange', () => {
+    if (!ac) return;
+    if (document.hidden) ac.suspend().catch(() => {}); else if (on) ac.resume().catch(() => {});
+  });
+
+  let toastEl = null, toastT = 0;
+  function toast(v) {
+    if (!document.body) return;
+    if (!toastEl) { toastEl = document.createElement('div'); toastEl.id = 'sfxToast'; document.body.appendChild(toastEl); }
+    toastEl.textContent = v ? '소리 켜짐' : '소리 꺼짐';
+    toastEl.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => toastEl.classList.remove('show'), 1400);
+  }
+  function toggle(v) {
+    on = v == null ? !on : !!v;
+    try { localStorage.setItem(KEY, on ? '1' : '0'); } catch (e) {}
+    unlock();
+    const x = ensure();
+    if (x && out) out.gain.setTargetAtTime(on ? .9 : 0, ac.currentTime, .03);
+    toast(on);
+    if (on) play('pop');
+    return on;
+  }
+
+  /* ═════════ 점검 도구 ═════════ */
+  function measure(buf) {
+    let peak = 0, sum = 0, n = 0, last = 0, first = -1, zc = 0, prev = 0;
+    const ch = buf.getChannelData(0), ch2 = buf.numberOfChannels > 1 ? buf.getChannelData(1) : ch, sr = buf.sampleRate;
+    for (let i = 0; i < ch.length; i++) {
+      const v = Math.max(Math.abs(ch[i]), Math.abs(ch2[i]));
+      if (v > peak) peak = v;
+      sum += ch[i] * ch[i]; n++;
+      if (v > .003) { last = i; if (first < 0) first = i; }
+      if ((ch[i] >= 0) !== (prev >= 0)) zc++; prev = ch[i];
+    }
+    const active = Math.max(1, last - Math.max(0, first)) / sr;
+    return { peak: +peak.toFixed(3), rms: +Math.sqrt(sum / n).toFixed(4), attack: first < 0 ? null : +(first / sr).toFixed(3), length: +(last / sr).toFixed(2), approxHz: Math.round(zc / 2 / active), clipped: peak >= .98, silent: peak < .01 };
+  }
+  async function analyze(name, a, b, secs = 3) {
+    const OA = window.OfflineAudioContext || window.webkitOfflineAudioContext, sr = 44100;
+    const oc = new OA(2, Math.floor(sr * secs), sr), g = oc.createGain(); g.gain.value = .9; g.connect(oc.destination);
+    const x = { ac: oc, dest: g, nz: noiseBuf(oc) };
+    S[name](x, .02, a, b);
+    return measure(await oc.startRendering());
+  }
+  async function analyzeLoop(kind, level = 1, secs = 1.5) {
+    const OA = window.OfflineAudioContext || window.webkitOfflineAudioContext, sr = 44100;
+    const oc = new OA(2, Math.floor(sr * secs), sr), g = oc.createGain(); g.gain.value = .9; g.connect(oc.destination);
+    const h = LOOPS[kind]({ ac: oc, dest: g, nz: noiseBuf(oc) }); h.level(level);
+    const r = measure(await oc.startRendering()); try { h.stop(); } catch (e) {} return r;
+  }
+
+  /** ?sfx=demo — 모든 소리를 눌러 들어 보는 패널 */
+  function demoPanel() {
+    const box = document.createElement('div');
+    box.style.cssText = 'position:fixed;left:12px;top:12px;z-index:200;max-width:340px;max-height:92vh;overflow:auto;background:rgba(29,29,31,.94);color:#f5f5f7;border-radius:14px;padding:14px;font:600 13px/1.3 system-ui,sans-serif';
+    const btn = (t, fn) => { const b = document.createElement('button'); b.textContent = t; b.style.cssText = 'margin:3px;padding:6px 10px;border-radius:9999px;border:0;background:#0066cc;color:#fff;font:600 13px system-ui'; b.onclick = () => { unlock(); fn(); }; return b; };
+    box.appendChild(Object.assign(document.createElement('div'), { textContent: '효과음 듣기 (F2 로 닫기)', style: 'margin-bottom:8px;font-size:14px' }));
+    Object.keys(S).forEach(k => box.appendChild(btn(k, () => { if (!on) toggle(true); play(k, k === 'kick' ? true : undefined, 1); })));
+    let fan = null;
+    box.appendChild(btn('fan 0→1→0', () => { if (!on) toggle(true); if (fan) fan.stop(); fan = loop('fan'); let v = 0, dir = 1; const id = setInterval(() => { v += dir * .05; if (v >= 1) dir = -1; fan.level(clamp(v)); if (v <= 0 && dir < 0) { clearInterval(id); fan.stop(); fan = null; } }, 60); }));
+    box.appendChild(btn('boil', () => { if (!on) toggle(true); const h = loop('boil'); h.level(1); setTimeout(() => h.stop(), 4000); }));
+    box.appendChild(btn('hum', () => { if (!on) toggle(true); const h = loop('hum'); h.level(1); setTimeout(() => h.stop(), 3000); }));
+    document.body.appendChild(box);
+    document.addEventListener('keydown', e => { if (e.key === 'F2') box.remove(); });
+  }
+  if (Q.get('sfx') === 'demo') { const go = () => demoPanel(); if (document.body) go(); else document.addEventListener('DOMContentLoaded', go); }
+
+  return { play, loop, toggle, unlock, analyze, analyzeLoop, names: () => Object.keys(S), isOn: () => on, isOff: () => OFF, S, debug: () => ({ pendingLoops: pending.size, unlocked, state: ac ? ac.state : 'none' }) };
+})();
+
+}catch(e){console.error("[object 03_sfx.js]",e)}
+
+</script><script>
+function txt(x,y,s,size=28,color='var(--t2)',anchor='middle',extra=''){return `<text x="${x}" y="${y}" text-anchor="${anchor}" font-size="${size}" fill="${color}" ${extra}>${s}</text>`;}
+function line(x1,y1,x2,y2,color='var(--hl)',width=2,extra=''){return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="${width}" ${extra}/>`;}
+const f1=v=>Math.round(v*10)/10;
+const sfxAt=(map)=>(c,k)=>{const f=map[k];if(f)f(c);};
+function arrow(x1,y1,x2,y2,col='var(--t3)',w=4,extra=''){const a=Math.atan2(y2-y1,x2-x1),h=16;
+  return `<g ${extra}><line x1="${x1}" y1="${y1}" x2="${f1(x2-Math.cos(a)*6)}" y2="${f1(y2-Math.sin(a)*6)}" stroke="${col}" stroke-width="${w}" stroke-linecap="round"/><path d="M${x2} ${y2}L${f1(x2-h*Math.cos(a-0.45))} ${f1(y2-h*Math.sin(a-0.45))}L${f1(x2-h*Math.cos(a+0.45))} ${f1(y2-h*Math.sin(a+0.45))}Z" fill="${col}"/></g>`;}
+
+/* 아이콘(중심 0,0 · 약 44px) */
+const IC={
+  ac:c=>`<rect x="-22" y="-14" width="44" height="18" rx="5" fill="none" stroke="${c}" stroke-width="4"/><path d="M-14 12q4 6 0 12M0 12q4 6 0 12M14 12q4 6 0 12" fill="none" stroke="${c}" stroke-width="3" stroke-linecap="round"/>`,
+  speaker:c=>`<rect x="-12" y="-22" width="24" height="44" rx="10" fill="none" stroke="${c}" stroke-width="4"/><circle cx="0" cy="-8" r="3" fill="${c}"/><circle cx="0" cy="8" r="6" fill="none" stroke="${c}" stroke-width="3"/>`,
+  bulb:c=>`<circle cx="0" cy="-6" r="14" fill="none" stroke="${c}" stroke-width="4"/><path d="M-7 10h14M-6 17h12" stroke="${c}" stroke-width="4" stroke-linecap="round"/>`,
+  energy:c=>`<rect x="-22" y="-20" width="44" height="40" rx="6" fill="none" stroke="${c}" stroke-width="4"/><path d="M-12 12v-8M-2 12v-16M8 12v-10" stroke="${c}" stroke-width="5" stroke-linecap="round"/>`,
+  fridge:c=>`<rect x="-14" y="-24" width="28" height="48" rx="5" fill="none" stroke="${c}" stroke-width="4"/><path d="M-14 -4h28M8 -16v6M8 4v8" stroke="${c}" stroke-width="3" stroke-linecap="round"/>`,
+  vacuum:c=>`<circle r="20" fill="none" stroke="${c}" stroke-width="4"/><circle r="7" fill="${c}"/><path d="M-14 -14l-6 -6M14 -14l6 -6" stroke="${c}" stroke-width="3" stroke-linecap="round"/>`,
+  hospital:c=>`<rect x="-20" y="-20" width="40" height="40" rx="8" fill="none" stroke="${c}" stroke-width="4"/><path d="M0 -10v20M-10 0h20" stroke="${c}" stroke-width="6" stroke-linecap="round"/>`,
+  car:c=>`<path d="M-22 6v-8l8-12h28l8 12v8z" fill="none" stroke="${c}" stroke-width="4" stroke-linejoin="round"/><circle cx="-12" cy="10" r="5" fill="${c}"/><circle cx="12" cy="10" r="5" fill="${c}"/>`,
+  farm:c=>`<path d="M0 20V-4M0 4q-16 0 -18 -18q16 0 18 18M0 -4q14 -2 16 -18q-14 2 -16 18" fill="none" stroke="${c}" stroke-width="4" stroke-linejoin="round"/>`,
+  surgery:c=>`<path d="M-18 20V4l14 -14 14 6" fill="none" stroke="${c}" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/><path d="M10 -4l8 10M10 -4l-2 12" stroke="${c}" stroke-width="3" stroke-linecap="round"/><circle cx="-4" cy="-10" r="4" fill="${c}"/>`,
+  drone:c=>`<path d="M-14 -14L14 14M14 -14L-14 14" stroke="${c}" stroke-width="4"/><circle cx="-16" cy="-16" r="7" fill="none" stroke="${c}" stroke-width="3"/><circle cx="16" cy="-16" r="7" fill="none" stroke="${c}" stroke-width="3"/><circle cx="-16" cy="16" r="7" fill="none" stroke="${c}" stroke-width="3"/><circle cx="16" cy="16" r="7" fill="none" stroke="${c}" stroke-width="3"/><rect x="-6" y="-6" width="12" height="12" fill="${c}"/>`,
+  factory:c=>`<path d="M-22 20V-2l12 -8v8l12 -8v8l12 -8v30z" fill="none" stroke="${c}" stroke-width="4" stroke-linejoin="round"/><rect x="10" y="-22" width="6" height="16" fill="${c}"/>`,
+  sensor:c=>`<circle r="8" fill="${c}"/><path d="M-16 -12a20 20 0 0 0 0 24M16 -12a20 20 0 0 1 0 24M-24 -20a32 32 0 0 0 0 40M24 -20a32 32 0 0 1 0 40" fill="none" stroke="${c}" stroke-width="3" stroke-linecap="round"/>`,
+  cloud:c=>`<path d="M-20 12h40a12 12 0 0 0 0 -24a16 16 0 0 0 -30 -4a12 12 0 0 0 -10 28z" fill="none" stroke="${c}" stroke-width="4" stroke-linejoin="round"/>`,
+  brain:c=>`<path d="M0 -20v40M0 -20q-20 -2 -20 14q-6 10 4 18q4 10 16 8M0 -20q20 -2 20 14q6 10 -4 18q-4 10 -16 8" fill="none" stroke="${c}" stroke-width="4" stroke-linejoin="round"/>`,
+  arm:c=>`<path d="M-20 22h24M-8 22V2l18 -14" fill="none" stroke="${c}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 -12l10 2M10 -12l4 -10" stroke="${c}" stroke-width="4" stroke-linecap="round"/><circle cx="-8" cy="2" r="4" fill="${c}"/>`,
+  phone:c=>`<rect x="-13" y="-22" width="26" height="44" rx="6" fill="none" stroke="${c}" stroke-width="4"/><path d="M-4 15h8" stroke="${c}" stroke-width="3" stroke-linecap="round"/>`,
+  gear:c=>`<circle r="10" fill="none" stroke="${c}" stroke-width="4"/>${[0,1,2,3,4,5,6,7].map(i=>{const a=i*Math.PI/4;return `<line x1="${f1(Math.cos(a)*14)}" y1="${f1(Math.sin(a)*14)}" x2="${f1(Math.cos(a)*21)}" y2="${f1(Math.sin(a)*21)}" stroke="${c}" stroke-width="6" stroke-linecap="round"/>`;}).join('')}`
+};
+const icon=(k,x,y,c,s=1)=>`<g transform="translate(${x} ${y}) scale(${s})">${IC[k](c)}</g>`;
+
+/* ── 과학 관련 사회적 쟁점과 과학 윤리 덱 ── */
+const person=(x,y,col,s=1)=>`<g transform="translate(${x} ${y}) scale(${s})"><circle cx="0" cy="-30" r="18" fill="${col}"/><path d="M-30 22q0-34 30-34q30 0 30 34z" fill="${col}"/></g>`;
+const bubble=(x,y,w,h,col,txtS='',fs=26,tail='l')=>`<g><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${h/2}" fill="${col}" fill-opacity=".16" stroke="${col}" stroke-width="3"/><path d="M${tail==='l'?x+30:x+w-30} ${y+h-2}l${tail==='l'?-10:10} 22 ${tail==='l'?26:-26}-22" fill="${col}" fill-opacity=".16" stroke="${col}" stroke-width="3" stroke-linejoin="round"/>${txtS?txt(x+w/2,y+h/2+fs*.36,txtS,fs,'#f5f5f7','middle','font-weight="600"'):''}</g>`;
+
+/* 표지: 서로 다른 의견 말풍선과 가운데 물음표 */
+Deck.scene('cover',{steps:0,
+  build(root){const R=U.rng(8);let s='';
+    const B=[[200,160,'elec'],[420,330,'kin'],[260,480,'sound'],[560,170,'light'],[1260,170,'heat'],[1480,330,'chem'],[1300,480,'elec'],[1600,170,'kin'],[700,430,'heat'],[1080,430,'sound']];
+    B.forEach(([x,y,c],i)=>{const w=150+R()*90;s+=`<g class="bb" data-in="${150+i*90}" data-fx="pop">${bubble(x,y,w,64,`var(--${c})`,'',0,i%2?'r':'l')}${[0,1,2].map(k=>`<rect x="${f1(x+30+k*((w-60)/3))}" y="${y+28}" width="${f1((w-60)/3-14)}" height="8" rx="4" fill="var(--${c})" opacity=".7"/>`).join('')}</g>`;});
+    s+=`<g data-in="900" data-fx="pop"><circle cx="960" cy="330" r="110" fill="#1d1d1f" stroke="var(--light)" stroke-width="5"/>${txt(960,380,'?',150,'var(--light)','middle','font-weight="800"')}</g>`;
+    root.querySelector('#hero-g').innerHTML=s;},
+  enter(c){if(c.still||c.reduced)return;const g=c.$$('#hero-g .bb');c.loop(t=>g.forEach((e,i)=>e.setAttribute('transform',`translate(0 ${f1(Math.sin(t*1.2+i)*6)})`)));}
+});
+
+/* 로봇 3원칙: 순서가 있는 계단 */
+Deck.scene('laws',{steps:3,
+  build(root){let s='';
+    const L=[['①','로봇은 사람을 해쳐서는 안 된다.','가장 먼저','var(--heat)'],['②','로봇은 사람의 명령을 따른다.','①에 어긋나지 않는 한','var(--light)'],['③','로봇은 자신을 보호해야 한다.','①과 ②에 어긋나지 않는 한','var(--elec)']];
+    L.forEach(([n,t,cond,col],i)=>{const x=300+i*130,y=300+i*190,w=1500-i*130;
+      s+=`<g data-step="${i+1}" data-fx="rise"><rect x="${x}" y="${y}" width="${w}" height="160" rx="22" fill="#232326" stroke="${col}" stroke-width="3"/>${txt(x+70,y+102,n,64,col,'middle','font-weight="800"')}${txt(x+140,y+70,cond,26,col,'start','font-weight="600"')}${txt(x+140,y+120,t,40,'#f5f5f7','start','font-weight="700"')}</g>`;});
+    s+=`<g data-in="200" data-fx="fade">${arrow(190,840,190,330,'#86868b',5)}${txt(190,890,'먼저 지킨다',26,'#86868b')}</g>`;
+    root.querySelector('#laws-g').innerHTML=s;}
+});
+
+/* 관심 쟁점 표시는 덱을 보는 동안 유지한다. */
+const pickedIssues = new Set();
+Deck.scene('aiissues',{steps:3,
+  enter(c) {
+    c.$$('.is-card').forEach(button => {
+      const issue = button.dataset.issue;
+      const update = selected => {
+        button.classList.toggle('picked', selected);
+        button.setAttribute('aria-pressed', String(selected));
+      };
+      update(pickedIssues.has(issue));
+      button.addEventListener('click', () => {
+        const selected = !pickedIssues.has(issue);
+        if (selected) pickedIssues.add(issue);
+        else pickedIssues.delete(issue);
+        update(selected);
+        if (window.SFX && !Deck.STILL) SFX.play('pop');
+      });
+    });
+  }
+});
+
+/* 쟁점을 다루는 방법 */
+Deck.scene('decide',{steps:5,
+  build(root){let s='';const cx=330,cy=520;
+    s+=`<g data-in="100" data-fx="pop"><circle cx="${cx}" cy="${cy}" r="80" fill="#1d1d1f" stroke="var(--light)" stroke-width="4"/>${txt(cx,cy+12,'쟁점',36,'var(--light)','middle','font-weight="700"')}</g>`;
+    const P=[[-150,-170,'var(--elec)'],[150,-170,'var(--kin)'],[-190,10,'var(--sound)'],[190,10,'var(--chem)']];
+    P.forEach(([dx,dy,col],i)=>{s+=`<g data-step="1" data-fx="pop" data-delay="${i*120}">${person(cx+dx,cy+dy,col,.9)}<circle cx="${cx+dx+(dx>0?34:-34)}" cy="${cy+dy-62}" r="18" fill="${col}" fill-opacity=".2" stroke="${col}" stroke-width="2"/>${txt(cx+dx+(dx>0?34:-34),cy+dy-54,'!',24,col,'middle','font-weight="800"')}</g>`;});
+    s+=`<g data-step="1" data-fx="fade" data-delay="500">${txt(cx,cy+140,'여러 입장 · 이해관계',26,'#86868b')}</g>`;
+    s+=`<g data-step="2" data-fx="fade">${arrow(cx,cy+170,cx,cy+260,'var(--heat)',4)}<rect x="${cx-150}" y="${cy+270}" width="300" height="90" rx="18" fill="var(--heat)" fill-opacity=".14" stroke="var(--heat)" stroke-width="3"/>${txt(cx,cy+312,'방치하면',24,'var(--heat)')}${txt(cx,cy+346,'사회적 갈등',30,'#f5f5f7','middle','font-weight="700"')}</g>`;
+    const N=[[760,'다양한 관점과','복잡한 상황 이해','var(--elec)'],[1180,'충분한','협의','var(--kin)'],[1600,'합리적인','의사 결정','var(--light)']];
+    N.forEach(([x,a,b,col],i)=>{const last=i===2;s+=`<g data-step="${i+3}" data-fx="rise">${arrow(i?N[i-1][0]+170:cx+100,cy,x-170,cy,'#6e6e73',4)}<rect x="${x-160}" y="${cy-90}" width="320" height="180" rx="22" fill="#232326" stroke="${col}" stroke-width="3"/>${txt(x,cy-10,a,30,'#f5f5f7','middle','font-weight="600"')}${last?line(x-90,cy+50,x+90,cy+50,'#6e6e73',3):txt(x,cy+36,b,34,col,'middle','font-weight="700"')}</g>${last?`<g data-step="5" data-fx="pop" data-delay="500">${txt(x,cy+36,b,34,col,'middle','font-weight="700"')}</g>`:''}`;});
+    root.querySelector('#decide-g').innerHTML=s;}
+});
+
+/* 연결 활동 카드 */
+Deck.scene('match',{steps:5,
+  enter(c){c.$$('.mt-card').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();if(b.classList.contains('open'))return;b.classList.add('open');c.reveal(b.querySelector('.ds-i'),'rise');if(window.SFX&&!Deck.STILL)SFX.play('pop');}));}
+});
+
+/* 탐구 표지: 필름 */
+Deck.scene('inq-title',{
+  build(root){let s='';const x=1340,y=300,w=440,h=520;
+    s+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="18" fill="#1d1d1f" stroke="var(--kin)" stroke-width="3"/>`;
+    for(let i=0;i<8;i++){s+=`<rect x="${x+14}" y="${y+24+i*62}" width="26" height="34" rx="5" fill="#3a3a3c"/><rect x="${x+w-40}" y="${y+24+i*62}" width="26" height="34" rx="5" fill="#3a3a3c"/>`;}
+    const C=['var(--elec)','var(--sound)','var(--kin)'];
+    for(let k=0;k<3;k++)s+=`<rect class="fr" x="${x+64}" y="${y+24+k*164}" width="${w-128}" height="140" rx="10" fill="${C[k]}" opacity=".35"/>`;
+    root.querySelector('#inq-hero').innerHTML=s;},
+  enter(c){if(c.still||c.reduced)return;const f=c.$$('#inq-hero .fr');c.loop(t=>f.forEach((e,i)=>e.setAttribute('opacity',(0.25+0.3*Math.max(0,Math.sin(t*1.6-i*1.1))).toFixed(2))));}
+});
+
+/* 정책 제안서 문서 */
+Deck.scene('policy',{steps:5,
+  build(root){let s='';const x=160,y=290,w=840,h=650;
+    s+=`<rect x="${x+12}" y="${y+14}" width="${w}" height="${h}" rx="14" fill="#000" opacity=".06"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="14" fill="#fff" stroke="#d2d2d7" stroke-width="2"/>`;
+    s+=txt(x+w/2,y+86,'과학 관련 사회적 쟁점 정책 제안서',38,'#1d1d1f','middle','font-weight="700"')+line(x+60,y+120,x+w-60,y+120,'#d2d2d7',2);
+    const I=['쟁점과 서로 다른 입장','제안하는 조건 한 가지','자료의 사실과 적용할 윤리 원칙','실행·점검 주체와 확인 방법'];
+    I.forEach((t,i)=>{const yy=y+200+i*110;s+=`<g data-step="${i+1}" data-fx="rise"><circle cx="${x+90}" cy="${yy-12}" r="24" fill="var(--act)"/>${txt(x+90,yy-2,i+1,28,'#fff','middle','font-weight="700"')}${txt(x+136,yy,t,34,'#1d1d1f','start','font-weight="600"')}${line(x+136,yy+30,x+w-80,yy+30,'#e8e8ed',10,'stroke-linecap="round"')}${line(x+136,yy+52,x+w-260,yy+52,'#e8e8ed',10,'stroke-linecap="round"')}</g>`;});
+    s+=`<g transform="rotate(-12 ${x+w-110} ${y+h-90})"><rect x="${x+w-190}" y="${y+h-130}" width="160" height="80" rx="12" fill="none" stroke="var(--heat)" stroke-width="5"/>${txt(x+w-110,y+h-77,'예시',40,'var(--heat)','middle','font-weight="800"')}</g>`;
+    root.querySelector('#doc-g').innerHTML=s;}
+});
+
+</script></body></html>
