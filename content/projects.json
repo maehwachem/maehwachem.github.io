@@ -291,7 +291,7 @@
         "title": "골목 눈싸움",
         "subject": "tools",
         "date": "2026-11-07",
-        "desc": "눈 쌓인 3D 골목에서 담 너머로 눈덩이를 던지고 눈사람을 지킵니다. 혼자 대결과 연습을 할 수 있고, 팀전은 같은 와이파이에서 방장 PC로 방을 열어 플레이합니다.",
+        "desc": "눈 쌓인 3D 골목에서 담 너머로 눈덩이를 던지고 눈사람을 지킵니다. 혼자 대결하거나 연습할 수 있고, 온라인 단체전은 초대 링크로 함께 플레이합니다.",
         "tag": "3D · 눈싸움",
         "cover": "/assets/covers/snowball-alley-gameplay.webp",
         "links": [
@@ -300,7 +300,11 @@
             "url": "/games/snowball-alley/"
           },
           {
-            "label": "팀전 ZIP 다운로드",
+            "label": "온라인 단체전",
+            "url": "https://snowball-alley-trial.onrender.com/?online=1"
+          },
+          {
+            "label": "같은 와이파이용 ZIP",
             "url": "/games/snowball-alley/snowball-alley-team.zip"
           }
         ],
