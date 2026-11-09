@@ -9,6 +9,7 @@ const {createBotController} = require('./bots.cjs');
 const botsByMap = Object.fromEntries(Object.entries(worlds).map(([id, world]) => [id, createBotController(world)]));
 const validMap = id => typeof id === 'string' && Object.hasOwn(worlds, id);
 const MAX_HP = 3, MAX_AMMO = 3, BALL_RADIUS = .12, PLAYER_RADIUS = .4;
+const WALK_SPEED = 4.6, RUN_SPEED = 6.6;
 const BODY = [[.44,.44],[1.02,.35],[1.52,.27]];
 const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const DT = .025, LOST_SEAT_MS = 15000;
@@ -20,7 +21,7 @@ const online = player => player.bot || Boolean(player.socket);
 const people = room => [...room.players.values()].filter(player => !player.bot);
 const waitingForPlayer = room => people(room).some(player=>!player.socket);
 const modes = {team:4,coop:2,duel:2};
-const freshInput = () => ({mx:0,my:0,gather:false,crouch:false});
+const freshInput = () => ({mx:0,my:0,gather:false,crouch:false,run:false});
 const nearPile = (world, player) => world.piles.some(pile => Math.hypot(player.x-pile.x, player.z-pile.z) < 1.9);
 
 function resolveWall(player, wall) {
@@ -96,7 +97,8 @@ function movePlayers(room, now) {
       if (player.gatherTime>=.75-1e-6) {player.ammo++; player.gatherTime=0;}
     } else player.gatherTime=0;
     if (player.stun || player.gathering) continue;
-    const speed=(player.crouch?2:player.bot?3.35:4.6)*DT, length=Math.max(1,Math.hypot(input.mx,input.my));
+    const pace=player.bot ? 3.35 : input.run ? RUN_SPEED : WALK_SPEED;
+    const speed=(player.crouch ? 2 : pace)*DT, length=Math.max(1,Math.hypot(input.mx,input.my));
     const mx=input.mx/length, my=input.my/length;
     player.x+= (Math.cos(player.yaw)*mx-Math.sin(player.yaw)*my)*speed;
     player.z+= (-Math.sin(player.yaw)*mx-Math.cos(player.yaw)*my)*speed;
@@ -371,7 +373,7 @@ function createServer({publicOrigin = ''} = {}) {
       } else if (data.type === 'input') {
         if (room.phase !== 'play' || waitingForPlayer(room) || data.round !== room.round) return;
         player.input = {mx:clamp(finite(data.mx), -1, 1), my:clamp(finite(data.my), -1, 1),
-          crouch:data.crouch === true, gather:data.gather === true};
+          crouch:data.crouch === true, gather:data.gather === true, run:data.run === true};
         player.yaw = finite(data.yaw, player.yaw) % (2 * Math.PI);
         player.pitch = clamp(finite(data.pitch, player.pitch), -.12, 1.25);
         player.inputAt = now;
