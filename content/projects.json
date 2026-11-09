@@ -728,6 +728,7 @@
         "desc": "교실 이산화 탄소 측정에서 데이터의 의미와 빅데이터 활용으로 이어지는 31장 수업 자료입니다. 환기 모형을 조작하고 데이터 품질·편향·개인정보 보호를 토의합니다.",
         "tag": "과학과 미래 사회 · 빅데이터",
         "level": "고등학교 통합과학2",
+        "cover": "/assets/uploads/cover-series-big-data-v1.webp",
         "poster": "lab",
         "words": "빅데이터와\n과학기술사회",
         "links": [
@@ -745,6 +746,7 @@
         "desc": "스마트 홈과 미래 도시에서 사물 인터넷·인공지능·로봇의 역할을 살펴봅니다. 로봇 개선안을 비교하고 과학기술의 이점과 한계를 예측하는 20장 수업 자료입니다.",
         "tag": "과학과 미래 사회 · 첨단 과학기술",
         "level": "고등학교 통합과학2",
+        "cover": "/assets/uploads/cover-series-tech-life-v1.webp",
         "poster": "lab",
         "words": "과학기술의 발전과\n우리 생활",
         "links": [
@@ -762,6 +764,7 @@
         "desc": "로봇 3원칙과 영화 속 쟁점에서 출발해 자율주행차 시험 운행의 안전과 책임을 토의하는 20장 수업 자료입니다. 작품별 자료와 모둠 정책 제안 활동을 담았습니다.",
         "tag": "과학과 미래 사회 · 과학 윤리",
         "level": "고등학교 통합과학2",
+        "cover": "/assets/uploads/cover-series-sci-ethics-v1.webp",
         "poster": "lab",
         "words": "사회적 쟁점과\n과학 윤리",
         "links": [
