@@ -296,6 +296,10 @@
         "cover": "/assets/covers/snowball-alley-gameplay.webp",
         "links": [
           {
+            "label": "개선판",
+            "url": "/games/snowball-alley-improved/"
+          },
+          {
             "label": "혼자 하기",
             "url": "/games/snowball-alley/"
           },
