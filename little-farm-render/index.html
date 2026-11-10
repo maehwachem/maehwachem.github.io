@@ -135,8 +135,6 @@ body.placing .slot.empty .ring{opacity:1;transform:scale(1);animation:pulse 1.2s
 .plot.wet .soil::after{opacity:1}
 .plot.wet .soil{box-shadow:0 0 0 calc(var(--cell)*.034) #a77a4c,0 0 0 calc(var(--cell)*.044) #6e4528,0 calc(var(--cell)*.075) 0 #6e4528,0 calc(var(--cell)*.1) calc(var(--cell)*.06) rgba(40,50,20,.32),inset 0 calc(var(--cell)*.02) 0 rgba(255,236,200,.2)}
 body.w-rain:not(.in-greenhouse) .plot.wet .soil::after{filter:brightness(1.06) contrast(1.05)}
-/* 물이 필요한 밭: 갈라진 흙 */
-.plot.dry .soil::before{content:"";position:absolute;inset:0;border-radius:inherit;z-index:1;background:linear-gradient(120deg,transparent 46%,rgba(90,52,24,.32) 47% 48%,transparent 49%),linear-gradient(40deg,transparent 60%,rgba(90,52,24,.26) 61% 62%,transparent 63%),linear-gradient(160deg,transparent 72%,rgba(90,52,24,.22) 73% 74%,transparent 75%);}
 .plot.dry .soil{filter:saturate(.85) brightness(1.05)}
 .plot:active .soil{transform:scale(.96)}
 .plot .soak{position:absolute;left:5%;right:5%;top:20%;bottom:9%;border-radius:15%;pointer-events:none;opacity:0;background:radial-gradient(circle at 50% 50%,rgba(38,20,6,.6) 0 40%,rgba(38,20,6,.25) 58%,transparent 72%)}
