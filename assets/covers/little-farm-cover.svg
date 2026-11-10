@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="320" viewBox="0 0 480 320" preserveAspectRatio="xMidYMid slice">
+          <rect width="480" height="320" fill="#d6e5b7"/>
+          <circle cx="373" cy="58" r="32" fill="#f6d881"/>
+          <path d="M0 161L114 85l107 67 111-60 148 67v161H0z" fill="#a7c388"/>
+          <path d="M0 210l112-44 119 24 109-28 140 39v119H0z" fill="#719760"/>
+          <path d="M118 211l85-36h155l-66 36zm-37 46l26-33h164l-62 33zm162 0l62-33h147l17 33z" fill="#a96f4e"/>
+          <path d="M70 174v-53l47-36 47 36v53z" fill="#f6e2b7" stroke="#684b3d" stroke-width="4"/>
+          <path d="M58 124l59-48 59 48z" fill="#b96853" stroke="#684b3d" stroke-width="4" stroke-linejoin="round"/>
+          <rect x="107" y="139" width="20" height="35" rx="3" fill="#8b5d44"/>
+          <g fill="#c8df96" stroke="#4d7748" stroke-width="2">
+            <defs><path id="sprout" d="M0 16V5C-4 1-10 3-12-5c6-2 12 1 12 8 0-7 6-10 12-8-2 8-8 6-12 10z"/></defs>
+            <use href="#sprout" x="175" y="196"/><use href="#sprout" x="220" y="196"/>
+            <use href="#sprout" x="265" y="196"/><use href="#sprout" x="310" y="196"/>
+            <use href="#sprout" x="139" y="241"/><use href="#sprout" x="185" y="241"/>
+            <use href="#sprout" x="337" y="241"/><use href="#sprout" x="388" y="241"/>
+          </g>
+        </svg>

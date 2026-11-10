@@ -71,6 +71,8 @@
     #kje-portfolio .kje-poster-island{background:light-dark(#dce6db,#b6cbb6);color:#2a4b3a}
     #kje-portfolio .kje-poster-lab,#kje-portfolio .kje-poster-gas,#kje-portfolio .kje-poster-heat,#kje-portfolio .kje-poster-rate,#kje-portfolio .kje-poster-equil{background:light-dark(#eadfcc,#d1c2a6);color:#5c4a2d}
     #kje-portfolio .kje-poster-note{background:light-dark(#dfe5e9,#c2d1d9);color:#344f60}
+    #kje-portfolio img.kje-project-cover[src$="/little-farm-cover.svg"]{display:block;width:100%;height:100%;object-fit:cover}
+    #kje-portfolio .kje-poster:has(img[src$="/little-farm-cover.svg"]) .kje-poster-word{color:#fffdf1;text-shadow:0 1px 4px #293f2c}
     #kje-portfolio .kje-poster-cap{position:absolute;left:17px;top:13px;font-size:9px;letter-spacing:1.4px}
     #kje-portfolio .kje-poster-word{position:absolute;left:16px;bottom:13px;font-family:'Noto Serif KR',serif;font-size:23px;letter-spacing:-1px;line-height:1.45;z-index:2}
     #kje-portfolio .kje-contour{position:absolute;border:1px solid #8ca28a;width:185px;height:128px;border-radius:43% 56% 40% 49%;transform:rotate(-27deg);right:-25px;top:17px}
@@ -304,23 +306,7 @@ html{color-scheme:only light;scroll-behavior:smooth}body{margin:0;background:lig
       <p class="kje-project-tag">지구과학 · 천체 관측 · 프로토타입</p><h3 class="kje-project-title">할아버지의 별 일지</h3><p class="kje-project-desc">1987년의 옥상으로 돌아가 할아버지가 기록한 별과 행성을 찾아봅니다. 성도와 올려다보기 화면을 오가며 찢어진 일지의 첫 페이지를 채워 보세요.</p><div class="kje-project-links"><a class="kje-project-go" href="/games/grandpas-star-journal/">게임 열기 <span aria-hidden="true">↗</span></a></div>
     </article><article class="kje-project" data-kind="play" data-subject="tools">
       <div class="kje-poster kje-game-cover" aria-hidden="true">
-        <svg class="kje-project-cover" width="100%" height="100%" viewBox="0 0 480 320" preserveAspectRatio="xMidYMid slice">
-          <rect width="480" height="320" fill="#d6e5b7"/>
-          <circle cx="373" cy="58" r="32" fill="#f6d881"/>
-          <path d="M0 161L114 85l107 67 111-60 148 67v161H0z" fill="#a7c388"/>
-          <path d="M0 210l112-44 119 24 109-28 140 39v119H0z" fill="#719760"/>
-          <path d="M118 211l85-36h155l-66 36zm-37 46l26-33h164l-62 33zm162 0l62-33h147l17 33z" fill="#a96f4e"/>
-          <path d="M70 174v-53l47-36 47 36v53z" fill="#f6e2b7" stroke="#684b3d" stroke-width="4"/>
-          <path d="M58 124l59-48 59 48z" fill="#b96853" stroke="#684b3d" stroke-width="4" stroke-linejoin="round"/>
-          <rect x="107" y="139" width="20" height="35" rx="3" fill="#8b5d44"/>
-          <g fill="#c8df96" stroke="#4d7748" stroke-width="2">
-            <defs><path id="kje-farm-sprout" d="M0 16V5C-4 1-10 3-12-5c6-2 12 1 12 8 0-7 6-10 12-8-2 8-8 6-12 10z"/></defs>
-            <use href="#kje-farm-sprout" x="175" y="196"/><use href="#kje-farm-sprout" x="220" y="196"/>
-            <use href="#kje-farm-sprout" x="265" y="196"/><use href="#kje-farm-sprout" x="310" y="196"/>
-            <use href="#kje-farm-sprout" x="139" y="241"/><use href="#kje-farm-sprout" x="185" y="241"/>
-            <use href="#kje-farm-sprout" x="337" y="241"/><use href="#kje-farm-sprout" x="388" y="241"/>
-          </g>
-        </svg><span class="kje-poster-word" style="color:#fffdf1;text-shadow:0 1px 4px #293f2c">오늘도,<br>작은 농장</span>
+        <img class="kje-project-cover" src="/assets/covers/little-farm-cover.svg" alt="" loading="lazy" width="480" height="320"><span class="kje-poster-word">오늘도,<br>작은 농장</span>
       </div>
       <p class="kje-project-tag">힐링 · 농장 가꾸기</p><h3 class="kje-project-title">오늘도, 작은 농장</h3>
       <p class="kje-project-desc">씨앗을 심고 물을 주어 작물을 수확하고, 내 농장을 조금씩 가꿔 보세요. 로그인 없이 기기에 저장할 수 있고, 새 클라우드 농장은 신청이 승인되면 만들 수 있습니다.</p>
