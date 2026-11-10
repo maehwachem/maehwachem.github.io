@@ -17,9 +17,10 @@ if (FARM_SERVICE_ACCOUNT && FARM_BRIDGE_URL && FARM_BRIDGE_KEY) {
     bridgeUrl: FARM_BRIDGE_URL, bridgeKey: FARM_BRIDGE_KEY, operatorEmail: FARM_OPERATOR_EMAIL?.trim().toLowerCase(), origins
   });
 }
-const source = await readFile(new URL('./index.html', import.meta.url), 'utf8');
+const [source, dashboard] = await Promise.all(['index.html','admin.html'].map(name =>
+  readFile(new URL(name, import.meta.url), 'utf8')));
 const configMarker = '/* __FARM_FIREBASE_CONFIG__ */ {}';
-if (!source.includes(configMarker)) throw new Error('The Firebase web config placeholder is missing.');
+if (!source.includes(configMarker) || !dashboard.includes(configMarker)) throw new Error('The Firebase web config placeholder is missing.');
 
 const firebaseWebApiKey = process.env.FARM_FIREBASE_WEB_API_KEY || '';
 const firebaseConfig = api && endpoint && /^AIza[A-Za-z0-9_-]{35}$/.test(firebaseWebApiKey)
@@ -33,6 +34,7 @@ const firebaseConfig = api && endpoint && /^AIza[A-Za-z0-9_-]{35}$/.test(firebas
 const html = source
   .replace(configMarker, JSON.stringify(firebaseConfig))
   .replace('__FARM_SAVE_ENDPOINT__', firebaseConfig.apiKey ? endpoint + '/api/farm-save' : '');
+const adminHtml = dashboard.replace(configMarker, JSON.stringify(firebaseConfig));
 const json = {'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'};
 const port = Number(process.env.PORT || 10000);
 
@@ -40,9 +42,9 @@ const app = createServer(async (req,res) => {
   try {
     if (req.method === 'GET' && req.url === '/healthz') {
       res.writeHead(200,json).end(JSON.stringify({ok:true,ready:!!api}));
-    } else if (req.method === 'GET' && req.url === '/') {
+    } else if (req.method === 'GET' && ['/', '/admin', '/admin/'].includes(req.url)) {
       res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store',
-        'X-Content-Type-Options':'nosniff','X-Robots-Tag':'noindex, nofollow'}).end(html);
+        'X-Content-Type-Options':'nosniff','X-Robots-Tag':'noindex, nofollow', ...(req.url === '/' ? {} : {'X-Frame-Options':'DENY'})}).end(req.url === '/' ? html : adminHtml);
     } else if (req.url === '/api/farm-save') {
       if (!api) {
         res.writeHead(503,json).end('{"error":"network"}');

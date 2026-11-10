@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>농장 관리자 대시보드</title>
+<style>
+  :root{color-scheme:light;--ink:#253b2c;--muted:#506158;--line:#d4ddd0;--accent:#29543a;--paper:#fffdf5;--danger:#8e3929}
+  *{box-sizing:border-box}
+  body{margin:0;background:#f0f3e9;color:var(--ink);font:16px/1.6 system-ui,sans-serif}
+  main{width:min(860px,100% - 32px);margin:42px auto}
+  a{color:var(--accent);text-underline-offset:4px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  h1,h2,p{margin:0}
+  h1{font-size:clamp(26px,5vw,38px);line-height:1.3;letter-spacing:-.035em}
+  h2{font-size:20px}
+  .eyebrow{font-size:14px;color:var(--muted);font-weight:700;margin-bottom:4px}
+  .note{color:var(--muted);margin:10px 0 18px;word-break:keep-all}
+  .panel,dialog{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:clamp(14px,4vw,28px)}
+  .panel{margin-top:20px}
+  .toolbar,.actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+  .toolbar{justify-content:space-between;margin-bottom:16px}
+  button{min-height:44px;padding:6px 12px;border:1px solid var(--line);border-radius:8px;background:white;color:var(--ink);font:inherit;cursor:pointer}
+  button:disabled{cursor:default;opacity:.55}
+  button[aria-pressed=true],.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .danger{color:var(--danger)}
+  button:focus-visible,a:focus-visible{outline:3px solid #427654;outline-offset:3px}
+  ul{list-style:none;padding:0;margin:12px 0}
+  li{display:flex;align-items:center;justify-content:space-between;gap:10px 18px;flex-wrap:wrap;padding:14px 0;border-top:1px solid var(--line)}
+  li b{overflow-wrap:anywhere;min-width:0}
+  nav{justify-content:flex-end}
+  #error{color:var(--danger);margin:8px 0}
+  dialog{color:var(--ink);width:min(430px,100% - 32px)}
+  dialog::backdrop{background:#14241990}
+  dialog .actions{justify-content:flex-end}
+</style>
+</head>
+<body>
+<main>
+  <header><div><p class="eyebrow">오늘도, 작은 농장</p><h1>관리자 대시보드</h1></div><a href="/">농장 게임으로</a></header>
+  <p class="note">클라우드 저장 신청을 확인하고 새 농장 생성 권한을 관리합니다.</p>
+  <section class="panel" aria-label="관리자 로그인">
+    <div class="toolbar"><p id="session" role="status">관리자 구글 계정으로 로그인해 주세요.</p>
+      <button id="login" class="primary" disabled>구글로 로그인</button><button id="logout" hidden>로그아웃</button>
+    </div>
+    <p id="error" role="alert" hidden></p>
+    <button id="retry" hidden>연결 다시 확인</button>
+    <div id="dashboard" hidden>
+      <div class="toolbar"><h2>저장 신청 목록</h2><button id="refresh">새로고침</button></div>
+      <div class="actions" id="filters" role="group" aria-label="신청 상태">
+        <button data-status="pending" aria-pressed="true">대기</button><button data-status="approved" aria-pressed="false">승인</button>
+        <button data-status="rejected" aria-pressed="false">거절</button><button data-status="revoked" aria-pressed="false">승인 취소</button>
+      </div>
+      <p id="listStatus" class="note" role="status"></p>
+      <ul id="requests" aria-label="신청 기록"></ul>
+      <nav class="actions" aria-label="신청 목록 페이지"><button id="prev">이전</button><button id="next">다음</button></nav>
+    </div>
+  </section>
+</main>
+<dialog id="confirm" aria-labelledby="confirmTitle" aria-describedby="confirmAccount confirmNote">
+  <form method="dialog">
+    <h2 id="confirmTitle"></h2>
+    <p id="confirmAccount"></p>
+    <p id="confirmNote" class="note"></p>
+    <div class="actions"><button value="cancel" autofocus>돌아가기</button><button id="confirmAction" value="apply" class="primary"></button></div>
+  </form>
+</dialog>
+<script type="module">
+const config = /* __FARM_FIREBASE_CONFIG__ */ {};
+const $ = id => document.getElementById(id);
+const choices = {
+  pending: [['approved','승인'],['rejected','거절'],['delete','신청 기록 삭제']],
+  approved: [['revoked','승인 취소']],
+  rejected: [['approved','다시 승인'],['delete','신청 기록 삭제']],
+  revoked: [['approved','다시 승인'],['delete','신청 기록 삭제']]
+};
+const labels = {
+  approved: '새 클라우드 농장을 만들 수 있게 됩니다.',
+  rejected: '신청을 거절하면 이 계정은 새 클라우드 농장을 만들 수 없어요.',
+  revoked: '새 클라우드 농장 생성을 막아요. 기존 농장은 계속 열고 저장할 수 있어요.',
+  delete: '신청 기록을 삭제하면 이 계정이 다시 신청할 수 있어요. 기존 농장에는 영향이 없어요.'
+};
+const statusButtons = [...$('filters').querySelectorAll('button')];
+let auth, authSdk, activeUser, generation = 0, busy = false;
+let filter = 'pending', pages = [undefined], page = 0, nextCursor = null;
+
+function error(message = '') {
+  $('error').textContent = message;
+  $('error').hidden = !message;
+}
+function setBusy(value) {
+  busy = value;
+  $('retry').disabled = value;
+  $('dashboard').setAttribute('aria-busy', String(value));
+  for (const button of $('dashboard').querySelectorAll('button')) button.disabled = value;
+  $('prev').disabled = value || page === 0;
+  $('next').disabled = value || !nextCursor;
+}
+async function request(user, action, data) {
+  const send = async force => fetch('/api/farm-save', {
+    method:'POST', cache:'no-store', signal:AbortSignal.timeout(20000),
+    headers:{'Content-Type':'application/json',Authorization:'Bearer '+await user.getIdToken(force)},
+    body:JSON.stringify({action,...data})
+  });
+  let response = await send(false);
+  if (response.status === 401) response = await send(true);
+  if (!response.ok) throw new Error(String(response.status));
+  return response.json();
+}
+function rowFor(record) {
+  const row = document.createElement('li');
+  const name = document.createElement('b');
+  name.textContent = record.email || '이전 기록 · '+record.id.slice(0,8);
+  const actions = document.createElement('div');
+  actions.className = 'actions';
+  for (const [decision,label] of choices[filter]) {
+    const button = document.createElement('button');
+    button.textContent = label;
+    if (decision === 'delete' || decision === 'revoked') button.className = 'danger';
+    button.addEventListener('click', () => confirmChange(record, decision, label, name.textContent));
+    actions.append(button);
+  }
+  row.append(name, actions);
+  return row;
+}
+async function load(user, status, cursors, target) {
+  const result = await request(user, 'review-list', {status, after:cursors[target]});
+  return {status, cursors, target, result};
+}
+function showList({status, cursors, target, result}) {
+  filter = status;
+  pages = cursors;
+  page = target;
+  nextCursor = result.next;
+  for (const button of statusButtons) button.setAttribute('aria-pressed', String(button.dataset.status === filter));
+  $('requests').replaceChildren(...result.requests.map(rowFor));
+  $('listStatus').textContent = result.requests.length
+    ? (page+1)+'페이지 · '+result.requests.length+'건'
+    : '이 페이지에 표시할 신청이 없어요.';
+  $('dashboard').hidden = false;
+  $('retry').hidden = true;
+  $('session').textContent = '관리자 인증 완료';
+}
+async function run(work) {
+  if (busy || !activeUser) return;
+  const current = generation;
+  error();
+  setBusy(true);
+  try {
+    const result = await work(activeUser);
+    if (generation === current) showList(result);
+  } catch (failure) {
+    if (generation !== current) return;
+    if (failure.message === '403' || failure.message === '401') {
+      $('requests').replaceChildren();
+      $('dashboard').hidden = true;
+      $('retry').hidden = true;
+      $('session').textContent = failure.message === '403' ? '이 구글 계정은 관리자 권한이 없어요.' : '다시 로그인해 주세요.';
+    } else {
+      if ($('dashboard').hidden) $('retry').hidden = false;
+      error(failure.message === '409' ? '신청 상태가 바뀌었어요. 새로고침한 뒤 확인해 주세요.'
+        : '연결이 끊겼어요. 목록을 새로고침해 현재 상태를 확인해 주세요.');
+    }
+  } finally {
+    if (generation === current) setBusy(false);
+  }
+}
+function confirmChange(record, decision, label, account) {
+  if (busy || !activeUser) return;
+  const current = generation;
+  const dialog = $('confirm');
+  $('confirmTitle').textContent = label;
+  $('confirmAccount').textContent = account;
+  $('confirmNote').textContent = labels[decision];
+  $('confirmAction').textContent = label;
+  dialog.returnValue = 'cancel';
+  dialog.addEventListener('close', () => {
+    if (dialog.returnValue !== 'apply' || generation !== current) return;
+    void run(async user => {
+      await request(user, decision === 'delete' ? 'review-delete' : 'review',
+        {id:record.id,version:record.version,decision});
+      return load(user, filter, pages, page);
+    });
+  }, {once:true});
+  dialog.showModal();
+}
+for (const button of statusButtons) {
+  button.addEventListener('click', () => void run(user => load(user, button.dataset.status, [undefined], 0)));
+}
+$('retry').addEventListener('click', () => void run(user => load(user, filter, pages, page)));
+$('refresh').addEventListener('click', () => void run(user => load(user, filter, pages, page)));
+$('prev').addEventListener('click', () => void run(user => load(user, filter, pages, page-1)));
+$('next').addEventListener('click', () => void run(user => load(user, filter, [...pages.slice(0,page+1),nextCursor], page+1)));
+$('login').addEventListener('click', async () => {
+  $('login').disabled = true;
+  error();
+  try { await authSdk.signInWithPopup(auth, new authSdk.GoogleAuthProvider()); }
+  catch (failure) {
+    if (failure.code !== 'auth/popup-closed-by-user') error('구글 로그인에 연결하지 못했어요. 팝업을 허용하고 다시 시도해 주세요.');
+  } finally { $('login').disabled = false; }
+});
+$('logout').addEventListener('click', async () => {
+  try { await authSdk.signOut(auth); }
+  catch { error('로그아웃하지 못했어요. 다시 시도해 주세요.'); }
+});
+try {
+  if (!config.projectId) throw new Error('Firebase config unavailable');
+  const sdk = 'https://www.gstatic.com/firebasejs/13.2.0/';
+  const [app, sdkAuth] = await Promise.all([import(sdk+'firebase-app.js'),import(sdk+'firebase-auth.js')]);
+  authSdk = sdkAuth;
+  auth = authSdk.getAuth(app.initializeApp(config,'little-farm'));
+  await authSdk.setPersistence(auth,authSdk.browserSessionPersistence);
+  authSdk.onAuthStateChanged(auth, user => {
+    activeUser = user;
+    generation++;
+    $('confirm').close();
+    $('dashboard').hidden = true;
+    $('retry').hidden = true;
+    $('requests').replaceChildren();
+    $('login').hidden = !!user;
+    $('login').disabled = false;
+    $('logout').hidden = !user;
+    filter = 'pending';
+    pages = [undefined];
+    page = 0;
+    nextCursor = null;
+    setBusy(false);
+    error();
+    $('session').textContent = user ? '관리자 권한을 확인하고 있어요.' : '관리자 구글 계정으로 로그인해 주세요.';
+    if (user) void run(user => load(user, filter, pages, page));
+  });
+} catch {
+  error('로그인 서비스를 준비하지 못했어요. 페이지를 다시 열어 주세요.');
+}
+</script>
+</body>
+</html>
