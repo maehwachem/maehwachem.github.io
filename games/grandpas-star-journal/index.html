@@ -767,11 +767,15 @@ body[data-chapter="4"] #intro { background: radial-gradient(ellipse at 70% 16%,#
 #meteorPanel h3 { margin: 0; font: 700 19px/1.3 var(--serif); }
 #meteorPanel p { margin: 5px 0 8px; font-size: 13px; line-height: 1.5; }
 #meteorPanel button { min-height: 42px; }
-#meteorPanel #meteorExtend[aria-pressed="true"] { background: #604734; color: #fff3db; }
-.meteor-diagram { position: relative; width: min(100%,440px); margin: 8px auto; }
-.meteor-diagram svg { display: block; width: 100%; height: auto; }
-.meteor-diagram text { font: 700 11px system-ui,sans-serif; stroke: none; }
-.meteor-extension { stroke-width: 1.3; stroke-dasharray: 3 3; opacity: .75; }
+#meteorPanel button[aria-pressed="true"] { background: #604734; color: #fff3db; }
+.meteor-photo { width: min(100%,500px); margin: 8px auto; }
+.meteor-photo figcaption { margin-top: 5px; color: #6b513a; font-size: 12px; text-align: center; }
+.meteor-frame { position: relative; overflow: hidden; border-radius: 7px; background: #0c1424; }
+.meteor-frame canvas { display: block; width: 100%; height: auto; }
+.meteor-frame svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.meteor-frame text { font: 700 11px system-ui,sans-serif; stroke: #0b1424; stroke-width: 2.5; paint-order: stroke; }
+.meteor-extension { stroke-width: 1.4; stroke-dasharray: 3 3; opacity: .9; }
+.meteor-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 6px; }
 #meteorPanel .meteor-choice { position: absolute; display: grid; place-items: center; width: 39px; height: 39px; min-height: 39px; padding: 0; transform: translate(-50%,-50%); border-radius: 50%; border: 1px solid #8f724d; background: #fff1d9ed; color: #59412a; font-weight: 700; }
 #meteorPanel .meteor-choice:hover,#meteorPanel .meteor-choice:focus-visible { background: #604734; color: #fff3db; }
 .meteor-note { display: block; color: #6b513a; margin-top: 8px; font-size: 12px; line-height: 1.4; }
@@ -1084,7 +1088,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <button id="gyroBtn" type="button" aria-pressed="false">자이로</button>
         <button id="lampBtn" type="button" aria-pressed="true" hidden>등불 끄기</button>
         <button id="trailBtn" type="button" hidden>고정 관측</button>
-        <button id="meteorBtn" type="button" hidden>유성 관측</button>
+        <button id="meteorBtn" type="button" hidden>유성 촬영</button>
         <button id="jBtn" class="main" type="button">일지</button>
       </div>
     </div>
@@ -1113,10 +1117,10 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 </dialog>
 
 <dialog id="meteorDialog" aria-labelledby="meteorDialogTitle">
-  <div class="camera-heading"><div><h2 id="meteorDialogTitle">바닷가 유성 관측</h2><small>8월 13일 03:00 · 북동쪽 하늘</small></div><button id="meteorClose" type="button">닫기</button></div>
-  <div class="meteor-field"><canvas id="meteorSky" width="840" height="516" role="img" aria-label="8월 13일 새벽 북동쪽 하늘의 별과 유성 움직임"></canvas></div>
+  <div class="camera-heading"><div><h2 id="meteorDialogTitle">바닷가 유성 촬영</h2><small>8월 13일 03:00 · 북동쪽에 고정한 카메라</small></div><button id="meteorClose" type="button">닫기</button></div>
+  <div class="meteor-field"><canvas id="meteorSky" width="840" height="516" role="img" aria-label="8월 13일 새벽 북동쪽 하늘을 향한 카메라의 촬영 화면"></canvas></div>
   <p id="meteorStatus" role="status"></p>
-  <div class="camera-footer"><button id="meteorWait" type="button">하늘 기다리기</button><button id="meteorRecord" class="main" type="button" disabled>궤적 기록하기</button></div>
+  <div class="camera-footer"><button id="meteorWait" type="button">장노출 시작</button><button id="meteorRecord" class="main" type="button" disabled>사진 남기기</button></div>
 </dialog>
 
 <div id="intro">
@@ -2220,15 +2224,15 @@ function bindPhotoPanel(){
 const BEACH_SITE={name:'여름 바닷가',lat:37.75,lon:128.91,h:9,baseLim:5.35};
 const METEOR_TIME='1989-08-13T03:00:00+09:00';
 const METEOR_TASKS=[
-  {id:'meteor_1',name:'첫 번째 유성',hint:'잠시 기다렸다가 빛줄기가 사라지면 궤적을 일지에 남겨 보렴.',frag:'첫 유성은 말을 꺼낼 새도 없이 지나갔다. 손주가 빛이 향한 쪽을 짧은 화살표로 그었다.'},
-  {id:'meteor_2',name:'두 번째 유성',hint:'이번에는 빛줄기의 처음과 끝을 함께 살펴보렴.',frag:'두 번째는 다른 자리에서 보였다. 손주는 연필을 잠깐 멈추고, 화살표 머리를 어느 쪽에 그릴지 생각했다.'},
-  {id:'meteor_3',name:'세 번째 유성',hint:'한 줄을 더 남기면 세 궤적을 한 장에서 비교할 수 있단다.',frag:'세 번째 줄을 그은 뒤, 나는 세 화살표를 거꾸로 이어 보면 어떻겠냐고 물었다.'},
+  {id:'meteor_1',name:'첫 번째 유성 사진',hint:'유성이 오기 전에 장노출을 시작하고 기다려 보렴. 촬영이 끝나면 사진을 일지에 남기자.',frag:'첫 유성은 말을 꺼낼 새도 없이 지나갔다. 미리 장노출을 시작해 둔 덕분에 별들 사이에 그 빛이 남았다.'},
+  {id:'meteor_2',name:'두 번째 유성 사진',hint:'카메라는 그대로 두고 한 장 더 찍으렴. 유성이 어느 쪽으로 지나가는지도 살펴보자.',frag:'두 번째 유성은 다른 곳을 지나갔다. 손주와 나는 어느 별 쪽에서 나타나 어느 쪽으로 사라졌는지 서로 확인했다.'},
+  {id:'meteor_3',name:'세 번째 유성 사진',hint:'같은 구도로 세 장을 찍어 겹쳐 보렴. 별을 기준으로 빛줄기를 비교할 수 있단다.',frag:'세 장의 별을 맞추어 놓으니 유성이 지나간 자리가 한눈에 보였다. 나는 빛이 지나온 쪽을 거꾸로 따라가 보자고 했다.'},
   {id:'meteor_radiant',name:'복사점 찾기',hint:'세 궤적을 진행 방향과 반대로 연장해, 한곳으로 모이는 지점을 골라 보렴.',frag:'거의 나란히 들어오는 유성들이 멀리 한 점에서 퍼져 나오는 것처럼 보인다. 그 겉보기 출발 방향이 복사점이다.'},
 ];
 const BEACH_PAGE={title:'별똥별이 지나간 자리',short:BEACH_SITE.name,night:'다섯 번째 밤',
   age:10,date:'8월 13일 새벽',travel:METEOR_TIME,az:44,alt:54,
- intro:'여름 바닷가에서 할아버지와 별똥별을 기다려요. 유성 세 개가 지나간 방향을 기록하고 그 궤적을 거꾸로 이어 보세요.',
-  end:'수첩에는 가느다란 화살표 세 줄이 남았다. 한 줄도 같은 자리에서 시작하지 않았지만, 뒤로 이어 보니 한곳을 가리켰다. 집에 가자는 말을 하려다, 손주 옆에 누워 파도 소리를 한 번 더 들었다.',
+ intro:'여름 바닷가에서 할아버지와 카메라를 북동쪽에 고정해요. 유성이 담긴 사진 세 장을 겹쳐 빛이 지나온 쪽을 찾아보세요.',
+ end:'같은 구도로 찍은 사진을 겹치자 별은 한 자리에 놓이고 유성 세 줄은 저마다 다른 자리에 남았다. 지나온 쪽으로 이어 보니 한곳이 보였다. 집에 가자는 말을 하려다, 손주 옆에 누워 파도 소리를 한 번 더 들었다.',
   site:BEACH_SITE,tasks:METEOR_TASKS};
 
 const meteorWidth=280,meteorHeight=172,meteorScale=3;
@@ -2251,9 +2255,9 @@ function meteorProject(v){
 }
 const radiant=meteorProject(radiantVector);
 const METEORS=[
-  {dx:-.88,dy:-.20,start:31,end:98,color:'#96502e',delay:700},
-  {dx:.76,dy:-.37,start:38,end:126,color:'#315e79',delay:1050},
-  {dx:.60,dy:.56,start:36,end:125,color:'#347261',delay:1350},
+  {dx:-.88,dy:-.20,start:31,end:98,color:'#ffd28f',delay:700},
+  {dx:.76,dy:-.37,start:38,end:126,color:'#addbff',delay:1050},
+  {dx:.60,dy:.56,start:36,end:125,color:'#a7ecc9',delay:1350},
 ].map(m=>({...m,from:[radiant[0]+m.dx*m.start,radiant[1]+m.dy*m.start],to:[radiant[0]+m.dx*m.end,radiant[1]+m.dy*m.end]}));
 const meteorChoices=[[66,108],radiant,[211,98]];
 
@@ -2262,8 +2266,9 @@ const meteorSky=document.getElementById('meteorSky');
 const meteorWait=document.getElementById('meteorWait');
 const meteorRecord=document.getElementById('meteorRecord');
 const meteorStatus=document.getElementById('meteorStatus');
-let meteorBackdrop,meteorTimer,meteorFrame,meteorSeen=false,meteorExtended=false;
+let meteorBackdrop,meteorTimer,meteorFrame,meteorSeen=false,meteorExtended=false,meteorMarks=true;
 function nextMeteor(){return METEOR_TASKS.slice(0,3).findIndex(t=>!taskDone(t));}
+function recordedMeteors(){return METEORS.filter((_,i)=>taskDone(METEOR_TASKS[i]));}
 
 function makeMeteorBackdrop(){
   const canvas=document.createElement('canvas');canvas.width=meteorSky.width;canvas.height=meteorSky.height;
@@ -2279,45 +2284,54 @@ function makeMeteorBackdrop(){
   });
   return canvas;
 }
-function drawMeteor(m,progress=0,after=false){
-  const pen=meteorSky.getContext('2d');pen.drawImage(meteorBackdrop,0,0);
-  if(!m||progress<=0)return;
+function paintMeteorImage(canvas,meteors=[],progress=1,photo=false){
+  meteorBackdrop??=makeMeteorBackdrop();
+  const pen=canvas.getContext('2d');pen.drawImage(meteorBackdrop,0,0);
+  if(!meteors.length||progress<=0)return;
   pen.save();pen.scale(meteorScale,meteorScale);
-  const point=t=>m.from.map((v,i)=>v+(m.to[i]-v)*t);
-  const head=point(progress),tail=point(after?0:Math.max(0,progress-.7));
-  const light=pen.createLinearGradient(...tail,...head);
-  light.addColorStop(0,'#c8defa00');light.addColorStop(1,after?'#afceeb8a':'#fff8da');
-  pen.strokeStyle=light;pen.lineWidth=after?1:2.2;pen.lineCap='round';
-  pen.beginPath();pen.moveTo(...tail);pen.lineTo(...head);pen.stroke();
-  if(!after){pen.fillStyle='#fff7d9';pen.beginPath();pen.arc(...head,1.6,0,Math.PI*2);pen.fill();}
+  for(const m of meteors){
+    const point=t=>m.from.map((v,i)=>lerp(v,m.to[i],t));
+    const head=point(progress),tail=point(photo?0:Math.max(0,progress-.7));
+    const light=pen.createLinearGradient(...tail,...head);
+    light.addColorStop(0,'#c8defa12');
+    if(photo){
+      light.addColorStop(.22,'#cbdffba0');light.addColorStop(.72,'#fff6dbef');
+      light.addColorStop(.92,'#d9e8ffd4');
+    }
+    light.addColorStop(1,photo?'#d9e8ff22':'#fff8da');
+    pen.strokeStyle=light;pen.lineWidth=photo?1.45:2.2;pen.lineCap='round';
+    if(photo){pen.shadowColor='#a6cbff85';pen.shadowBlur=4;}
+    pen.beginPath();pen.moveTo(...tail);pen.lineTo(...head);pen.stroke();
+    if(!photo){pen.fillStyle='#fff7d9';pen.beginPath();pen.arc(...head,1.6,0,Math.PI*2);pen.fill();}
+  }
   pen.restore();
 }
 function prepareMeteor(){
-  meteorSeen=false;drawMeteor();
-  meteorWait.disabled=false;meteorWait.textContent='하늘 기다리기';meteorRecord.disabled=true;
-  meteorStatus.textContent=`${nextMeteor()+1}번째 유성 · 진행 방향을 눈으로 따라가 보세요.`;
+  meteorSeen=false;paintMeteorImage(meteorSky);
+  meteorWait.disabled=false;meteorWait.textContent='장노출 시작';meteorRecord.disabled=true;
+  meteorStatus.textContent=`${nextMeteor()+1}장째 · 삼각대에 고정한 카메라로 유성을 기다려요.`;
 }
 function showMeteor(){
   if(nextMeteor()<0)return;
-  meteorBackdrop??=makeMeteorBackdrop();prepareMeteor();meteorDialog.showModal();
+  prepareMeteor();meteorDialog.showModal();
   meteorWait.focus({preventScroll:true});
 }
 meteorWait.onclick=()=>{
   const m=METEORS[nextMeteor()];
-  meteorSeen=false;meteorWait.disabled=true;meteorRecord.disabled=true;drawMeteor();
-  meteorStatus.textContent='하늘을 살펴보고 있어요…';
+  meteorSeen=false;meteorWait.disabled=true;meteorRecord.disabled=true;paintMeteorImage(meteorSky);
+  meteorStatus.textContent='셔터가 열렸어요. 유성이 지나가는 방향을 살펴보세요.';
   meteorTimer=setTimeout(()=>{
     const finish=()=>{
-      drawMeteor(m,1,true);meteorSeen=true;meteorRecord.disabled=false;
-      meteorWait.disabled=false;meteorWait.textContent='다시 보기';
-      meteorStatus.textContent='유성이 지나갔어요. 흐리게 표시된 궤적을 일지에 남겨 보세요.';
+      paintMeteorImage(meteorSky,[m],1,true);meteorSeen=true;meteorRecord.disabled=false;
+      meteorWait.disabled=false;meteorWait.textContent='촬영 과정 다시 보기';
+      meteorStatus.textContent='촬영을 마쳤어요. 별 사이에 남은 빛줄기를 보고 사진을 일지에 남겨요.';
     };
     if(matchMedia('(prefers-reduced-motion: reduce)').matches){finish();return;}
     const start=performance.now();
     const animate=now=>{
       const p=Math.min(1,(now-start)/470);
       if(p===1){finish();return;}
-      drawMeteor(m,p);meteorFrame=requestAnimationFrame(animate);
+      paintMeteorImage(meteorSky,[m],p);meteorFrame=requestAnimationFrame(animate);
     };
     meteorFrame=requestAnimationFrame(animate);
   },m.delay);
@@ -2325,7 +2339,7 @@ meteorWait.onclick=()=>{
 meteorRecord.onclick=()=>{
   if(!meteorSeen)return;
   meteorSeen=false;complete(METEOR_TASKS[nextMeteor()]);
-  if(nextMeteor()<0)meteorDialog.close('compare');
+  if(nextMeteor()<0){meteorMarks=true;meteorDialog.close('compare');}
   else{prepareMeteor();meteorWait.focus({preventScroll:true});}
 };
 document.getElementById('meteorClose').onclick=()=>meteorDialog.close();
@@ -2338,38 +2352,49 @@ meteorDialog.addEventListener('close',()=>{
 
 function meteorPanel(){
   const ready=nextMeteor()<0,solved=taskDone(METEOR_TASKS.at(-1));
+  const count=recordedMeteors().length;
   const paths=METEORS.map((m,i)=>{
-    if(!taskDone(METEOR_TASKS[i]))return '';
+    if(!meteorMarks||!taskDone(METEOR_TASKS[i]))return '';
     const angle=Math.atan2(m.dy,m.dx)*R2D;
     const point=m.from.map((v,j)=>(v+m.to[j])/2);
     return `<g stroke="${m.color}" fill="none">
       ${meteorExtended||solved?`<path class="meteor-extension" d="M${m.from.join(' ')}L${radiant.map((v,j)=>v-(j?m.dy:m.dx)*13).join(' ')}"/>`:''}
-      <path d="M${m.from.join(' ')}L${m.to.join(' ')}" stroke-width="2.2" stroke-linecap="round"/>
-      <path d="M-5 -4L1 0L-5 4" transform="translate(${point.join(' ')}) rotate(${angle})" stroke-width="2.2" stroke-linecap="round"/>
+      <path class="meteor-direction" d="M-5 -4L1 0L-5 4M-8 0H1" transform="translate(${point.join(' ')}) rotate(${angle})" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
       <text x="${m.to[0]}" y="${m.to[1]-6}" fill="${m.color}">${i+1}</text>
     </g>`;
   }).join('');
-  const options=ready&&!solved?meteorChoices.map(([x,y],i)=>
+  const options=ready&&!solved&&meteorMarks?meteorChoices.map(([x,y],i)=>
     `<button type="button" class="meteor-choice" data-meteor-choice="${i}" style="left:${x/meteorWidth*100}%;top:${y/meteorHeight*100}%" aria-label="${'ABC'[i]} 위치 선택">${'ABC'[i]}</button>`).join(''):'';
-  return `<section id="meteorPanel" aria-labelledby="meteorTitle"><h3 id="meteorTitle">세 줄이 모이는 곳</h3>
-    ${ready?'<p>화살표의 반대 방향으로 세 줄을 되짚어 보세요. <b>한곳으로 모여 보이는 위치</b>를 골라요.</p>':
-      '<p>하늘을 기다렸다가 유성이 지나가면 궤적을 남겨요. 세 번의 기록을 한 장에 모아 보세요.</p>'}
-    ${paths?`<div class="meteor-diagram"><svg viewBox="0 0 280 172" role="img" aria-label="기록한 유성의 궤적과 진행 방향">
-      <rect x=".5" y=".5" width="279" height="171" rx="6" fill="#f4e6ca" stroke="#b8986b"/>
-      ${paths}${solved?`<circle cx="${radiant[0]}" cy="${radiant[1]}" r="5" fill="#63452b"/><text x="${radiant[0]+9}" y="${radiant[1]-4}" fill="#49321d">복사점</text>`:''}
-    </svg>${options}</div>`:''}
-    ${!ready?`<button class="travel" id="meteorOpen" type="button">유성 관측 열기</button><small> ${METEOR_TASKS.slice(0,3).filter(taskDone).length} / 3개 기록</small>`:''}
-    ${ready&&!solved?`<button id="meteorExtend" type="button" aria-pressed="${meteorExtended}">${meteorExtended?'점선 숨기기':'궤적을 뒤로 연장하기'}</button><p id="meteorFeedback" role="status"></p>`:''}
+  return `<section id="meteorPanel" aria-labelledby="meteorTitle"><h3 id="meteorTitle">같은 구도, 세 장의 유성 사진</h3>
+    ${ready?`<p>같은 별을 기준으로 사진을 겹쳤어요. ${meteorMarks?
+      '화살표는 촬영 중 본 이동 방향이에요. '+(solved?'점선은 유성이 지나온 쪽을 가리켜요.':'그 반대로 되짚어 <b>한곳으로 모이는 위치</b>를 골라요.'):
+      '‘이동 방향 표시’를 켜면 세 빛줄기를 비교할 수 있어요.'}</p>`:
+      '<p>카메라를 북동쪽에 고정하고 셔터를 열어 유성을 기다려요. 유성이 담긴 사진 세 장을 모아 보세요.</p>'}
+    ${!ready?`<div class="meteor-actions"><button class="travel" id="meteorOpen" type="button">유성 카메라 열기</button><small>${count} / 3장 촬영</small></div>`:''}
+    ${count?`<figure class="meteor-photo"><div class="meteor-frame">
+      <canvas id="meteorComposite" width="840" height="516" role="img" aria-label="별 위치에 맞춰 유성 사진 ${count}장을 겹친 북동쪽 하늘"></canvas>
+      ${meteorMarks?`<svg viewBox="0 0 280 172" aria-hidden="true">
+        ${paths}${solved?`<circle cx="${radiant[0]}" cy="${radiant[1]}" r="4" fill="#0b1424" stroke="#ffe4ac" stroke-width="2"/><text x="${radiant[0]+9}" y="${radiant[1]-4}" fill="#ffe4ac">복사점</text>`:''}
+      </svg>`:''}${options}</div>
+      <figcaption>북동쪽 · 삼각대 고정 · ${count===1?'첫 번째 사진':count+'장 겹쳐 보기'}</figcaption></figure>
+      <div class="meteor-actions"><button id="meteorMarks" type="button" aria-pressed="${meteorMarks}">이동 방향 표시</button>
+      ${ready&&!solved&&meteorMarks?`<button id="meteorExtend" type="button" aria-pressed="${meteorExtended}">궤적을 뒤로 연장하기</button>`:''}</div>
+      ${ready&&!solved&&meteorMarks?'<p id="meteorFeedback" role="status"></p>':''}`:''}
     ${solved?'<p class="trail-result"><b>페르세우스자리 방향의 복사점을 찾았어요.</b> 유성들은 하늘 여러 곳에 나타나요. 지나온 방향을 거꾸로 따라가면 같은 쪽에서 퍼져 나오는 것처럼 보여요.</p>':''}
-    <small class="meteor-note">별 위치는 일지 시각의 성도이며, 유성은 학습용으로 재현했어요.</small></section>`;
+    <small class="meteor-note">별 위치는 일지 속 성도를 바탕으로 했고, 유성은 모의 촬영으로 재현했어요.</small></section>`;
 }
 function openMeteorPanel(){
   openJournal();document.getElementById('meteorPanel').scrollIntoView({block:'start'});
-  pageEl.querySelector('#meteorOpen, #meteorExtend')?.focus({preventScroll:true});
+  const action=document.getElementById('meteorOpen')??document.getElementById('meteorExtend')??document.getElementById('meteorMarks');
+  action?.focus({preventScroll:true});
 }
 function bindMeteor(){
   const open=document.getElementById('meteorOpen');
   if(open)open.onclick=showMeteor;
+  const photo=document.getElementById('meteorComposite');
+  if(photo)paintMeteorImage(photo,recordedMeteors(),1,true);
+  const marks=document.getElementById('meteorMarks');
+  if(marks)marks.onclick=()=>{meteorMarks=!meteorMarks;redrawTrail('#meteorMarks');};
   const extend=document.getElementById('meteorExtend');
   if(extend)extend.onclick=()=>{meteorExtended=!meteorExtended;redrawTrail('#meteorExtend');};
   for(const b of pageEl.querySelectorAll('[data-meteor-choice]'))b.onclick=()=>{
@@ -2545,8 +2570,8 @@ const MEMORIES=[
   [
     [0,'새벽 바닷가의 모래는 발끝에 닿으면 서늘했다. 할아버지가 내 옆에 누우니 돗자리가 조금 기울었다. 우리는 파도 소리를 들으며 하늘이 눈에 익을 때까지 기다렸다.'],
     [1,'처음 본 빛은 너무 짧아서 내가 본 게 맞나 싶었다. 고개를 돌리니 할아버지 손이 천천히 올라와 있었다. 그제야 나도 손을 들었다.'],
-    [2,'두 번째 빛은 훨씬 다른 쪽에 나타났다. 나는 수첩을 든 채 연필 끝을 그쪽으로 돌려 봤다. 할아버지는 급히 적을 필요 없다며 내 손이 멈출 때까지 기다렸다.'],
-    [3,'세 줄을 한 장에 그려 놓으니 저마다 다른 데로 가는 것 같았다. 할아버지가 연필의 뭉툭한 쪽을 짚었다. 나는 그쪽으로 선을 한 번씩 더 이어 보았다.'],
+    [2,'두 번째 빛은 훨씬 다른 쪽에 나타났다. 나는 삼각대 쪽으로 몸을 일으켰다. 할아버지가 카메라는 그대로 두고, 내가 방금 본 방향을 손으로 가리켜 보라고 했다.'],
+    [3,'사진 세 장을 겹쳐 보니 우리가 계속 보고 있던 별들은 한 자리에 있었다. 그 사이로 다른 방향을 향한 빛 세 줄이 남았다. 나는 사진 위에서 빛이 처음 나타난 쪽을 손가락으로 따라가 보았다.'],
     [4,'집으로 돌아가는 길에 신발을 털었다. 모래는 웬만큼 떨어졌는데 양말 안에 들어간 몇 알은 밤새 따라왔다. 수첩을 다시 열면 지금도 파도 소리가 먼저 생각난다.'],
   ],
 ];
@@ -2609,7 +2634,7 @@ function setChapter(index){
   document.getElementById('coverCaption').textContent=journalDate(PAGE);
   document.getElementById('startBtn').textContent=index===0?'일지 펼치기':PAGE.short+' 이어 보기';
   moonDatePanel.hidden=index!==2;trailBtn.hidden=index!==3;meteorBtn.hidden=index!==4;
-  if(index===4)meteorExtended=false;
+  if(index===4){meteorExtended=false;meteorMarks=true;}
   dateBtn.textContent=index===2?'달력':'날짜';
   updateLamp();setView(S.view);
   return true;
@@ -2629,9 +2654,9 @@ function updateGuide(){
     guideDetail.textContent=next.name;
     guideNext.textContent='고정 관측';
   }else if(S.chapter===4){
-    guideAction.textContent=nextMeteor()<0?'궤적을 되짚어 복사점을 찾으세요':'지나가는 유성의 궤적을 기록하세요';
+    guideAction.textContent=nextMeteor()<0?'사진에서 복사점을 찾으세요':'셔터를 열고 유성을 기다리세요';
     guideDetail.textContent=next.name;
-    guideNext.textContent='유성 관측';
+    guideNext.textContent='유성 촬영';
   }else if(lastRecorded){
     guideAction.textContent=S.mode==='expert'?'관측 기록 완료':lastRecorded+' 기록 완료';
     guideDetail.textContent=S.mode==='expert'?'일지에서 다음 목표를 확인하세요.':`다음 관측 · ${next.name}`;
