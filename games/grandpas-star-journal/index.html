@@ -1505,15 +1505,16 @@ function skyline(az){
 }
 
 /* ---------- state ---------- */
-const S = {t:new Date(), speed:1, view:'map', mode:'guide', chapter:0, lamp:true, az:250, alt:30, fov:75, lines:true, gyro:false, sel:null, found:{}, moonNotes:{}, trailMode:'photo', trailPhotos:[], trailPhotoSolved:false, azOff:0};
+const S = {t:new Date(), speed:1, view:'map', mode:'guide', chapter:0, lamp:true, az:250, alt:30, fov:75, lines:true, gyro:false, sel:null, found:{}, starTargets:[], moonNotes:{}, trailMode:'photo', trailPhotos:[], trailPhotoSolved:false, azOff:0};
 const SPEEDS=[[0,'멈춤'],[1,'실시간'],[60,'×60'],[600,'×600'],[3600,'×3600']];
 let speedIdx=1;
 const STORE='gstarjournal-v1';
 function load(){try{const d=JSON.parse(localStorage.getItem(STORE)||'{}');S.found=d.found&&typeof d.found==='object'&&!Array.isArray(d.found)?d.found:{};S.chapter=Number.isInteger(d.chapter)?d.chapter:0;S.moonNotes=d.moonNotes&&typeof d.moonNotes==='object'&&!Array.isArray(d.moonNotes)?d.moonNotes:{};S.lamp=d.lamp!==false;
+  S.starTargets=Array.isArray(d.starTargets)?d.starTargets:[];
   S.trailMode=d.trailMode==='simple'?'simple':'photo';
   S.trailPhotos=Array.isArray(d.trailPhotos)?[0,1,2].filter(i=>d.trailPhotos.includes(i)):[];
   S.trailPhotoSolved=S.trailPhotos.length===3&&d.trailPhotoSolved===true;if(d.view==='look'||d.view==='map')S.view=d.view;S.lines=d.lines!==false;if(d.mode==='expert')S.mode=d.mode;}catch(e){}}
-function save(){try{localStorage.setItem(STORE,JSON.stringify({found:S.found,moonNotes:S.moonNotes,trailMode:S.trailMode,trailPhotos:S.trailPhotos,trailPhotoSolved:S.trailPhotoSolved,view:S.view,lines:S.lines,mode:S.mode,chapter:S.chapter,lamp:S.lamp}));}catch(e){}}
+function save(){try{localStorage.setItem(STORE,JSON.stringify({found:S.found,starTargets:S.starTargets,moonNotes:S.moonNotes,trailMode:S.trailMode,trailPhotos:S.trailPhotos,trailPhotoSolved:S.trailPhotoSolved,view:S.view,lines:S.lines,mode:S.mode,chapter:S.chapter,lamp:S.lamp}));}catch(e){}}
 load();
 
 /* ---------- astronomy per frame ---------- */
@@ -1902,8 +1903,8 @@ function describe(o){
 /* ---------- journal / tasks ---------- */
 const ROOFTOP_TASKS=[
  {id:'polaris',star:findStar('Polaris'),name:'북극성',hint:'북쪽 지평선에서 약 38° 위를 보렴. 카시오페이아의 W 모양을 먼저 찾으면 길을 알려 줄 거야.',frag:'북극성은 밤새 북쪽 가까이에 있다. 길을 잃으면 북쪽부터 보거라.'},
- {id:'vega',star:findStar('Vega'),name:'직녀성 (베가)',hint:'초저녁 서쪽 하늘 높은 곳, 푸르게 빛나는 가장 밝은 별.',frag:'직녀는 여름 별인데, 가을 저녁까지 서쪽에 남아 인사를 한다.'},
- {id:'altair',star:findStar('Altair'),name:'견우성 (알타이르)',hint:'직녀에서 남쪽으로 내려오면, 양옆에 작은 별 두 개를 거느린 별이 있다.',frag:'견우와 직녀 사이로 은하수가 흐른다는데, 여기선 보이지 않는구나. 언젠가 시골에서 보여 주마.'},
+ {id:'vega',star:findStar('Vega'),name:'직녀성 (베가)',hint:'일지 날짜의 하늘에서 북서쪽 지평선 위 약 30°. 거문고자리의 푸른빛을 찾아보렴.',frag:'직녀는 여름 별인데, 가을 저녁까지 서쪽에 남아 인사를 한다.'},
+ {id:'altair',star:findStar('Altair'),name:'견우성 (알타이르)',hint:'일지 날짜의 하늘에서 서쪽 지평선 위 약 27°. 양옆에 작은 별 두 개를 거느린 별이 있단다.',frag:'견우와 직녀 사이로 은하수가 흐른다는데, 여기선 보이지 않는구나. 언젠가 시골에서 보여 주마.'},
  {id:'capella',star:findStar('Capella'),name:'카펠라',hint:'북동쪽 하늘에 떠오르는 노란 별. 마차부자리의 으뜸별이다.',frag:'카펠라가 높이 오르면 겨울이 가까이 왔다는 뜻이다.'},
  {id:'betelgeuse',star:findStar('Betelgeuse'),name:'베텔게우스',hint:'밤이 깊으면 동쪽에서 오리온이 올라온다. 오리온의 붉은 어깨별을 찾아라. (시간을 앞으로 돌려 보렴)',frag:'베텔게우스는 나이 든 별이라 붉게 탄다. 나처럼 말이다.'},
  {id:'planet',planet:true,name:'떠돌이별 하나',hint:'별보다 덜 반짝이는 밝은 점을 찾아보렴. 그날 밤 떠 있는 행성이면 무엇이든 좋다.',frag:'행성은 별자리 사이를 떠돌아다닌다. 그래서 옛사람들은 떠돌이별이라 불렀지.'},
@@ -1914,7 +1915,7 @@ const ROOFTOP_PAGE={title:'첫 번째 페이지', short:'집 옥상', night:'첫
  end:'오늘 만난 친구들을 여기 적어 둔다. 언젠가 손주 녀석도 이 별들을 찾을 수 있으면 좋겠다.',
  site:ROOFTOP_SITE, tasks:ROOFTOP_TASKS};
 const COUNTRY_TASKS=[
- {id:'rural_deneb',star:findStar('Deneb'),name:'데네브',hint:'베가와 알타이르를 떠올려 보렴. 그 둘과 큰 삼각형을 만드는 백조자리의 꼬리별을 찾아라.',frag:'직녀와 견우 사이 위쪽에 데네브가 있다. 세 별을 이으면 여름 하늘에 커다란 삼각형이 생긴다.'},
+ {id:'rural_deneb',star:findStar('Deneb'),name:'데네브',hint:'일지 날짜의 하늘에서 북동쪽 높은 곳을 보렴. 베가, 알타이르와 큰 삼각형을 이루는 백조의 꼬리별이란다.',frag:'직녀와 견우 사이 위쪽에 데네브가 있다. 세 별을 이으면 여름 하늘에 커다란 삼각형이 생긴다.'},
  {id:'rural_antares',star:findStar('Antares'),name:'안타레스',hint:'남서쪽, 산등성이 위로 낮게 보이는 붉은 별이란다. 전갈자리의 심장이지.',frag:'전갈의 심장이 붉게 빛난다. 같은 밤에 보아도 별마다 색이 다르다는 걸 손주에게 보여 주고 싶다.'},
  {id:'rural_cygnus',region:true,name:'백조자리 쪽 은하수',hint:'등불을 끄고 데네브 주변에서 하늘을 가로지르는 뿌연 띠를 찾아보렴. 백조자리 쪽 띠를 가운데 원에 맞추어 보자.',frag:'백조자리 쪽에 우윳빛 띠가 길게 놓였다. 눈으로 하나씩 가를 수 없을 만큼 많은 별빛이 모인 거란다.'},
  {id:'rural_sagittarius',region:true,name:'궁수자리 쪽 은하수',hint:'백조자리에서 시작한 띠를 낮은 남쪽 하늘로 따라가 보렴. 궁수자리 쪽이 더 짙고 넓어 보일 거야.',frag:'남쪽 궁수자리 쪽으로 은하수의 밝은 부분이 모여 있다. 저쪽으로 우리 은하의 중심이 있는 방향을 바라본다.'},
@@ -2381,6 +2382,48 @@ function bindMeteor(){
   };
 }
 const CHAPTERS=[ROOFTOP_PAGE,COUNTRY_PAGE,RIVER_PAGE,HILL_PAGE,BEACH_PAGE];
+
+function extraStarTasks(page,prefix,names){
+  const {lat,lon,h}=page.site;
+  const rotation=A.Rotation_EQJ_HOR(A.MakeTime(new Date(page.travel)),new A.Observer(lat,lon,h)).rot;
+  return names.map(en=>{
+    const star=findStar(en),name=starName(star),constellation=CONSKO[STARNAMES[star][2]];
+    const [alt,az]=altAz(toENU(SV,star*3,[0,0,0],rotation));
+    const position=`${dirName(az)}쪽 지평선 위 약 ${Math.round(alt)}°`;
+    return {id:prefix+en.toLowerCase().replaceAll(' ','_'),star,name,
+      hint:`일지 날짜의 하늘에서 ${position}. ${constellation}에서 찾아보렴.`,
+      frag:`${constellation}의 ${name}. 첫 관측 시각에는 ${position}에 있었다.`};
+  });
+}
+const STAR_TARGETS=[
+  {page:ROOFTOP_PAGE,legacy:ROOFTOP_TASKS,count:4,
+    before:[ROOFTOP_TASKS[0]],after:[ROOFTOP_TASKS.at(-1)],
+    candidates:[...ROOFTOP_TASKS.slice(1,4),...extraStarTasks(ROOFTOP_PAGE,'roof_',
+      ['Aldebaran','Fomalhaut','Deneb','Mirfak','Hamal','Kochab','Enif'])]},
+  {page:COUNTRY_PAGE,legacy:COUNTRY_TASKS,count:1,
+    before:[COUNTRY_TASKS[0]],after:COUNTRY_TASKS.slice(2),
+    candidates:[COUNTRY_TASKS[1],...extraStarTasks(COUNTRY_PAGE,'rural_',
+      ['Altair','Arcturus','Dubhe','Kaus Australis','Rasalhague','Alpheratz'])]},
+];
+function prepareStarTargets(){
+  for(const [index,{page,legacy,count,before,after,candidates}] of STAR_TARGETS.entries()){
+    const byId=new Map([...legacy,...candidates].map(task=>[task.id,task]));
+    const saved=S.starTargets[index];
+    const valid=Array.isArray(saved)&&saved.length===legacy.length&&new Set(saved).size===saved.length
+      &&saved.every(id=>byId.has(id))&&[...before,...after].every(task=>saved.includes(task.id));
+    if(valid){
+      page.tasks=saved.map(id=>byId.get(id));
+    }else if(legacy.some(taskDone)){
+      // Keep the original quest list for saves made before random selection.
+      page.tasks=legacy;
+    }else{
+      const pool=[...candidates];
+      const picked=Array.from({length:count},()=>pool.splice(Math.floor(Math.random()*pool.length),1)[0]);
+      page.tasks=[...before,...picked,...after];
+    }
+    S.starTargets[index]=page.tasks.map(task=>task.id);
+  }
+}
 const grandpaReader=document.getElementById('grandpaReader');
 const finale=document.getElementById('finale');
 const finaleSky=document.getElementById('finaleSky');
@@ -2471,22 +2514,24 @@ function taskDone(t){return t.planet?Object.keys(S.found).some(k=>k.startsWith('
 const MEMORIES=[
   [
     [0,'옥상 문을 열자 낮 동안 데워진 시멘트 냄새가 났다. 할아버지는 내 손에 작은 수첩을 쥐여 주었다. 첫 장은 비어 있었다.'],
-    [1,'나는 제일 환한 별이 북극성일 거라고 했다. 할아버지는 웃으며 내 손을 북쪽으로 돌려 주었다. 둘이 한참 같은 곳을 보고 있자니, 아까까지 어둠으로만 보이던 자리에 별 하나가 떠올랐다.'],
+    [1,'나는 제일 환한 별이 북극성일 거라고 했다. 할아버지는 웃으며 내 손을 북쪽으로 돌려 주었다. 둘이 한참 같은 곳을 보고 있자니, 아까까지 어둠으로만 보이던 자리에 별 하나가 떠올랐다.','polaris'],
     [3,'아래층에서 저녁 설거지 소리가 났다. 나는 수첩을 무릎에 올리고 할아버지가 짚어 주는 곳마다 연필로 점을 찍었다. 점이 빗나가도 할아버지는 지우개를 건네지 않고 기다려 주었다.'],
     [6,'옥상 문을 닫기 전, 할아버지는 내 점들 사이로 손가락을 천천히 그었다. “외가에 가면 여기에 강 하나가 보여.” 나는 수첩 귀퉁이에 ‘강’이라고 적고, 그 옆은 비워 두었다.'],
   ],
   [
     [0,'외가 마당의 돗자리에서는 햇볕에 마른 짚 냄새가 났다. 할아버지는 옥상에서 가져온 수첩을 펼쳤다. 귀퉁이의 ‘강’ 글자는 주머니 속에서 쓸려 조금 흐려져 있었다.'],
-    [1,'할아버지가 등불을 끄자 풀벌레 소리가 더 가까이 들렸다. 나는 금세 보일 줄 알고 하늘만 올려다봤다. 할아버지는 돗자리에 등을 대고 누우며 말했다. “조금만 더 기다리자.”'],
-    [2,'산등성이 위로 붉은 별 하나가 보였다. 할아버지는 그 별을 전갈의 심장이라고 했다. 나는 수첩에 빨간 연필로 점을 찍고, 할아버지가 가리키는 쪽으로 몸을 돌렸다.'],
-    [3,'별 하나를 찾던 눈에, 이번에는 옅은 띠가 들어왔다. 나는 할아버지에게 저게 그때 말한 강이냐고 물었다. 할아버지는 내 어깨를 살짝 짚고, 띠가 산 쪽으로 내려가는 곳을 가리켰다.'],
+    [1,'할아버지가 백조의 꼬리라며 데네브를 짚었다. 나는 수첩을 무릎 위에서 돌려, 그림 속 백조도 우리와 같은 방향을 보게 했다.','rural_deneb'],
+    [1,'산등성이 위로 붉은 별 하나가 보였다. 할아버지는 그 별을 전갈의 심장이라고 했다. 나는 수첩에 빨간 연필로 점을 찍고, 할아버지가 가리키는 쪽으로 몸을 돌렸다.','rural_antares'],
+    [1,'등불을 끄고 기다리니 백조자리 곁으로 옅은 띠가 보였다. 나는 할아버지에게 저게 옥상에서 말한 강이냐고 물었다. 할아버지는 말없이 하늘을 보며 고개를 끄덕였다.','rural_cygnus'],
+    [1,'궁수자리 쪽에서는 뿌연 띠가 산등성이 가까이까지 내려왔다. 나는 연필을 기울여 옅게 문질렀다. 손가락으로 한 번 쓸어 보니 하늘에서 본 것처럼 가장자리가 흐려졌다.','rural_sagittarius'],
     [4,'집으로 들어가기 전 나는 ‘강’ 옆에 ‘할아버지랑 봄’이라고 적었다. 그날 수첩에 그린 별은 몇 개뿐이다. 어느 쪽으로 몸을 돌리면 할아버지 어깨가 닿았는지는 지금도 기억난다.'],
   ],
   [
     [0,'여름날 하늘에서 본 강이 생각나서, 겨울에는 할아버지와 진짜 강으로 갔다. 바람에 종이가 들릴 때마다 할아버지는 수첩 귀퉁이를 눌러 주었다. 나는 먼저 날짜부터 썼다.'],
-    [1,'서쪽 하늘에 가느다란 달이 걸려 있었다. 연필로 곡선을 두 번 긋고 나니 달보다 내 손이 먼저 떨렸다. 할아버지는 보온병 뚜껑에 따뜻한 물을 따라 주었다.'],
-    [2,'다시 강가에 갔을 때, 달의 밝은 쪽이 훨씬 넓어져 있었다. 나는 지난번 그림을 들춰 보았다. 할아버지가 내 그림 옆에 오늘 날짜를 써 주었다.'],
-    [3,'세 번째 밤에는 동쪽에서 둥근 달이 올라왔다. 수첩을 덮으려다 세 날짜 아래에 ‘같은 자리’라고 적었다. 그 옆에 할아버지의 손도 그려 두고 싶었지만, 할아버지는 이미 내 손을 잡고 집 쪽으로 걷고 있었다.'],
+    [1,'1월 10일. 서쪽 하늘에 가느다란 달이 걸려 있었다. 연필로 곡선을 두 번 긋고 나니 달보다 내 손이 먼저 떨렸다. 할아버지는 보온병 뚜껑에 따뜻한 물을 따라 주었다.','moon_crescent'],
+    [1,'1월 14일. 달의 밝은 쪽이 반달 모양이었다. 가운데 선을 긋는 사이 종이가 움직였다. 할아버지가 종이를 눌러 주고 그림 옆에 날짜를 써 주었다.','moon_quarter'],
+    [1,'1월 22일. 동쪽 하늘로 둥근 달이 올라왔다. 강이 유난히 밝아, 물이 흘러가는 모습도 보였다. 나는 수첩에 동그라미를 그리고 한참 강 쪽을 바라봤다.','moon_full'],
+    [3,'수첩을 덮으려다 세 날짜 아래에 ‘같은 자리’라고 적었다. 그 옆에 할아버지의 손도 그려 두고 싶었지만, 할아버지는 이미 내 손을 잡고 집 쪽으로 걷고 있었다.'],
   ],
   [
     [0,'겨울에 달을 그렸던 수첩을 들고 언덕에 올랐다. 바위가 아직 차가웠다. 할아버지는 앉기 전에 내 쪽 바위부터 손으로 쓸어 주었다.'],
@@ -2515,7 +2560,7 @@ const memoryReader=document.getElementById('memoryReader');
 const memoryArtwork=document.getElementById('memoryArtwork');
 const memoryParagraphs=document.getElementById('memoryParagraphs');
 function memoryUnlocked(done){
-  return MEMORIES[S.chapter].filter(([at])=>done>=at).map(([,paragraph])=>paragraph);
+  return MEMORIES[S.chapter].filter(([at,,taskId])=>done>=at&&(!taskId||S.found[taskId])).map(([,paragraph])=>paragraph);
 }
 function openMemory(){
   if(memoryReader.open)return;
@@ -2530,7 +2575,7 @@ function openMemory(){
     const p=document.createElement('p'), ink=document.createElement('span');
     ink.className='fountain-writing';ink.textContent=text;p.append(ink);return p;
   }));
-  document.getElementById('memoryNote').textContent=paragraphs.length===MEMORIES[S.chapter].length
+  document.getElementById('memoryNote').textContent=TASKS.every(taskDone)
     ?'이 밤의 추억을 모두 읽었어요.'
     :'관측을 기록할수록 다음 이야기가 이어져요.';
   memoryReader.showModal();
@@ -2642,13 +2687,13 @@ function renderJournal(revealNext=false){
         '<button type="button" id="jFinale" aria-haspopup="dialog">유성우 엔딩 보기</button>'}</div></section>`;
   }else if(S.chapter===1){
     h+=`<div class="journal-instructions"><strong>어둠에서 관측하는 법</strong>
-      등불을 끄면 은하수가 드러나요. 기본 모드에서는 성도의 점선 원이 은하수 관측 지점이에요. 대상을 누르고 ‘이쪽 보기’로 조준해 가운데 원을 채워 보세요. 실제 관측에서는 눈이 어둠에 익숙해질 시간이 필요해요.</div>`;
+      등불을 끄면 은하수가 드러나요. 실제 관측에서는 눈이 어둠에 익숙해질 시간이 필요해요. 기본 모드에서는 성도의 점선 원이 은하수 관측 지점이에요. 대상을 누르고 ‘이쪽 보기’로 조준해 가운데 원을 채워 보세요. 데네브와 함께 볼 별 하나는 새 기록마다 골라져요.</div>`;
   }else if(S.chapter===2){
     h+=`<div class="journal-instructions"><strong>세 날짜의 달을 그려 보세요</strong>
       아래 날짜를 골라 성도에서 달을 찾고 ‘이쪽 보기’로 조준해 보세요. 기록한 달의 밝은 면을 일지에서 비교할 수 있어요.</div>`;
   }else if(S.chapter===0){
     h+=`<div class="journal-instructions"><strong>별을 기록하는 법</strong>
-      성도에서 별을 눌러 ‘이쪽 보기’를 선택하거나 하늘을 직접 둘러보세요. 별을 가운데 원에 약 1초 맞추면 일지에 체크돼요.</div>`;
+      성도에서 별을 눌러 ‘이쪽 보기’를 선택하거나 하늘을 직접 둘러보세요. 별을 가운데 원에 약 1초 맞추면 일지에 체크돼요. 북극성 외에 함께 볼 별 네 개는 새 기록마다 골라져요.</div>`;
   }
   if(S.chapter===2){
     h+=moonDates();
@@ -2687,7 +2732,8 @@ function renderJournal(revealNext=false){
       return;
     }
     clearTimeout(endingTimer);
-    S.found={};S.moonNotes={};S.trailPhotos=[];S.trailPhotoSolved=false;photoShots.clear();S.lamp=true;setChapter(0);openJournal();
+    S.found={};S.starTargets=[];S.moonNotes={};S.trailPhotos=[];S.trailPhotoSolved=false;photoShots.clear();S.lamp=true;
+    prepareStarTargets();setChapter(0);openJournal();
   };
 }
 function openJournal(revealNext=false){
@@ -2956,6 +3002,7 @@ document.getElementById('startBtn').onclick=()=>{
 };
 
 /* ---------- loop ---------- */
+prepareStarTargets();
 setChapter(chapterAvailable(S.chapter)?S.chapter:0);showLineState();setMode(S.mode);
 let lastFrame=performance.now(),clockTick=0;
 function loop(now){const dt=now-lastFrame;lastFrame=now;frameT=now;
