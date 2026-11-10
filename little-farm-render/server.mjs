@@ -40,11 +40,16 @@ const port = Number(process.env.PORT || 10000);
 
 const app = createServer(async (req,res) => {
   try {
+    const art = req.method === 'GET' && /^\/art\/v1\/(lettuce|carrot|tomato|strawberry|sunflower|paprika|plots9|plots12|greenhouse)\.webp$/.exec(req.url);
     if (req.method === 'GET' && req.url === '/healthz') {
       res.writeHead(200,json).end(JSON.stringify({ok:true,ready:!!api}));
     } else if (req.method === 'GET' && ['/', '/admin', '/admin/'].includes(req.url)) {
       res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store',
         'X-Content-Type-Options':'nosniff','X-Robots-Tag':'noindex, nofollow', ...(req.url === '/' ? {} : {'X-Frame-Options':'DENY'})}).end(req.url === '/' ? html : adminHtml);
+    } else if (art) {
+      const image = await readFile(new URL('./art/' + art[1] + '.webp', import.meta.url));
+      res.writeHead(200,{'Content-Type':'image/webp','Cache-Control':'public, max-age=31536000, immutable',
+        'X-Content-Type-Options':'nosniff'}).end(image);
     } else if (req.url === '/api/farm-save') {
       if (!api) {
         res.writeHead(503,json).end('{"error":"network"}');

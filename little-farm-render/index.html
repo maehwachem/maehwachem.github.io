@@ -70,6 +70,19 @@ body.w-rain .butterfly{opacity:0}
 #dayPill small{font-weight:600;opacity:.7;font-size:13px}
 #coinPill .coin{width:18px;height:18px}
 #hud .spacer{flex:1}
+#bookBtn{font-size:13px;min-height:36px;padding-inline:9px}
+.book-launch{margin:5px 0 12px}
+.book-intro{margin:6px 2px 12px;font-size:13px;color:#665440;line-height:1.55}
+.book-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.book-card{min-width:0;border:1px solid var(--edge);border-radius:14px;background:#fffdf5;padding:9px;overflow:hidden}
+.book-card.locked{background:#f4ead5}
+.book-card h4{display:flex;gap:6px;align-items:center;margin:0 0 5px;font-size:14px}
+.book-card .ic{width:31px;height:31px;flex:none}
+.book-card p{margin:4px 0;font-size:12px;line-height:1.5}
+.book-card summary{font-size:13px;font-weight:700;cursor:pointer;padding:9px 0;color:#3e612b}
+.book-card img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;border-radius:9px;background:#ebdfc3}
+.book-postcards{display:grid;gap:10px}
+.book-postcards .book-card img{margin:5px 0 8px}
 .iconbtn{width:42px;height:42px;border-radius:50%;justify-content:center;padding:0;font-size:18px}
 #hint{position:relative;z-index:20;align-self:center;margin:2px 12px 0;max-width:calc(100% - 24px);background:rgba(255,248,234,.95);border:1.5px solid var(--edge);border-radius:16px 16px 16px 6px;padding:8px 15px;font-size:14px;font-weight:600;box-shadow:0 2px 0 rgba(122,88,52,.18),0 5px 14px rgba(70,50,20,.08);text-align:center;transition:opacity .4s, transform .4s}
 #hint.swap{opacity:0;transform:translateY(-4px)}
@@ -308,7 +321,7 @@ body.placing #placeBar{display:flex}
   #dayPill .wx{width:16px;height:16px}
   #hud .iconbtn{width:34px;height:34px}
   #hud #dayPill small{font-size:11px}
-  #hud .spacer{display:none}
+  #hud .spacer,#bookBtn{display:none}
   #farmTools{grid-row:2;gap:4px}
   .toolchip,.fieldSwitch{border-width:1px}
   .toolchip{padding-inline:8px}
@@ -345,6 +358,7 @@ body.placing #placeBar{display:flex}
     <div class="pill" id="dayPill">1일째 <small>☀️ 맑음</small></div>
     <div class="spacer"></div>
     <div class="pill" id="coinPill"><svg class="coin" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" fill="#f6c343" stroke="#d99a1e" stroke-width="2"/><circle cx="10" cy="10" r="5" fill="none" stroke="#fff3b0" stroke-width="1.6"/></svg><span id="coins">0</span></div>
+    <button class="pill" id="bookBtn" aria-label="농장 도감">📖 도감</button>
     <button class="pill iconbtn" id="setBtn" aria-label="소리와 설정">🔈</button>
   </div>
   <div id="farmTools">
@@ -396,6 +410,19 @@ const CROPS = {
   paprika:   {name:'파프리카',stages:5, price:18, yield:3, free:true, cost:0, regrow:3, greenhouse:true, desc:'온실에서 열리는 달콤한 열매'},
 };
 const CROP_ORDER = ['lettuce','carrot','tomato','strawberry','sunflower','paprika'];
+const CROP_PHOTO_NOTES = {
+  lettuce:'잎이 둥글게 뭉치지 않고 뿌리 가까이에서 바깥으로 펼쳐져요.',
+  carrot:'깃털처럼 갈라진 잎과 땅속에서 자란 뿌리를 같이 봐요.',
+  tomato:'줄기 하나에 아직 초록색인 열매와 빨갛게 익은 열매가 함께 달려 있어요.',
+  strawberry:'작은 흰 꽃과 땅 가까이에서 익은 딸기를 찾아봐요.',
+  sunflower:'넓은 잎과 노란 꽃잎, 가운데 씨앗이 맺히는 부분을 봐요.',
+  paprika:'온실의 줄기 아래로 노란 열매와 붉은 열매가 달려 있어요.',
+};
+const FARM_POSTCARDS = [
+  {level:1, art:'plots9', title:'밭이 한 줄 더 생긴 날', hint:'노지 9칸 열기', alt:'작은 시골집과 나무 사이 오솔길 끝에 세 줄의 텃밭이 보이는 풍경'},
+  {level:2, art:'plots12', title:'아침 햇살이 비친 네 줄 텃밭', hint:'노지 12칸 열기', alt:'열린 울타리 너머 아침 햇살이 비치는 네 줄 텃밭과 수확 바구니'},
+  {level:3, art:'greenhouse', title:'온실 문을 처음 연 날', hint:'온실 짓기', alt:'시골집 옆 열린 유리 온실과 안에서 자라는 파프리카'},
+];
 const DECOR = {
   tulip:    {name:'분홍 튤립',  cost:20, desc:'봄빛 꽃 세 송이'},
   daisy:    {name:'데이지',     cost:20, desc:'작고 하얀 꽃무리'},
@@ -431,7 +458,7 @@ function freshState(){
     plots:Array.from({length:12},emptyPlot), greenhousePlots:Array.from({length:6},emptyPlot),
     greenhouse:false, smart:false, autoWater:true, field:'outdoor',
     supplies:{fertilizer:2,treatment:1},
-    basket:{}, seeds:{strawberry:0,sunflower:0}, decorInv:{}, decor:Array(10).fill(null),
+    basket:{}, harvested:[], seeds:{strawberry:0,sunflower:0}, decorInv:{}, decor:Array(10).fill(null),
     sound:{rain:false,sfx:false}, flags:{}, lastSeed:'lettuce'};
 }
 let S=freshState();
@@ -448,11 +475,14 @@ function restoreState(d){
   });
   const rows=[2,3,4].includes(d.rows)?d.rows:2;
   const greenhouse=rows===4&&d.greenhouse===true;
+  const basket=counts(CROP_ORDER,d.basket);
+  const knownHarvests=Array.isArray(d.harvested)?d.harvested:[];
+  const harvested=CROP_ORDER.filter(type=>knownHarvests.includes(type)||basket[type]>0);
   return {...f,day:Math.max(1,count(d.day,1)),coins:count(d.coins),rows,
     weather:['sunny','cloudy','rain'].includes(d.weather)?d.weather:'sunny',greenhouse,smart:greenhouse&&d.smart===true,
     autoWater:d.autoWater!==false,field:greenhouse&&d.field==='greenhouse'?'greenhouse':'outdoor',
     plots:plots(12,d.plots,false),greenhousePlots:plots(6,d.greenhousePlots,true),
-    basket:counts(CROP_ORDER,d.basket),seeds:counts(['strawberry','sunflower'],d.seeds),
+    basket,harvested,seeds:counts(['strawberry','sunflower'],d.seeds),
     decorInv:counts(DECOR_ORDER,d.decorInv),
     decor:Array.from({length:10},(_,i)=>DECOR_ORDER.includes(d.decor?.[i])?d.decor[i]:null),
     supplies:{fertilizer:count(d.supplies?.fertilizer,2),treatment:count(d.supplies?.treatment,1)},
@@ -891,13 +921,12 @@ function drawLettuce(s){
 }
 /* ---- 당근: 가는 깃털 잎이 위로, 다 자라면 주황 어깨가 흙 위로 ---- */
 function frond(a,len){
-  const [tx,ty]=radial(a,len,1), [mx,my]=radial(a*.7,len*.55,1);
-  let g=`<path d="M50 140 Q${r1(mx)} ${r1(my)} ${r1(tx)} ${r1(ty)}" stroke="#4c8a33" stroke-width="1.5" fill="none" stroke-linecap="round"/>`;
-  for(let k=.36;k<=1.0001;k+=.13){
-    const px=(1-k)*(1-k)*50+2*(1-k)*k*mx+k*k*tx, py=(1-k)*(1-k)*140+2*(1-k)*k*my+k*k*ty, sz=2.1+(1-k)*2.6;
-    g+=`<ellipse cx="${r1(px-sz*.85)}" cy="${r1(py)}" rx="${r1(sz)}" ry="${r1(sz*.5)}" fill="#86ca55" stroke="#4f8a34" stroke-width=".45" transform="rotate(${r1(a-38)} ${r1(px)} ${r1(py)})"/><ellipse cx="${r1(px+sz*.85)}" cy="${r1(py)}" rx="${r1(sz)}" ry="${r1(sz*.5)}" fill="#68b443" stroke="#4f8a34" stroke-width=".45" transform="rotate(${r1(a+38)} ${r1(px)} ${r1(py)})"/>`;
+  let branches='';
+  for(let i=0;i<3;i++){
+    const y=-11-i*5, w=8-i*1.8;
+    branches+=`<path d="M0 ${y} Q${w*.5} ${y-3} ${w} ${y-5} M${w*.48} ${y-2.8} l1 -4 M${w*.58} ${y-3.2} l3 -.4 M0 ${y-1} Q${-w*.5} ${y-4} ${-w} ${y-6} M${-w*.48} ${y-3.8} l-1 -3.8 M${-w*.58} ${y-4.2} l-2.8 -.2" stroke="${i%2?'#82b852':'#6da746'}" stroke-width="1.25"/>`;
   }
-  return g;
+  return `<g transform="translate(50 140) rotate(${a}) scale(${r1(len/29)})" fill="none" stroke-linecap="round"><path d="M0 0 Q-1 -12 0 -29" stroke="#4e8538" stroke-width="1.2"/>${branches}<path d="M0 -25 L2.7 -29 M0 -26 L-2.2 -30" stroke="#84bb53" stroke-width="1.05"/></g>`;
 }
 function carrotTop(w){
   return `<path d="M${r1(50-w)} 140.6 Q${r1(50-w)} ${r1(140-w*.95)} 50 ${r1(140-w*1.02)} Q${r1(50+w)} ${r1(140-w*.95)} ${r1(50+w)} 140.6 Q50 143 ${r1(50-w)} 140.6Z" fill="url(#g-orange)" stroke="#a9520f" stroke-width=".9" stroke-linejoin="round"/><path d="M${r1(50-w*.62)} ${r1(140-w*.32)} q${r1(w*.28)} -.8 ${r1(w*.5)} 0 M${r1(50+w*.05)} ${r1(140-w*.18)} q${r1(w*.28)} -.8 ${r1(w*.45)} 0" stroke="#c8601a" stroke-width=".8" fill="none"/><path d="M${r1(50+w*.18)} ${r1(140-w*.78)} q${r1(w*.38)} .3 ${r1(w*.52)} ${r1(w*.38)}" stroke="#ffd7a6" stroke-width="1.1" fill="none" stroke-linecap="round"/>`;
@@ -906,9 +935,9 @@ function drawCarrot(s){
   if(s===0) return mound('carrot');
   if(s===1) return shadow(7)+`<g class="sway">${leaf(50,141,-14,13,1.5,'#7cc84c',false,.3)}${leaf(50,141,12,11,1.5,'#66b240',false,.3)}</g>`;
   let g='';
-  if(s===2){ [-22,0,22].forEach((a,i)=>g+=frond(a,23+i%2*4)); return shadow(11)+`<g class="sway">${g}</g>`; }
-  if(s===3){ [-36,-16,4,22,38].forEach((a,i)=>g+=frond(a,31+(i%2)*6)); return shadow(15)+`<g class="sway">${g}</g>`+carrotTop(5); }
-  [-48,-32,-15,0,15,32,48].forEach((a,i)=>g+=frond(a,40+(i%3)*5));
+  if(s===2){ [-32,-5,30].forEach((a,i)=>g+=frond(a,22+i%2*7)); return shadow(11)+`<g class="sway">${g}</g>`; }
+  if(s===3){ [-43,-20,8,37].forEach((a,i)=>g+=frond(a,28+i%3*5)); return shadow(15)+`<g class="sway">${g}</g>`+carrotTop(5); }
+  [-50,-29,-7,20,43].forEach((a,i)=>g+=frond(a,32+(i%3)*5));
   return shadow(19)+`<g class="sway">${g}</g>`+carrotTop(10.5)+`<circle cx="36" cy="141" r="1.2" fill="#7a5233"/><circle cx="64" cy="140.6" r="1" fill="#7a5233"/>`;
 }
 /* ---- 토마토: 지지대를 타고 높이 자라는 덩굴, 줄기 옆에 둥근 열매 ---- */
@@ -1568,6 +1597,8 @@ function harvest(i,el){
     ? (type==='strawberry'?[[27,136],[73,135]]:TOMS).map(([px,py])=>new DOMPoint(px,py).matrixTransform(svg.querySelector('.sway').getScreenCTM()))
     : [];
   S.basket[type]=(S.basket[type]||0)+c.yield;
+  const firstHarvest=!S.harvested.includes(type);
+  if(firstHarvest) S.harvested.push(type);
   const wet=p.wet, watered=automaticWater(), protectedUntil=p.protectedUntil;
   Object.assign(p,emptyPlot(),c.regrow
     ? {crop:type,stage:c.regrow,wet:wet||watered,watered,protectedUntil}
@@ -1575,6 +1606,7 @@ function harvest(i,el){
   saveNow(); renderPlot(i); renderHUD(); renderHint(); Snd.pop(type);
   harvestBurst(el,x,y-el.offsetHeight*.08);
   floatText(x,y-28,`+${c.yield} ${c.name}`);
+  if(firstHarvest) toast(`📖 도감에 ${c.name}이(가) 열렸어요`);
   if(type==='carrot'){
     const f=document.createElement('div'); f.className='flyer'; f.style.left=x+'px'; f.style.top=(y+8)+'px';
     f.innerHTML=`<svg viewBox="0 0 40 60" width="40" height="60" style="margin-top:-20px"><path d="M14 18 Q20 16 26 18 L21 58 Q20 60 19 58Z" fill="#f28c28" stroke="#d26c12"/><path d="M16 26 l4 0 M18 34 l3 0 M17 42 l3 0" stroke="#d26c12" stroke-width="1.2"/><path d="M20 18 Q16 6 10 2 M20 18 Q20 4 22 0 M20 18 Q26 8 32 4" stroke="#5cae3e" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`;
@@ -1782,7 +1814,7 @@ function onSlot(k,el){
 function openSheet(kind){
   if(busy) return;
   closePopover(); cancelPlace(); if(careMode) setCareMode(false);
-  sheetAnchor=document.activeElement;
+  if(!sheetOpen) sheetAnchor=document.activeElement;
   sheetOpen=kind;
   sheet.dataset.kind=kind;
   sheet.inert=false; sheet.classList.add('show'); syncOverlay();
@@ -1795,13 +1827,36 @@ function closeSheet(force=false){
   sheetAnchor?.focus({preventScroll:true}); sheetAnchor=null;
 }
 $('sheetClose').addEventListener('click',closeSheet);
+let bookTab='crops';
+function openFarmBook(tab='crops'){
+  bookTab=tab; openSheet('book');
+}
+function farmBookPanel(){
+  const photo=(art,alt)=>`<img loading="lazy" width="480" height="360" src="/art/v1/${art}.webp" alt="${alt}">`;
+  if(bookTab==='postcards'){
+    const level=farmLevel();
+    const cards=FARM_POSTCARDS.map(card=>`
+      <article class="book-card ${level<card.level?'locked':''}">
+        <h4>${level>=card.level?'✉️':'🔒'} ${card.title}</h4>
+        ${level>=card.level?photo(card.art,card.alt):`<p>${card.hint}를 마치면 받아요.</p>`}
+      </article>`).join('');
+    return `<p class="book-intro">농장을 넓힌 날을 엽서로 모아요 · ${FARM_POSTCARDS.filter(card=>level>=card.level).length}/${FARM_POSTCARDS.length}<br>이미지는 AI로 만든 실사풍 풍경이에요.</p><div class="book-postcards">${cards}</div>`;
+  }
+  const cards=CROP_ORDER.map(type=>{
+    const name=CROPS[type].name, unlocked=S.harvested.includes(type);
+    return `<article class="book-card ${unlocked?'':'locked'}"><h4>${itemIcon(type)}${name}</h4>
+      ${unlocked?`<details><summary>실사풍 보기</summary>${photo(type,`${name}이 자라는 모습을 담은 실사풍 이미지`)}<p>${CROP_PHOTO_NOTES[type]}</p></details>`:'<p>🔒 첫 수확 때 열려요.</p>'}
+      </article>`;
+  }).join('');
+  return `<p class="book-intro">첫 수확으로 작물을 기록해요 · ${S.harvested.length}/${CROP_ORDER.length}<br>이미지는 AI로 만든 실사풍 관찰 그림이에요.</p><div class="book-grid">${cards}</div>`;
+}
 function farmGrowthPanel(){
   const level=farmLevel(), next=FARM_STEPS[level+1];
   const steps=FARM_STEPS.map((s,i)=>`<div class="growth-step ${i===level?'current':''}"><span class="step-icon">${s.icon}</span><div><b>${s.name} ${i===level?'· 지금':i<level?'✓':''}</b><small>${s.note}</small></div></div>`).join('');
   const action=next
     ? `<button class="small" id="buyLand" ${S.coins<next.cost?'disabled':''}>${next.action} · ${COIN_SVG} ${next.cost}</button><p>${S.coins<next.cost?`코인 ${next.cost-S.coins}개를 더 모으면 열려요`:'지금 업그레이드할 수 있어요'}</p>`
     : `<button class="small alt" id="toggleAuto" aria-pressed="${S.autoWater}">💧 자동 관수 ${S.autoWater?'끄기':'켜기'}</button><p>자동 관수를 켜면 노지와 온실의 작물에 매일 물을 줘요.</p>`;
-  return `<div class="sec">보유 코인 ${COIN_SVG} ${S.coins}</div><div class="growth-actions">${action}</div><div class="growth-list">${steps}</div>`;
+  return `<div class="sec">보유 코인 ${COIN_SVG} ${S.coins}</div><div class="growth-actions">${action}</div><div class="growth-list">${steps}</div><button class="small alt book-launch" id="growthBook">✉️ 농장 엽서</button>`;
 }
 function buyFarmUpgrade(){
   const level=farmLevel(), next=FARM_STEPS[level+1];
@@ -1816,7 +1871,8 @@ function buyFarmUpgrade(){
   $('sheetBody').scrollTop=0;
   const nextAction=$('buyLand')||$('toggleAuto');
   (nextAction&&!nextAction.disabled?nextAction:$('sheetClose')).focus({preventScroll:true});
-  toast(`${next.icon} ${next.name}이 되었어요`);
+  const postcard=FARM_POSTCARDS.find(card=>card.level===level+1);
+  toast(postcard?`✉️ 새 농장 엽서 · ${postcard.title}`:`${next.icon} ${next.name}이 되었어요`);
 }
 function htmlText(s){
   return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -2047,13 +2103,17 @@ function renderSheet(){
   }else if(sheetOpen==='basket'){
     $('sheetTitle').textContent='🧺 바구니';
     const items=CROP_ORDER.filter(t=>S.basket[t]>0);
-    let h='';
+    let h='<button class="small alt book-launch" id="basketBook">📖 농장 도감</button>';
     if(!items.length) h+=`<div class="empty-note">아직 바구니가 비어 있어요.<br>다 자라 반짝이는 작물을 눌러 수확해 보세요.</div>`;
     else { let total=0; h+=items.map(t=>{ const c=CROPS[t], n=S.basket[t]; total+=n*c.price; return `<div class="row">${itemIcon(t)}<div class="info"><b>${c.name} ×${n}</b><span>하나에 ${COIN_SVG} ${c.price}</span></div><div class="acts"><button class="small alt" data-sell1="${t}">1개 팔기</button><button class="small" data-sellall="${t}">모두</button></div></div>`; }).join('');
       h+=`<button class="small sellall" id="sellEvery">전부 팔기 · ${COIN_SVG} +${total}</button><div class="empty-note" style="padding:8px">팔지 않고 모아 두어도 괜찮아요.</div>`; }
     const inv=DECOR_ORDER.filter(t=>S.decorInv[t]>0);
     if(inv.length){ h+=`<div class="sec">장식 보관함</div>`+inv.map(t=>`<div class="row"><svg class="ic" viewBox="0 0 100 100">${decorSVG(t).replace(/<svg[^>]*>|<\/svg>/g,'')}</svg><div class="info"><b>${DECOR[t].name} ×${S.decorInv[t]}</b><span>밭 둘레에 놓을 수 있어요</span></div><div class="acts"><button class="small" data-place="${t}">놓기</button></div></div>`).join(''); }
     body.innerHTML=h;
+  } else if(sheetOpen==='book'){
+    $('sheetTitle').textContent='📖 농장 도감';
+    tabs.innerHTML=[['crops','작물 도감'],['postcards','농장 엽서']].map(([key,label])=>`<button data-book-tab="${key}" class="${key===bookTab?'on':''}" aria-pressed="${key===bookTab}">${label}</button>`).join('');
+    body.innerHTML=farmBookPanel();
   } else if(sheetOpen==='growth'){
     $('sheetTitle').textContent='🌱 농장 성장';
     body.innerHTML=farmGrowthPanel();
@@ -2105,6 +2165,8 @@ $('sheetBody').addEventListener('click',e=>{
     (buyNext||$('sheetClose')).focus({preventScroll:true});
     toast(`${item.name} 1개를 샀어요`);
   }
+  else if(b.id==='basketBook') openFarmBook();
+  else if(b.id==='growthBook') openFarmBook('postcards');
   else if(b.id==='buyLand') buyFarmUpgrade();
   else if(b.id==='toggleAuto'&&S.smart){
     S.autoWater=!S.autoWater;
@@ -2116,7 +2178,7 @@ $('sheetBody').addEventListener('click',e=>{
   else if(b.id==='resetBtn') resetCurrentFarm(b);
 });
 $('sheetTabs').addEventListener('click',e=>{
-  const b=e.target.closest('[data-tab],[data-save-view]');
+  const b=e.target.closest('[data-tab],[data-save-view],[data-book-tab]');
   if(!b||profileBusy) return;
   if(b.dataset.saveView){
     saveView=b.dataset.saveView; profileError='';
@@ -2125,6 +2187,7 @@ $('sheetTabs').addEventListener('click',e=>{
       if(sheetOpen==='profiles'&&saveView==='device'&&!profileBusy&&!$('farmPlayerInput')?.value) renderSheet();
     });
   }
+  else if(b.dataset.bookTab) bookTab=b.dataset.bookTab;
   else shopTab=b.dataset.tab;
   renderSheet(); $('sheetBody').scrollTop=0; $('sheetTabs').querySelector('.on')?.focus({preventScroll:true});
 });
@@ -2132,6 +2195,7 @@ function sell(t,n,btn){ if(!S.basket[t]) return; n=Math.min(n,S.basket[t]); S.ba
 function gain(amount,btn){ if(!amount) return; S.coins+=amount; S.flags.sold=true; Snd.coin(); const [x,y]=centerOf(btn,.3); floatText(x,y,`+${amount}`); const cp=$('coinPill'); cp.classList.remove('bounce'); void cp.offsetWidth; cp.classList.add('bounce'); saveNow(); renderHUD(); renderHint(); renderSheet(); }
 
 $('basketBtn').addEventListener('click',()=>openSheet('basket'));
+$('bookBtn').addEventListener('click',()=>openFarmBook());
 $('shopBtn').addEventListener('click',()=>openSheet('shop'));
 $('setBtn').addEventListener('click',()=>openSheet('settings'));
 $('nextBtn').addEventListener('click',nextDay);
