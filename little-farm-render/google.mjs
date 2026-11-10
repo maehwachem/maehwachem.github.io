@@ -53,7 +53,9 @@ export function firebaseIdentity(projectId, fetcher = fetch) {
     if (!key || !verify('RSA-SHA256', Buffer.from(parts[0] + '.' + parts[1]), key, Buffer.from(parts[2], 'base64url'))) {
       throw new FarmError(401, 'signin');
     }
-    return claims.sub;
+    const email = claims.email_verified === true && typeof claims.email === 'string' &&
+      claims.email.length <= 320 && /^[^\s@]+@[^\s@]+$/.test(claims.email) ? claims.email.toLowerCase() : '';
+    return {uid: claims.sub, email};
   };
 }
 
@@ -126,8 +128,23 @@ export function farmStore(projectId, credentials, fetcher = fetch) {
     throw new FarmError(503, 'network');
   }
   const path = (owner, id) => 'players/' + owner + '/farms/' + id;
+  const approvalPath = id => 'farmApprovals/' + id;
   return {
     get: (owner, id) => get(path(owner, id)),
+    getApproval: id => get(approvalPath(id)),
+    setApproval: (id, row, old) => commit([write(approvalPath(id), row, old)]),
+    async listApprovals() {
+      const structuredQuery = {
+        from: [{collectionId: 'farmApprovals'}],
+        where: {fieldFilter: {field: {fieldPath: 'status'}, op: 'EQUAL', value: {stringValue: 'pending'}}},
+        limit: 50
+      };
+      const response = await request(':runQuery', {method: 'POST', body: JSON.stringify({structuredQuery})});
+      if (!response.ok) throw new FarmError(503, 'network');
+      return (await response.json()).filter(row => row.document).map(({document}) => ({
+        id: document.name.split('/').at(-1), email: decode(document).email
+      }));
+    },
     set: (owner, id, row, old) => commit([write(path(owner, id), row, old)]),
     async list(owner) {
       const response = await request('/players/' + owner + '/farms?pageSize=100&orderBy=updated_at%20desc');

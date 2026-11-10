@@ -416,6 +416,7 @@ function legacyFarm(){
 const SESSION_KEY='today-small-farm-player-v1';
 const LEGACY_ID='legacy';
 let deviceDb, deviceReady=false, serverReady=null;
+let backupDb, backupList=[];
 let profile=null, profileList=[], saveView='device', profileBusy=false, profilesStarting=true;
 let inFlight=null, queued=null, saving=null, saveError='', profileError='';
 let createAttempt=null;
@@ -425,10 +426,13 @@ function farmCode(){
 }
 function snapshotFarm(){ return JSON.parse(JSON.stringify(S)); }
 function saveProblem(code){ return Object.assign(new Error(code),{code}); }
-function openDevice(){
+function openFarmDb(name,storeName){
   return new Promise((resolve,reject)=>{
-    const request=indexedDB.open('today-small-farm-players',1);
-    request.onupgradeneeded=()=>request.result.createObjectStore('farms',{keyPath:'id'}).createIndex('name','name',{unique:true});
+    const request=indexedDB.open(name,1);
+    request.onupgradeneeded=()=>{
+      const store=request.result.createObjectStore(storeName,{keyPath:'id'});
+      if(storeName==='farms') store.createIndex('name','name',{unique:true});
+    };
     request.onsuccess=()=>resolve(request.result);
     request.onerror=request.onblocked=()=>reject(saveProblem('storage'));
   });
@@ -463,13 +467,66 @@ function deviceRecord(action,data={}){
     };
   });
 }
+function backupRecord(action,data={}){
+  return new Promise((resolve,reject)=>{
+    const tx=backupDb.transaction('backups',action==='read'||action==='list'?'readonly':'readwrite');
+    const store=tx.objectStore('backups');
+    let value;
+    tx.oncomplete=()=>resolve(value);
+    tx.onabort=()=>reject(saveProblem('storage'));
+    const request=action==='list'?store.getAll():store.get(data.id);
+    request.onsuccess=()=>{
+      const old=request.result;
+      value=old;
+      if(action==='read'||action==='list') return;
+      if(action==='disable'){
+        if(!old) return;
+        value={...old,enabled:false};
+      }else{
+        if(action==='mirror'&&(!old?.enabled||old.revision>=data.revision)) return;
+        value={...(old?.revision>data.revision?old:data),enabled:true};
+      }
+      store.put(value);
+    };
+  });
+}
+function cloudBackupId(farm){ return farm.owner+':'+farm.id; }
+function backupData(farm){
+  const {name,state,revision}=farm.confirmed;
+  return {id:cloudBackupId(farm),name,state:restoreState(state),revision,updatedAt:Date.now()};
+}
+function rememberBackup(farm,record){
+  farm.backupEnabled=record?.enabled===true;
+  farm.backupFailed=false;
+  if(record) backupList=[record,...backupList.filter(row=>row.id!==record.id)];
+}
+async function syncBackup(farm,row){
+  farm.confirmed=row;
+  if(!backupDb) return;
+  try{ rememberBackup(farm,await backupRecord('mirror',backupData(farm))); }
+  catch{ if(farm.backupEnabled) farm.backupFailed=true; }
+  if(profile===farm) updateSaveStatus();
+}
+async function setFarmBackup(farm,enabled){
+  if(!backupDb||!farm.confirmed) throw saveProblem('backup');
+  try{ rememberBackup(farm,await backupRecord(enabled?'enable':'disable',backupData(farm))); }
+  catch{ throw saveProblem('backup'); }
+}
+async function refreshBackups(){
+  if(!backupDb) return;
+  try{ backupList=await backupRecord('list'); }catch{}
+}
 const FIREBASE_CONFIG=/* __FARM_FIREBASE_CONFIG__ */ {};
 const SDK_VERSION='13.2.0';
 const SAVE_API='__FARM_SAVE_ENDPOINT__';
 const CLOUD_CONFIGURED=/^https:\/\/[a-z0-9-]+\.onrender\.com\/api\/farm-save$/.test(SAVE_API)&&Boolean(FIREBASE_CONFIG.projectId);
 let cloudAuth=null, cloudSdk=null, cloudSetup=null, cloudSession=null, cloudFarms=[], cloudListLoad=null, lastCloudWrite=0;
+let cloudApproval='none', cloudOperator=false, approvalRequests=null;
 
 function setCloudUser(user){
+  if(cloudSession?.owner!==user?.uid){
+    cloudApproval='none'; cloudOperator=false; approvalRequests=null;
+  }
   cloudSession=user?{owner:user.uid}:null;
 }
 async function prepareCloudAuth(){
@@ -554,10 +611,19 @@ async function serverRecord(action,data={}){
   let body;
   try{ body=await reply.json(); }catch{ throw saveProblem('network'); }
   if(!reply.ok) throw saveProblem(reply.status===401?'signin':
-    ['missing','conflict','invalid','invite','rate','missing_file'].includes(body?.error)?body.error:'network');
+    ['missing','conflict','invalid','approval','verified','forbidden','reviewed','rate','missing_file'].includes(body?.error)?body.error:'network');
   if(action==='list'){
     if(!Array.isArray(body?.farms)) throw saveProblem('network');
-    return body.farms.filter(row=>/^[a-f0-9]{32}$/.test(row.id)&&typeof row.name==='string');
+    return {farms:body.farms.filter(row=>/^[a-f0-9]{32}$/.test(row.id)&&typeof row.name==='string'),
+      approval:body.approval,isOperator:body.isOperator===true};
+  }
+  if(action==='review-list'){
+    if(!Array.isArray(body?.requests)) throw saveProblem('network');
+    return body.requests.filter(row=>/^[a-f0-9]{64}$/.test(row.id)&&typeof row.email==='string');
+  }
+  if(action==='request-approval'||action==='review'){
+    if(!['pending','approved','rejected'].includes(body?.approval)) throw saveProblem('network');
+    return body.approval;
   }
   if(!body||typeof body.name!=='string'||!Number.isInteger(body.revision)||body.state?.v!==1) throw saveProblem('network');
   return body;
@@ -566,9 +632,9 @@ function refreshCloudFarms(){
   if(!cloudSession){ serverReady=false; return Promise.resolve(); }
   if(cloudListLoad) return cloudListLoad;
   const owner=cloudSession.owner;
-  cloudListLoad=serverRecord('list').then(farms=>{
+  cloudListLoad=serverRecord('list').then(({farms,approval,isOperator})=>{
     if(cloudSession?.owner!==owner) return;
-    cloudFarms=farms; serverReady=true;
+    cloudFarms=farms; cloudApproval=approval; cloudOperator=isOperator; serverReady=true;
   }).catch(e=>{
     serverReady=false; profileError=profileErrorMessage(e);
   }).finally(()=>{ cloudListLoad=null; });
@@ -605,7 +671,9 @@ function saveMessage(){
   if(saveError==='signin') return '로그인 필요';
   if(saveError) return '저장 실패';
   if(inFlight||queued) return '저장 중…';
-  return profile.mode==='server'?'클라우드 저장됨':'기기 저장됨';
+  if(profile.mode!=='server') return '기기 저장됨';
+  if(profile.backupFailed) return '클라우드 저장됨 · 기기 백업 실패';
+  return profile.backupEnabled?'클라우드·기기 백업됨':'클라우드 저장됨';
 }
 function updateSaveStatus(){
   $('playerName').textContent=profile?.name||'플레이어';
@@ -619,6 +687,8 @@ function updateSaveStatus(){
     : saveError?'현재 화면의 진행을 아직 저장하지 못했어요. 다시 저장할 수 있어요.':saveMessage();
   if($('retryFarmSave')) $('retryFarmSave').hidden=!saveError||saveError==='conflict';
   if($('reloadFarmSave')) $('reloadFarmSave').hidden=!saveError;
+  const backupToggle=$('farmBackupToggle');
+  if(backupToggle) backupToggle.textContent=profile?.backupEnabled?'기기 자동 백업 끄기':'이 기기에 자동 백업 켜기';
 }
 function saveNow(){
   if(!profile||profile.mode==='guest') return;
@@ -635,7 +705,9 @@ function flushFarm(){
       rememberFarm(); updateSaveStatus();
       try{
         const row=await recordFor(profile.mode,'write',{id:profile.id,revision:profile.revision,...inFlight});
-        profile.revision=row.revision; inFlight=null;
+        profile.revision=row.revision;
+        if(profile.mode==='server') await syncBackup(profile,row);
+        inFlight=null;
       }catch(e){
         saveError=e.code||'storage';
         toast(saveError==='conflict'?'다른 곳에서 먼저 저장했어요. 플레이어 메뉴에서 확인해 주세요.':'저장에 실패했어요. 플레이어 메뉴에서 다시 저장할 수 있어요.');
@@ -659,6 +731,10 @@ function activateFarm(mode,id,row,resume=null,initialError=''){
     if(latest?.state?.v===1) S=restoreState(latest.state);
   }
   if(initialError&&!saveError) saveError=initialError;
+  if(mode==='server'){
+    profile.backupEnabled=backupList.some(row=>row.id===cloudBackupId(profile)&&row.enabled);
+    if(!initialError) void syncBackup(profile,row);
+  }
   saveView=mode==='server'?'server':'device';
   shopTab='seed'; careMode=false; placing=null;
   rememberFarm(); closeSheet(true); renderAll(); layout(); $('stage').scrollTop=0;
@@ -674,10 +750,13 @@ async function refreshDeviceFarms(){
 async function initFarms(){
   openSheet('profiles');
   const legacy=legacyFarm();
-  await restoreCloudSession();
+  const backups=openFarmDb('today-small-farm-cloud-backups','backups').then(async db=>{
+    backupDb=db; await refreshBackups();
+  }).catch(()=>{ backupDb=null; });
+  await Promise.all([restoreCloudSession(),backups]);
   const cloudSelected=saveView==='server';
   try{
-    deviceDb=await openDevice(); deviceReady=true;
+    deviceDb=await openFarmDb('today-small-farm-players','farms'); deviceReady=true;
     if(legacy) await deviceRecord('create',{id:LEGACY_ID,name:'기존 농장',state:legacy});
     await refreshDeviceFarms();
   }catch{ deviceReady=false; }
@@ -1488,6 +1567,22 @@ function buyFarmUpgrade(){
 function htmlText(s){
   return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
+function cloudApprovalPanel(){
+  if(cloudOperator){
+    const requests=approvalRequests===null?'':approvalRequests.length
+      ? approvalRequests.map(({id,email})=>`<div class="farm-profile-current"><b>${htmlText(email)}</b>
+        <div class="farm-profile-actions"><button class="small" data-review-id="${id}" data-review-decision="approved">승인</button>
+        <button class="small alt" data-review-id="${id}" data-review-decision="rejected">거절</button></div></div>`).join('')
+      : '<p class="farm-profile-note" role="status">승인 대기 중인 신청이 없어요.</p>';
+    return `<div class="sec">관리자 · 저장 신청</div>
+      <button class="small alt" id="cloudReviewList">${approvalRequests===null?'신청 목록 보기':'신청 목록 새로고침'}</button>${requests}`;
+  }
+  if(cloudApproval==='unavailable') return '<p class="farm-profile-note">승인 상태를 가져오지 못했어요. 기존 농장은 이어 할 수 있어요.</p><button class="small alt" id="retryCloudList">승인 상태 다시 확인</button>';
+  if(cloudApproval==='approved') return '<p class="farm-profile-note" role="status">승인됐어요. 새 클라우드 농장을 만들 수 있어요.</p>';
+  if(cloudApproval==='pending') return '<p class="farm-profile-note" role="status">승인 대기 중이에요.</p><button class="small alt" id="retryCloudList">승인 상태 확인</button>';
+  if(cloudApproval==='rejected') return '<p class="farm-profile-note" role="status">신청이 거절됐어요. 기존 농장은 이어 할 수 있어요.</p>';
+  return '<p class="farm-profile-note">새 클라우드 농장을 만들려면 한 번만 신청하세요. 신청하면 구글 계정 이메일을 운영자가 확인할 수 있어요.</p><button class="small alt" id="cloudRequestApproval">클라우드 저장 신청</button>';
+}
 function renderProfiles(body,tabs){
   $('sheetTitle').textContent='🌱 내 농장 · 플레이어';
   if(profilesStarting){ body.innerHTML='<p class="empty-note">농장 기록을 찾고 있어요…</p>'; return; }
@@ -1507,15 +1602,20 @@ function renderProfiles(body,tabs){
       ${cloudListLoad?'<p class="farm-profile-note" role="status">클라우드에 연결 중이에요. 첫 연결에는 약 1분이 걸릴 수 있어요.</p>':''}`;
   const current=profile?`<div class="farm-profile-current"><b>${htmlText(profile.name)} · ${S.day}일째</b><small id="profileSaveNotice" aria-live="polite"></small>
     <div class="farm-profile-actions"><button class="small alt" id="retryFarmSave" hidden>다시 저장</button><button class="small alt" id="reloadFarmSave" hidden>최신 저장본 열기</button></div>
-    <div class="farm-profile-actions"><button class="small alt" id="resetBtn">이 농장 처음부터</button><button class="small alt" id="exportFarm">진행 파일 내보내기</button></div></div>`:'';
+    <div class="farm-profile-actions"><button class="small alt" id="resetBtn">이 농장 처음부터</button><button class="small alt" id="exportFarm">진행 파일 내보내기</button></div>
+    ${profile.mode==='server'&&backupDb?`<div class="farm-profile-actions"><button class="small alt" id="farmBackupToggle">${profile.backupEnabled?'기기 자동 백업 끄기':'이 기기에 자동 백업 켜기'}</button></div>
+    <small>이 브라우저에 마지막 클라우드 저장본을 보관해요. 같은 브라우저를 쓰는 사람도 백업을 열 수 있어요.</small>`:''}</div>`:'';
   const farms=local&&ready&&profileList.length?`<div class="sec">기기에 저장한 농장</div><div class="farm-profile-list">${profileList.map(row=>`<button class="small alt" data-local-farm="${htmlText(row.id)}"><b>${htmlText(row.name)}</b><span>${Number.isSafeInteger(row.state?.day)?row.state.day:1}일째 ${profile?.mode==='device'&&profile.id===row.id?'· 플레이 중':'· 이어 하기'}</span></button>`).join('')}</div>`:'';
   const savedCloud=!local&&ready&&cloudFarms.length?`<div class="sec">클라우드에 저장한 농장</div><div class="farm-profile-list">${cloudFarms.map(row=>`<button class="small alt" data-cloud-farm="${row.id}"><b>${htmlText(row.name)}</b><span>${profile?.mode==='server'&&profile.id===row.id?'플레이 중':'이어 하기'}</span></button>`).join('')}</div>`:'';
-  const nameForm=ready?`<form id="newFarmForm" class="farm-profile-form"><label for="farmPlayerInput">플레이어 이름</label><input id="farmPlayerInput" name="player" maxlength="24" required placeholder="예: 콩 농부" autocomplete="off">
-    ${local?'':'<label for="farmInviteInput">클라우드 농장 생성 코드</label><input type="password" id="farmInviteInput" name="invite" maxlength="64" required autocomplete="off">'}
+  const deviceBackups=local&&ready&&backupList.length?`<div class="sec">이 기기의 클라우드 백업</div>
+    <p class="farm-profile-note">마지막 백업을 별도 기기 농장으로 열어요.</p><div class="farm-profile-list">${[...backupList].sort((a,b)=>b.updatedAt-a.updatedAt).map(row=>
+      `<button class="small alt" data-backup-farm="${htmlText(row.id)}"><b>${htmlText(row.name)}</b><span>${Number.isSafeInteger(row.state?.day)?row.state.day:1}일째 · 사본 열기</span></button>`).join('')}</div>`:'';
+  const nameForm=ready&&(local||cloudApproval==='approved')?`<form id="newFarmForm" class="farm-profile-form"><label for="farmPlayerInput">플레이어 이름</label><input id="farmPlayerInput" name="player" maxlength="24" required placeholder="예: 콩 농부" autocomplete="off">
+    ${!local&&backupDb?'<label><input type="checkbox" id="newFarmBackup" name="backup"> 이 기기에 자동 백업</label><small>같은 브라우저를 쓰는 사람도 이 백업을 열 수 있어요.</small>':''}
     <div class="farm-profile-actions"><button class="small" type="submit" value="new">새 농장 시작</button>${profile?'<button class="small alt" type="submit" value="copy">현재 진행 복사</button>':''}</div>
     <label class="farm-file-label" for="importFarm">진행 파일 가져오기</label><input type="file" id="importFarm" accept=".json,application/json"></form>`:'';
   body.innerHTML=`${current}<p class="farm-profile-note">${desc}${local&&!ready?' 기기 저장에 접근할 수 없어요.':''}</p>
-    <p class="farm-profile-error" id="profileError" role="status" ${profileError?'':'hidden'}>${htmlText(profileError)}</p>${cloudControls}${farms}${savedCloud}${nameForm}
+    <p class="farm-profile-error" id="profileError" role="status" ${profileError?'':'hidden'}>${htmlText(profileError)}</p>${cloudControls}${farms}${deviceBackups}${savedCloud}${!local&&ready?cloudApprovalPanel():''}${nameForm}
     ${!profile?'<button class="small alt" id="guestFarm">저장 없이 체험</button>':''}`;
   updateSaveStatus();
 }
@@ -1529,7 +1629,10 @@ function profileErrorMessage(e){
     missing_file:'클라우드 진행 파일을 찾지 못했어요.',
     signin:'구글 계정으로 다시 로그인해 주세요.',
     popup:'팝업을 허용한 뒤 구글 로그인 버튼을 다시 눌러 주세요.',
-    invite:'클라우드 농장 생성 코드를 확인해 주세요.',
+    approval:'새 클라우드 농장을 만들려면 먼저 승인을 받아야 해요.',
+    verified:'이메일이 확인된 구글 계정으로 다시 로그인해 주세요.',
+    forbidden:'이 작업은 운영자만 할 수 있어요.',
+    reviewed:'이미 처리된 신청이에요. 신청 목록을 새로고침해 주세요.',
     rate:'저장 요청이 잠시 밀렸어요. 잠시 뒤 다시 저장해 주세요.',
     name:'이미 같은 이름이 있어요. 목록에서 이어 하거나 다른 이름을 써 주세요.',
     conflict:'다른 곳의 진행이 더 최신이에요.',
@@ -1559,7 +1662,7 @@ function openProfiles(){
   if(profile?.mode==='server') saveView='server';
   openSheet('profiles');
   if(saveView==='server') void openCloudStorage();
-  void refreshDeviceFarms().then(()=>{
+  void Promise.all([refreshDeviceFarms(),refreshBackups()]).then(()=>{
     if(sheetOpen==='profiles'&&saveView==='device'&&!profileBusy&&!$('farmPlayerInput')?.value) renderSheet();
   });
 }
@@ -1578,14 +1681,19 @@ function exportFarmFile(){
   const link=document.createElement('a'); link.href=url; link.download='small-farm-save.json';
   document.body.append(link); link.click(); link.remove(); setTimeout(()=>URL.revokeObjectURL(url),2000);
 }
-async function createProfile(mode,name,state,invite){
+async function createProfile(mode,name,state,backup=false){
   if(!name||name.length>24) throw saveProblem('invalid');
   const signature=JSON.stringify({mode,name,state});
   if(createAttempt?.signature!==signature) createAttempt={signature,id:farmCode(),operation:farmCode()};
   const id=createAttempt.id;
-  const row=await recordFor(mode,'create',{id,name,state,...(mode==='server'?{invite,operation:createAttempt.operation}:{})});
+  const row=await recordFor(mode,'create',{id,name,state,...(mode==='server'?{operation:createAttempt.operation}:{})});
   if(mode==='device') await refreshDeviceFarms();
   activateFarm(mode,id,row);
+  if(mode==='server'&&backup){
+    try{ await setFarmBackup(profile,true); }
+    catch{ profile.backupFailed=true; toast('클라우드 농장은 만들었지만 기기 백업은 설정하지 못했어요.'); }
+    updateSaveStatus();
+  }
   if(mode==='server') void refreshCloudFarms().then(renderCloudList);
 }
 function renderCloudList(){
@@ -1599,12 +1707,12 @@ $('sheetBody').addEventListener('submit',e=>{
   const data=new FormData(form), mode=saveView;
   const name=String(data.get('player')).trim(), copy=e.submitter?.value==='copy';
   void profileAction(async()=>{
-    if(await readyToSwitch(copy)) await createProfile(mode,name,copy?snapshotFarm():freshState(),data.get('invite'));
+    if(await readyToSwitch(copy)) await createProfile(mode,name,copy?snapshotFarm():freshState(),data.has('backup'));
   });
 });
 $('sheetBody').addEventListener('change',e=>{
   if(e.target.id!=='importFarm') return;
-  const file=e.target.files[0], mode=saveView, invite=$('farmInviteInput')?.value;
+  const file=e.target.files[0], mode=saveView, backup=$('newFarmBackup')?.checked===true;
   if(!file) return;
   e.target.value='';
   void profileAction(async()=>{
@@ -1616,7 +1724,7 @@ $('sheetBody').addEventListener('change',e=>{
       if(data.format!=='small-farm-save'||data.state?.v!==1||typeof data.name!=='string') throw new Error();
     }catch{ setProfileError('농장 진행 파일을 읽을 수 없어요. 게임에서 내보낸 JSON을 골라 주세요.'); return; }
     const name=$('farmPlayerInput').value.trim()||data.name.trim().slice(0,24);
-    await createProfile(mode,name,restoreState(data.state),invite);
+    await createProfile(mode,name,restoreState(data.state),backup);
   });
 });
 function profileButton(button){
@@ -1630,6 +1738,49 @@ function profileButton(button){
       const last=rememberedFarm();
       const resume=last?.mode==='server'&&last.id===cloudFarm&&last.owner===cloudSession?.owner?last:null;
       activateFarm('server',cloudFarm,await serverRecord('read',{id:cloudFarm}),resume);
+    });
+  }else if(button.dataset.backupFarm){
+    void profileAction(async()=>{
+      const id=button.dataset.backupFarm;
+      const sameFarm=profile?.mode==='server'&&cloudBackupId(profile)===id;
+      if(!await readyToSwitch(sameFarm)) return;
+      const row=await backupRecord('read',{id});
+      if(!row) throw saveProblem('missing');
+      const copyDraft=sameFarm&&!!saveError;
+      const state=copyDraft?snapshotFarm():row.state;
+      await refreshDeviceFarms();
+      const names=new Set(profileList.map(farm=>farm.name));
+      let suffix=' (백업)', name=row.name.slice(0,24-suffix.length)+suffix;
+      for(let copy=2;names.has(name);copy++){
+        suffix=' (백업 '+copy+')';
+        name=row.name.slice(0,24-suffix.length)+suffix;
+      }
+      await createProfile('device',name,state);
+      if(copyDraft) toast('아직 클라우드에 저장되지 않은 현재 진행도 기기 사본에 담았어요.');
+    });
+  }else if(button.id==='farmBackupToggle'){
+    void profileAction(async()=>{
+      await setFarmBackup(profile,!profile.backupEnabled);
+      renderSheet();
+      toast(profile.backupEnabled?'이 기기에 자동 백업을 켰어요.':'자동 백업을 껐어요. 마지막 백업은 보관해요.');
+    });
+  }else if(button.id==='cloudRequestApproval'){
+    void profileAction(async()=>{
+      cloudApproval=await serverRecord('request-approval');
+      renderSheet();
+    });
+  }else if(button.id==='cloudReviewList'){
+    void profileAction(async()=>{
+      approvalRequests=await serverRecord('review-list');
+      renderSheet();
+    });
+  }else if(button.dataset.reviewId){
+    void profileAction(async()=>{
+      const {reviewId,reviewDecision}=button.dataset;
+      await serverRecord('review',{id:reviewId,decision:reviewDecision});
+      approvalRequests=approvalRequests.filter(request=>request.id!==reviewId);
+      renderSheet();
+      toast(reviewDecision==='approved'?'클라우드 저장을 승인했어요.':'클라우드 저장 신청을 거절했어요.');
     });
   }else if(button.id==='retryCloudList'){
     void openCloudStorage();
@@ -1735,6 +1886,9 @@ $('sheetTabs').addEventListener('click',e=>{
   if(b.dataset.saveView){
     saveView=b.dataset.saveView; profileError='';
     if(saveView==='server'&&!serverReady) void openCloudStorage();
+    if(saveView==='device') void refreshBackups().then(()=>{
+      if(sheetOpen==='profiles'&&saveView==='device'&&!profileBusy&&!$('farmPlayerInput')?.value) renderSheet();
+    });
   }
   else shopTab=b.dataset.tab;
   renderSheet(); $('sheetBody').scrollTop=0; $('sheetTabs').querySelector('.on')?.focus({preventScroll:true});

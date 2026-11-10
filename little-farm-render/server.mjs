@@ -8,13 +8,13 @@ const firebaseProject = 'kjelab-little-farm';
 const configuredOrigin = process.env.RENDER_EXTERNAL_URL || '';
 const endpoint = /^https:\/\/[a-z0-9-]+\.onrender\.com$/.test(configuredOrigin) ? configuredOrigin : '';
 const origins = ['https://kjelab.kr', ...(endpoint ? [endpoint] : [])];
-const {FARM_SERVICE_ACCOUNT, FARM_BRIDGE_URL, FARM_BRIDGE_KEY, FARM_ENROLLMENT_HASH} = process.env;
+const {FARM_SERVICE_ACCOUNT, FARM_BRIDGE_URL, FARM_BRIDGE_KEY, FARM_OPERATOR_EMAIL} = process.env;
 let api;
-if (FARM_SERVICE_ACCOUNT && FARM_BRIDGE_URL && FARM_BRIDGE_KEY && FARM_ENROLLMENT_HASH) {
+if (FARM_SERVICE_ACCOUNT && FARM_BRIDGE_URL && FARM_BRIDGE_KEY) {
   api = createHandler({
     identity: firebaseIdentity(firebaseProject),
     store: farmStore(firebaseProject, JSON.parse(FARM_SERVICE_ACCOUNT)),
-    bridgeUrl: FARM_BRIDGE_URL, bridgeKey: FARM_BRIDGE_KEY, enrollmentHash: FARM_ENROLLMENT_HASH, origins
+    bridgeUrl: FARM_BRIDGE_URL, bridgeKey: FARM_BRIDGE_KEY, operatorEmail: FARM_OPERATOR_EMAIL?.trim().toLowerCase(), origins
   });
 }
 const source = await readFile(new URL('./index.html', import.meta.url), 'utf8');

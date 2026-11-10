@@ -8,12 +8,6 @@ const hash = async text => hex(await crypto.subtle.digest('SHA-256',encoder.enco
 const nonce = () => hex(crypto.getRandomValues(new Uint8Array(16)));
 const bridgePattern = /^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/;
 
-function matchingHash(a,b) {
-  if (typeof a !== 'string'||typeof b !== 'string'||!HASH.test(a)||!HASH.test(b)) return false;
-  let diff = 0;
-  for (let i=0;i<64;i++) diff |= a.charCodeAt(i)^b.charCodeAt(i);
-  return diff===0;
-}
 async function requestBody(req) {
   const reader=req.body?.getReader();
   if (!reader) throw new Failure(400,'invalid');
@@ -36,7 +30,7 @@ async function requestBody(req) {
   }
 }
 
-export function createHandler({identity, store, bridgeUrl, bridgeKey, enrollmentHash,
+export function createHandler({identity, store, bridgeUrl, bridgeKey, operatorEmail,
   origins = ['https://kjelab.kr'], fetcher = fetch, waitUntil = promise => promise}) {
   const allowedOrigins = new Set(origins);
   let signingKey;
@@ -105,13 +99,41 @@ export function createHandler({identity, store, bridgeUrl, bridgeKey, enrollment
     if (!/^application\/json(?:\s*;|$)/i.test(req.headers.get('content-type')||'')) return reply(415,{error:'invalid'});
     try {
       const data=await requestBody(req);
-      const user=await owner(req);
+      const {uid: user, email}=await owner(req);
+      const isOperator=!!operatorEmail&&email===operatorEmail;
+      const accountKey=await hash(user);
       admit(user);
       if (!HASH.test(bridgeKey||'')||!bridgePattern.test(bridgeUrl||'')) throw new Failure(503,'network');
       if (data.action==='list') {
-        await takeBudget(await hash(user),'list');
-        const rows=await store.list(user);
-        return reply(200,{farms:rows.map(row=>({id:row.save_id,name:row.name,revision:row.revision,updatedAt:Date.parse(row.updated_at)}))});
+        await takeBudget(accountKey,'list');
+        const approvalStatus=isOperator?'approved':store.getApproval(accountKey)
+          .then(request=>request?.status??'none').catch(()=>'unavailable');
+        const [rows, approval]=await Promise.all([store.list(user),approvalStatus]);
+        return reply(200,{approval,isOperator,
+          farms:rows.map(row=>({id:row.save_id,name:row.name,revision:row.revision,updatedAt:Date.parse(row.updated_at)}))});
+      }
+      if (data.action==='request-approval') {
+        if (!email) throw new Failure(403,'verified');
+        if (!operatorEmail) throw new Failure(503,'network');
+        if (isOperator) return reply(200,{approval:'approved'});
+        const current=await store.getApproval(accountKey);
+        if (current) return reply(200,{approval:current.status});
+        if (await store.setApproval(accountKey,{status:'pending',email},null)) return reply(200,{approval:'pending'});
+        const existing=await store.getApproval(accountKey);
+        if (!existing) throw new Failure(503,'network');
+        return reply(200,{approval:existing.status});
+      }
+      if (data.action==='review-list'||data.action==='review') {
+        if (!isOperator) throw new Failure(403,'forbidden');
+        if (data.action==='review-list') return reply(200,{requests:await store.listApprovals()});
+        const {id,decision}=data;
+        if (typeof id!=='string'||!HASH.test(id)||!['approved','rejected'].includes(decision)) throw new Failure(400,'invalid');
+        const current=await store.getApproval(id);
+        if (!current) throw new Failure(404,'missing');
+        if (current.status===decision) return reply(200,{approval:decision});
+        if (current.status==='pending'&&await store.setApproval(id,{status:decision},current)) return reply(200,{approval:decision});
+        if ((await store.getApproval(id))?.status===decision) return reply(200,{approval:decision});
+        throw new Failure(409,'reviewed');
       }
       if (typeof data.id!=='string'||!CODE.test(data.id)||!['create','read','write'].includes(data.action)) throw new Failure(400,'invalid');
       const key=await hash(user+':'+data.id), row=await store.get(user,data.id);
@@ -125,8 +147,8 @@ export function createHandler({identity, store, bridgeUrl, bridgeKey, enrollment
       if (typeof data.operation!=='string'||!CODE.test(data.operation)) throw new Failure(400,'invalid');
       if (data.action==='create') {
         if (typeof data.name!=='string'||!data.name.trim()||data.name.trim().length>24) throw new Failure(400,'invalid');
-        if (typeof data.invite!=='string'||data.invite.length>64||!matchingHash(await hash(data.invite.trim()),enrollmentHash)) throw new Failure(403,'invite');
-        await takeBudget(await hash(user),'create');
+        if (!isOperator&&(await store.getApproval(accountKey))?.status!=='approved') throw new Failure(403,'approval');
+        await takeBudget(accountKey,'create');
       } else {
         if (!row) throw new Failure(404,'missing');
         if (!Number.isSafeInteger(data.revision)||data.revision<0) throw new Failure(400,'invalid');

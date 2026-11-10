@@ -53,20 +53,20 @@ assert.equal(apiCalls,1);
 const rows=new Map(), background=[];
 const project='kjelab-little-farm';
 const farmId='31'.repeat(16), scriptUrl='https://script.google.com/macros/s/sample/exec';
-const enroll='long-random-mock-code';
+const operatorEmail='farmer@example.test';
 const {privateKey,publicKey}=generateKeyPairSync('rsa',{modulusLength:2048});
 const kid='1'.repeat(40);
 const token=(sub,aud=project,options={})=>{
   const now=Math.floor(Date.now()/1000);
   const payload={aud,sub,iss:'https://securetoken.google.com/'+aud,exp:now+3600,iat:now,auth_time:now,
-    firebase:{sign_in_provider:'google.com'},...options};
+    email:sub+'@example.test',email_verified:true,firebase:{sign_in_provider:'google.com'},...options};
   const body=[{alg:'RS256',kid},payload].map(x=>Buffer.from(JSON.stringify(x)).toString('base64url')).join('.');
   return body+'.'+makeSignature('RSA-SHA256',Buffer.from(body),privateKey).toString('base64url');
 };
-const users={alice:token('alice'),bob:token('bob'),guest:token('guest',project,{firebase:{sign_in_provider:'anonymous'}})};
+const users={farmer:token('farmer'),alice:token('alice'),bob:token('bob'),guest:token('guest',project,{firebase:{sign_in_provider:'anonymous'}})};
 const account={type:'service_account',project_id:project,client_email:'farm-save@'+project+'.iam.gserviceaccount.com',
   private_key:privateKey.export({type:'pkcs8',format:'pem'})};
-let dbCalls=0, versions=0, tokenExchanges=0, certRequests=0;
+let dbCalls=0, versions=0, tokenExchanges=0, certRequests=0, failApprovalReads=false;
 const simulatedFetch=async (input,options={})=>{
   const url=new URL(input);
   if(input===scriptUrl) return Response.json(drive(options.body));
@@ -99,14 +99,22 @@ const simulatedFetch=async (input,options={})=>{
     for(const w of writes) rows.set(w.update.name,{...w.update,updateTime:'etag'+(++versions)});
     return Response.json({});
   }
+  if(name.endsWith(':runQuery')){
+    const query=JSON.parse(options.body).structuredQuery;
+    const filter=query.where.fieldFilter;
+    const collection=name.slice(0,-':runQuery'.length)+'/'+query.from[0].collectionId+'/';
+    return Response.json([...rows.values()].filter(row=>row.name.startsWith(collection)&&
+      row.fields[filter.field.fieldPath]?.stringValue===filter.value.stringValue).slice(0,query.limit).map(document=>({document})));
+  }
   if(name.endsWith('/farms')){
     return Response.json({documents:[...rows.values()].filter(row=>row.name.startsWith(name+'/'))});
   }
+  if(failApprovalReads&&name.includes('/farmApprovals/')) return Response.json({}, {status:503});
   return rows.has(name)?Response.json(rows.get(name)):Response.json({}, {status:404});
 };
 const identity=firebaseIdentity(project,simulatedFetch);
 const store=farmStore(project,account,simulatedFetch);
-const handler=createHandler({identity,store,bridgeUrl:scriptUrl,enrollmentHash:sha(enroll),bridgeKey:sampleKey,
+const handler=createHandler({identity,store,bridgeUrl:scriptUrl,operatorEmail,bridgeKey:sampleKey,
   fetcher:simulatedFetch,waitUntil:p=>background.push(p)});
 const call=async (token,body,origin='https://kjelab.kr')=>{
   const response=await handler(new Request('https://project.invalid/farm-cloud-auth',{
@@ -125,13 +133,42 @@ assert.equal((await call(tampered,{action:'list'}))[0],401);
 assert.equal((await call(token('alice',project,{exp:1}),{action:'list'}))[0],401);
 assert.equal(dbCalls,0);
 const create={action:'create',id:farmId,operation:'33'.repeat(16),name:'콩 농장',state:empty};
-assert.deepEqual(await call('alice',create),[403,{error:'invite'}]);
-assert.equal((await call('alice',{...create,invite:enroll,operation:null}))[0],400);
-const [createdStatus,created]=await call('alice',{...create,invite:enroll});
+assert.deepEqual(await call('alice',create),[403,{error:'approval'}]);
+assert.equal((await call('alice',{...create,operation:null}))[0],400);
+assert.equal((await call('alice',{action:'list'}))[1].approval,'none');
+assert.equal((await call('farmer',{action:'list'}))[1].isOperator,true);
+assert.equal((await call('alice',{action:'review-list'}))[0],403);
+assert.equal((await call(token('impostor',project,{email:operatorEmail,email_verified:false}),{action:'review-list'}))[0],403);
+assert.equal((await call(token('impostor',project,{email_verified:false}),{action:'request-approval'}))[0],403);
+assert.deepEqual(await call('alice',{action:'request-approval',email:operatorEmail}),[200,{approval:'pending'}]);
+assert.deepEqual(await call('alice',{action:'request-approval'}),[200,{approval:'pending'}]);
+assert.equal((await call('alice',create))[0],403);
+const [queueStatus,queue]=await call('farmer',{action:'review-list'});
+assert.equal(queueStatus,200);
+assert.deepEqual(queue.requests,[{id:sha('alice'),email:'alice@example.test'}]);
+const accept={action:'review',id:sha('alice'),decision:'approved'};
+assert.equal((await call('bob',accept))[0],403);
+const [approved,rejected]=await Promise.all([call('farmer',accept),call('farmer',{...accept,decision:'rejected'})]);
+assert.deepEqual([approved[0],rejected[0]],[200,409]);
+assert.equal((await call('alice',{action:'list'}))[1].approval,'approved');
+assert.equal((await call('bob',{action:'request-approval'}))[1].approval,'pending');
+assert.equal((await call('farmer',{...accept,id:sha('bob'),decision:'rejected'}))[0],200);
+assert.equal((await call('bob',{action:'request-approval'}))[1].approval,'rejected');
+assert.equal((await call('bob',create))[0],403);
+assert.deepEqual((await call('farmer',{action:'review-list'}))[1].requests,[]);
+const [createdStatus,created]=await call('alice',create);
 assert.equal(createdStatus,200);
 assert.equal(created.revision,0);
 assert.equal(created.name,'콩 농장');
-assert.deepEqual((await call('bob',{action:'list'}))[1],{farms:[]});
+failApprovalReads=true;
+const [legacyStatus,legacyList]=await call('alice',{action:'list'});
+assert.equal(legacyStatus,200);
+assert.equal(legacyList.approval,'unavailable');
+assert.equal(legacyList.farms[0].id,farmId);
+failApprovalReads=false;
+for(const name of rows.keys()) if(name.endsWith('/farmApprovals/'+sha('alice'))) rows.delete(name);
+assert.equal((await call('alice',{action:'list'}))[1].approval,'none');
+assert.deepEqual((await call('bob',{action:'list'}))[1],{farms:[],approval:'rejected',isOperator:false});
 assert.equal((await call('bob',{action:'read',id:farmId}))[0],404);
 assert.equal((await call('alice',{action:'list'}))[1].farms[0].id,farmId);
 assert.deepEqual((await call('alice',{action:'read',id:farmId}))[1].state,empty);
@@ -148,4 +185,4 @@ await Promise.all(background);
 assert.equal([...files.values()].filter(file=>!file.trashed).length,1);
 const code=html.match(/<script>([\s\S]*?)<\/script>/)[1];
 new vm.Script(code);
-console.log('PASS: Firebase identity and project validation, scoped Firestore access and Google assertion, sign-in required, owner isolation, invite, HMAC replay protection, create/read/update, concurrent revision conflict, idempotent retry, file cleanup, and browser script syntax');
+console.log('PASS: Firebase identity and project validation, scoped Firestore access and Google assertion, sign-in required, owner isolation, account approval and concurrent review, HMAC replay protection, create/read/update, concurrent revision conflict, idempotent retry, file cleanup, and browser script syntax');
