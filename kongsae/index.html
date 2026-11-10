@@ -881,7 +881,7 @@ function renderSubmissions() {
   const draft = submissionDraft;
   body.innerHTML = (isTeacher ? '' : [
     '<section class="sub-panel"><h2>사진 제출</h2>',
-    '<p class="sub-status">사진은 나와 담당 반 선생님만 볼 수 있어요.</p>',
+    '<p class="sub-status">제출을 누르면 사진과 메모를 외부 저장 서비스로 보내요. 콩새에서는 제출한 학생과 담당 선생님이 볼 수 있어요. 제출 전에 <a href="/privacy/#kongsae-photos" target="_blank" rel="noopener noreferrer">사진 저장·열람·삭제 안내(새 탭)</a>를 확인해 주세요.</p>',
     '<form id="submissionForm"><fieldset class="sub-form">',
     '<div class="sub-picker"><label for="submissionFiles">사진 선택 (최대 3장)</label>',
     '<input id="submissionFiles" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif" multiple></div>',
@@ -945,7 +945,7 @@ function renderSubmissions() {
       };
       const withdraw = $('[data-withdraw]', entry);
       if (withdraw) withdraw.onclick = async () => {
-        if (!confirm('제출을 취소할까요? 사진과 메모가 삭제돼요.')) return;
+        if (!confirm('제출을 취소할까요? 제출 목록에서 내려가고 메모가 지워져요. 사진 파일 정리에는 시간이 걸릴 수 있어요.')) return;
         withdraw.disabled = true;
         const { error: withdrawError } = await sb.rpc('ks_withdraw_submission', { p_submission: item.id });
         if (!list.isConnected) return;
@@ -1157,7 +1157,7 @@ async function renderAdmin() {
   });
   const del = $('#aDel');
   if (del) del.onclick = async () => {
-    const typed = prompt(`반과 사진 제출물이 함께 삭제돼요. 계속하려면 반 이름 "${S.cls.name}"을(를) 그대로 입력해 주세요.`);
+    const typed = prompt(`반과 사진 제출 기록이 삭제돼요. 사진 파일 정리에는 시간이 걸릴 수 있어요. 계속하려면 반 이름 "${S.cls.name}"을(를) 그대로 입력해 주세요.`);
     if (typed !== S.cls.name) return typed !== null && toast('반 이름이 달라서 지우지 않았어요.');
     const { error } = await sb.rpc('ks_delete_class', { p_class: S.cid });
     if (error) return toast(errMsg(error));
