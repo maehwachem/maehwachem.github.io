@@ -154,6 +154,17 @@ body.placing #placeBar{display:flex}
 #scrim.clear{background:transparent}
 .sheet{position:fixed;left:50%;bottom:0;z-index:55;width:min(100%,520px);max-height:78vh;background:var(--paper);border-radius:24px 24px 0 0;transform:translate(-50%,105%);transition:transform .32s cubic-bezier(.2,.9,.3,1);display:flex;flex-direction:column;box-shadow:0 -8px 30px rgba(0,0,0,.18);padding-bottom:env(safe-area-inset-bottom)}
 .sheet.show{transform:translate(-50%,0)}
+.sheet[data-kind="profiles"]{
+  top:50%;bottom:auto;width:min(calc(100% - 24px),520px);
+  max-height:calc(100vh - 32px);
+  max-height:calc(100dvh - 32px - 2 * max(env(safe-area-inset-top),env(safe-area-inset-bottom)));
+  border-radius:24px;padding-bottom:0;box-shadow:0 12px 36px rgba(0,0,0,.22);
+  transform:translate(-50%,calc(-50% + 12px));opacity:0;visibility:hidden;
+  transition:transform .22s ease,opacity .22s ease,visibility .22s;
+}
+.sheet[data-kind="profiles"].show{transform:translate(-50%,-50%);opacity:1;visibility:visible}
+.sheet[data-kind="profiles"] :is(header,.tabs){flex-shrink:0}
+.sheet[data-kind="profiles"] .body{min-height:0;overscroll-behavior:contain}
 .sheet header{display:flex;align-items:center;padding:16px 18px 8px;gap:8px}
 .sheet header h3{margin:0;font-size:18px;flex:1}
 .sheet .close{width:36px;height:36px;border-radius:50%;background:#efe3cc;font-size:18px;font-weight:800}
@@ -1527,6 +1538,7 @@ function openSheet(kind){
   closePopover(); cancelPlace(); if(careMode) setCareMode(false);
   sheetAnchor=document.activeElement;
   sheetOpen=kind;
+  sheet.dataset.kind=kind;
   sheet.inert=false; sheet.classList.add('show'); syncOverlay();
   renderSheet(); $('sheetBody').scrollTop=0;
   ($('sheetClose').disabled?$('farmPlayerInput'):$('sheetClose'))?.focus({preventScroll:true});
