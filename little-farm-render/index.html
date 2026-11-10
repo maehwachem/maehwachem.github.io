@@ -16,28 +16,46 @@ html,body{margin:0;height:100%;overflow:hidden;font-family:var(--font);color:var
 button{font-family:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
 #app{position:fixed;inset:0;display:flex;flex-direction:column;overflow:hidden}
 
-/* ---------- 배경 ---------- */
-#sky{position:absolute;inset:0;background:linear-gradient(#7cc8f0 0%,#b9e6f7 calc(var(--horizon) - 4vh),#e9f7e4 var(--horizon));transition:filter 1.2s, background 1.2s;z-index:0}
-body.w-cloudy #sky{filter:saturate(.7) brightness(.95)}
-body.w-rain #sky{filter:saturate(.45) brightness(.78) hue-rotate(10deg)}
-#sun{position:absolute;right:9%;top:calc(var(--horizon)*.18);width:min(16vw,110px);aspect-ratio:1;transition:opacity 1.2s,transform 1.2s}
-#sun .core{position:absolute;inset:22%;border-radius:50%;background:radial-gradient(circle at 40% 40%,#fff7c2,#ffd85a 60%,#ffb83f);box-shadow:0 0 40px 18px rgba(255,215,90,.55)}
-#sun .rays{position:absolute;inset:-30%;background:repeating-conic-gradient(rgba(255,236,150,.35) 0 6deg,transparent 6deg 20deg);border-radius:50%;-webkit-mask:radial-gradient(circle,#000 30%,transparent 70%);mask:radial-gradient(circle,#000 30%,transparent 70%);animation:spin 60s linear infinite}
+/* ---------- 배경 (그림책 풍경) ---------- */
+body{--shd:.26;--paper:#fff8ea;--paper2:#f5e9cf;--edge:rgba(122,88,52,.32);--wood:#c49563;--wood-dk:#8a5d36;--sage:#6f9f45;--sage-dk:#4f7a2e}
+body.w-cloudy{--shd:.15} body.w-rain{--shd:.07}
+#sky{position:absolute;inset:0;background:linear-gradient(#86c3e3 0%,#b9dfee calc(var(--horizon)*.55),#f7e8c8 var(--horizon));transition:filter 1.2s;z-index:0}
+body.w-cloudy #sky{filter:saturate(.62) brightness(.96)}
+body.w-rain #sky{filter:saturate(.4) brightness(.76) hue-rotate(12deg)}
+#sun{position:absolute;right:9%;top:calc(var(--horizon)*.16);width:min(16vw,110px);aspect-ratio:1;transition:opacity 1.2s,transform 1.2s}
+#sun .core{position:absolute;inset:24%;border-radius:50%;background:radial-gradient(circle at 42% 40%,#fffbe0,#ffe27a 55%,#ffc04f);box-shadow:0 0 0 3px rgba(255,236,170,.55),0 0 46px 20px rgba(255,214,120,.5)}
+#sun .rays{position:absolute;inset:-30%;background:repeating-conic-gradient(rgba(255,232,160,.32) 0 5deg,transparent 5deg 18deg);border-radius:50%;-webkit-mask:radial-gradient(circle,#000 30%,transparent 70%);mask:radial-gradient(circle,#000 30%,transparent 70%);animation:spin 80s linear infinite}
 body.w-cloudy #sun{opacity:.45;transform:scale(.9)}
 body.w-rain #sun{opacity:0;transform:translateY(-20px)}
 @keyframes spin{to{transform:rotate(360deg)}}
 .cloud{position:absolute;left:0;opacity:.95;transition:filter 1.2s}
-body.w-rain .cloud{filter:brightness(.72) saturate(.3)}
-#hills{position:absolute;left:0;width:100%;height:24vh;top:calc(var(--horizon) - 24vh + 2px);z-index:1;transition:filter 1.2s}
-body.w-rain #hills{filter:saturate(.75) brightness(.86)}
-body.w-cloudy #hills{filter:saturate(.9) brightness(.96)}
+body.w-cloudy .cloud{filter:brightness(.97) saturate(.6)}
+body.w-rain .cloud{filter:brightness(.7) saturate(.3)}
 #ground{position:absolute;left:0;right:0;bottom:0;top:var(--horizon);z-index:1;
-  background:radial-gradient(ellipse at 50% 0%,#9fdc72 0%,transparent 60%),linear-gradient(#8fd263,#6fbf4c 55%,#5fae42);transition:filter 1.2s}
-body.w-rain #ground{filter:saturate(.8) brightness(.85)}
-#tufts{position:absolute;inset:0;z-index:1;pointer-events:none}
-#tufts svg{position:absolute}
-#sunlight{position:absolute;inset:0;z-index:6;pointer-events:none;background:radial-gradient(ellipse at 88% 4%,rgba(255,226,140,.42),transparent 55%);mix-blend-mode:soft-light;transition:opacity 1.2s}
-body.w-rain #sunlight{opacity:0} body.w-cloudy #sunlight{opacity:.4}
+  background:linear-gradient(#b2d37f 0%,#9cc76a 18%,#88bb5a 55%,#76ab4c 100%);transition:filter 1.2s}
+#scene{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;overflow:visible;transition:filter 1.2s}
+body.w-cloudy #scene,body.w-cloudy #tufts{filter:saturate(.86) brightness(.96)}
+body.w-rain #scene,body.w-rain #ground,body.w-rain #tufts{filter:saturate(.72) brightness(.84)}
+#scene .smoke circle{transform-box:fill-box;transform-origin:center;animation:smoke 6s ease-out infinite;opacity:0}
+#scene .smoke circle:nth-child(2){animation-delay:2s}#scene .smoke circle:nth-child(3){animation-delay:4s}
+@keyframes smoke{0%{opacity:0;transform:translate(0,0) scale(.5)}20%{opacity:.75}100%{opacity:0;transform:translate(14px,-26px) scale(1.6)}}
+#scene .winglow{opacity:.25;transition:opacity 1.2s}
+body.w-cloudy #scene .winglow{opacity:.55} body.w-rain #scene .winglow{opacity:.9}
+body.w-rain #scene .smoke{opacity:.5}
+#tufts{position:absolute;inset:0;z-index:1;pointer-events:none;transition:filter 1.2s}
+#tufts svg{position:absolute;overflow:visible}
+#sunlight{position:absolute;inset:0;z-index:6;pointer-events:none;background:radial-gradient(ellipse at 88% 4%,rgba(255,224,150,.5),transparent 58%);mix-blend-mode:soft-light;transition:opacity 1.2s}
+body.w-rain #sunlight{opacity:0} body.w-cloudy #sunlight{opacity:.35}
+#weatherTint{position:absolute;inset:0;z-index:16;pointer-events:none;opacity:0;transition:opacity 1.2s;background:linear-gradient(rgba(70,86,118,.2),rgba(70,90,110,.1));mix-blend-mode:multiply}
+body.w-cloudy #weatherTint{opacity:.45} body.w-rain #weatherTint{opacity:1}
+body.in-greenhouse.w-rain #weatherTint{opacity:.5}
+#morning{position:absolute;inset:0;z-index:17;pointer-events:none;opacity:0;background:linear-gradient(rgba(255,170,130,.5),rgba(255,206,150,.28) 45%,rgba(255,236,190,.12));mix-blend-mode:soft-light}
+body.dawn #morning{animation:dawn 2.8s ease-out}
+body.dawn #sun{animation:sunrise 2.8s cubic-bezier(.2,.7,.3,1)}
+@keyframes dawn{0%{opacity:1}100%{opacity:0}}
+@keyframes sunrise{from{transform:translateY(34px) scale(.92)}}
+#grain{position:absolute;inset:0;z-index:18;pointer-events:none;opacity:.16;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .35 0 0 0 0 .22 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E")}
 #rain{position:absolute;inset:0;z-index:7;pointer-events:none;opacity:0;transition:opacity 1.2s}
 body.w-rain #rain{opacity:1}
 .butterfly{position:absolute;z-index:5;width:22px;height:18px;pointer-events:none;transition:opacity 1s}
@@ -47,32 +65,39 @@ body.w-rain .butterfly{opacity:0}
 
 /* ---------- 상단 ---------- */
 #hud{position:relative;z-index:20;display:flex;align-items:center;gap:8px;padding:calc(env(safe-area-inset-top) + 10px) 12px 6px}
-.pill{background:rgba(255,250,240,.88);border-radius:999px;padding:7px 13px;box-shadow:0 2px 0 rgba(74,58,42,.15),0 4px 14px rgba(0,0,0,.06);font-weight:700;font-size:15px;display:flex;align-items:center;gap:6px;white-space:nowrap;backdrop-filter:blur(4px)}
+.pill{background:rgba(255,248,234,.94);border:1.5px solid var(--edge);border-radius:999px;padding:6px 13px;box-shadow:0 2px 0 rgba(122,88,52,.22),0 5px 14px rgba(70,50,20,.08);font-weight:700;font-size:15px;display:flex;align-items:center;gap:6px;white-space:nowrap}
+#dayPill .wx{width:20px;height:20px;flex:none}
 #dayPill small{font-weight:600;opacity:.7;font-size:13px}
 #coinPill .coin{width:18px;height:18px}
 #hud .spacer{flex:1}
-.iconbtn{width:40px;height:40px;border-radius:50%;justify-content:center;padding:0;font-size:18px}
-#hint{position:relative;z-index:20;align-self:center;margin:2px 12px 0;max-width:calc(100% - 24px);background:rgba(255,250,240,.92);border-radius:14px;padding:8px 14px;font-size:14px;font-weight:600;box-shadow:0 3px 12px rgba(0,0,0,.08);text-align:center;transition:opacity .4s, transform .4s}
+.iconbtn{width:42px;height:42px;border-radius:50%;justify-content:center;padding:0;font-size:18px}
+#hint{position:relative;z-index:20;align-self:center;margin:2px 12px 0;max-width:calc(100% - 24px);background:rgba(255,248,234,.95);border:1.5px solid var(--edge);border-radius:16px 16px 16px 6px;padding:8px 15px;font-size:14px;font-weight:600;box-shadow:0 2px 0 rgba(122,88,52,.18),0 5px 14px rgba(70,50,20,.08);text-align:center;transition:opacity .4s, transform .4s}
 #hint.swap{opacity:0;transform:translateY(-4px)}
 [hidden]{display:none!important}
 #farmTools{position:relative;z-index:20;display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:6px;margin:6px 10px 1px}
-.toolchip,.fieldSwitch{background:#fffaf0;border-radius:14px;box-shadow:0 2px 0 rgba(74,58,42,.18)}
-.toolchip,.fieldSwitch button{min-height:36px;padding:6px 10px;font-size:13px;font-weight:800}
+.toolchip,.fieldSwitch{background:var(--paper);border:1.5px solid var(--edge);border-radius:14px;box-shadow:0 2px 0 rgba(122,88,52,.24)}
+.toolchip,.fieldSwitch button{min-height:38px;padding:6px 11px;font-size:13px;font-weight:800}
 #growthBtn{display:flex;align-items:center;gap:7px}
 #growthBtn small{color:#536242;font-size:11px}
-#growthBtn.can-upgrade{box-shadow:0 2px 0 #739447,0 0 0 2px #d6ed9b}
+#growthBtn.can-upgrade{border-color:#8fb35a;box-shadow:0 2px 0 #739447,0 0 0 3px #e2f0b4}
 #profileBtn{display:flex;align-items:center;gap:6px;min-width:0;max-width:calc(100% - 6px)}
 #playerName{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #saveState{flex:none;font-size:10px;color:#536242}
 #profileBtn.save-alert{background:#fff0db;outline:2px solid #df9a59}
 #profileBtn.save-alert #saveState{color:#79370f}
-.toolchip[aria-pressed="true"],.fieldSwitch button[aria-pressed="true"]{background:#dceab9;color:#365129}
+.toolchip[aria-pressed="true"],.fieldSwitch button[aria-pressed="true"]{background:#dfeab8;color:#34501f;box-shadow:inset 0 0 0 1.5px #9dbb6a}
 .fieldSwitch{display:flex;gap:2px;padding:2px}
 .fieldSwitch button{min-height:32px;border-radius:12px}
-#fieldLabel{display:block;margin:4px 10px 0;min-height:18px;color:#334623;font-size:12px;font-weight:700;text-align:center;position:relative;z-index:20}
+#fieldLabel{display:block;margin:4px 10px 0;min-height:18px;color:#2f4220;font-size:12px;font-weight:700;text-align:center;position:relative;z-index:20;text-shadow:0 1px 0 rgba(255,250,235,.8),0 0 6px rgba(255,248,230,.9)}
 
 /* ---------- 농장 ---------- */
 #stage{position:relative;z-index:10;flex:1;display:flex;align-items:safe center;justify-content:center;min-height:0;min-width:0;overflow:auto;overscroll-behavior:contain;padding:9px 12px}
+@media (max-width:649px) and (orientation:portrait){
+  #stage{padding-top:clamp(62px,12vh,106px)}
+}
+@media (max-width:649px) and (orientation:portrait) and (max-height:699px){
+  #stage{padding-top:clamp(32px,6vh,44px)}
+}
 #farm{position:relative;width:calc(var(--cell)*3 + var(--gap)*2)}
 .decor-row{position:relative;display:grid;grid-template-columns:repeat(5,1fr);height:calc(var(--cell)*.62)}
 .decor-row.bottom{margin-top:calc(var(--gap)*1.2)}
@@ -84,57 +109,92 @@ body.placing .slot.empty .ring{opacity:1;transform:scale(1);animation:pulse 1.2s
 @keyframes pulse{50%{transform:scale(1.08);background:rgba(255,255,255,.45)}}
 .slot.pop svg{animation:popin .45s cubic-bezier(.3,1.6,.5,1)}
 @keyframes popin{from{transform:scale(.3) translateY(10%);opacity:0}}
+.shd{opacity:var(--shd);transition:opacity 1.2s}
+.glow{transition:opacity 1.2s} body.w-cloudy .glow{opacity:.6} body.w-rain .glow{opacity:.85}
 #grid{position:relative;display:grid;grid-template-columns:repeat(3,var(--cell));gap:var(--gap)}
-#grid::before{content:"";position:absolute;inset:calc(var(--gap)*-.9);border-radius:calc(var(--cell)*.2);background:rgba(70,130,40,.22);box-shadow:inset 0 0 0 3px rgba(255,255,255,.12)}
+/* 밭 둘레: 짧게 깎은 풀밭 + 흙길 테두리 */
+#grid::before{content:"";position:absolute;inset:calc(var(--gap)*-.95);border-radius:calc(var(--cell)*.22);
+  background:radial-gradient(ellipse at 60% 30%,rgba(222,240,170,.35),transparent 70%),rgba(92,132,52,.24);
+  box-shadow:0 0 0 calc(var(--cell)*.035) rgba(230,205,150,.55),0 0 0 calc(var(--cell)*.05) rgba(150,112,64,.25),0 calc(var(--cell)*.06) calc(var(--cell)*.12) rgba(40,60,20,.18)}
 .plot{position:relative;width:var(--cell);height:var(--cell);cursor:pointer;outline:none}
-.soil{position:absolute;left:5%;right:5%;top:20%;bottom:9%;border-radius:18%;
-  background:repeating-linear-gradient(180deg,rgba(0,0,0,0) 0 14%,rgba(60,30,10,.13) 14% 18%),radial-gradient(ellipse at 50% 35%,#b98a5e,#a0714a 70%);
-  box-shadow:0 calc(var(--cell)*.07) 0 #7a5233,0 calc(var(--cell)*.09) 6px rgba(40,60,20,.35),inset 0 2px 0 rgba(255,255,255,.18);
-  transition:background 1s, filter 1s, transform .15s}
-.plot.wet .soil{background:repeating-linear-gradient(180deg,rgba(0,0,0,0) 0 14%,rgba(20,10,0,.18) 14% 18%),radial-gradient(ellipse at 45% 30%,#7d5233,#5e3b22 70%);box-shadow:0 calc(var(--cell)*.07) 0 #4b2f1a,0 calc(var(--cell)*.09) 6px rgba(40,60,20,.35),inset 0 2px 0 rgba(255,255,255,.12),inset 6px 6px 0 -2px rgba(255,255,255,.09)}
-.plot.wet .soil::after{content:"";position:absolute;left:18%;top:22%;width:22%;height:10%;border-radius:50%;background:rgba(255,255,255,.18);filter:blur(1px)}
-.plot.dry .soil::before{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(120deg,transparent 46%,rgba(80,45,20,.22) 47% 48%,transparent 49%),linear-gradient(40deg,transparent 60%,rgba(80,45,20,.18) 61% 62%,transparent 63%);}
+/* 나무 틀을 두른 돋운 밭: 마른 흙(기본) */
+.soil{position:absolute;left:5%;right:5%;top:20%;bottom:9%;border-radius:15%;
+  background:
+    radial-gradient(circle at 22% 70%,rgba(255,240,210,.28) 0 2.2%,transparent 2.8%),radial-gradient(circle at 74% 34%,rgba(255,240,210,.24) 0 1.8%,transparent 2.4%),radial-gradient(circle at 60% 82%,rgba(80,48,22,.25) 0 1.8%,transparent 2.4%),
+    repeating-linear-gradient(180deg,rgba(255,230,190,.16) 0 3%,rgba(0,0,0,0) 3% 13%,rgba(86,52,24,.2) 13% 17%),
+    radial-gradient(ellipse at 62% 28%,#cfa274,#b38358 55%,#9c6e46);
+  box-shadow:0 0 0 calc(var(--cell)*.034) #c99a64,0 0 0 calc(var(--cell)*.044) #8a5d36,0 calc(var(--cell)*.075) 0 #8a5d36,0 calc(var(--cell)*.1) calc(var(--cell)*.06) rgba(40,50,20,.32),inset 0 calc(var(--cell)*.02) 0 rgba(255,236,200,.28),inset 0 calc(var(--cell)*-.03) calc(var(--cell)*.04) rgba(70,40,15,.25);
+  transition:filter 1s, transform .15s}
+/* 젖은 흙: 위에 겹친 층이 천천히 번져요 */
+.soil::after{content:"";position:absolute;inset:0;border-radius:inherit;opacity:0;transition:opacity .9s ease .2s;
+  background:
+    radial-gradient(11% 3.2% at 30% 30%,rgba(225,242,255,.6),transparent),radial-gradient(7% 2.4% at 70% 62%,rgba(225,242,255,.5),transparent),radial-gradient(5% 2% at 46% 82%,rgba(225,242,255,.45),transparent),radial-gradient(4% 1.6% at 78% 28%,rgba(225,242,255,.5),transparent),
+    repeating-linear-gradient(180deg,rgba(255,240,220,.08) 0 3%,rgba(0,0,0,0) 3% 13%,rgba(20,8,0,.26) 13% 17%),
+    radial-gradient(ellipse at 60% 28%,#7e5634,#5e3b22 60%,#4a2c17);
+  box-shadow:inset 0 0 0 calc(var(--cell)*.012) rgba(40,22,8,.35)}
+.plot.wet .soil::after{opacity:1}
+.plot.wet .soil{box-shadow:0 0 0 calc(var(--cell)*.034) #a77a4c,0 0 0 calc(var(--cell)*.044) #6e4528,0 calc(var(--cell)*.075) 0 #6e4528,0 calc(var(--cell)*.1) calc(var(--cell)*.06) rgba(40,50,20,.32),inset 0 calc(var(--cell)*.02) 0 rgba(255,236,200,.2)}
+body.w-rain:not(.in-greenhouse) .plot.wet .soil::after{filter:brightness(1.06) contrast(1.05)}
+/* 물이 필요한 밭: 갈라진 흙 */
+.plot.dry .soil::before{content:"";position:absolute;inset:0;border-radius:inherit;z-index:1;background:linear-gradient(120deg,transparent 46%,rgba(90,52,24,.32) 47% 48%,transparent 49%),linear-gradient(40deg,transparent 60%,rgba(90,52,24,.26) 61% 62%,transparent 63%),linear-gradient(160deg,transparent 72%,rgba(90,52,24,.22) 73% 74%,transparent 75%);}
+.plot.dry .soil{filter:saturate(.85) brightness(1.05)}
 .plot:active .soil{transform:scale(.96)}
-.plot .crop{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;pointer-events:none}
-.crop .sway{transform-box:view-box;transform-origin:50px 140px;animation:sway 4.5s ease-in-out infinite}
-@keyframes sway{0%,100%{transform:rotate(-1.6deg)}50%{transform:rotate(1.6deg)}}
-body.w-rain .crop .sway{animation-duration:2.6s}
+.plot .soak{position:absolute;left:5%;right:5%;top:20%;bottom:9%;border-radius:15%;pointer-events:none;opacity:0;background:radial-gradient(circle at 50% 50%,rgba(38,20,6,.6) 0 40%,rgba(38,20,6,.25) 58%,transparent 72%)}
+.plot.soaking .soak{animation:soak 1.15s ease-out .18s both}
+@keyframes soak{0%{opacity:0;transform:scale(.25)}30%{opacity:.95}100%{opacity:0;transform:scale(1.2)}}
+.plot .crop{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;pointer-events:none;z-index:2}
+.crop .sway{transform-box:view-box;transform-origin:50px 140px;animation:sway 5s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(-1.2deg)}50%{transform:rotate(1.2deg)}}
+body.w-rain .crop .sway{animation-duration:3s}
 .plot.grew .crop{animation:grow .7s cubic-bezier(.3,1.5,.5,1)}
 @keyframes grow{from{transform:scale(.82) translateY(4%)}}
-.plot .ripe{position:absolute;right:7%;top:7%;width:19%;pointer-events:none;animation:bob 1.6s ease-in-out infinite;filter:drop-shadow(0 1px 1px rgba(0,0,0,.2))}
-@keyframes bob{50%{transform:translateY(-3px) scale(1.08)}}
-.plot.focus .soil,.plot:focus-visible .soil,.slot:focus-visible .ring{box-shadow:0 0 0 3px #fff,0 calc(var(--cell)*.07) 0 #7a5233}
+/* 수확할 수 있는 밭: 따뜻한 빛 + 반짝임 */
+.plot.is-ripe::before{content:"";position:absolute;left:2%;right:2%;top:8%;bottom:4%;z-index:1;border-radius:50%;pointer-events:none;background:radial-gradient(ellipse at 50% 58%,rgba(255,238,160,.62),rgba(255,226,130,.25) 45%,transparent 70%);animation:ripeglow 2.4s ease-in-out infinite}
+@keyframes ripeglow{50%{opacity:.6}}
+.plot .ripe{position:absolute;right:5%;top:5%;width:21%;z-index:3;pointer-events:none;animation:bob 1.6s ease-in-out infinite;filter:drop-shadow(0 1px 1px rgba(90,60,10,.35))}
+@keyframes bob{50%{transform:translateY(-3px) scale(1.08) rotate(8deg)}}
+/* 물이 필요해요: 빈 물방울 표시 */
+.plot.thirsty::after{content:"";position:absolute;right:7%;top:9%;width:14%;aspect-ratio:3/4;z-index:3;pointer-events:none;opacity:.95;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 24'%3E%3Cpath d='M9 1.5 C13 8 16 11.5 16 15.5 A7 7 0 0 1 2 15.5 C2 11.5 5 8 9 1.5Z' fill='%23fffaf0' fill-opacity='.92' stroke='%234f8cc2' stroke-width='1.8' stroke-dasharray='3 2.2' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;animation:thirst 2.2s ease-in-out infinite}
+@keyframes thirst{50%{transform:translateY(-2px)}}
+.plot .pips{position:absolute;left:0;right:0;bottom:2.4%;z-index:3;display:flex;justify-content:center;gap:calc(var(--cell)*.022);pointer-events:none}
+.plot .pips i{width:calc(var(--cell)*.058);height:calc(var(--cell)*.058);min-width:5px;min-height:5px;border-radius:50%;background:rgba(70,40,18,.4);box-shadow:inset 0 0 0 1px rgba(255,236,200,.25)}
+.plot .pips i.on{background:#f3dc8c;box-shadow:inset 0 0 0 1px rgba(150,100,30,.5),0 0 3px rgba(255,236,160,.8)}
+.plot.focus .soil,.plot:focus-visible .soil,.slot:focus-visible .ring{box-shadow:0 0 0 calc(var(--cell)*.034) #c99a64,0 0 0 calc(var(--cell)*.044 + 3px) #fff,0 calc(var(--cell)*.075) 0 #8a5d36}
 .slot:focus-visible .ring{opacity:1}
-.plot-note{position:absolute;top:5%;left:5%;display:flex;gap:3px;pointer-events:none}
-.plot-note span{background:#fffaf0;border-radius:10px;padding:2px 5px;font-size:clamp(10px,2.8vw,13px);box-shadow:0 1px 3px #46362050}
-.plot.problem .soil{outline:2px dashed #fff3b1;outline-offset:1px}
-.plot.care-target .soil{outline:2px dashed #f9ffe2;outline-offset:1px}
-.plot .irrigation{position:absolute;bottom:9%;left:9%;width:32%;height:16%;opacity:.78;pointer-events:none}
-.plot .harvest-ghost{z-index:2}
+.plot-note{position:absolute;top:5%;left:5%;display:flex;gap:3px;pointer-events:none;z-index:4}
+.plot-note span{background:var(--paper);border:1px solid var(--edge);border-radius:10px;padding:2px 6px;font-size:clamp(10px,2.8vw,13px);font-weight:700;white-space:nowrap;box-shadow:0 1px 3px #46362040}
+.plot.problem .soil{outline:2px dashed #fff3b1;outline-offset:calc(var(--cell)*.05)}
+.plot.care-target .soil{outline:2px dashed #f9ffe2;outline-offset:calc(var(--cell)*.05)}
+.plot .irrigation{position:absolute;bottom:9%;left:9%;width:32%;height:16%;opacity:.85;pointer-events:none;z-index:3}
+.plot .harvest-ghost{z-index:5}
+.plot.harvested .soil{animation:thump .35s ease-out}
+@keyframes thump{40%{transform:scale(1.04,.95)}}
 #houseFrame{position:absolute;inset:0;pointer-events:none}
 #houseFrame .glass{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 body.in-greenhouse #farm{padding:calc(var(--cell)*.4) 0 calc(var(--cell)*.19)}
-body.in-greenhouse #grid::before{background:#5b89625c}
-body.in-greenhouse #ground{background:linear-gradient(#9dc197,#c2d8a4 60%,#8fb184)}
+body.in-greenhouse #grid::before{background:rgba(80,120,90,.3)}
+body.in-greenhouse #ground{background:linear-gradient(#a9c99d,#c6dcab 60%,#93b585)}
 body.in-greenhouse #rain,body.in-greenhouse .butterfly{opacity:0}
 
 /* ---------- 하단 ---------- */
 #bar{position:relative;z-index:20;display:flex;gap:10px;padding:8px 12px calc(env(safe-area-inset-bottom) + 12px);justify-content:center}
-.btn{background:var(--paper);border-radius:18px;padding:11px 16px;font-weight:800;font-size:15px;box-shadow:0 4px 0 #d9c7a5,0 6px 16px rgba(0,0,0,.1);display:flex;align-items:center;gap:7px;position:relative;transition:transform .1s, box-shadow .1s}
-.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #d9c7a5}
-.btn svg{width:24px;height:24px}
-.btn.primary{background:linear-gradient(#ffb866,#f28c3a);color:#fff;box-shadow:0 4px 0 #c96a20,0 6px 16px rgba(0,0,0,.12);text-shadow:0 1px 0 rgba(0,0,0,.15)}
-.btn.primary:active{box-shadow:0 1px 0 #c96a20}
-.badge{position:absolute;top:-6px;right:-6px;min-width:22px;height:22px;border-radius:11px;background:#e5533d;color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 6px;box-shadow:0 2px 0 rgba(0,0,0,.15)}
+.btn{background:linear-gradient(#fffaf0,#f7ead0);border:1.5px solid rgba(122,88,52,.4);border-radius:18px;min-height:48px;padding:10px 16px;font-weight:800;font-size:15px;box-shadow:0 4px 0 #b88f5f,0 7px 16px rgba(60,40,15,.16);display:flex;align-items:center;gap:7px;position:relative;transition:transform .1s, box-shadow .1s}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #b88f5f}
+.btn svg{width:26px;height:26px;flex:none}
+.btn.primary{background:linear-gradient(#f5b56c,#e2803f);border-color:#a85a24;color:#fff;box-shadow:0 4px 0 #a85a24,0 7px 16px rgba(60,40,15,.18);text-shadow:0 1px 0 rgba(110,50,10,.35)}
+.btn.primary:active{box-shadow:0 1px 0 #a85a24}
+.btn.primary svg{width:20px;height:20px}
+.badge{position:absolute;top:-7px;right:-7px;min-width:23px;height:23px;border-radius:12px;background:#d9533a;border:2px solid #fff8ea;color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 6px;box-shadow:0 2px 0 rgba(90,40,10,.25)}
 .badge:empty{display:none}
 .bounce{animation:bounce .4s}
 @keyframes bounce{40%{transform:scale(1.15)}}
-#placeBar{position:relative;z-index:20;display:none;margin:5px auto 0;background:#fffaf0;border-radius:16px;padding:7px 9px 7px 12px;font-weight:700;font-size:12px;gap:8px;align-items:center;box-shadow:0 3px 12px rgba(0,0,0,.12);width:max-content;max-width:calc(100% - 16px)}
+#placeBar{position:relative;z-index:20;display:none;margin:5px auto 0;background:var(--paper);border:1.5px solid var(--edge);border-radius:16px;padding:7px 9px 7px 12px;font-weight:700;font-size:12px;gap:8px;align-items:center;box-shadow:0 3px 12px rgba(0,0,0,.12);width:max-content;max-width:calc(100% - 16px)}
 body.placing #placeBar{display:flex}
-#placeBar button{background:#efe3cc;border-radius:10px;padding:6px 10px;font-weight:700}
+#placeBar button{background:#efe1c3;border-radius:10px;padding:6px 10px;min-height:34px;font-weight:700}
 
 /* ---------- 팝오버/시트 ---------- */
-#popover{position:fixed;z-index:60;background:var(--paper);border-radius:18px;padding:10px;box-shadow:0 10px 30px rgba(0,0,0,.22);display:none;max-width:min(92vw,360px)}
+#popover{position:fixed;z-index:60;background:var(--paper);border:1.5px solid var(--edge);border-radius:18px;padding:10px;box-shadow:0 3px 0 rgba(122,88,52,.25),0 12px 30px rgba(50,35,15,.25);display:none;max-width:min(92vw,360px)}
 #popover.show{display:block;animation:pop .2s ease-out}
 @keyframes pop{from{opacity:0;transform:scale(.92)}}
 #popover h4{margin:2px 6px 8px;font-size:14px}
@@ -143,43 +203,43 @@ body.placing #placeBar{display:flex}
 #popover .care-actions{display:grid;gap:6px}
 #popover .care-actions button{text-align:left;white-space:normal;min-height:36px}
 .seedgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:min(calc(92vw - 20px),330px)}
-.seedbtn{background:#fff;border-radius:14px;padding:8px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:0 2px 0 #e6d8bd;font-weight:700;font-size:13px}
+.seedbtn{background:#fffdf7;border:1.5px solid rgba(122,88,52,.2);border-radius:14px;padding:8px 6px;min-height:76px;display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:0 2px 0 #dcc79f;font-weight:700;font-size:13px}
 .seedbtn svg{width:36px;height:36px}
 .seedbtn small{font-weight:600;font-size:11px;opacity:.65}
 .seedbtn:active{transform:translateY(2px);box-shadow:none}
 .poprow{display:flex;gap:8px}
-.poprow button{flex:1;background:#fff;border-radius:12px;padding:10px 12px;font-weight:700;box-shadow:0 2px 0 #e6d8bd}
-#scrim{position:fixed;inset:0;z-index:50;background:rgba(40,30,20,.28);opacity:0;pointer-events:none;transition:opacity .25s}
+.poprow button{flex:1;background:#fffdf7;border:1.5px solid rgba(122,88,52,.2);border-radius:12px;padding:10px 12px;min-height:42px;font-weight:700;box-shadow:0 2px 0 #dcc79f}
+#scrim{position:fixed;inset:0;z-index:50;background:rgba(48,34,18,.32);opacity:0;pointer-events:none;transition:opacity .25s}
 #scrim.show{opacity:1;pointer-events:auto}
 #scrim.clear{background:transparent}
-.sheet{position:fixed;left:50%;bottom:0;z-index:55;width:min(100%,520px);max-height:78vh;background:var(--paper);border-radius:24px 24px 0 0;transform:translate(-50%,105%);transition:transform .32s cubic-bezier(.2,.9,.3,1);display:flex;flex-direction:column;box-shadow:0 -8px 30px rgba(0,0,0,.18);padding-bottom:env(safe-area-inset-bottom)}
+.sheet{position:fixed;left:50%;bottom:0;z-index:55;width:min(100%,520px);max-height:78vh;background:var(--paper);border:1.5px solid var(--edge);border-bottom:0;border-radius:24px 24px 0 0;transform:translate(-50%,105%);transition:transform .32s cubic-bezier(.2,.9,.3,1);display:flex;flex-direction:column;box-shadow:0 -8px 30px rgba(0,0,0,.18);padding-bottom:env(safe-area-inset-bottom)}
 .sheet.show{transform:translate(-50%,0)}
 .sheet[data-kind="profiles"]{
   top:50%;bottom:auto;width:min(calc(100% - 24px),520px);
   max-height:calc(100vh - 32px);
   max-height:calc(100dvh - 32px - 2 * max(env(safe-area-inset-top),env(safe-area-inset-bottom)));
-  border-radius:24px;padding-bottom:0;box-shadow:0 12px 36px rgba(0,0,0,.22);
+  border-radius:24px;border-bottom:1.5px solid var(--edge);padding-bottom:0;box-shadow:0 4px 0 rgba(122,88,52,.25),0 14px 36px rgba(50,35,15,.26);
   transform:translate(-50%,calc(-50% + 12px));opacity:0;visibility:hidden;
   transition:transform .22s ease,opacity .22s ease,visibility .22s;
 }
 .sheet[data-kind="profiles"].show{transform:translate(-50%,-50%);opacity:1;visibility:visible}
 .sheet[data-kind="profiles"] :is(header,.tabs){flex-shrink:0}
 .sheet[data-kind="profiles"] .body{min-height:0;overscroll-behavior:contain}
-.sheet header{display:flex;align-items:center;padding:16px 18px 8px;gap:8px}
+.sheet header{display:flex;align-items:center;padding:16px 18px 10px;gap:8px;border-bottom:1.5px dashed rgba(122,88,52,.22);margin:0 6px 8px}
 .sheet header h3{margin:0;font-size:18px;flex:1}
-.sheet .close{width:36px;height:36px;border-radius:50%;background:#efe3cc;font-size:18px;font-weight:800}
+.sheet .close{width:40px;height:40px;border-radius:50%;background:#f0e1c3;border:1.5px solid rgba(122,88,52,.25);font-size:19px;font-weight:800}
 .sheet .body{overflow:auto;padding:4px 16px 18px}
 .tabs{display:flex;gap:6px;padding:0 16px 8px}
-.tabs button{flex:1;padding:9px;border-radius:12px;background:#efe3cc;font-weight:700;font-size:14px}
-.tabs button.on{background:#7cb342;color:#fff}
-.row{display:flex;align-items:center;gap:12px;background:#fff;border-radius:16px;padding:10px 12px;margin:8px 0;box-shadow:0 2px 0 #eadfc8}
+.tabs button{flex:1;padding:9px;min-height:40px;border-radius:12px;background:#f0e1c3;font-weight:700;font-size:14px}
+.tabs button.on{background:var(--sage);color:#fff;box-shadow:inset 0 -3px 0 var(--sage-dk)}
+.row{display:flex;align-items:center;gap:12px;background:#fffdf7;border:1px solid rgba(122,88,52,.16);border-radius:16px;padding:10px 12px;margin:8px 0;box-shadow:0 2px 0 #e3d2ae}
 .row svg.ic{width:44px;height:44px;flex:none}
 .row .info{flex:1;min-width:0}
 .row .info b{display:block;font-size:15px}
 .row .info span{font-size:12.5px;opacity:.7}
 .row .acts{display:flex;gap:6px;flex:none}
-.small{background:#7cb342;color:#fff;border-radius:12px;padding:8px 11px;font-weight:800;font-size:13px;box-shadow:0 2px 0 #5a8a2c;white-space:nowrap}
-.small.alt{background:#efe3cc;color:var(--ink);box-shadow:0 2px 0 #d9c7a5}
+.small{background:var(--sage);color:#fff;border-radius:12px;padding:8px 12px;min-height:36px;font-weight:800;font-size:13px;box-shadow:0 2px 0 var(--sage-dk);white-space:nowrap}
+.small.alt{background:#f0e1c3;color:var(--ink);box-shadow:0 2px 0 #c9ab7c}
 .small:disabled{opacity:.4;box-shadow:none}
 .small:active:not(:disabled){transform:translateY(2px);box-shadow:none}
 .empty-note{text-align:center;opacity:.65;padding:24px 8px;font-size:14px;line-height:1.6}
@@ -187,10 +247,10 @@ body.placing #placeBar{display:flex}
 .sellall{width:100%;margin-top:10px;padding:13px;font-size:15px;border-radius:14px}
 .toggle{width:52px;height:30px;border-radius:15px;background:#d8ccb4;position:relative;transition:.2s;flex:none}
 .toggle::after{content:"";position:absolute;left:3px;top:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:.2s}
-.toggle.on{background:#7cb342}.toggle.on::after{left:25px}
+.toggle.on{background:var(--sage)}.toggle.on::after{left:25px}
 .growth-list{display:grid;gap:7px;margin:10px 0}
-.growth-step{display:grid;grid-template-columns:30px minmax(0,1fr);align-items:center;gap:8px;padding:9px 10px;background:#f2ead9;border-radius:13px}
-.growth-step.current{background:#e5edce;outline:1px solid #acc479}
+.growth-step{display:grid;grid-template-columns:30px minmax(0,1fr);align-items:center;gap:8px;padding:9px 10px;background:#f4e9d2;border-radius:13px}
+.growth-step.current{background:#e5edce;outline:1.5px solid #a8c272}
 .growth-step .step-icon{font-size:19px;text-align:center}
 .growth-step b,.growth-step small{display:block}
 .growth-step b{font-size:14px}
@@ -198,7 +258,7 @@ body.placing #placeBar{display:flex}
 .growth-actions{margin:12px 0}
 .growth-actions .small{min-height:38px;width:100%;white-space:normal}
 .growth-actions p{font-size:12px;margin:7px 4px;color:#574d3c;text-align:center}
-.farm-profile-current,.farm-profile-form{display:grid;gap:8px;border-radius:14px;padding:12px;background:#f2ead9;margin:8px 0}
+.farm-profile-current,.farm-profile-form{display:grid;gap:8px;border-radius:14px;padding:12px;background:#f4e9d2;border:1px solid rgba(122,88,52,.14);margin:8px 0}
 .farm-profile-current b{overflow-wrap:anywhere}
 .farm-profile-current small,.farm-profile-note{font-size:13px;line-height:1.5}
 #cloudSignInForm label{display:flex;gap:8px;align-items:center}
@@ -218,19 +278,22 @@ body.placing #placeBar{display:flex}
 
 /* ---------- 효과 ---------- */
 #fx{position:fixed;inset:0;z-index:40;pointer-events:none}
-.drop{position:absolute;width:6px;height:9px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:#8fd0ff;box-shadow:inset -1px -1px 0 rgba(0,90,160,.25)}
+.drop{position:absolute;width:6px;height:9px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:#a6dcff;box-shadow:inset -1px -1px 0 rgba(0,90,160,.3),0 0 0 .6px rgba(60,120,170,.45)}
+.ripple{position:absolute;width:10px;height:4px;margin:-2px 0 0 -5px;border-radius:50%;border:1.5px solid rgba(225,242,255,.9);pointer-events:none}
+.burst{position:absolute;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;border:3px solid rgba(255,236,150,.95);box-shadow:0 0 12px rgba(255,226,120,.8);pointer-events:none}
+.spark{position:absolute;width:12px;height:12px;margin:-6px 0 0 -6px;background:#fff1a6;clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);pointer-events:none}
 .leafbit{position:absolute;width:12px;height:7px;border-radius:50%;background:#7ccf4f}
-.crumb{position:absolute;width:6px;height:6px;border-radius:50%;background:#7a5233}
+.crumb{position:absolute;width:6px;height:6px;border-radius:50%;background:#7a5233;box-shadow:inset 1px 1px 0 rgba(255,230,190,.3)}
 .floattext{position:absolute;transform:translate(-50%,-50%);font-weight:800;font-size:14px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35),0 0 6px rgba(0,0,0,.15);white-space:nowrap;animation:floatup 1.4s ease-out forwards}
 @keyframes floatup{0%{opacity:0;transform:translate(-50%,-30%)}15%{opacity:1}100%{opacity:0;transform:translate(-50%,-180%)}}
 .flyer{position:absolute;width:40px;height:40px;margin:-20px 0 0 -20px}
 .can{position:absolute;width:64px;height:52px;margin:-26px 0 0 -32px}
-#dayveil{position:fixed;inset:0;z-index:80;pointer-events:none;opacity:0;background:linear-gradient(#2b3a67,#6b5b95 60%,#e8a87c);display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff;transition:opacity .55s}
+#dayveil{position:fixed;inset:0;z-index:80;pointer-events:none;opacity:0;background:linear-gradient(#26305e,#5b5590 55%,#e7a27c 92%,#f6c98f);display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff;transition:opacity .55s}
 #dayveil.show{opacity:1;pointer-events:auto}
 #dayveil .big{font-size:28px;font-weight:800;text-shadow:0 2px 8px rgba(0,0,0,.25)}
 #dayveil .sub{margin-top:8px;font-size:16px;opacity:.9}
 #dayveil .stars{position:absolute;inset:0;background-image:radial-gradient(2px 2px at 20% 20%,#fff,transparent),radial-gradient(1.5px 1.5px at 70% 15%,#fff,transparent),radial-gradient(2px 2px at 40% 35%,#fff,transparent),radial-gradient(1.5px 1.5px at 85% 40%,#fff,transparent),radial-gradient(1.5px 1.5px at 10% 45%,#fff,transparent);opacity:.8}
-#toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 12px);transform:translate(-50%,-10px);z-index:70;background:rgba(74,58,42,.92);color:#fff;padding:9px 16px;border-radius:14px;font-size:14px;font-weight:600;opacity:0;transition:.3s;pointer-events:none;max-width:90vw;text-align:center}
+#toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 12px);transform:translate(-50%,-10px);z-index:70;background:rgba(78,58,38,.94);border:1.5px solid rgba(255,236,200,.25);color:#fff;padding:9px 16px;border-radius:14px;font-size:14px;font-weight:600;opacity:0;transition:.3s;pointer-events:none;max-width:90vw;text-align:center}
 #toast.show{opacity:1;transform:translate(-50%,0)}
 @media (max-width:360px){
   #bar{gap:7px;padding-inline:8px}
@@ -242,23 +305,28 @@ body.placing #placeBar{display:flex}
 @media (orientation:landscape) and (max-height:540px){
   #app{display:grid;grid-template-columns:minmax(174px,29vw) minmax(0,1fr);grid-template-rows:auto auto auto auto 1fr auto}
   #hud,#farmTools,#fieldLabel,#hint,#bar{grid-column:1;min-width:0}
-  #hud{grid-row:1;gap:5px;flex-wrap:wrap;padding-inline:8px}
-  #hud .pill{padding-inline:7px;font-size:13px}
+  #hud{grid-row:1;gap:4px;flex-wrap:wrap;padding-inline:8px}
+  #hud .pill{padding:3px 6px;border-width:1px;font-size:13px}
+  #dayPill .wx{width:16px;height:16px}
   #hud .iconbtn{width:34px;height:34px}
   #hud #dayPill small{font-size:11px}
   #hud .spacer{display:none}
-  #farmTools{grid-row:2}
+  #farmTools{grid-row:2;gap:4px}
+  .toolchip,.fieldSwitch{border-width:1px}
+  .toolchip{padding-inline:8px}
+  .toolchip,.fieldSwitch button{min-height:34px;padding-block:4px}
+  .fieldSwitch button{min-height:30px}
   #fieldLabel{grid-row:3}
   #hint{grid-row:4;margin-inline:8px;font-size:13px;padding:7px 8px}
-  #stage{grid-column:2;grid-row:1/-1;padding-bottom:calc(env(safe-area-inset-bottom) + 9px)}
+  #stage{grid-column:2;grid-row:1/-1;max-height:100vh;max-height:100dvh;padding-bottom:calc(env(safe-area-inset-bottom) + 9px)}
   #bar{grid-row:6;display:grid;grid-template-columns:1fr 1fr;gap:7px;padding-inline:8px}
-  #bar .btn{padding:8px 5px;justify-content:center;white-space:nowrap;font-size:13px;gap:4px}
+  #bar .btn{padding:8px 5px;min-height:36px;justify-content:center;white-space:nowrap;font-size:13px;gap:4px}
   #bar .btn svg{width:18px;height:18px}
   #nextBtn{grid-column:1/-1}
   #placeBar{grid-column:1;grid-row:5;align-self:start}
   #toast{left:64.5%}
 }
-@media (prefers-reduced-motion:reduce){.crop .sway,#sun .rays,.butterfly .wing,.plot .ripe{animation:none}}
+@media (prefers-reduced-motion:reduce){.crop .sway,#sun .rays,.butterfly .wing,.plot .ripe,.plot.is-ripe::before,.plot.thirsty::after,#scene .smoke circle{animation:none}body.dawn #morning,body.dawn #sun{animation:none}}
 </style>
 </head>
 <body class="w-sunny">
@@ -266,36 +334,14 @@ body.placing #placeBar{display:flex}
   <div id="sky">
     <div id="sun"><div class="rays"></div><div class="core"></div></div>
   </div>
-  <svg id="hills" viewBox="0 0 1200 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
-    <path d="M0 170 C150 90 300 120 420 150 C560 70 760 90 880 140 C1000 100 1120 110 1200 130 V300 H0Z" fill="#b5dd96"/>
-    <path d="M0 215 C180 160 360 175 520 205 C700 150 900 165 1200 195 V300 H0Z" fill="#9bd17a"/>
-    <g fill="#6fb24f">
-      <circle cx="660" cy="182" r="26"/><circle cx="690" cy="170" r="32"/><circle cx="724" cy="184" r="24"/>
-      <circle cx="960" cy="168" r="22"/><circle cx="988" cy="160" r="28"/><circle cx="1018" cy="172" r="20"/>
-      <circle cx="80" cy="190" r="20"/><circle cx="104" cy="180" r="26"/>
-    </g>
-    <g fill="#5d9e42"><rect x="686" y="196" width="8" height="18"/><rect x="984" y="184" width="8" height="18"/><rect x="100" y="200" width="7" height="16"/></g>
-    <!-- 작은 집 -->
-    <g transform="translate(250 150)">
-      <rect x="0" y="30" width="70" height="46" fill="#fff3dc"/>
-      <path d="M-8 34 L35 0 L78 34Z" fill="#e0735a"/>
-      <rect x="27" y="50" width="16" height="26" fill="#a86b44"/>
-      <rect x="8" y="42" width="13" height="12" fill="#9fd3ef" stroke="#fff" stroke-width="2"/>
-      <rect x="50" y="42" width="13" height="12" fill="#9fd3ef" stroke="#fff" stroke-width="2"/>
-      <rect x="52" y="8" width="8" height="16" fill="#b55b47"/>
-    </g>
-    <path d="M0 262 C300 248 900 248 1200 262 V300 H0Z" fill="#8fd263"/>
-    <!-- 울타리 -->
-    <g fill="#f2e2c4" stroke="#c9a978" stroke-width="2">
-      <rect x="0" y="252" width="1200" height="7" rx="3"/>
-      <rect x="0" y="270" width="1200" height="7" rx="3"/>
-    </g>
-    <g id="posts" fill="#f7ead0" stroke="#c9a978" stroke-width="2"></g>
-  </svg>
   <div id="ground"></div>
+  <svg id="scene" aria-hidden="true"></svg>
   <div id="tufts"></div>
   <div id="sunlight"></div>
   <canvas id="rain"></canvas>
+  <div id="weatherTint"></div>
+  <div id="morning"></div>
+  <div id="grain"></div>
 
   <div id="hud">
     <div class="pill" id="dayPill">1일째 <small>☀️ 맑음</small></div>
@@ -317,7 +363,7 @@ body.placing #placeBar{display:flex}
 
   <main id="stage">
     <div id="farm">
-      <div id="houseFrame" aria-hidden="true" hidden><svg class="glass" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M-2 17 Q50 -12 102 17 V98 H-2Z" fill="#d9ffec" fill-opacity=".34" stroke="#f1fff4" stroke-width="1.4"/><path d="M0 24 H100 M30 7 V97 M70 7 V97 M0 96 H100" fill="none" stroke="#fbfff8" stroke-opacity=".48" stroke-width=".8"/></svg></div>
+      <div id="houseFrame" aria-hidden="true" hidden><svg class="glass" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M-2 17 Q50 -12 102 17 V98 H-2Z" fill="#e2fbef" fill-opacity=".3" stroke="#8a6a48" stroke-width="1.6" vector-effect="non-scaling-stroke"/><path d="M-1 18.5 Q50 -9 101 18.5" fill="none" stroke="#fffdf4" stroke-opacity=".7" stroke-width="1" vector-effect="non-scaling-stroke"/><path d="M0 24 H100 M30 6 V97 M70 6 V97 M0 96 H100" fill="none" stroke="#9a7a56" stroke-opacity=".55" stroke-width="1.2" vector-effect="non-scaling-stroke"/><path d="M8 30 L20 58 M78 30 L88 48" stroke="#fff" stroke-opacity=".35" stroke-width="2" vector-effect="non-scaling-stroke"/></svg></div>
       <div class="decor-row top" id="decorTop"></div>
       <div id="grid"></div>
       <div class="decor-row bottom" id="decorBottom"></div>
@@ -325,9 +371,9 @@ body.placing #placeBar{display:flex}
   </main>
 
   <nav id="bar">
-    <button class="btn" id="basketBtn"><svg viewBox="0 0 40 40"><path d="M8 17 L32 17 L29 33 Q28 35 26 35 H14 Q12 35 11 33Z" fill="#d9a35f" stroke="#a8743a" stroke-width="2"/><path d="M13 17 Q20 5 27 17" fill="none" stroke="#a8743a" stroke-width="3"/><path d="M11 23 H29 M12 28 H28" stroke="#a8743a" stroke-width="1.6"/></svg>바구니<span class="badge" id="basketBadge"></span></button>
-    <button class="btn" id="shopBtn"><svg viewBox="0 0 40 40"><rect x="7" y="17" width="26" height="17" rx="2" fill="#fff3dc" stroke="#c9a978" stroke-width="2"/><path d="M5 17 L9 8 H31 L35 17Z" fill="#7cb342"/><path d="M9 8 L11 17 M16 8 L16 17 M24 8 L24 17 M31 8 L29 17" stroke="#fff" stroke-width="2.4"/><rect x="16" y="23" width="8" height="11" fill="#a86b44"/></svg>상점</button>
-    <button class="btn primary" id="nextBtn">다음 날 <span style="font-size:13px">▶</span></button>
+    <button class="btn" id="basketBtn"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M12 18 Q20 3 28 18" fill="none" stroke="#8a5d36" stroke-width="3.2" stroke-linecap="round"/><circle cx="15" cy="15" r="4.2" fill="url(#g-red)" stroke="#8f1d14" stroke-width="1"/><path d="M19 16 Q22 9 27 12 Q26 17 19 16Z" fill="url(#g-leaf)" stroke="#3d5c28" stroke-width="1"/><path d="M6 18 H34 L31 33 Q30.4 35.5 28 35.5 H12 Q9.6 35.5 9 33Z" fill="#dcaa68" stroke="#8a5d36" stroke-width="1.8" stroke-linejoin="round"/><path d="M8.5 23.5 H31.5 M10 29 H30 M15 18 L16 35 M20 18 V35 M25 18 L24 35" stroke="#a8743a" stroke-width="1.3" opacity=".8"/><path d="M6 18 H34" stroke="#8a5d36" stroke-width="2.6" stroke-linecap="round"/></svg>바구니<span class="badge" id="basketBadge"></span></button>
+    <button class="btn" id="shopBtn"><svg viewBox="0 0 40 40" aria-hidden="true"><rect x="7" y="17" width="26" height="18" rx="1.5" fill="#fff3dc" stroke="#8a5d36" stroke-width="1.8"/><path d="M4.5 18 L8.5 7.5 H31.5 L35.5 18Z" fill="#e8735a" stroke="#8a3f2c" stroke-width="1.6" stroke-linejoin="round"/><path d="M11 7.5 L10.5 18 M17.5 7.5 V18 M24 7.5 V18 M30 7.5 L30.5 18" stroke="#fff6e4" stroke-width="2.6"/><path d="M4.5 18 Q8 21.5 11.2 18 Q14.4 21.5 17.6 18 Q20.8 21.5 24 18 Q27.2 21.5 30.4 18 Q33 21.5 35.5 18" fill="none" stroke="#8a3f2c" stroke-width="1.4"/><rect x="16" y="24" width="8" height="11" fill="#a86b44" stroke="#6e4528" stroke-width="1.2"/><rect x="25.5" y="23" width="5" height="5" rx=".8" fill="#ffe7a3" stroke="#8a5d36" stroke-width="1"/></svg>상점</button>
+    <button class="btn primary" id="nextBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 3.5 A8.6 8.6 0 1 0 20.6 15.4 A7 7 0 0 1 15.5 3.5Z" fill="#fff6d8" stroke="#a85a24" stroke-width="1.2" stroke-linejoin="round"/><circle cx="19.5" cy="5.5" r="1.1" fill="#fff6d8"/></svg>다음 날</button>
   </nav>
 </div>
 
@@ -800,153 +846,200 @@ async function initFarms(){
    ========================================================= */
 const BX=50, BY=140; // 작물 뿌리 위치
 const r1 = n=>Math.round(n*10)/10;
+const OL='#3d5c28'; // 잎 윤곽선 (그림책 잉크 톤)
 function leafE(cx,cy,rx,ry,rot,fill,stroke,vein){
   return `<g transform="rotate(${r1(rot)} ${r1(cx)} ${r1(cy)})"><ellipse cx="${r1(cx)}" cy="${r1(cy)}" rx="${r1(rx)}" ry="${r1(ry)}" fill="${fill}" stroke="${stroke||'none'}" stroke-width="1.2"/>${vein?`<path d="M${r1(cx)} ${r1(cy+ry*.85)} L${r1(cx)} ${r1(cy-ry*.7)}" stroke="${vein}" stroke-width="1" fill="none" opacity=".7"/>`:''}</g>`;
 }
 function radial(a,d,squash=1){ const t=a*Math.PI/180; return [BX+Math.sin(t)*d, BY-Math.cos(t)*d*squash]; }
-function mound(){ return `<ellipse cx="50" cy="141" rx="15" ry="5" fill="#6e4528" opacity=".55"/><ellipse cx="50" cy="139" rx="11" ry="4" fill="#8a5a35"/><circle cx="45" cy="138" r="1.6" fill="#f3e2b3"/><circle cx="51" cy="137.4" r="1.6" fill="#f3e2b3"/><circle cx="56" cy="138.4" r="1.6" fill="#f3e2b3"/>`; }
-function sprout(c1='#8fd65a',c2='#6cbf43'){
-  return `<path d="M50 141 Q49 132 50 124" stroke="#6aa83c" stroke-width="2.4" fill="none"/>${leafE(43.5,122,7,3.8,-18,c1,c2)}${leafE(56.5,122,7,3.8,18,c1,c2)}`;
+/* 잎 모양: (x,y)에서 a도(0=위, 시계 방향) 방향으로 길이 L, 반폭 w */
+function leaf(x,y,a,L,w,fill='url(#g-leaf)',vein=true,round=.25){
+  const p=`M0 0 C${r1(w)} ${r1(-L*round)} ${r1(w*.8)} ${r1(-L*.75)} 0 ${r1(-L)} C${r1(-w*.8)} ${r1(-L*.75)} ${r1(-w)} ${r1(-L*round)} 0 0Z`;
+  return `<g transform="translate(${r1(x)} ${r1(y)}) rotate(${r1(a)})"><path d="${p}" fill="${fill}" stroke="${OL}" stroke-width=".9" stroke-linejoin="round"/>${vein?`<path d="M0 ${r1(-L*.1)} Q${r1(w*.14)} ${r1(-L*.5)} 0 ${r1(-L*.84)}" stroke="#effbd3" stroke-width=".7" fill="none" opacity=".75"/>`:''}</g>`;
 }
-function shadow(rx=18){ return `<ellipse cx="50" cy="142" rx="${rx}" ry="${rx*.28}" fill="#3b2412" opacity=".22"/>`; }
+function leafR(x,y,a,L,w,fill='url(#g-leaf)',vein=true){ // 둥근 잎
+  const p=`M0 0 C${r1(w*1.15)} ${r1(-L*.08)} ${r1(w*1.05)} ${r1(-L*.95)} 0 ${r1(-L)} C${r1(-w*1.05)} ${r1(-L*.95)} ${r1(-w*1.15)} ${r1(-L*.08)} 0 0Z`;
+  return `<g transform="translate(${r1(x)} ${r1(y)}) rotate(${r1(a)})"><path d="${p}" fill="${fill}" stroke="${OL}" stroke-width=".9" stroke-linejoin="round"/>${vein?`<path d="M0 ${r1(-L*.12)} V${r1(-L*.8)}" stroke="#effbd3" stroke-width=".7" opacity=".7"/>`:''}</g>`;
+}
+function heartLeaf(x,y,a,L,w,fill='url(#g-leaf2)'){ // 해바라기 하트 잎
+  const p=`M0 0 C${r1(w*1.4)} ${r1(-L*.12)} ${r1(w*.9)} ${r1(-L*.8)} 0 ${r1(-L)} C${r1(-w*.9)} ${r1(-L*.8)} ${r1(-w*1.4)} ${r1(-L*.12)} 0 0Z`;
+  return `<g transform="translate(${r1(x)} ${r1(y)}) rotate(${r1(a)})"><path d="${p}" fill="${fill}" stroke="${OL}" stroke-width=".9" stroke-linejoin="round"/><path d="M0 ${r1(-L*.08)} V${r1(-L*.85)} M0 ${r1(-L*.4)} l${r1(w*.5)} ${r1(-L*.14)} M0 ${r1(-L*.4)} l${r1(-w*.5)} ${r1(-L*.14)}" stroke="#eaf7c8" stroke-width=".6" fill="none" opacity=".7"/></g>`;
+}
+function ruffle(x,y,a,L,w,fill,edge){ // 상추처럼 가장자리가 물결치는 잎
+  let s='';
+  for(let i=0;i<5;i++){ const t=(-.5+i/4)*Math.PI*.92; s+=`<circle cx="${r1(Math.sin(t)*w*.78)}" cy="${r1(-L*.6-Math.cos(t)*L*.3)}" r="${r1(w*.38)}" fill="${fill}" stroke="${edge}" stroke-width=".9"/>`; }
+  const body=`<path d="M0 0 C${r1(w*1.05)} ${r1(-L*.15)} ${r1(w*1.02)} ${r1(-L*.66)} 0 ${r1(-L*.76)} C${r1(-w*1.02)} ${r1(-L*.66)} ${r1(-w*1.05)} ${r1(-L*.15)} 0 0Z" fill="${fill}"/>`;
+  return `<g transform="translate(${r1(x)} ${r1(y)}) rotate(${r1(a)})">${s}${body}<path d="M0 -1 Q${r1(w*.1)} ${r1(-L*.4)} 0 ${r1(-L*.72)}" stroke="#f6ffe0" stroke-width=".9" fill="none" opacity=".85"/></g>`;
+}
+function stem(d,w,col='#5f9a3a'){ return `<path d="${d}" stroke="${OL}" stroke-width="${r1(w+1.5)}" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${col}" stroke-width="${w}" fill="none" stroke-linecap="round"/>`; }
+const TAG={lettuce:'#86c454',carrot:'#f28c28',tomato:'#e2412f',strawberry:'#e8384a',sunflower:'#f7c62f',paprika:'#f49b35'};
+function mound(t){ // 씨앗을 심은 흙 둔덕 + 작물 이름표
+  return `<ellipse class="shd" cx="47" cy="142.4" rx="15" ry="4.4" fill="#3b2412"/><path d="M36 141.5 Q50 130.5 64 141.5Z" fill="url(#g-mound)" stroke="#5e3b20" stroke-width=".9" stroke-linejoin="round"/><path d="M43 136 q3 -2 6 -1" stroke="#c99a6a" stroke-width=".8" fill="none"/><circle cx="46" cy="138.2" r="1.25" fill="#f3e2b3" stroke="#a88a5a" stroke-width=".4"/><circle cx="51" cy="137" r="1.25" fill="#f3e2b3" stroke="#a88a5a" stroke-width=".4"/><circle cx="55.5" cy="138.6" r="1.25" fill="#f3e2b3" stroke="#a88a5a" stroke-width=".4"/>`
+    +`<rect x="64.4" y="123" width="1.7" height="18.5" rx=".6" fill="#a7744a" stroke="#6e4a2c" stroke-width=".5"/><rect x="59.6" y="116.5" width="11.2" height="8.6" rx="1.8" fill="#fff6df" stroke="#8a6440" stroke-width=".8"/><circle cx="65.2" cy="120.8" r="2.5" fill="${TAG[t]}" stroke="#6e4a2c" stroke-width=".5"/>`;
+}
+function shadow(rx=18){ return `<ellipse class="shd" cx="47" cy="142.2" rx="${rx}" ry="${r1(rx*.28)}" fill="#3b2412"/>`; }
 
+/* ---- 상추: 낮고 넓게 퍼지는 물결 잎 → 동그란 결구 ---- */
 function drawLettuce(s){
-  if(s===0) return mound();
-  if(s===1) return shadow(10)+`<g class="sway">${sprout('#a7e070','#7cc04c')}</g>`;
+  if(s===0) return mound('lettuce');
+  if(s===1) return shadow(9)+`<g class="sway">${stem('M50 141 Q49.6 135 50 130',1.6,'#8cc95a')}${leafR(50,130.5,-62,8.5,4.4,'url(#g-lett)',false)}${leafR(50,130.5,62,8.5,4.4,'url(#g-lett)',false)}</g>`;
   let g='';
-  const ring=(n,span,d,w,l,fill,stroke,squash)=>{ for(let i=0;i<n;i++){ const a=-span+ (2*span)*(n===1?.5:i/(n-1)); const [x,y]=radial(a,d,squash); g+=leafE(x,y,w,l,a,fill,stroke,'#e9ffd0'); } };
-  if(s===2){ ring(4,58,9,6,10,'#93d65c','#6fb343',.9); g+=leafE(50,128,5,7,0,'#b6ea7c','#7cc04c'); return shadow(14)+`<g class="sway">${g}</g>`; }
-  if(s===3){ ring(6,74,13,8.5,14,'#82cc4e','#5ea83a',.75); ring(4,40,9,7,11,'#9edc63','#6fb343',.85); g+=leafE(50,127,6,8,0,'#c3f088','#7cc04c'); return shadow(20)+`<g class="sway">${g}</g>`; }
-  // s===4 풍성한 상추
-  ring(8,84,19,11,18,'#5fae3c','#43862a',.62);
-  ring(7,70,14,10,15,'#78c84a','#549d35',.72);
-  ring(5,48,10,9,12,'#98dc5f','#69b043',.82);
-  ring(3,24,6,7,9,'#bdee82','#7cc04c',.9);
-  // 잎 가장자리 주름
-  for(let i=0;i<9;i++){ const a=-80+i*20; const [x,y]=radial(a,30,.62); g+=`<circle cx="${r1(x)}" cy="${r1(y)}" r="3.4" fill="#6dbb42" opacity=".9"/>`; }
-  return shadow(30)+`<g class="sway">${g}</g>`;
+  const ring=(angles,L,w,fill,edge)=>angles.forEach(a=>{ g+=ruffle(50,140.5,a,L,w,fill,edge); });
+  if(s===2){ ring([-62,-30,30,62],13,6.5,'url(#g-leaf)',OL); ring([0],12,6,'url(#g-lett)',OL); return shadow(14)+`<g class="sway">${g}</g>`; }
+  if(s===3){ ring([-80,-52,-24,24,52,80],18,8.5,'url(#g-leaf)',OL); ring([-30,0,30],14,7,'url(#g-lett)',OL); return shadow(21)+`<g class="sway">${g}</g>`; }
+  // s===4 수확: 바깥 잎이 넓게 펼쳐지고 가운데에 둥근 결구
+  ring([-92,-64,-34,34,64,92],24,11,'url(#g-leaf2)',OL);
+  ring([-50,-18,18,50],20,10,'url(#g-leaf)',OL);
+  g+=`<ellipse cx="50" cy="129" rx="13.5" ry="11.5" fill="url(#g-lett)" stroke="${OL}" stroke-width=".9"/><path d="M39 131 Q44 120 50 119 M61 131 Q56 120 50 119 M42 136 Q50 127 58 136" stroke="#7fb64c" stroke-width=".9" fill="none"/><path d="M53 121.5 q4 1.5 5.5 5" stroke="#fbffe8" stroke-width="1.2" fill="none" stroke-linecap="round"/>`;
+  return shadow(31)+`<g class="sway">${g}</g>`;
 }
-function frond(a,len,col='#5cae3e'){
-  const [tx,ty]=radial(a,len,1); const [mx,my]=radial(a*0.7,len*.55,1);
-  let g=`<path d="M50 140 Q${r1(mx)} ${r1(my)} ${r1(tx)} ${r1(ty)}" stroke="${col}" stroke-width="1.8" fill="none"/>`;
-  for(let k=0.38;k<=1.0001;k+=0.155){
-    const px = (1-k)*(1-k)*50 + 2*(1-k)*k*mx + k*k*tx, py=(1-k)*(1-k)*140+2*(1-k)*k*my+k*k*ty;
-    const sz = 2.4+ (1-k)*2.8;
-    g+=`<ellipse cx="${r1(px-sz*.9)}" cy="${r1(py)}" rx="${r1(sz)}" ry="${r1(sz*.55)}" fill="#7cc84c" transform="rotate(${r1(a-35)} ${r1(px)} ${r1(py)})"/><ellipse cx="${r1(px+sz*.9)}" cy="${r1(py)}" rx="${r1(sz)}" ry="${r1(sz*.55)}" fill="#6dbd45" transform="rotate(${r1(a+35)} ${r1(px)} ${r1(py)})"/>`;
+/* ---- 당근: 가는 깃털 잎이 위로, 다 자라면 주황 어깨가 흙 위로 ---- */
+function frond(a,len){
+  const [tx,ty]=radial(a,len,1), [mx,my]=radial(a*.7,len*.55,1);
+  let g=`<path d="M50 140 Q${r1(mx)} ${r1(my)} ${r1(tx)} ${r1(ty)}" stroke="#4c8a33" stroke-width="1.5" fill="none" stroke-linecap="round"/>`;
+  for(let k=.36;k<=1.0001;k+=.13){
+    const px=(1-k)*(1-k)*50+2*(1-k)*k*mx+k*k*tx, py=(1-k)*(1-k)*140+2*(1-k)*k*my+k*k*ty, sz=2.1+(1-k)*2.6;
+    g+=`<ellipse cx="${r1(px-sz*.85)}" cy="${r1(py)}" rx="${r1(sz)}" ry="${r1(sz*.5)}" fill="#86ca55" stroke="#4f8a34" stroke-width=".45" transform="rotate(${r1(a-38)} ${r1(px)} ${r1(py)})"/><ellipse cx="${r1(px+sz*.85)}" cy="${r1(py)}" rx="${r1(sz)}" ry="${r1(sz*.5)}" fill="#68b443" stroke="#4f8a34" stroke-width=".45" transform="rotate(${r1(a+38)} ${r1(px)} ${r1(py)})"/>`;
   }
   return g;
 }
-function carrotTop(w){ return `<path d="M${50-w} 139 Q50 ${139-w*.9} ${50+w} 139 Q50 ${142+w*.25} ${50-w} 139Z" fill="#f28c28" stroke="#d26c12" stroke-width="1"/><path d="M${50-w*.4} 138 h${w*.5}" stroke="#ffc07a" stroke-width="1.2"/>`; }
-function drawCarrot(s){
-  if(s===0) return mound();
-  if(s===1) return shadow(8)+`<g class="sway"><path d="M50 141 L50 128" stroke="#5cae3e" stroke-width="1.8"/>${leafE(46,126,3,5.5,-25,'#7cc84c')}${leafE(54,125,3,5.5,25,'#6dbd45')}</g>`;
-  let g='';
-  if(s===2){ [-22,0,22].forEach((a,i)=>g+=frond(a,24+i%2*4)); return shadow(12)+`<g class="sway">${g}</g>`; }
-  if(s===3){ [-36,-16,4,22,38].forEach((a,i)=>g+=frond(a,32+(i%2)*6)); return shadow(16)+carrotTop(5)+`<g class="sway">${g}</g>`; }
-  [-46,-30,-14,0,14,30,46].forEach((a,i)=>g+=frond(a,40+(i%3)*6));
-  return shadow(20)+`<g class="sway">${g}</g>`+carrotTop(8.5);
+function carrotTop(w){
+  return `<path d="M${r1(50-w)} 140.6 Q${r1(50-w)} ${r1(140-w*.95)} 50 ${r1(140-w*1.02)} Q${r1(50+w)} ${r1(140-w*.95)} ${r1(50+w)} 140.6 Q50 143 ${r1(50-w)} 140.6Z" fill="url(#g-orange)" stroke="#a9520f" stroke-width=".9" stroke-linejoin="round"/><path d="M${r1(50-w*.62)} ${r1(140-w*.32)} q${r1(w*.28)} -.8 ${r1(w*.5)} 0 M${r1(50+w*.05)} ${r1(140-w*.18)} q${r1(w*.28)} -.8 ${r1(w*.45)} 0" stroke="#c8601a" stroke-width=".8" fill="none"/><path d="M${r1(50+w*.18)} ${r1(140-w*.78)} q${r1(w*.38)} .3 ${r1(w*.52)} ${r1(w*.38)}" stroke="#ffd7a6" stroke-width="1.1" fill="none" stroke-linecap="round"/>`;
 }
-function tleaf(x,y,a,sz,col='#4f9f3a'){
-  // 토마토 겹잎
-  let g=''; const t=a*Math.PI/180;
-  for(let i=0;i<3;i++){ const d=i*sz*.9; const cx=x+Math.cos(t)*d, cy=y+Math.sin(t)*d; const s=sz*(1-i*.15);
-    g+=`<ellipse cx="${r1(cx)}" cy="${r1(cy-s*.45)}" rx="${r1(s*.42)}" ry="${r1(s*.26)}" fill="${col}" transform="rotate(${r1(a-40)} ${r1(cx)} ${r1(cy)})"/><ellipse cx="${r1(cx)}" cy="${r1(cy+s*.45)}" rx="${r1(s*.42)}" ry="${r1(s*.26)}" fill="${col}" transform="rotate(${r1(a+40)} ${r1(cx)} ${r1(cy)})"/>`; }
-  const ex=x+Math.cos(t)*sz*2.4, ey=y+Math.sin(t)*sz*2.4;
-  g+=`<path d="M${r1(x)} ${r1(y)} L${r1(ex)} ${r1(ey)}" stroke="#3f8a2e" stroke-width="1.2"/><ellipse cx="${r1(ex)}" cy="${r1(ey)}" rx="${r1(sz*.5)}" ry="${r1(sz*.3)}" fill="${col}" transform="rotate(${a} ${r1(ex)} ${r1(ey)})"/>`;
-  return g;
+function drawCarrot(s){
+  if(s===0) return mound('carrot');
+  if(s===1) return shadow(7)+`<g class="sway">${leaf(50,141,-14,13,1.5,'#7cc84c',false,.3)}${leaf(50,141,12,11,1.5,'#66b240',false,.3)}</g>`;
+  let g='';
+  if(s===2){ [-22,0,22].forEach((a,i)=>g+=frond(a,23+i%2*4)); return shadow(11)+`<g class="sway">${g}</g>`; }
+  if(s===3){ [-36,-16,4,22,38].forEach((a,i)=>g+=frond(a,31+(i%2)*6)); return shadow(15)+`<g class="sway">${g}</g>`+carrotTop(5); }
+  [-48,-32,-15,0,15,32,48].forEach((a,i)=>g+=frond(a,40+(i%3)*5));
+  return shadow(19)+`<g class="sway">${g}</g>`+carrotTop(10.5)+`<circle cx="36" cy="141" r="1.2" fill="#7a5233"/><circle cx="64" cy="140.6" r="1" fill="#7a5233"/>`;
+}
+/* ---- 토마토: 지지대를 타고 높이 자라는 덩굴, 줄기 옆에 둥근 열매 ---- */
+function tleaf(x,y,a,sz,fill='url(#g-leaf)'){
+  const t=a*Math.PI/180, dir=a+90, ex=x+Math.cos(t)*sz*2.2, ey=y+Math.sin(t)*sz*2.2;
+  let g=`<path d="M${r1(x)} ${r1(y)} L${r1(ex)} ${r1(ey)}" stroke="#3f7a2a" stroke-width="1.1"/>`;
+  for(let i=1;i<=2;i++){ const d=i*sz*.72, cx=x+Math.cos(t)*d, cy=y+Math.sin(t)*d, s=sz*(1-i*.1);
+    g+=leaf(cx,cy,dir-58,s*.95,s*.36,fill,false)+leaf(cx,cy,dir+58,s*.95,s*.36,fill,false); }
+  return g+leaf(ex,ey,dir,sz*1.05,sz*.42,fill,false);
 }
 function tomatoFruit(x,y,r,ripe){
-  const body = ripe ? '#e8382f' : '#9ccc54', shade= ripe?'#b81f1a':'#76a83a';
-  return `<g><circle cx="${x}" cy="${y}" r="${r}" fill="${body}" stroke="${shade}" stroke-width="1"/><ellipse cx="${x-r*.35}" cy="${y-r*.35}" rx="${r*.28}" ry="${r*.18}" fill="#fff" opacity=".55"/><path d="M${x} ${y-r} l-3 -1.5 M${x} ${y-r} l3 -1.5 M${x} ${y-r} l-1 2.2 M${x} ${y-r} l1.4 2" stroke="#2f7a24" stroke-width="1.6" stroke-linecap="round"/></g>`;
+  return `<g><circle cx="${x}" cy="${y}" r="${r}" fill="url(#${ripe?'g-red':'g-green'})" stroke="${ripe?'#8f1d14':'#5e8a2c'}" stroke-width=".9"/><ellipse cx="${r1(x+r*.32)}" cy="${r1(y-r*.38)}" rx="${r1(r*.26)}" ry="${r1(r*.16)}" fill="#fff" opacity=".6" transform="rotate(25 ${r1(x+r*.32)} ${r1(y-r*.38)})"/><path d="M${x} ${r1(y-r+.6)} l-3.2 -1.2 M${x} ${r1(y-r+.6)} l3.2 -1.2 M${x} ${r1(y-r+.6)} l-1.2 2.2 M${x} ${r1(y-r+.6)} l1.5 2 M${x} ${r1(y-r+.6)} v-2.6" stroke="#2f6e22" stroke-width="1.4" stroke-linecap="round"/></g>`;
 }
-function flowerY(x,y,r=3){ let g=''; for(let i=0;i<5;i++){ const a=i*72*Math.PI/180; g+=`<circle cx="${r1(x+Math.cos(a)*r)}" cy="${r1(y+Math.sin(a)*r)}" r="${r*.7}" fill="#ffd93b"/>`; } return g+`<circle cx="${x}" cy="${y}" r="${r*.55}" fill="#f2a516"/>`; }
+function flowerY(x,y,r=3){ let g=''; for(let i=0;i<5;i++){ const a=(i*72-90)*Math.PI/180; g+=`<ellipse cx="${r1(x+Math.cos(a)*r*.8)}" cy="${r1(y+Math.sin(a)*r*.8)}" rx="${r1(r*.62)}" ry="${r1(r*.36)}" fill="#ffd93b" stroke="#c99212" stroke-width=".4" transform="rotate(${i*72} ${r1(x+Math.cos(a)*r*.8)} ${r1(y+Math.sin(a)*r*.8)})"/>`; } return g+`<circle cx="${x}" cy="${y}" r="${r1(r*.42)}" fill="#e8951a"/>`; }
 const TOMS=[[38,96],[61,84],[47,70]];
-function drawTomato(s, paprika=false){
-  if(s===0) return mound();
-  if(s===1) return shadow(9)+`<g class="sway">${sprout('#7fcf55','#55a63a')}</g>`;
-  if(s===2) return shadow(13)+`<g class="sway"><path d="M50 141 Q48 125 50 108" stroke="#4f8f34" stroke-width="2.6" fill="none"/>${tleaf(50,126,200,7)}${tleaf(50,118,-20,7)}${tleaf(50,110,-120,6)}</g>`;
-  const stake=`<rect x="64" y="56" width="3.2" height="86" rx="1.6" fill="#c79a62"/><path d="M50 98 Q58 96 65 95 M51 78 Q58 76 65 74" stroke="#e8d6a8" stroke-width="1.4" fill="none"/>`;
-  let back=`<path d="M50 141 Q46 115 51 92 Q55 75 49 60" stroke="#4f8f34" stroke-width="3" fill="none"/>`;
-  back+=tleaf(49,122,195,8,'#4a9a37')+tleaf(50,114,-15,8,'#57a840')+tleaf(51,100,205,8,'#4a9a37')+tleaf(51,90,-25,7.5,'#57a840')+tleaf(50,76,200,7,'#5fb046')+tleaf(49,66,-35,6.5,'#5fb046');
+function drawTomato(s){
+  if(s===0) return mound('tomato');
+  if(s===1) return shadow(8)+`<g class="sway">${stem('M50 141 Q49 133 50 125',1.6,'#6aa83c')}${leaf(50,126,-64,9.5,2.8,'url(#g-leaf)',false)}${leaf(50,126,64,9.5,2.8,'url(#g-leaf)',false)}</g>`;
+  if(s===2) return shadow(13)+`<g class="sway">${stem('M50 141 Q48 125 50 108',1.8,'#5a9a3a')}${tleaf(50,127,200,7)}${tleaf(50,119,-20,7)}${tleaf(50,110,-110,6)}</g>`;
+  const stake=`<rect x="64" y="60" width="3.4" height="82" rx="1.4" fill="#c99a62" stroke="#8a6440" stroke-width=".7"/><path d="M50 99 Q58 97 65 96 M51 79 Q58 77 65 75" stroke="#efe0b8" stroke-width="1.3" fill="none"/>`;
+  let back=stem('M50 141 Q46 115 51 92 Q55 76 49 64',1.9,'#4f8f34');
+  back+=tleaf(49,122,195,8,'url(#g-leaf2)')+tleaf(50,114,-15,8)+tleaf(51,101,205,8,'url(#g-leaf2)')+tleaf(51,90,-25,7.5)+tleaf(50,77,200,7)+tleaf(49,67,-38,6.5);
   let mid='';
-  if(s===3){ mid=flowerY(38,98)+flowerY(62,85)+flowerY(46,70,2.6); }
-  else {
-    const ripe=s===5;
-    TOMS.forEach(([x,y],i)=>{
-      if(paprika){
-        mid+=`<path d="M${x} ${y-6} q-9 -4 -8 5 q1 10 8 10 q7 0 8 -10 q1 -9 -8 -5Z" fill="${ripe?'#f49b35':'#80bc54'}" stroke="${ripe?'#c76526':'#528942'}" stroke-width="1.1"/><path d="M${x} ${y-5} q-2 -3 1 -6" stroke="#518337" stroke-width="1.6" fill="none"/>`;
-      }else mid+=tomatoFruit(x,y,i===2?6:7.5,ripe);
-    });
-  }
-  // 열매 앞을 살짝 가리는 잎
-  const front = tleaf(52,106,160,6.5,'#62b248')+tleaf(50,80,15,5.5,'#62b248');
+  if(s===3) mid=flowerY(38,98)+flowerY(62,85)+flowerY(46,71,2.6);
+  else TOMS.forEach(([x,y],i)=>{ mid+=tomatoFruit(x,y,(i===2?6.4:7.8)*(s===5?1:.82),s===5); });
+  const front=tleaf(52,106,160,6.4)+tleaf(50,82,15,5.4);
   return shadow(22)+stake+`<g class="sway">${back}${mid}${front}</g>`;
 }
-function trifol(x,y,a,s,col='#4e9e3c'){
-  let g=`<path d="M50 140 Q${r1((50+x)/2)} ${r1(y+8)} ${x} ${y}" stroke="#5a9a3a" stroke-width="1.6" fill="none"/>`;
-  [-40,0,40].forEach(o=>{ const t=(a+o)*Math.PI/180; const cx=x+Math.sin(t)*s*.8, cy=y-Math.cos(t)*s*.8; g+=leafE(cx,cy,s*.55,s*.75,a+o,col,'#3c7e2c','#8fd06a'); });
+/* ---- 파프리카(온실): 지지대 없이 넓은 잎의 덤불, 잎 아래 매달린 종 모양 열매 ---- */
+function bell(x,y,ripe){
+  return `<path d="M${x} ${y-6} q-1 -3 2 -5" stroke="#3f7a2a" stroke-width="1.6" fill="none" stroke-linecap="round"/><path d="M${x-6.5} ${y-3} Q${x-7.5} ${y+7} ${x-3.4} ${y+9} Q${x} ${y+7.4} ${x+3.4} ${y+9} Q${x+7.5} ${y+7} ${x+6.5} ${y-3} Q${x} ${y-7.4} ${x-6.5} ${y-3}Z" fill="url(#${ripe?'g-orange':'g-green'})" stroke="${ripe?'#a9520f':'#5e8a2c'}" stroke-width=".9" stroke-linejoin="round"/><path d="M${x-4} ${y-4.4} Q${x} ${y-6.8} ${x+4} ${y-4.4} Q${x} ${y-2.6} ${x-4} ${y-4.4}Z" fill="#4f8f34"/><path d="M${x+2.6} ${y-1} q1.6 3 .6 6.4" stroke="#fff" stroke-width="1.2" fill="none" opacity=".55" stroke-linecap="round"/>`;
+}
+function drawPaprika(s){
+  if(s===0) return mound('paprika');
+  if(s===1) return shadow(8)+`<g class="sway">${stem('M50 141 Q50 134 50 128',1.6,'#4f8f34')}${leaf(50,129,-56,8.5,2.2,'url(#g-leaf2)',false)}${leaf(50,129,56,8.5,2.2,'url(#g-leaf2)',false)}</g>`;
+  if(s===2) return shadow(14)+`<g class="sway">${stem('M50 141 Q50 128 50 116',1.8,'#4f8f34')}${leafR(50,132,-74,13,6,'url(#g-leaf2)')}${leafR(50,132,74,13,6,'url(#g-leaf2)')}${leafR(50,121,-34,12,5.5)}${leafR(50,121,34,12,5.5)}${leafR(50,116,0,10,5)}</g>`;
+  let g=stem('M50 141 Q50 118 50 104 Q42 92 40 82 M50 104 Q60 94 60 76 M50 104 Q50 86 47 66',1.9,'#4a8a33');
+  g+=leafR(50,134,-80,15,7,'url(#g-leaf2)')+leafR(50,134,80,15,7,'url(#g-leaf2)')+leafR(50,120,-60,14,6.5)+leafR(50,118,58,14,6.5,'url(#g-leaf2)');
+  let fruit='';
+  if(s===3) TOMS.forEach(([x,y])=>{ fruit+=`<g transform="translate(${x} ${y})">${[0,72,144,216,288].map(a=>`<ellipse cx="0" cy="-2.4" rx="1.4" ry="2.4" fill="#fffdf2" stroke="#b7b08a" stroke-width=".35" transform="rotate(${a})"/>`).join('')}<circle r="1.1" fill="#e7c94a"/></g>`; });
+  else TOMS.forEach(([x,y])=>{ fruit+=bell(x,y,s===5); });
+  const front=leafR(40,82,-40,13,6)+leafR(60,76,40,13,6,'url(#g-leaf2)')+leafR(47,66,-8,12,6)+leafR(42,100,-118,12,5.8)+leafR(58,96,112,12,5.8,'url(#g-leaf2)');
+  return shadow(24)+`<g class="sway">${g}${front}${fruit}</g>`;
+}
+/* ---- 딸기: 땅에 붙어 퍼지는 세잎, 열매는 잎 바깥 흙 위에 ---- */
+function trifol(x,y,a,s,fill='url(#g-leaf)'){
+  let g=stem(`M50 140 Q${r1((50+x)/2)} ${r1(y+8)} ${x} ${y}`,1,'#5a9a3a');
+  [-46,0,46].forEach(o=>{ g+=leafR(x,y,a+o,s*1.05,s*.58,fill); });
   return g;
 }
-function berry(x,y,ripe){ const c= ripe?'#ec3b4a':'#e9f0b8'; let g=`<path d="M${x} ${y-5} C${x+6} ${y-6} ${x+6} ${y+2} ${x} ${y+7} C${x-6} ${y+2} ${x-6} ${y-6} ${x} ${y-5}Z" fill="${c}" stroke="${ripe?'#b91f2e':'#c8d090'}" stroke-width=".8"/>`; if(ripe){ [[-2,-1],[2,-1],[0,2],[-2.5,2.5],[2.5,2.5],[0,-3]].forEach(([dx,dy])=>g+=`<circle cx="${x+dx}" cy="${y+dy}" r=".6" fill="#ffe58a"/>`); } g+=`<path d="M${x-3} ${y-5} L${x} ${y-7} L${x+3} ${y-5}" stroke="#3f8a2e" stroke-width="1.6" fill="none"/>`; return g; }
-function wflower(x,y){ let g=''; for(let i=0;i<5;i++){const a=i*72*Math.PI/180; g+=`<circle cx="${r1(x+Math.cos(a)*3)}" cy="${r1(y+Math.sin(a)*3)}" r="2.3" fill="#fff"/>`;} return g+`<circle cx="${x}" cy="${y}" r="1.7" fill="#f7c533"/>`; }
-function drawStrawberry(s){
-  if(s===0) return mound();
-  if(s===1) return shadow(9)+`<g class="sway">${sprout('#86d05c','#5aa63c')}</g>`;
-  let g=trifol(36,124,-40,9)+trifol(64,124,40,9)+trifol(50,118,0,9.5,'#58a945');
-  if(s===2) return shadow(18)+`<g class="sway">${g}</g>`;
-  g = trifol(30,128,-60,9,'#4a9838')+trifol(70,128,60,9,'#4a9838')+g;
-  let f='';
-  if(s===3){ f=wflower(26,134)+wflower(74,133)+wflower(58,128); }
-  else { f=`<path d="M40 128 Q32 130 28 134 M60 128 Q68 130 72 133 M52 126 Q58 128 60 131" stroke="#5a9a3a" stroke-width="1.2" fill="none"/>`+berry(27,136,true)+berry(73,135,true)+berry(61,133,true); }
-  return shadow(24)+`<g class="sway">${g}${f}</g>`;
+function berry(x,y,ripe){
+  let g=`<path d="M${x} ${y-5} C${x+6.4} ${y-6} ${x+6.4} ${y+2} ${x} ${y+7.5} C${x-6.4} ${y+2} ${x-6.4} ${y-6} ${x} ${y-5}Z" fill="${ripe?'url(#g-straw)':'#eef3c4'}" stroke="${ripe?'#8f1626':'#a9b37a'}" stroke-width=".8"/>`;
+  if(ripe){ [[-2.2,-1.2],[2.2,-1.2],[0,1.8],[-2.6,2.4],[2.6,2.4],[0,-3.2],[0,4.8]].forEach(([dx,dy])=>g+=`<ellipse cx="${x+dx}" cy="${y+dy}" rx=".5" ry=".75" fill="#ffe58a"/>`); g+=`<path d="M${x+2} ${y-3} q1.8 1.2 1.4 3.4" stroke="#fff" stroke-width=".9" fill="none" opacity=".6"/>`; }
+  return g+`<path d="M${x-3.6} ${y-4.6} L${x-1} ${y-6.2} L${x} ${y-4.4} L${x+1} ${y-6.2} L${x+3.6} ${y-4.6}" stroke="#2f6e22" stroke-width="1.4" fill="none" stroke-linejoin="round"/>`;
 }
+function wflower(x,y){ let g=''; for(let i=0;i<5;i++){const a=i*72*Math.PI/180; g+=`<circle cx="${r1(x+Math.cos(a)*3)}" cy="${r1(y+Math.sin(a)*3)}" r="2.3" fill="#fffdf4" stroke="#bdb79a" stroke-width=".4"/>`;} return g+`<circle cx="${x}" cy="${y}" r="1.7" fill="#f7c533"/>`; }
+function drawStrawberry(s){
+  if(s===0) return mound('strawberry');
+  if(s===1) return shadow(8)+`<g class="sway">${trifol(50,131,0,6.5,'url(#g-lett)')}</g>`;
+  let g=trifol(36,126,-42,8.5)+trifol(64,126,42,8.5)+trifol(50,122,0,8.8,'url(#g-leaf2)');
+  if(s===2) return shadow(18)+`<g class="sway">${g}</g>`;
+  g=trifol(29,131,-64,8.2,'url(#g-leaf2)')+trifol(71,131,64,8.2,'url(#g-leaf2)')+g;
+  let f='';
+  if(s===3) f=wflower(25,134)+wflower(75,133)+wflower(59,129);
+  else f=`<path d="M40 129 Q32 130 28 133 M60 129 Q68 130 72 132 M53 127 Q58 128 61 130" stroke="#4f8a34" stroke-width="1.1" fill="none"/>`+berry(27,136,true)+berry(73,135,true)+berry(61,133,true);
+  return shadow(25)+`<g class="sway">${g}${f}</g>`;
+}
+/* ---- 해바라기: 가장 키가 크고, 하트 잎과 맨 위의 큰 꽃 ---- */
 function drawSunflower(s){
-  if(s===0) return mound();
-  if(s===1) return shadow(9)+`<g class="sway">${sprout('#9ad85f','#6ab042')}</g>`;
-  const tops={2:116,3:92,4:66,5:52,6:44}; const top=tops[s];
-  let g=`<path d="M50 141 Q52 ${r1((141+top)/2)} 50 ${top}" stroke="#5f9e37" stroke-width="${s>3?4:3}" fill="none"/>`;
-  const L=(y,dir,sz)=>leafE(50+dir*sz*.9,y,sz*.55,sz,dir*62,'#64b043','#46872e','#a5dc7a');
-  g+=L(126,-1,9)+L(122,1,9);
-  if(s>=3){ g+=L(108,-1,11)+L(100,1,11); }
-  if(s>=4){ g+=L(86,-1,11)+L(80,1,10); }
-  if(s===4){ g+=`<circle cx="50" cy="${top}" r="7" fill="#79b84a" stroke="#4f8a2e"/><path d="M44 ${top-2} l-3 -3 M56 ${top-2} l3 -3 M50 ${top-7} l0 -3" stroke="#4f8a2e" stroke-width="1.6"/>`; }
-  if(s>=5){ const R = s===6?17:11, C = s===6?9.5:6; let p='';
-    const n= s===6?16:12; for(let i=0;i<n;i++){ const a=i*360/n; const t=a*Math.PI/180; const px=50+Math.sin(t)*R*.75, py=top-Math.cos(t)*R*.75; p+=`<ellipse cx="${r1(px)}" cy="${r1(py)}" rx="${R*.24}" ry="${R*.5}" fill="${i%2?'#ffcf2e':'#ffdc4a'}" transform="rotate(${a} ${r1(px)} ${r1(py)})"/>`; }
-    p+=`<circle cx="50" cy="${top}" r="${C}" fill="#7a4a1e"/><circle cx="50" cy="${top}" r="${C*.65}" fill="#5c3412"/>`;
-    if(s===6){ for(let i=0;i<10;i++){ const t=i*36*Math.PI/180; p+=`<circle cx="${r1(50+Math.cos(t)*5.5)}" cy="${r1(top+Math.sin(t)*5.5)}" r=".9" fill="#c8913a"/>`; } }
-    g+=`<g transform="rotate(-8 50 ${top})">${p}</g>`;
+  if(s===0) return mound('sunflower');
+  if(s===1) return shadow(9)+`<g class="sway">${stem('M50 141 Q51 134 50 128',2.6,'#8cc95a')}${leafR(50,129,-68,10,5,'url(#g-lett)',false)}${leafR(50,129,68,10,5,'url(#g-lett)',false)}<g transform="rotate(-25 58 121)"><ellipse cx="58" cy="121" rx="2.6" ry="4" fill="#4a3a2c"/><path d="M58 117.4 V124.6" stroke="#e9e1cf" stroke-width=".7"/></g></g>`;
+  const tops={2:114,3:94,4:70,5:50,6:38}, top=tops[s];
+  let g=stem(`M50 141 Q52 ${r1((141+top)/2)} 50 ${top}`,s>3?3.4:2.6);
+  const L=(y,dir,sz)=>heartLeaf(50,y,dir*62,sz*1.4,sz*.6,dir<0?'url(#g-leaf2)':'url(#g-leaf)');
+  g+=L(130,-1,13)+L(126,1,13);
+  if(s>=3) g+=L(112,-1,15)+L(104,1,15);
+  if(s>=4) g+=L(90,-1,14)+L(84,1,13);
+  if(s>=5) g+=L(70,-1,12)+L(64,1,11);
+  if(s===2) g+=leaf(50,116,-30,6,2.5,'url(#g-lett)',false)+leaf(50,116,30,6,2.5,'url(#g-lett)',false);
+  if(s===3) g+=leaf(50,96,-28,7,2.8,'url(#g-lett)',false)+leaf(50,96,28,7,2.8,'url(#g-lett)',false);
+  if(s===4) g+=`<circle cx="50" cy="${top}" r="6.6" fill="url(#g-green)" stroke="${OL}" stroke-width=".9"/>${[-60,-20,20,60].map(a=>leaf(50,top+2,a,8,2.4,'url(#g-leaf)',false)).join('')}<circle cx="50" cy="${top}" r="4.2" fill="#a9d36a" stroke="${OL}" stroke-width=".6"/>`;
+  if(s>=5){
+    const R=s===6?17:11, C=s===6?9:5.6, n=s===6?16:12; let p='';
+    for(let i=0;i<n;i++){ const a=i*360/n, t=a*Math.PI/180, px=50+Math.sin(t)*R*.72, py=top-Math.cos(t)*R*.72;
+      p+=`<ellipse cx="${r1(px)}" cy="${r1(py)}" rx="${r1(R*.23)}" ry="${r1(R*.5)}" fill="url(#g-petal)" stroke="#c48a10" stroke-width=".6" transform="rotate(${r1(a)} ${r1(px)} ${r1(py)})"/>`; }
+    p+=`<circle cx="50" cy="${top}" r="${C}" fill="#7a4a1e" stroke="#4a2a10" stroke-width=".8"/><circle cx="50" cy="${top}" r="${r1(C*.62)}" fill="#5a3212"/>`;
+    if(s===6){ for(let i=0;i<14;i++){ const t=i*360/14*Math.PI/180; p+=`<circle cx="${r1(50+Math.cos(t)*6.2)}" cy="${r1(top+Math.sin(t)*6.2)}" r=".8" fill="#c8913a"/>`; } p+=`<path d="M53 ${top-6} q3 1.4 4 4.4" stroke="#e8b25a" stroke-width="1" fill="none" opacity=".8"/>`; }
+    g+=`<g transform="rotate(10 50 ${top})">${p}</g>`;
   }
-  return shadow(18)+`<g class="sway">${g}</g>`;
+  return shadow(17)+`<g class="sway">${g}</g>`;
 }
 const SOIL_CENTER_Y=55.5; // 흙 윗면의 중앙 (20~91%)
 const CROP_ART={
   lettuce:{draw:drawLettuce,scale:1.14,baseY:66},
   carrot:{draw:drawCarrot,scale:1.3,baseY:74},
-  tomato:{draw:drawTomato,scale:.83,baseY:78},
-  strawberry:{draw:drawStrawberry,scale:1.25,baseY:70},
-  sunflower:{draw:drawSunflower,scale:.64,baseY:81},
-  paprika:{draw:s=>drawTomato(s,true),scale:.83,baseY:78},
+  tomato:{draw:drawTomato,scale:.8,baseY:78},
+  strawberry:{draw:drawStrawberry,scale:1.2,baseY:70},
+  sunflower:{draw:drawSunflower,scale:.66,baseY:84},
+  paprika:{draw:drawPaprika,scale:.82,baseY:78},
 };
+/* 작물 그림에 쓰는 공용 그라데이션 (빛은 오른쪽 위에서) */
+const ART_DEFS=`<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+${[['g-leaf','#c3e68a','#7fbd4f','#4f8f36'],['g-leaf2','#a9d674','#62a443','#3f7a2c'],['g-lett','#f0fac0','#b1df78','#76b84b'],
+['g-red','#ff9a7e','#e5432f','#a8231a'],['g-green','#e2f2a6','#a3cc5b','#6b9a35'],['g-orange','#ffd08a','#f4922e','#c35e17'],
+['g-straw','#ff9c96','#e63a4b','#9e1b2c'],['g-petal','#fff3b0','#ffd23a','#eaa717'],['g-mound','#c79466','#9a6a42','#6e4528']]
+.map(([id,a,b,c])=>`<radialGradient id="${id}" cx=".64" cy=".3" r=".85" fx=".66" fy=".26"><stop offset="0" stop-color="${a}"/><stop offset=".55" stop-color="${b}"/><stop offset="1" stop-color="${c}"/></radialGradient>`).join('')}
+</defs></svg>`;
+document.body.insertAdjacentHTML('afterbegin',ART_DEFS);
 
 function itemIcon(t){
-  const v='viewBox="0 0 40 40"';
+  const v='viewBox="0 0 40 40"', o='stroke-linejoin="round"';
   switch(t){
-    case 'paprika': return `<svg ${v} class="ic"><path d="M20 13 C8 7 6 19 10 29 Q14 36 20 33 Q27 36 31 27 C35 16 29 8 20 13Z" fill="#f49b35" stroke="#c76526" stroke-width="1.6"/><path d="M20 13 Q16 7 22 5" stroke="#518337" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M14 17 Q11 21 14 27" stroke="#ffd085" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`;
-    case 'lettuce': return `<svg ${v} class="ic"><ellipse cx="20" cy="24" rx="15" ry="11" fill="#5fae3c"/><ellipse cx="13" cy="21" rx="8" ry="7" fill="#78c84a"/><ellipse cx="27" cy="21" rx="8" ry="7" fill="#78c84a"/><ellipse cx="20" cy="19" rx="8" ry="8" fill="#a6e36b"/><ellipse cx="20" cy="18" rx="4" ry="5" fill="#cdf595"/><path d="M20 30 V16" stroke="#e9ffd0" stroke-width="1.2"/></svg>`;
-    case 'carrot': return `<svg ${v} class="ic"><path d="M12 14 L30 12 Q32 14 30 16 L14 30 Q10 26 12 14Z" fill="#f28c28" stroke="#d26c12"/><path d="M15 17 l4 1 M17 22 l4 0 M14 25 l3 1" stroke="#d26c12" stroke-width="1.2"/><path d="M29 13 Q33 6 30 3 M30 13 Q37 9 38 6 M30 14 Q37 15 39 13" stroke="#5cae3e" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>`;
-    case 'tomato': return `<svg ${v} class="ic"><circle cx="20" cy="23" r="13" fill="#e8382f" stroke="#b81f1a"/><ellipse cx="15" cy="18" rx="4" ry="2.5" fill="#fff" opacity=".5"/><path d="M20 11 l-6 -2 M20 11 l6 -2 M20 11 l-2 5 M20 11 l3 4 M20 11 V5" stroke="#2f7a24" stroke-width="2.2" stroke-linecap="round"/></svg>`;
-    case 'strawberry': return `<svg ${v} class="ic"><path d="M20 12 C32 10 33 22 20 35 C7 22 8 10 20 12Z" fill="#ec3b4a" stroke="#b91f2e"/>${[[15,17],[24,17],[20,22],[14,24],[26,24],[20,29]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="1" fill="#ffe58a"/>`).join('')}<path d="M12 12 L20 8 L28 12 M20 8 V4" stroke="#3f8a2e" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>`;
-    case 'sunflower': { let p=''; for(let i=0;i<12;i++){ const a=i*30; const t=a*Math.PI/180; p+=`<ellipse cx="${r1(20+Math.sin(t)*10)}" cy="${r1(18-Math.cos(t)*10)}" rx="3.2" ry="6.5" fill="#ffd23a" transform="rotate(${a} ${r1(20+Math.sin(t)*10)} ${r1(18-Math.cos(t)*10)})"/>`; } return `<svg ${v} class="ic"><path d="M20 28 V39" stroke="#5f9e37" stroke-width="3"/>${p}<circle cx="20" cy="18" r="7" fill="#6b3d16"/></svg>`; }
+    case 'paprika': return `<svg ${v} class="ic"><path d="M20 12 C8 8 6 20 10 29 Q13 36 17 34 Q20 31.5 23 34 Q27 36 30 29 C34 20 32 8 20 12Z" fill="url(#g-orange)" stroke="#a9520f" stroke-width="1.4" ${o}/><path d="M14 12.5 Q20 9 26 12.5 Q20 15 14 12.5Z" fill="#4f8f34"/><path d="M20 11 Q18 6 23 4" stroke="#3f7a2a" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M25 17 Q28 22 26 28" stroke="#fff" stroke-width="1.8" fill="none" opacity=".5" stroke-linecap="round"/></svg>`;
+    case 'lettuce': return `<svg ${v} class="ic"><path d="M5 26 Q4 16 12 15 Q14 8 20 9 Q26 8 28 15 Q36 16 35 26 Q34 34 20 34 Q6 34 5 26Z" fill="url(#g-leaf)" stroke="${OL}" stroke-width="1.3" ${o}/><ellipse cx="20" cy="23" rx="9" ry="8.5" fill="url(#g-lett)" stroke="${OL}" stroke-width="1.1"/><path d="M13 26 Q16 18 20 17.5 M27 26 Q24 18 20 17.5" stroke="#7fb64c" stroke-width="1" fill="none"/><path d="M22 17 q3 1 4 4" stroke="#fff" stroke-width="1.3" fill="none" opacity=".8" stroke-linecap="round"/></svg>`;
+    case 'carrot': return `<svg ${v} class="ic"><path d="M11 15 Q20 9 29 13 Q30 17 27 19 L14 33 Q11 33 10 30 Q8 22 11 15Z" fill="url(#g-orange)" stroke="#a9520f" stroke-width="1.3" ${o}/><path d="M14 18 l4 1 M15 23 l4 .4 M13 27 l3 .8" stroke="#c35e17" stroke-width="1.1"/><path d="M27 13 Q31 6 28 3 M28 13 Q35 9 37 5 M29 15 Q36 15 38 12" stroke="#5aa83a" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>`;
+    case 'tomato': return `<svg ${v} class="ic"><circle cx="20" cy="23" r="13" fill="url(#g-red)" stroke="#8f1d14" stroke-width="1.3"/><ellipse cx="25" cy="17.5" rx="3.6" ry="2.2" fill="#fff" opacity=".55" transform="rotate(25 25 17.5)"/><path d="M20 11.5 l-6 -2 M20 11.5 l6 -2 M20 11.5 l-2.4 4.6 M20 11.5 l2.8 4 M20 11.5 V5.5" stroke="#2f6e22" stroke-width="2.2" stroke-linecap="round"/></svg>`;
+    case 'strawberry': return `<svg ${v} class="ic"><path d="M20 12 C33 10 33 23 20 36 C7 23 7 10 20 12Z" fill="url(#g-straw)" stroke="#8f1626" stroke-width="1.3" ${o}/>${[[15,17],[24,17],[20,22],[14,24],[26,24],[20,29]].map(([x,y])=>`<ellipse cx="${x}" cy="${y}" rx=".9" ry="1.3" fill="#ffe58a"/>`).join('')}<path d="M12 12.5 L16 9 L20 11.5 L24 9 L28 12.5 M20 10 V4.5" stroke="#2f6e22" stroke-width="2.2" fill="none" stroke-linecap="round" ${o}/></svg>`;
+    case 'sunflower': { let p=''; for(let i=0;i<12;i++){ const a=i*30, t=a*Math.PI/180, x=r1(20+Math.sin(t)*10), y=r1(18-Math.cos(t)*10); p+=`<ellipse cx="${x}" cy="${y}" rx="3.2" ry="6.4" fill="url(#g-petal)" stroke="#c48a10" stroke-width=".7" transform="rotate(${a} ${x} ${y})"/>`; } return `<svg ${v} class="ic"><path d="M20 28 V39" stroke="${OL}" stroke-width="4.4" stroke-linecap="round"/><path d="M20 28 V39" stroke="#5f9a3a" stroke-width="2.6" stroke-linecap="round"/>${p}<circle cx="20" cy="18" r="7" fill="#6b3d16" stroke="#3e220c" stroke-width="1"/><circle cx="20" cy="18" r="4.2" fill="#552f10"/></svg>`; }
   }
   return '';
 }
 function seedIcon(t){
   // 씨앗 봉투 + 작물 그림
-  return `<svg viewBox="0 0 40 40" class="ic"><rect x="7" y="5" width="26" height="31" rx="4" fill="#fff3dc" stroke="#d6bf94" stroke-width="1.5"/><path d="M7 11 H33" stroke="#d6bf94" stroke-width="1.5" stroke-dasharray="2 2"/><g transform="translate(9 12) scale(.55)">${itemIcon(t).replace(/<svg[^>]*>|<\/svg>/g,'')}</g></svg>`;
+  return `<svg viewBox="0 0 40 40" class="ic"><path d="M7.5 8 Q7 5 10 5 H30 Q33 5 32.5 8 L33 33 Q33 36 30 36 H10 Q7 36 7 33Z" fill="#fff4dc" stroke="#a9845a" stroke-width="1.4" stroke-linejoin="round"/><path d="M7.5 11 H32.5" stroke="#a9845a" stroke-width="1.2" stroke-dasharray="2 1.6"/><g transform="translate(9 13) scale(.55)">${itemIcon(t).replace(/<svg[^>]*>|<\/svg>/g,'')}</g></svg>`;
 }
 function decorSVG(t){
   const v='viewBox="0 0 100 100"';
-  const sh=`<ellipse cx="50" cy="94" rx="30" ry="5" fill="#2e5a1c" opacity=".22"/>`;
+  const sh=`<ellipse class="shd" cx="46" cy="94" rx="30" ry="5" fill="#2e5a1c"/>`;
   switch(t){
     case 'tulip': { let g=sh; [[34,58,'#ff8fb1'],[52,48,'#ff6f9c'],[68,60,'#ffa3c0']].forEach(([x,y,c])=>{ g+=`<path d="M${x} 94 Q${x+2} ${(94+y)/2} ${x} ${y}" stroke="#4f9a35" stroke-width="3" fill="none"/>`+leafE(x-6,82,4,11,-25,'#62b046')+`<path d="M${x-8} ${y-2} Q${x-8} ${y+12} ${x} ${y+12} Q${x+8} ${y+12} ${x+8} ${y-2} L${x+4} ${y+3} L${x} ${y-6} L${x-4} ${y+3}Z" fill="${c}" stroke="#d94b7c" stroke-width="1"/>`; }); return `<svg ${v}>${g}</svg>`; }
     case 'daisy': { let g=sh+`<ellipse cx="50" cy="88" rx="30" ry="9" fill="#5aa83a"/>`; [[30,70],[48,62],[66,72],[40,80],[60,82],[52,74]].forEach(([x,y])=>{ g+=`<path d="M${x} 92 L${x} ${y}" stroke="#4f9a35" stroke-width="2"/>`; for(let i=0;i<8;i++){const a=i*45*Math.PI/180; g+=`<ellipse cx="${r1(x+Math.cos(a)*5)}" cy="${r1(y+Math.sin(a)*5)}" rx="3.6" ry="1.9" fill="#fff" transform="rotate(${i*45} ${r1(x+Math.cos(a)*5)} ${r1(y+Math.sin(a)*5)})"/>`;} g+=`<circle cx="${x}" cy="${y}" r="3" fill="#f6c330"/>`; }); return `<svg ${v}>${g}</svg>`; }
@@ -1006,29 +1099,155 @@ const Snd = (()=>{
 const $ = id=>document.getElementById(id);
 function rand(seed){ let x=seed; return ()=>{ x=(x*16807)%2147483647; return (x-1)/2147483646; }; }
 (function buildScenery(){
-  // 울타리 기둥
-  let p=''; for(let x=10;x<1200;x+=46) p+=`<path d="M${x} 284 V246 L${x+5} 240 L${x+10} 246 V284Z"/>`; $('posts').innerHTML=p;
-  // 구름
+  // 구름 (아래쪽에 옅은 그늘이 진 수채화 구름)
   const sky=$('sky');
   [[.08,1.1,90],[.2,.8,130],[.05,.65,170]].forEach(([top,sc,dur],i)=>{
     const c=document.createElement('div'); c.className='cloud';
-    c.innerHTML=`<svg width="${160*sc}" height="${70*sc}" viewBox="0 0 160 70"><g fill="#fff"><ellipse cx="50" cy="45" rx="40" ry="22"/><ellipse cx="85" cy="32" rx="34" ry="28"/><ellipse cx="118" cy="46" rx="32" ry="20"/><rect x="30" y="45" width="110" height="20" rx="10"/></g></svg>`;
+    c.innerHTML=`<svg width="${160*sc}" height="${74*sc}" viewBox="0 0 160 74"><g fill="#e6e9f2"><ellipse cx="50" cy="49" rx="40" ry="20"/><ellipse cx="86" cy="38" rx="34" ry="27"/><ellipse cx="118" cy="50" rx="32" ry="18"/><rect x="30" y="49" width="110" height="19" rx="9.5"/></g><g fill="#fffdf8"><ellipse cx="50" cy="44" rx="38" ry="19"/><ellipse cx="86" cy="32" rx="32" ry="25"/><ellipse cx="118" cy="45" rx="30" ry="16"/><rect x="32" y="44" width="106" height="16" rx="8"/></g><path d="M74 16 Q90 10 104 22" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" opacity=".9"/></svg>`;
     c.style.top=`calc(var(--horizon) * ${top*3})`;
     sky.appendChild(c);
     const start=Math.random();
     c.animate([{transform:'translateX(-30vw)'},{transform:'translateX(110vw)'}],{duration:dur*1000,iterations:Infinity,delay:-start*dur*1000});
   });
 })();
+const f1=n=>Math.round(n*10)/10;
+function hillPath(R,W,base,amp,step,y0){ // 부드러운 언덕 능선
+  let d=`M-20 ${f1(y0)}`, x=-20, y=y0;
+  while(x<W+20){ const nx=x+step*(.7+R()*.6), ny=base-amp*(.35+R()*.65); d+=` Q${f1((x+nx)/2)} ${f1(Math.min(y,ny)-amp*.35)} ${f1(nx)} ${f1(ny)}`; x=nx; y=ny; }
+  return d;
+}
+function treeSVG(x,y,s,dark='#5e9444',mid='#7fb556',light='#a7d176'){ // 동그란 그림책 나무
+  return `<g><ellipse cx="${f1(x-s*.15)}" cy="${f1(y+s*.05)}" rx="${f1(s*.6)}" ry="${f1(s*.13)}" fill="#3b4a20" class="shd"/><path d="M${f1(x-s*.07)} ${f1(y)} L${f1(x-s*.05)} ${f1(y-s*.55)} H${f1(x+s*.05)} L${f1(x+s*.07)} ${f1(y)}Z" fill="#8a6440" stroke="#5e4028" stroke-width="1"/>`
+   +`<g stroke="#4e7a36" stroke-width="1.1"><circle cx="${f1(x-s*.28)}" cy="${f1(y-s*.66)}" r="${f1(s*.3)}" fill="${dark}"/><circle cx="${f1(x+s*.26)}" cy="${f1(y-s*.7)}" r="${f1(s*.32)}" fill="${mid}"/><circle cx="${f1(x)}" cy="${f1(y-s*.98)}" r="${f1(s*.38)}" fill="${mid}"/></g>`
+   +`<circle cx="${f1(x+s*.12)}" cy="${f1(y-s*1.08)}" r="${f1(s*.2)}" fill="${light}" opacity=".8"/><circle cx="${f1(x+s*.36)}" cy="${f1(y-s*.78)}" r="${f1(s*.13)}" fill="${light}" opacity=".7"/></g>`;
+}
+function houseSVG(x,y,w){ // 기준점: 문 아래 가운데 (x,y)
+  const h=w*.62, L=x-w/2, top=y-h, rh=w*.42;
+  const k=w/100, sw=f1(Math.max(1,k*1.4));
+  let g=`<ellipse class="shd" cx="${f1(x-w*.08)}" cy="${f1(y+k*2)}" rx="${f1(w*.62)}" ry="${f1(k*6)}" fill="#3b4a20"/>`;
+  // 굴뚝 + 연기
+  g+=`<g class="smoke" fill="#fffaf2">${[0,1,2].map(i=>`<circle cx="${f1(x+w*.27)}" cy="${f1(top-rh*.8)}" r="${f1(k*5)}"/>`).join('')}</g>`;
+  g+=`<rect x="${f1(x+w*.2)}" y="${f1(top-rh*.78)}" width="${f1(w*.12)}" height="${f1(rh*.6)}" fill="#c4674f" stroke="#7a3b2c" stroke-width="${sw}"/><rect x="${f1(x+w*.18)}" y="${f1(top-rh*.84)}" width="${f1(w*.16)}" height="${f1(k*5)}" fill="#a95441" stroke="#7a3b2c" stroke-width="${sw}"/>`;
+  // 벽
+  g+=`<rect x="${f1(L)}" y="${f1(top)}" width="${f1(w)}" height="${f1(h)}" fill="#fbefd6" stroke="#8a6440" stroke-width="${sw}"/><rect x="${f1(L)}" y="${f1(y-h*.22)}" width="${f1(w)}" height="${f1(h*.22)}" fill="#ead8b4" opacity=".8"/>`;
+  g+=`<path d="M${f1(L+w*.02)} ${f1(top)} V${f1(y)} M${f1(L+w*.98)} ${f1(top)} V${f1(y)}" stroke="#b28a5c" stroke-width="${f1(k*3)}"/>`;
+  // 지붕 (기와 무늬)
+  g+=`<path d="M${f1(L-w*.1)} ${f1(top+k*3)} L${f1(x)} ${f1(top-rh)} L${f1(L+w*1.1)} ${f1(top+k*3)}Z" fill="#dc6b51" stroke="#7a3b2c" stroke-width="${sw}" stroke-linejoin="round"/>`;
+  for(let r=1;r<=3;r++){ const t=r/4, yy=top-rh+rh*t+k*3*t, half=(w*.6)*t; g+=`<path d="M${f1(x-half)} ${f1(yy)} Q${f1(x)} ${f1(yy+k*3)} ${f1(x+half)} ${f1(yy)}" stroke="#b5503c" stroke-width="${f1(k*1.2)}" fill="none"/>`; }
+  g+=`<path d="M${f1(x-w*.12)} ${f1(top-rh*.62)} L${f1(x+w*.05)} ${f1(top-rh*.82)}" stroke="#f29a82" stroke-width="${f1(k*2)}" stroke-linecap="round" opacity=".8"/>`;
+  // 지붕창 + 문 + 창
+  g+=`<circle cx="${f1(x)}" cy="${f1(top-rh*.35)}" r="${f1(k*6)}" fill="#ffe7a3" stroke="#7a3b2c" stroke-width="${sw}"/>`;
+  const dw=w*.2, dh=h*.6;
+  g+=`<path d="M${f1(x-dw/2)} ${f1(y)} V${f1(y-dh+dw/2)} A${f1(dw/2)} ${f1(dw/2)} 0 0 1 ${f1(x+dw/2)} ${f1(y-dh+dw/2)} V${f1(y)}Z" fill="#9a6440" stroke="#5e3b22" stroke-width="${sw}"/><circle cx="${f1(x+dw*.28)}" cy="${f1(y-dh*.42)}" r="${f1(k*1.6)}" fill="#f3d07a"/><rect x="${f1(x-dw*.75)}" y="${f1(y-k*.5)}" width="${f1(dw*1.5)}" height="${f1(k*3.5)}" rx="${f1(k)}" fill="#cdb48c" stroke="#8a6440" stroke-width="${f1(k)}"/>`;
+  [[L+w*.2],[L+w*.8]].forEach(([cx])=>{ const ww=w*.17, wy=top+h*.24;
+    g+=`<circle class="winglow" cx="${f1(cx)}" cy="${f1(wy+ww*.45)}" r="${f1(ww*.9)}" fill="#ffe08a"/><rect x="${f1(cx-ww/2)}" y="${f1(wy)}" width="${f1(ww)}" height="${f1(ww*.9)}" rx="${f1(k)}" fill="#ffe9a8" stroke="#7a5536" stroke-width="${sw}"/><path d="M${f1(cx)} ${f1(wy)} V${f1(wy+ww*.9)} M${f1(cx-ww/2)} ${f1(wy+ww*.45)} H${f1(cx+ww/2)}" stroke="#7a5536" stroke-width="${f1(k*1.1)}"/>`
+     +`<rect x="${f1(cx-ww*.65)}" y="${f1(wy+ww*.92)}" width="${f1(ww*1.3)}" height="${f1(k*4)}" fill="#a7744a" stroke="#6e4a2c" stroke-width="${f1(k)}"/>`
+     +[-.4,-.1,.2,.45].map((o,j)=>`<circle cx="${f1(cx+ww*o)}" cy="${f1(wy+ww*.9)}" r="${f1(k*2.3)}" fill="${['#ef6a7a','#ffd36a','#f29ab0','#ef6a7a'][j]}"/>`).join(''); });
+  return g;
+}
+function fenceSVG(W,y,fh,gap){ // 말뚝 울타리 (길이 지나는 곳은 문으로 비워 둬요)
+  const step=Math.max(14,fh*1.25), pw=Math.max(4,fh*.26); let rails='', posts='';
+  const seg=(a,b)=>{ if(b-a<4) return; rails+=`<rect x="${f1(a)}" y="${f1(y-fh*.72)}" width="${f1(b-a)}" height="${f1(fh*.16)}" rx="2"/><rect x="${f1(a)}" y="${f1(y-fh*.34)}" width="${f1(b-a)}" height="${f1(fh*.16)}" rx="2"/>`; };
+  if(gap){ seg(-10,gap[0]); seg(gap[1],W+10); } else seg(-10,W+10);
+  for(let x=-4;x<W+step;x+=step){ if(gap&&x>gap[0]-pw&&x<gap[1]) continue; posts+=`<path d="M${f1(x)} ${f1(y)} V${f1(y-fh*.86)} L${f1(x+pw/2)} ${f1(y-fh)} L${f1(x+pw)} ${f1(y-fh*.86)} V${f1(y)}Z"/>`; }
+  let gate='';
+  if(gap){ const gp=pw*1.35; [gap[0]-gp,gap[1]].forEach(x=>{ gate+=`<rect x="${f1(x)}" y="${f1(y-fh*1.12)}" width="${f1(gp)}" height="${f1(fh*1.12)}" rx="1.5"/><circle cx="${f1(x+gp/2)}" cy="${f1(y-fh*1.16)}" r="${f1(gp*.62)}"/>`; }); }
+  return `<g fill="#f6ead0" stroke="#a9845a" stroke-width="1.3" stroke-linejoin="round">${rails}${posts}${gate}</g><path d="M-10 ${f1(y+1)} H${W+10}" stroke="#7fae55" stroke-width="2" opacity=".5"/>`;
+}
+function propSVG(kind,x,y,s){ // 생활 소품 (기준점: 바닥 가운데)
+  const k=s/40, sw=f1(Math.max(.8,k*1.2)), sh=`<ellipse class="shd" cx="${f1(x-s*.1)}" cy="${f1(y)}" rx="${f1(s*.55)}" ry="${f1(s*.12)}" fill="#3b4a20"/>`;
+  const T=(dx,dy)=>`${f1(x+dx*k)} ${f1(y+dy*k)}`;
+  switch(kind){
+    case 'mailbox': return sh+`<rect x="${f1(x-1.6*k)}" y="${f1(y-24*k)}" width="${f1(3.2*k)}" height="${f1(24*k)}" fill="#8a6440" stroke="#5e4028" stroke-width="${sw}"/><path d="M${T(-9,-22)} L${T(-9,-30)} Q${T(-9,-36)} ${T(0,-36)} Q${T(9,-36)} ${T(9,-30)} L${T(9,-22)}Z" fill="#6f9fd0" stroke="#3e6488" stroke-width="${sw}"/><path d="M${T(-9,-22)} H${f1(x+9*k)}" stroke="#3e6488" stroke-width="${sw}"/><rect x="${f1(x+9*k)}" y="${f1(y-36*k)}" width="${f1(1.6*k)}" height="${f1(9*k)}" fill="#5e4028"/><rect x="${f1(x+10.6*k)}" y="${f1(y-36*k)}" width="${f1(5*k)}" height="${f1(3.4*k)}" fill="#e2503c"/>`;
+    case 'hay': return sh+`<path d="M${T(-18,0)} L${T(-17,-16)} Q${T(0,-21)} ${T(17,-16)} L${T(18,0)}Z" fill="#f0cf7a" stroke="#a9843a" stroke-width="${sw}" stroke-linejoin="round"/><path d="M${T(-17,-8)} Q${T(0,-12)} ${T(17,-8)} M${T(-8,-18)} V${f1(y)} M${T(8,-18)} V${f1(y)}" stroke="#b8923e" stroke-width="${sw}" fill="none"/><path d="M${T(-12,-15)} l${f1(3*k)} ${f1(-3*k)} M${T(4,-17)} l${f1(2*k)} ${f1(-4*k)}" stroke="#e8c060" stroke-width="${sw}"/>`;
+    case 'barrow': return sh+`<path d="M${T(-20,-14)} L${T(-26,-22)}" stroke="#7a5233" stroke-width="${f1(2.4*k)}" stroke-linecap="round"/><path d="M${T(-18,-12)} L${T(16,-12)} L${T(10,-2)} H${f1(x-12*k)}Z" fill="#c4674f" stroke="#7a3b2c" stroke-width="${sw}" stroke-linejoin="round"/><path d="M${T(-14,-12)} Q${T(-4,-22)} ${T(4,-17)} Q${T(10,-22)} ${T(14,-12)}" fill="#f0cf7a" stroke="#a9843a" stroke-width="${sw}"/><circle cx="${f1(x+10*k)}" cy="${f1(y-4*k)}" r="${f1(5*k)}" fill="#5e4a3a" stroke="#3a2c20" stroke-width="${sw}"/><circle cx="${f1(x+10*k)}" cy="${f1(y-4*k)}" r="${f1(1.6*k)}" fill="#c9b08a"/><path d="M${T(-10,-2)} V${f1(y)}" stroke="#7a5233" stroke-width="${f1(2*k)}"/>`;
+    case 'crate': return sh+`<rect x="${f1(x-14*k)}" y="${f1(y-15*k)}" width="${f1(28*k)}" height="${f1(15*k)}" fill="#d3a46c" stroke="#8a5d36" stroke-width="${sw}"/><path d="M${T(-14,-7.5)} H${f1(x+14*k)}" stroke="#8a5d36" stroke-width="${sw}"/>${[[-8,'#e5432f'],[-2,'#f4922e'],[4,'#e5432f'],[9,'#86c454']].map(([dx,c])=>`<circle cx="${f1(x+dx*k)}" cy="${f1(y-17*k)}" r="${f1(3.6*k)}" fill="${c}" stroke="#6e3a20" stroke-width="${f1(k*.8)}"/>`).join('')}`;
+    case 'can': return sh+`<path d="M${T(-8,0)} L${T(-7,-14)} H${f1(x+7*k)} L${T(8,0)}Z" fill="#8fb6d6" stroke="#43698a" stroke-width="${sw}" stroke-linejoin="round"/><path d="M${T(7,-11)} L${T(17,-18)}" stroke="#43698a" stroke-width="${f1(2.6*k)}" stroke-linecap="round"/><path d="M${T(-5,-14)} Q${T(0,-22)} ${T(5,-14)}" fill="none" stroke="#43698a" stroke-width="${f1(1.8*k)}"/><path d="M${T(-4,-11)} V${f1(y-3*k)}" stroke="#d6ecff" stroke-width="${f1(1.4*k)}" opacity=".8"/>`;
+    case 'bush': return sh+`<g stroke="#4e7a36" stroke-width="${sw}"><circle cx="${f1(x-8*k)}" cy="${f1(y-7*k)}" r="${f1(9*k)}" fill="#6fa64e"/><circle cx="${f1(x+7*k)}" cy="${f1(y-8*k)}" r="${f1(10*k)}" fill="#7fb556"/><circle cx="${f1(x)}" cy="${f1(y-14*k)}" r="${f1(9*k)}" fill="#8cc061"/></g>${[[-9,-10],[4,-16],[9,-6],[-2,-6]].map(([dx,dy],j)=>`<circle cx="${f1(x+dx*k)}" cy="${f1(y+dy*k)}" r="${f1(2*k)}" fill="${j%2?'#fff4f6':'#ffb3c7'}"/>`).join('')}`;
+  }
+  return '';
+}
+function buildScene(){
+  const svg=$('scene'), W=innerWidth, H=innerHeight;
+  const hz=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--horizon'))||H*.3;
+  const grid=$('grid').getBoundingClientRect(), stage=$('stage').getBoundingClientRect();
+  const cell=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cell'))||100;
+  const compact=W<650&&stage.left<1&&H>=W;
+  const leftRoom=grid.left-stage.left, rightRoom=W-grid.right;
+  const R=rand(23);
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  let g=`<defs><linearGradient id="sc-far" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a9bcd6"/><stop offset="1" stop-color="#d9e2df"/></linearGradient><linearGradient id="sc-mid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b7d58c"/><stop offset="1" stop-color="#a3c87a"/></linearGradient><linearGradient id="sc-path" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ead2a2"/><stop offset="1" stop-color="#ddbd86"/></linearGradient></defs>`;
+  // 1) 먼 산 (푸르스름하고 흐릿하게)
+  const farA=Math.min(hz*.34,130);
+  g+=`<path d="${hillPath(R,W,hz-farA*.32,farA,Math.max(160,W/4),hz-farA*.5)} V${f1(hz+2)} H-20Z" fill="url(#sc-far)" opacity=".9"/>`;
+  // 2) 중간 언덕 + 나무
+  const midA=Math.min(hz*.16,62);
+  g+=`<path d="${hillPath(R,W,hz-midA*.15,midA,Math.max(120,W/5),hz-midA*.4)} V${f1(hz+2)} H-20Z" fill="url(#sc-mid)"/>`;
+  const ts=Math.max(16,Math.min(44,hz*.15));
+  for(let x=R()*80;x<W;x+=ts*(2.2+R()*2.6)){ const s=ts*(.55+R()*.5); g+=treeSVG(x,hz-midA*(.18+R()*.25),s,'#7aa662','#93bf72','#b6da8e'); }
+  // 3) 가까운 둔덕
+  g+=`<path d="M-20 ${f1(hz-4)} Q${f1(W*.25)} ${f1(hz-14)} ${f1(W*.5)} ${f1(hz-6)} T${W+20} ${f1(hz-8)} V${f1(hz+3)} H-20Z" fill="#a8cd7c"/>`;
+  // 집과 밭 사이에 길을 내고, 소품은 길 바깥에 모아 둬요.
+  const hw=compact?Math.max(H<700?42:50,Math.min(91,W*.22,(grid.top-stage.top-28)*.8))
+    :Math.max(52,Math.min(148,W*.12,Math.max(leftRoom*1.08,52)));
+  const hx=compact?W*.24:Math.max(stage.left+hw*.68,grid.left-leftRoom*.50);
+  const hb=compact?Math.max(stage.top+hw*1.05+6,Math.min(hz-7,grid.top-40))
+    :Math.max(hw*1.05+8,Math.min(hz-12,grid.top-25));
+  const sideEntry=!compact&&leftRoom>hw*.9;
+  const entryX=sideEntry?grid.left-14:grid.left+grid.width*.40;
+  const gateX=hx+(entryX-hx)*.32, gateY=hb+Math.max(12,hw*.21);
+  const entryY=Math.max(gateY+12,sideEntry?grid.top+cell*.52:grid.top-11);
+  const gateHalf=Math.max(8,hw*.105), doorHalf=gateHalf*.52, endHalf=gateHalf*1.38;
+  const bendY=gateY+(entryY-gateY)*.66;
+  const door=(sign)=>`${f1(hx+sign*doorHalf)} ${f1(hb)}`;
+  const gate=(sign)=>`${f1(gateX+sign*gateHalf)} ${f1(gateY)}`;
+  const exit=(sign)=>`${f1(entryX+sign*endHalf)} ${f1(entryY)}`;
+  const near=(sign)=>`${f1(entryX+sign*endHalf)} ${f1(bendY)}`;
+  const far=(sign)=>`${f1(gateX+sign*gateHalf)} ${f1(bendY)}`;
+  const turn=(sign)=>`${f1(hx+sign*gateHalf)} ${f1(gateY)}`;
+  g+=`<path d="M${door(-1)} Q${turn(-1)} ${gate(-1)} C${far(-1)} ${near(-1)} ${exit(-1)} L${exit(1)} C${near(1)} ${far(1)} ${gate(1)} Q${turn(1)} ${door(1)}Z" fill="url(#sc-path)" stroke="#bfa16f" stroke-width="1.2" stroke-linejoin="round"/>`;
+  // 짧은 울타리와 열린 문이 길을 가리지 않아요.
+  const fh=Math.max(11,Math.min(25,hw*.17));
+  const fenceX=Math.max(stage.left+3,gateX-hw*1.14), fenceEnd=Math.min(W-4,gateX+hw*1.38);
+  g+=`<svg x="${f1(fenceX)}" y="${f1(gateY-fh*1.4)}" width="${f1(fenceEnd-fenceX)}" height="${f1(fh*1.55)}" overflow="hidden">${fenceSVG(fenceEnd-fenceX,fh*1.4,fh,[gateX-fenceX-gateHalf,gateX-fenceX+gateHalf])}</svg>`;
+  if(!compact&&leftRoom>hw*1.55) g+=treeSVG(hx-hw*.66,hb+1,hw*.82,'#729954','#87ad62','#b2ce83');
+  g+=houseSVG(hx,hb,hw);
+  g+=propSVG('mailbox',gateX+gateHalf+fh*.64,gateY,fh*1.32);
+
+  // 밭 오른쪽의 나무가 집과 균형을 잡고, 앞쪽은 비워서 밭이 잘 보여요.
+  if(compact){
+    g+=treeSVG(W*.79,hb+4,hw*.94,'#769954','#87ad63','#b1ce83');
+    g+=propSVG('bush',W*.83,hb+hw*.18,hw*.38);
+  }else{
+    if(rightRoom>80){
+      const x=grid.right+rightRoom*.48, y=Math.max(hz+18,grid.top+cell*.42);
+      g+=treeSVG(x,y,Math.min(114,cell*.81),'#749950','#85ad60','#aacb7c');
+      g+=propSVG('bush',x+Math.min(40,rightRoom*.24),y+12,Math.min(50,cell*.38));
+    }
+    if(leftRoom>100) g+=propSVG('barrow',grid.left-leftRoom*.34,grid.top+grid.height*.73,Math.min(61,cell*.49));
+    if(rightRoom>120){
+      const x=grid.right+rightRoom*.29, y=grid.top+grid.height*.73;
+      g+=propSVG('crate',x,y,Math.min(56,cell*.46));
+      g+=propSVG('can',x+Math.min(33,rightRoom*.17),y+8,Math.min(40,cell*.35));
+    }
+  }
+  // 가까운 풀밭: 아래로 갈수록 짙고, 군데군데 볕 든 자리
+  g+=`<path d="M-20 ${f1(H-Math.max(40,H*.08))} Q${f1(W*.3)} ${f1(H-Math.max(60,H*.11))} ${f1(W*.6)} ${f1(H-Math.max(44,H*.085))} T${W+20} ${f1(H-Math.max(54,H*.1))} V${H} H-20Z" fill="#6a9f45" opacity=".55"/>`;
+  for(let i=0;i<5;i++){ const y=hz+(H-hz)*(.18+R()*.6), x=R()*W; g+=`<ellipse cx="${f1(x)}" cy="${f1(y)}" rx="${f1(60+R()*120)}" ry="${f1(10+R()*16)}" fill="#d8ec9c" opacity=".16"/>`; }
+  svg.innerHTML=g;
+}
 function buildTufts(){
   const box=$('tufts'); box.innerHTML=''; const R=rand(7); const H=innerHeight, W=innerWidth;
   const hz = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--horizon'))||H*.3;
-  const n=Math.round(W*H/9000);
+  const n=Math.round(W*H/8000);
   for(let i=0;i<n;i++){
-    const x=R()*W, y=hz+20+R()*(H-hz-20); const s=10+R()*14;
+    const depth=R(), x=R()*W, y=hz+14+depth*(H-hz-14); const s=7+depth*20;
     const kind=R(); const el=document.createElementNS('http://www.w3.org/2000/svg','svg');
-    el.setAttribute('viewBox','0 0 20 20'); el.style.left=x+'px'; el.style.top=y+'px'; el.style.width=s+'px'; el.style.height=s+'px';
-    if(kind<.12){ const c=['#fff','#ffe066','#ffb3c7','#c9b6ff'][Math.floor(R()*4)]; el.innerHTML=`<path d="M10 20 V12" stroke="#4f9a35" stroke-width="1.5"/><circle cx="10" cy="10" r="3.2" fill="${c}"/><circle cx="10" cy="10" r="1.2" fill="#f2a516"/>`; }
-    else el.innerHTML=`<path d="M4 20 Q5 12 3 7 M10 20 Q10 10 11 4 M16 20 Q15 13 18 8" stroke="${R()<.5?'#5aa83a':'#4c9a34'}" stroke-width="2" fill="none" stroke-linecap="round"/>`;
+    el.setAttribute('viewBox','0 0 20 20'); el.style.left=(x-s/2)+'px'; el.style.top=(y-s)+'px'; el.style.width=s+'px'; el.style.height=s+'px';
+    const ink=depth>.6?'#4b7f30':'#5c9038';
+    if(kind<.12){ const c=['#fffaf0','#ffe066','#ffb3c7','#c9b6ff'][Math.floor(R()*4)]; el.innerHTML=`<path d="M10 20 V12" stroke="${ink}" stroke-width="1.5"/>${[0,72,144,216,288].map(a=>`<circle cx="${f1(10+Math.sin(a*Math.PI/180)*2.4)}" cy="${f1(10-Math.cos(a*Math.PI/180)*2.4)}" r="1.9" fill="${c}" stroke="rgba(90,70,40,.35)" stroke-width=".4"/>`).join('')}<circle cx="10" cy="10" r="1.3" fill="#f2a516"/>`; }
+    else if(kind<.16){ el.innerHTML=`<ellipse cx="10" cy="17" rx="5" ry="3" fill="#c9bfa8" stroke="#8f846c" stroke-width=".8"/><path d="M7.5 16 q2 -1.6 4.5 -.6" stroke="#ebe3d0" stroke-width=".9" fill="none"/>`; }
+    else el.innerHTML=`<path d="M3 20 Q5 12 2.5 6 M8 20 Q8.5 10 10 3 M13 20 Q13 12 15.5 7 M17 20 Q17 15 19 11" stroke="${R()<.5?ink:'#6aa443'}" stroke-width="${depth>.6?2.1:1.7}" fill="none" stroke-linecap="round"/>`;
     box.appendChild(el);
   }
 }
@@ -1073,10 +1292,15 @@ function fieldRows(field=S.field){ return field==='greenhouse'?2:S.rows; }
 function fieldPlots(field=S.field){ return field==='greenhouse'?S.greenhousePlots:S.plots; }
 function plotCount(field=S.field){ return fieldRows(field)*3; }
 function renderAll(){ renderHUD(); applyWeather(); renderGrid(); renderDecor(); renderHint(); }
+const WX_ICON={
+  sunny:'<svg class="wx" viewBox="0 0 24 24" aria-hidden="true"><g stroke="#d9921a" stroke-width="1.8" stroke-linecap="round">'+[0,45,90,135,180,225,270,315].map(a=>`<path d="M12 2.4 V5" transform="rotate(${a} 12 12)"/>`).join('')+'</g><circle cx="12" cy="12" r="5" fill="#ffd65a" stroke="#d9921a" stroke-width="1.3"/></svg>',
+  cloudy:'<svg class="wx" viewBox="0 0 24 24" aria-hidden="true"><circle cx="15.5" cy="8.5" r="4.2" fill="#ffd65a" stroke="#d9921a" stroke-width="1.2"/><path d="M6 19 Q2.5 19 2.8 15.8 Q3.2 13 6.4 13.4 Q7.2 9.6 11 10 Q14.2 10.4 14.6 13.4 Q18 13 18.2 16 Q18.2 19 15 19Z" fill="#fffdf8" stroke="#8a96a8" stroke-width="1.3" stroke-linejoin="round"/></svg>',
+  rain:'<svg class="wx" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15 Q2.5 15 2.8 11.8 Q3.2 9 6.4 9.4 Q7.2 5.6 11 6 Q14.2 6.4 14.6 9.4 Q18 9 18.4 12 Q18.4 15 15 15Z" fill="#e7ebf2" stroke="#6f7d92" stroke-width="1.3" stroke-linejoin="round"/><path d="M7 17.5 l-1 2.6 M11 17.5 l-1 2.6 M15 17.5 l-1 2.6" stroke="#4f8cc2" stroke-width="1.8" stroke-linecap="round"/></svg>'
+};
 function renderHUD(){
   updateSaveStatus();
   const w=WEATHER[S.weather];
-  $('dayPill').innerHTML=`${S.day}일째 <small>${w.icon} ${w.name}</small>`;
+  $('dayPill').innerHTML=`${S.day}일째 <small style="display:flex;align-items:center;gap:4px">${WX_ICON[S.weather]} ${w.name}</small>`;
   $('coins').textContent=S.coins;
   const n=Object.values(S.basket).reduce((a,b)=>a+b,0); $('basketBadge').textContent=n?n:'';
   $('setBtn').textContent=(S.sound.rain||S.sound.sfx)?'🔊':'🔈';
@@ -1113,7 +1337,7 @@ function renderGrid(){
   while(grid.children.length<n){
     const i=grid.children.length, el=document.createElement('div');
     el.className='plot'; el.dataset.i=i; el.setAttribute('role','button'); el.tabIndex=0;
-    el.innerHTML='<div class="soil"></div><svg class="crop" viewBox="0 0 100 100" aria-hidden="true"></svg><svg class="irrigation" viewBox="0 0 40 18" aria-hidden="true" hidden><path d="M2 12 H22 Q27 12 27 7 V5 H34" fill="none" stroke="#2f6b88" stroke-width="4" stroke-linecap="round"/><path d="M34 8 Q28 14 34 16 Q40 14 34 8" fill="#9ce5ff"/></svg><div class="plot-note" aria-hidden="true"></div>';
+    el.innerHTML='<div class="soil"></div><div class="soak"></div><svg class="crop" viewBox="0 0 100 100" aria-hidden="true"></svg><svg class="irrigation" viewBox="0 0 40 18" aria-hidden="true" hidden><path d="M2 12 H22 Q27 12 27 7 V5 H34" fill="none" stroke="#2f6b88" stroke-width="4" stroke-linecap="round"/><path d="M34 8 Q28 14 34 16 Q40 14 34 8" fill="#9ce5ff"/></svg><div class="plot-note" aria-hidden="true"></div><div class="pips" aria-hidden="true"></div>';
     el.addEventListener('click',()=>onPlot(i));
     el.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); if(!e.repeat) onPlot(i); } });
     grid.appendChild(el);
@@ -1129,6 +1353,10 @@ function renderPlot(i, grew){
   el.classList.toggle('dry',!!p.crop&&!p.wet&&!ripe);
   el.classList.toggle('problem',!!p.issue);
   el.classList.toggle('care-target',careMode&&!!p.crop&&!ripe);
+  el.classList.toggle('is-ripe',!!ripe);
+  el.classList.toggle('thirsty',!!p.crop&&!ripe&&!p.watered&&p.issue!=='weed');
+  const pips=el.querySelector('.pips'), pipKey=p.crop&&!ripe?p.crop+p.stage:'';
+  if(pips.dataset.k!==pipKey){ pips.dataset.k=pipKey; pips.innerHTML=pipKey?Array.from({length:CROPS[p.crop].stages},(_,k)=>`<i class="${k<p.stage?'on':''}"></i>`).join(''):''; }
   el.querySelector('.irrigation').toggleAttribute('hidden',!S.smart);
   const svg=el.querySelector('.crop');
   if(p.crop){
@@ -1143,7 +1371,7 @@ function renderPlot(i, grew){
   if(ripe&&!star){
     star=document.createElementNS('http://www.w3.org/2000/svg','svg');
     star.setAttribute('viewBox','0 0 20 20'); star.setAttribute('aria-hidden','true'); star.classList.add('ripe');
-    star.innerHTML='<path d="M10 1 L12.4 7.6 L19 10 L12.4 12.4 L10 19 L7.6 12.4 L1 10 L7.6 7.6Z" fill="#fff6b0" stroke="#f2b632" stroke-width="1"/>';
+    star.innerHTML='<path d="M10 .8 L12.3 7.7 L19.2 10 L12.3 12.3 L10 19.2 L7.7 12.3 L.8 10 L7.7 7.7Z" fill="#fff3a6" stroke="#c98a12" stroke-width="1.1" stroke-linejoin="round"/><circle cx="10" cy="10" r="2.2" fill="#fffdf0"/>';
     el.appendChild(star);
   }else if(!ripe&&star) star.remove();
   const marker=p.issue==='weed'?'🌿 잡초':p.issue==='pest'?'🐛 해충':p.fertilizer?'🌱 비료':protectedPlot(p)?'🛡️ 보호':'';
@@ -1223,9 +1451,12 @@ function layout(){
   root.setProperty('--cell',cell+'px'); root.setProperty('--gap',(cell*.08)+'px');
   requestAnimationFrame(()=>{
     const r=$('farm').getBoundingClientRect();
-    const hz=Math.max(innerHeight*.2,Math.min(innerHeight*.42,r.top+cell*.45));
+    const bounds=stage.getBoundingClientRect();
+    const compact=innerWidth<650&&bounds.left<1&&innerHeight>=innerWidth;
+    const hz=compact?Math.min(innerHeight*.39,Math.max(innerHeight*.24,bounds.top+98))
+      :Math.max(innerHeight*.2,Math.min(innerHeight*.41,r.top+cell*.40));
     root.setProperty('--horizon',hz+'px');
-    buildTufts();
+    buildScene(); buildTufts();
   });
 }
 
@@ -1302,9 +1533,10 @@ function water(i,el){
   const p=fieldPlots()[i];
   p.watered=true; p.wet=true;
   saveNow(); renderPlot(i); renderHUD(); renderHint();
+  el.classList.remove('soaking'); void el.offsetWidth; el.classList.add('soaking'); setTimeout(()=>el.classList.remove('soaking'),1450);
   const [x,y]=centerOf(el,.45);
   const can=document.createElement('div'); can.className='can';
-  can.innerHTML=`<svg viewBox="0 0 64 52"><path d="M14 18 H40 V44 Q40 48 36 48 H18 Q14 48 14 44Z" fill="#7fb7e8" stroke="#4f8cc2" stroke-width="2"/><path d="M40 26 L58 14 L60 18 L42 32" fill="#7fb7e8" stroke="#4f8cc2" stroke-width="2"/><circle cx="59" cy="15" r="3.5" fill="#4f8cc2"/><path d="M18 18 Q27 4 36 18" fill="none" stroke="#4f8cc2" stroke-width="3"/></svg>`;
+  can.innerHTML=`<svg viewBox="0 0 64 52"><path d="M18 18 Q27 3 36 18" fill="none" stroke="#43698a" stroke-width="3.4" stroke-linecap="round"/><path d="M40 27 L57 14.5 L60.5 18.5 L42 33" fill="#8fb6d6" stroke="#43698a" stroke-width="1.8" stroke-linejoin="round"/><ellipse cx="59" cy="16" rx="3.4" ry="4.4" transform="rotate(40 59 16)" fill="#6f9cc2" stroke="#43698a" stroke-width="1.4"/><path d="M13 18 H41 L39.5 44 Q39 48 35 48 H19 Q15 48 14.5 44Z" fill="#8fb6d6" stroke="#43698a" stroke-width="1.8" stroke-linejoin="round"/><path d="M13 18 H41" stroke="#43698a" stroke-width="3" stroke-linecap="round"/><path d="M19 23 V43" stroke="#e2f2ff" stroke-width="2.4" stroke-linecap="round" opacity=".8"/><path d="M15 36 H40" stroke="#6f9cc2" stroke-width="1.2"/></svg>`;
   can.style.left=(x-26)+'px'; can.style.top=(y-52)+'px'; fx.appendChild(can);
   can.animate([{transform:'rotate(0) translateY(-8px)',opacity:0},{transform:'rotate(0)',opacity:1,offset:.15},{transform:'rotate(28deg)',offset:.35},{transform:'rotate(32deg)',offset:.8},{transform:'rotate(0)',opacity:0}],{duration:1100,easing:'ease-in-out'}).onfinish=()=>can.remove();
   Snd.water();
@@ -1316,6 +1548,19 @@ function water(i,el){
     if(++k>14) clearInterval(iv);
   },45);
   setTimeout(()=>particles(x,y+4,'drop',9,34,36),330);
+  setTimeout(()=>ripples(x,y+el.offsetHeight*.12,el.offsetWidth),380);
+}
+function ripples(x,y,w){
+  for(let k=0;k<3;k++){ const r=document.createElement('div'); r.className='ripple'; r.style.left=(x+(k-1)*w*.18)+'px'; r.style.top=(y+(k%2)*w*.08)+'px'; fx.appendChild(r);
+    r.animate([{transform:'scale(.4)',opacity:.95},{transform:`scale(${3+k*.6})`,opacity:0}],{duration:760,delay:k*110,easing:'ease-out',fill:'both'}).onfinish=()=>r.remove(); }
+}
+function harvestBurst(el,x,y){
+  el.classList.remove('harvested'); void el.offsetWidth; el.classList.add('harvested'); setTimeout(()=>el.classList.remove('harvested'),400);
+  const b=document.createElement('div'); b.className='burst'; b.style.left=x+'px'; b.style.top=y+'px'; fx.appendChild(b);
+  b.animate([{transform:'scale(.3)',opacity:1},{transform:'scale(3.4)',opacity:0}],{duration:520,easing:'ease-out'}).onfinish=()=>b.remove();
+  for(let k=0;k<6;k++){ const sp=document.createElement('div'); sp.className='spark'; sp.style.left=x+'px'; sp.style.top=y+'px'; fx.appendChild(sp);
+    const a=k*Math.PI/3+.3, d=26+Math.random()*16;
+    sp.animate([{transform:'translate(0,0) scale(.4) rotate(0)',opacity:1},{transform:`translate(${Math.cos(a)*d}px,${Math.sin(a)*d}px) scale(1) rotate(90deg)`,opacity:1,offset:.55},{transform:`translate(${Math.cos(a)*d*1.2}px,${Math.sin(a)*d*1.2}px) scale(.2) rotate(140deg)`,opacity:0}],{duration:620,easing:'ease-out'}).onfinish=()=>sp.remove(); }
 }
 function harvest(i,el){
   const p=fieldPlots()[i], type=p.crop, c=CROPS[type];
@@ -1331,6 +1576,7 @@ function harvest(i,el){
     ? {crop:type,stage:c.regrow,wet:wet||watered,watered,protectedUntil}
     : {wet});
   saveNow(); renderPlot(i); renderHUD(); renderHint(); Snd.pop(type);
+  harvestBurst(el,x,y-el.offsetHeight*.08);
   floatText(x,y-28,`+${c.yield} ${c.name}`);
   if(type==='carrot'){
     const f=document.createElement('div'); f.className='flyer'; f.style.left=x+'px'; f.style.top=(y+8)+'px';
@@ -1420,6 +1666,7 @@ function addCareIssue(){
     }
   }
 }
+let dawnTimer;
 function nextDay(){
   if(busy||sheetOpen||popAnchor) return;
   busy=true; cancelPlace(); if(careMode) setCareMode(false);
@@ -1445,6 +1692,8 @@ function nextDay(){
   setTimeout(()=>{
     renderHUD(); applyWeather(); renderHint();
     for(let i=0;i<plotCount();i++) renderPlot(i,grew.includes(i));
+    document.body.classList.remove('dawn'); void document.body.offsetWidth; document.body.classList.add('dawn');
+    clearTimeout(dawnTimer); dawnTimer=setTimeout(()=>document.body.classList.remove('dawn'),3500);
   },420);
   setTimeout(()=>{ veil.classList.remove('show'); busy=false; },1080);
 }
