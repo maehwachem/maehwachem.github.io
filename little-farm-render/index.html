@@ -212,7 +212,8 @@ body.placing #placeBar{display:flex}
 #popover{overflow:auto;max-height:calc(100% - 16px)}
 #popover .care-info{margin:2px 6px 8px;font-size:12px;line-height:1.45}
 #popover .care-actions{display:grid;gap:6px}
-#popover .care-actions button{text-align:left;white-space:normal;min-height:36px}
+#popover .care-actions button{text-align:left;white-space:normal;min-height:44px}
+#popover .care-actions .remove-crop{background:#f3d8cb;color:#793b2c}
 .seedgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:min(calc(92vw - 20px),330px)}
 .seedbtn{background:#fffdf7;border:1.5px solid rgba(122,88,52,.2);border-radius:14px;padding:8px 6px;min-height:76px;display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:0 2px 0 #dcc79f;font-weight:700;font-size:13px}
 .seedbtn svg{width:36px;height:36px}
@@ -364,7 +365,7 @@ body.placing #placeBar{display:flex}
   <div id="farmTools">
     <button class="toolchip" id="profileBtn" aria-label="플레이어와 저장"><span aria-hidden="true">👤</span><span id="playerName">플레이어</span><small id="saveState" aria-live="polite">플레이어 선택</small></button>
     <button class="toolchip" id="growthBtn"><span id="farmRank">🌱 새내기 농부</span><small>농장 성장 ›</small></button>
-    <button class="toolchip" id="careBtn" aria-pressed="false" hidden>🌿 돌보기</button>
+    <button class="toolchip" id="careBtn" aria-pressed="false">🌿 돌보기</button>
     <div class="fieldSwitch" id="fieldSwitch" aria-label="재배 공간" hidden>
       <button data-field="outdoor" aria-pressed="true">노지</button><button data-field="greenhouse" aria-pressed="false">온실</button>
     </div>
@@ -991,10 +992,17 @@ function drawPaprika(s){
   return shadow(24)+`<g class="sway">${g}${front}${fruit}</g>`;
 }
 /* ---- 딸기: 땅에 붙어 퍼지는 세잎, 열매는 잎 바깥 흙 위에 ---- */
+function strawberryLeaflet(x,y,angle,size,fill){
+  return `<g transform="translate(${x} ${y}) rotate(${angle}) scale(${r1(size/10)})">
+    <path d="M0 0 Q-3 -.8 -4 -2.5 L-3.7 -3.6 L-5.2 -4.9 L-4.4 -6 L-5.3 -7.4 L-3.9 -8 L-4.1 -9.4 L-2.6 -9.6 L-2.3 -11 L-.9 -10.9 L.2 -12.2 L1.4 -10.9 L2.8 -11 L3 -9.6 L4.4 -9.3 L4 -7.9 L5.3 -7.1 L4.3 -5.9 L5 -4.7 L3.6 -3.5 L3.7 -2.4 Q2.8 -.8 0 0Z" fill="${fill}" stroke="#3d652e" stroke-width=".9" stroke-linejoin="round"/>
+    <path d="M0 -.4 Q-.2 -5 0 -10.5 M-.1 -3 L-2.6 -4.8 M-.1 -5.6 L-3.2 -7 M0 -4 L2.8 -5.8 M0 -6.7 L2.5 -8.4" fill="none" stroke="#c5de9b" stroke-width=".7" stroke-linecap="round" opacity=".8"/>
+  </g>`;
+}
 function trifol(x,y,a,s,fill='url(#g-leaf)'){
-  let g=stem(`M50 140 Q${r1((50+x)/2)} ${r1(y+8)} ${x} ${y}`,1,'#5a9a3a');
-  [-46,0,46].forEach(o=>{ g+=leafR(x,y,a+o,s*1.05,s*.58,fill); });
-  return g;
+  return stem(`M50 140 Q${r1((50+x)/2)} ${r1(y+8)} ${x} ${y}`,1,'#5a9a3a')
+    +strawberryLeaflet(x,y,a-57,s*.89,fill)
+    +strawberryLeaflet(x,y,a+54,s*.94,fill)
+    +strawberryLeaflet(x,y,a,s*1.18,fill);
 }
 function berry(x,y,ripe){
   let g=`<path d="M${x} ${y-5} C${x+6.4} ${y-6} ${x+6.4} ${y+2} ${x} ${y+7.5} C${x-6.4} ${y+2} ${x-6.4} ${y-6} ${x} ${y-5}Z" fill="${ripe?'url(#g-straw)':'#eef3c4'}" stroke="${ripe?'#8f1626':'#a9b37a'}" stroke-width=".8"/>`;
@@ -1005,9 +1013,9 @@ function wflower(x,y){ let g=''; for(let i=0;i<5;i++){const a=i*72*Math.PI/180; 
 function drawStrawberry(s){
   if(s===0) return mound('strawberry');
   if(s===1) return shadow(8)+`<g class="sway">${trifol(50,131,0,6.5,'url(#g-lett)')}</g>`;
-  let g=trifol(36,126,-42,8.5)+trifol(64,126,42,8.5)+trifol(50,122,0,8.8,'url(#g-leaf2)');
+  let g=trifol(38,128,-41,9.3)+trifol(62,128,39,9.1)+trifol(50,123,4,10,'url(#g-leaf2)');
   if(s===2) return shadow(18)+`<g class="sway">${g}</g>`;
-  g=trifol(29,131,-64,8.2,'url(#g-leaf2)')+trifol(71,131,64,8.2,'url(#g-leaf2)')+g;
+  g=trifol(33,133,-66,8.4,'url(#g-leaf2)')+trifol(67,133,66,8.4,'url(#g-leaf2)')+g;
   let f='';
   if(s===3) f=wflower(25,134)+wflower(75,133)+wflower(59,129);
   else f=`<path d="M40 129 Q32 130 28 133 M60 129 Q68 130 72 132 M53 127 Q58 128 61 130" stroke="#4f8a34" stroke-width="1.1" fill="none"/>`+berry(27,136,true)+berry(73,135,true)+berry(61,133,true);
@@ -1342,7 +1350,6 @@ function renderHUD(){
   $('farmRank').textContent=`${rank.icon} ${rank.name}`;
   const next=FARM_STEPS[level+1];
   $('growthBtn').classList.toggle('can-upgrade',!!next&&S.coins>=next.cost);
-  $('careBtn').hidden=level<1;
   $('careBtn').setAttribute('aria-pressed',String(careMode));
   $('fieldSwitch').hidden=!S.greenhouse;
   $('fieldSwitch').querySelectorAll('[data-field]').forEach(btn=>btn.setAttribute('aria-pressed',String(btn.dataset.field===S.field)));
@@ -1386,7 +1393,7 @@ function renderPlot(i, grew){
   el.classList.toggle('wet',!!p.wet);
   el.classList.toggle('dry',!!p.crop&&!p.wet&&!ripe);
   el.classList.toggle('problem',!!p.issue);
-  el.classList.toggle('care-target',careMode&&!!p.crop&&!ripe);
+  el.classList.toggle('care-target',careMode&&!!p.crop);
   el.classList.toggle('is-ripe',!!ripe);
   el.classList.toggle('thirsty',!!p.crop&&!ripe&&!p.watered&&p.issue!=='weed');
   const pips=el.querySelector('.pips'), pipKey=p.crop&&!ripe?p.crop+p.stage:'';
@@ -1449,7 +1456,7 @@ function hintFor(){
   const needWater=plots.filter(p=>p.crop&&!isRipe(p)&&!p.watered).length;
   const basketN=Object.values(S.basket).reduce((a,b)=>a+b,0);
   if(placing) return '빛나는 자리를 눌러 장식을 놓아보세요';
-  if(careMode) return S.rows>=4&&!inHouse?'비료나 방제제를 줄 작물을 눌러요':'비료를 줄 작물을 눌러요';
+  if(careMode) return '🌿 관리하거나 뽑을 작물을 눌러요';
   if(!F.planted) return '🌱 빈 밭을 눌러 씨앗을 심어보세요';
   if(plots.some(p=>p.issue==='weed')) return '🌿 잡초가 표시된 밭을 눌러 바로 뽑아요';
   if(plots.some(p=>p.issue==='pest')) return '🐛 해충이 표시된 밭을 눌러 살펴봐요';
@@ -1536,12 +1543,12 @@ function onPlot(i){
   if(busy) return;
   if(placing){ toast('장식은 밭 위·아래의 빛나는 자리에 놓을 수 있어요'); return; }
   const p=fieldPlots()[i], el=grid.children[i];
-  if(p.issue==='weed') return clearIssue(i);
   if(careMode){
-    if(p.crop&&!isRipe(p)) return openCare(i,el);
-    toast('자라고 있는 작물을 눌러 주세요');
+    if(p.crop) return openCare(i,el);
+    toast('작물이 있는 밭을 눌러 주세요');
     return;
   }
+  if(p.issue==='weed') return clearIssue(i);
   if(!p.crop) return openSeedPicker(i,el);
   if(isRipe(p)) return harvest(i,el);
   if(p.issue==='pest') return openCare(i,el);
@@ -1641,7 +1648,7 @@ function setCareMode(on){
   $('careBtn').setAttribute('aria-pressed',String(on));
   for(let i=0;i<plotCount();i++){
     const p=fieldPlots()[i];
-    grid.children[i].classList.toggle('care-target',on&&!!p.crop&&!isRipe(p));
+    grid.children[i].classList.toggle('care-target',on&&!!p.crop);
   }
   renderHint();
 }
@@ -1653,18 +1660,22 @@ function clearIssue(i){
 }
 function openCare(i,el){
   const p=fieldPlots()[i], fertilizer=SUPPLIES.fertilizer, treatment=SUPPLIES.treatment;
-  const issue=p.issue==='pest'?'해충이 찾아왔어요. 손으로 떼거나 방제제를 쓸 수 있어요.':'작물 상태가 좋아요.';
+  const issue=p.issue==='pest'?'해충이 찾아왔어요. 손으로 떼거나 방제제를 쓸 수 있어요.'
+    :p.issue==='weed'?'밭에 잡초가 났어요.':isRipe(p)?'수확할 수 있어요.':'작물 상태가 좋아요.';
   const stage=CROPS[p.crop].stages;
-  let actions=p.issue==='pest'?'<button class="small alt" data-care="clear">🐛 해충 떼어내기</button>':'';
-  if(careMode){
+  let actions=p.issue==='pest'?'<button class="small alt" data-care="clear">🐛 해충 떼어내기</button>'
+    :p.issue==='weed'?'<button class="small alt" data-care="clear">🌿 잡초 뽑기</button>':'';
+  if(careMode&&farmLevel()>=1&&!isRipe(p)){
     actions+=`<button class="small alt" data-care="fertilizer" ${p.fed||!S.supplies.fertilizer||stage-p.stage<=1?'disabled':''}>🌱 ${p.fed?'이미 비료를 줬어요':stage-p.stage<=1?'다음 성장에 수확할 수 있어요':'비료 주기 · 보유 '+S.supplies.fertilizer}</button>`;
   }
-  if(S.rows>=4&&S.field==='outdoor'){
+  if(S.rows>=4&&S.field==='outdoor'&&!isRipe(p)){
     actions+=`<button class="small alt" data-care="treatment" ${protectedPlot(p)||!S.supplies.treatment?'disabled':''}>🛡️ ${protectedPlot(p)?'보호 중 · '+(p.protectedUntil===S.day?'오늘까지':p.protectedUntil-S.day+'일 남음'):'방제제 주기 · 보유 '+S.supplies.treatment}</button>`;
   }
+  if(careMode) actions+='<button class="small alt remove-crop" data-care="remove">작물 뽑기</button>';
   showPopover(el,`<h4 id="popTitle">${i+1}번 밭 · ${CROPS[p.crop].name}</h4><p class="care-info">${issue}<br>성장 ${p.stage}/${stage} · ${p.watered?'흙이 촉촉해요':'물이 필요해요'}</p><div class="care-actions">${actions}<button class="small alt" data-care="close">닫기</button></div>`);
   pop.querySelectorAll('[data-care]').forEach(b=>b.addEventListener('click',()=>{
     const action=b.dataset.care;
+    if(action==='remove') return confirmUproot(i,el,p);
     closePopover();
     if(action==='close') return;
     if(action==='clear') return clearIssue(i);
@@ -1679,6 +1690,22 @@ function openCare(i,el){
     }
     saveNow(); renderPlot(i); renderHUD(); renderHint();
   }));
+}
+
+function confirmUproot(i,el,p){
+  const name=CROPS[p.crop].name;
+  showPopover(el,`<h4 id="popTitle">${i+1}번 밭 · 작물을 뽑을까요?</h4>
+    <p class="care-info">${name}을(를) 뽑으면 밭이 비어요.<br>수확물과 씨앗은 받지 않아요.</p>
+    <div class="care-actions"><button class="small alt" id="cancelUproot">취소</button>
+    <button class="small alt remove-crop" id="confirmUproot">뽑기</button></div>`);
+  $('cancelUproot').addEventListener('click',()=>openCare(i,el));
+  $('confirmUproot').addEventListener('click',()=>{
+    closePopover();
+    if(fieldPlots()[i]!==p||!p.crop) return;
+    Object.assign(p,emptyPlot(),{wet:p.wet});
+    setCareMode(false); saveNow(); renderPlot(i); renderHUD(); renderHint();
+    toast('밭을 비웠어요. 새 씨앗을 심을 수 있어요.');
+  });
 }
 
 /* ---- 다음 날 ---- */
