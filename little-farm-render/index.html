@@ -82,6 +82,11 @@ body.w-rain .butterfly{opacity:0}
 .book-card summary{font-size:13px;font-weight:700;cursor:pointer;padding:9px 0;color:#3e612b}
 .book-card img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;border-radius:9px;background:#ebdfc3}
 .book-postcards{display:grid;gap:10px}
+.title-picker{display:grid;gap:5px;margin:0 2px 12px;font-size:13px;font-weight:700}
+.title-picker select{width:100%;min-height:44px;padding:6px 10px;border:1px solid var(--edge);border-radius:10px;background:#fffdf5;color:inherit;font:inherit}
+.title-ranks{list-style:none;margin:6px 0 0;padding:0;font-size:12px;line-height:1.7}
+.title-ranks li{display:flex;flex-wrap:wrap;justify-content:space-between;gap:0 4px}
+.title-ranks .earned{color:#395a26;font-weight:700}
 .book-postcards .book-card img{margin:5px 0 8px}
 .iconbtn{width:42px;height:42px;border-radius:50%;justify-content:center;padding:0;font-size:18px}
 #hint{position:relative;z-index:20;align-self:center;margin:2px 12px 0;max-width:calc(100% - 24px);background:rgba(255,248,234,.95);border:1.5px solid var(--edge);border-radius:16px 16px 16px 6px;padding:8px 15px;font-size:14px;font-weight:600;box-shadow:0 2px 0 rgba(122,88,52,.18),0 5px 14px rgba(70,50,20,.08);text-align:center;transition:opacity .4s, transform .4s}
@@ -95,6 +100,7 @@ body.w-rain .butterfly{opacity:0}
 #growthBtn.can-upgrade{border-color:#8fb35a;box-shadow:0 2px 0 #739447,0 0 0 3px #e2f0b4}
 #profileBtn{display:flex;align-items:center;gap:6px;min-width:0;max-width:calc(100% - 6px)}
 #playerName{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#playerTitle{flex:none;max-width:min(32vw,140px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-radius:8px;padding:3px 5px;background:#eee2b6;color:#6c481b;font-size:10px}
 #saveState{flex:none;font-size:10px;color:#536242}
 #profileBtn.save-alert{background:#fff0db;outline:2px solid #df9a59}
 #profileBtn.save-alert #saveState{color:#79370f}
@@ -363,7 +369,7 @@ body.placing #placeBar{display:flex}
     <button class="pill iconbtn" id="setBtn" aria-label="소리와 설정">🔈</button>
   </div>
   <div id="farmTools">
-    <button class="toolchip" id="profileBtn" aria-label="플레이어와 저장"><span aria-hidden="true">👤</span><span id="playerName">플레이어</span><small id="saveState" aria-live="polite">플레이어 선택</small></button>
+    <button class="toolchip" id="profileBtn" aria-label="플레이어와 저장"><span aria-hidden="true">👤</span><span id="playerName">플레이어</span><small id="playerTitle" hidden></small><small id="saveState" aria-live="polite">플레이어 선택</small></button>
     <button class="toolchip" id="growthBtn"><span id="farmRank">🌱 새내기 농부</span><small>농장 성장 ›</small></button>
     <button class="toolchip" id="careBtn" aria-pressed="false">🌿 돌보기</button>
     <div class="fieldSwitch" id="fieldSwitch" aria-label="재배 공간" hidden>
@@ -411,6 +417,14 @@ const CROPS = {
   paprika:   {name:'파프리카',stages:5, price:18, yield:3, free:true, cost:0, regrow:3, greenhouse:true, desc:'온실에서 열리는 달콤한 열매'},
 };
 const CROP_ORDER = ['lettuce','carrot','tomato','strawberry','sunflower','paprika'];
+const TITLE_TIERS = [{at:5,label:'재배가'},{at:15,label:'장인'},{at:30,label:'명인'}];
+const TITLE_MAX = TITLE_TIERS.at(-1).at;
+const CROP_TITLES = CROP_ORDER.flatMap(type=>TITLE_TIERS.map(({at,label})=>({
+  id:`${type}-${at}`, type, at, name:`${CROPS[type].name} ${label}`
+})));
+function earnedTitle(id,sales){
+  return CROP_TITLES.find(title=>title.id===id&&(sales[title.type]||0)>=title.at);
+}
 const CROP_PHOTO_NOTES = {
   lettuce:'잎이 둥글게 뭉치지 않고 뿌리 가까이에서 바깥으로 펼쳐져요.',
   carrot:'깃털처럼 갈라진 잎과 땅속에서 자란 뿌리를 같이 봐요.',
@@ -452,14 +466,14 @@ const SAVE_KEY = 'today-small-farm-v1';
    상태 / 저장
    ========================================================= */
 function emptyPlot(){
-  return {crop:null,stage:0,watered:false,wet:false,issue:null,fed:false,fertilizer:false,protectedUntil:0};
+  return {crop:null,stage:0,watered:false,wet:false,issue:null,fed:false,fertilizer:false,protectedUntil:0,saleQueued:false};
 }
 function freshState(){
   return {v:1, day:1, weather:'sunny', coins:0, rows:2,
     plots:Array.from({length:12},emptyPlot), greenhousePlots:Array.from({length:6},emptyPlot),
     greenhouse:false, smart:false, autoWater:true, field:'outdoor',
     supplies:{fertilizer:2,treatment:1},
-    basket:{}, harvested:[], seeds:{strawberry:0,sunflower:0}, decorInv:{}, decor:Array(10).fill(null),
+    basket:{}, harvested:[], plantSales:{}, saleMarks:{}, activeTitle:'', seeds:{strawberry:0,sunflower:0}, decorInv:{}, decor:Array(10).fill(null),
     sound:{rain:false,sfx:false}, flags:{}, lastSeed:'lettuce'};
 }
 let S=freshState();
@@ -472,18 +486,32 @@ function restoreState(d){
     const p=saved?.[i];
     if(!CROP_ORDER.includes(p?.crop)||(!inHouse&&CROPS[p.crop].greenhouse)) return {...emptyPlot(),wet:p?.wet===true};
     return {crop:p.crop,stage:Math.min(CROPS[p.crop].stages,count(p.stage)),watered:p.watered===true,wet:p.wet===true,
-      issue:!inHouse&&['weed','pest'].includes(p.issue)?p.issue:null,fed:p.fed===true,fertilizer:p.fertilizer===true,protectedUntil:count(p.protectedUntil)};
+      issue:!inHouse&&['weed','pest'].includes(p.issue)?p.issue:null,fed:p.fed===true,fertilizer:p.fertilizer===true,
+      protectedUntil:count(p.protectedUntil),saleQueued:!!CROPS[p.crop].regrow&&p.saleQueued===true};
   });
   const rows=[2,3,4].includes(d.rows)?d.rows:2;
   const greenhouse=rows===4&&d.greenhouse===true;
   const basket=counts(CROP_ORDER,d.basket);
+  const plantSales=counts(CROP_ORDER,d.plantSales), saleMarks={};
+  for(const type of CROP_ORDER){
+    const sold=Math.min(TITLE_MAX,plantSales[type]||0);
+    if(sold) plantSales[type]=sold;
+    if(!Array.isArray(d.saleMarks?.[type])) continue;
+    const marks=[];
+    for(const mark of d.saleMarks[type]){
+      if(marks.length===TITLE_MAX-sold) break;
+      if(Number.isSafeInteger(mark)&&mark>(marks.at(-1)||0)&&mark<=basket[type]) marks.push(mark);
+    }
+    if(marks.length) saleMarks[type]=marks;
+  }
+  const activeTitle=earnedTitle(d.activeTitle,plantSales)?.id||'';
   const knownHarvests=Array.isArray(d.harvested)?d.harvested:[];
   const harvested=CROP_ORDER.filter(type=>knownHarvests.includes(type)||basket[type]>0);
   return {...f,day:Math.max(1,count(d.day,1)),coins:count(d.coins),rows,
     weather:['sunny','cloudy','rain'].includes(d.weather)?d.weather:'sunny',greenhouse,smart:greenhouse&&d.smart===true,
     autoWater:d.autoWater!==false,field:greenhouse&&d.field==='greenhouse'?'greenhouse':'outdoor',
     plots:plots(12,d.plots,false),greenhousePlots:plots(6,d.greenhousePlots,true),
-    basket,harvested,seeds:counts(['strawberry','sunflower'],d.seeds),
+    basket,harvested,plantSales,saleMarks,activeTitle,seeds:counts(['strawberry','sunflower'],d.seeds),
     decorInv:counts(DECOR_ORDER,d.decorInv),
     decor:Array.from({length:10},(_,i)=>DECOR_ORDER.includes(d.decor?.[i])?d.decor[i]:null),
     supplies:{fertilizer:count(d.supplies?.fertilizer,2),treatment:count(d.supplies?.treatment,1)},
@@ -759,9 +787,13 @@ function saveMessage(){
 }
 function updateSaveStatus(){
   $('playerName').textContent=profile?.name||'플레이어';
+  const title=earnedTitle(S.activeTitle,S.plantSales);
+  const badge=$('playerTitle');
+  badge.hidden=!title;
+  badge.textContent=title?.name||'';
   const status=saveMessage();
   if($('saveState').textContent!==status) $('saveState').textContent=status;
-  $('profileBtn').setAttribute('aria-label',`플레이어와 저장 · ${profile?.name||'선택'} · ${status}`);
+  $('profileBtn').setAttribute('aria-label',`플레이어와 저장 · ${profile?.name||'선택'}${title?' · '+title.name:''} · ${status}`);
   $('profileBtn').classList.toggle('save-alert',!!saveError);
   const notice=$('profileSaveNotice');
   if(notice) notice.textContent=saveError==='conflict'
@@ -1611,12 +1643,17 @@ function harvest(i,el){
   const fruitPositions=c.regrow
     ? (type==='strawberry'?[[27,136],[73,135]]:TOMS).map(([px,py])=>new DOMPoint(px,py).matrixTransform(svg.querySelector('.sway').getScreenCTM()))
     : [];
-  S.basket[type]=(S.basket[type]||0)+c.yield;
+  const stored=S.basket[type]||0;
+  if(!p.saleQueued&&(S.plantSales[type]||0)+(S.saleMarks[type]?.length||0)<TITLE_MAX){
+    // 바구니에서 이 포기의 첫 수확물이 놓인 판매 순서.
+    (S.saleMarks[type]??=[]).push(stored+1);
+  }
+  S.basket[type]=stored+c.yield;
   const firstHarvest=!S.harvested.includes(type);
   if(firstHarvest) S.harvested.push(type);
   const wet=p.wet, watered=automaticWater(), protectedUntil=p.protectedUntil;
   Object.assign(p,emptyPlot(),c.regrow
-    ? {crop:type,stage:c.regrow,wet:wet||watered,watered,protectedUntil}
+    ? {crop:type,stage:c.regrow,wet:wet||watered,watered,protectedUntil,saleQueued:true}
     : {wet});
   saveNow(); renderPlot(i); renderHUD(); renderHint(); Snd.pop(type);
   harvestBurst(el,x,y-el.offsetHeight*.08);
@@ -1866,7 +1903,23 @@ let bookTab='crops';
 function openFarmBook(tab='crops'){
   bookTab=tab; openSheet('book');
 }
+function cropTitlesPanel(){
+  const titles=CROP_TITLES.filter(({type,at})=>(S.plantSales[type]||0)>=at);
+  const options=titles.map(({id,name})=>`<option value="${id}"${S.activeTitle===id?' selected':''}>${name}</option>`).join('');
+  const cards=CROP_ORDER.map(type=>{
+    const sold=S.plantSales[type]||0;
+    const ranks=CROP_TITLES.filter(title=>title.type===type).map(({at,name})=>sold>=at
+      ?`<li class="earned"><span>${name}</span><span>획득 ✓</span></li>`
+      :`<li><span>${name}</span><span>${sold}/${at}포기</span></li>`).join('');
+    return `<article class="book-card"><h4>${itemIcon(type)}${CROPS[type].name}</h4><ul class="title-ranks">${ranks}</ul></article>`;
+  }).join('');
+  return `<p class="book-intro">한 포기의 수확물을 처음 팔 때 1포기로 기록해요. 칭호는 5·15·30포기에서 열려요.</p>
+    <label class="title-picker">이름 옆에 표시할 칭호
+      <select id="titleChoice"${titles.length?'':' disabled'}><option value="">${titles.length?'칭호 표시 안 함':'아직 획득한 칭호가 없어요'}</option>${options}</select>
+    </label><div class="book-grid">${cards}</div>`;
+}
 function farmBookPanel(){
+  if(bookTab==='titles') return cropTitlesPanel();
   const photo=(art,alt)=>`<img loading="lazy" width="480" height="360" src="/art/v1/${art}.webp" alt="${alt}">`;
   if(bookTab==='postcards'){
     const level=farmLevel();
@@ -2048,6 +2101,11 @@ $('sheetBody').addEventListener('submit',e=>{
   });
 });
 $('sheetBody').addEventListener('change',e=>{
+  if(e.target.id==='titleChoice'){
+    S.activeTitle=earnedTitle(e.target.value,S.plantSales)?.id||'';
+    saveNow(); updateSaveStatus();
+    return;
+  }
   if(e.target.id!=='importFarm') return;
   const file=e.target.files[0], mode=saveView, backup=$('newFarmBackup')?.checked===true;
   if(!file) return;
@@ -2147,7 +2205,7 @@ function renderSheet(){
     body.innerHTML=h;
   } else if(sheetOpen==='book'){
     $('sheetTitle').textContent='📖 농장 도감';
-    tabs.innerHTML=[['crops','작물 도감'],['postcards','농장 엽서']].map(([key,label])=>`<button data-book-tab="${key}" class="${key===bookTab?'on':''}" aria-pressed="${key===bookTab}">${label}</button>`).join('');
+    tabs.innerHTML=[['crops','작물 도감'],['postcards','농장 엽서'],['titles','칭호']].map(([key,label])=>`<button data-book-tab="${key}" class="${key===bookTab?'on':''}" aria-pressed="${key===bookTab}">${label}</button>`).join('');
     body.innerHTML=farmBookPanel();
   } else if(sheetOpen==='growth'){
     $('sheetTitle').textContent='🌱 농장 성장';
@@ -2186,8 +2244,8 @@ $('sheetBody').addEventListener('click',e=>{
   const b=e.target.closest('button'); if(!b||b.disabled) return;
   if(sheetOpen==='profiles'){ if(!b.form||b.type!=='submit') profileButton(b); return; }
   const d=b.dataset;
-  if(d.sell1||d.sellall){ const t=d.sell1||d.sellall; const n=d.sell1?1:S.basket[t]; sell(t,n,b); }
-  else if(b.id==='sellEvery'){ let total=0; CROP_ORDER.forEach(t=>{ if(S.basket[t]){ total+=S.basket[t]*CROPS[t].price; S.basket[t]=0; } }); gain(total,b); }
+  if(d.sell1||d.sellall) sellCrops([d.sell1||d.sellall],d.sell1?1:Infinity,b);
+  else if(b.id==='sellEvery') sellCrops(CROP_ORDER,Infinity,b);
   else if(d.place){ closeSheet(); startPlace(d.place); }
   else if(d.buyseed){ const c=CROPS[d.buyseed]; if(S.coins<c.cost) return; S.coins-=c.cost; S.seeds[d.buyseed]=(S.seeds[d.buyseed]||0)+1; Snd.coin(); toast(`${c.name} 씨앗을 샀어요 · 빈 밭을 눌러 심어요`); saveNow(); renderHUD(); renderSheet(); }
   else if(d.buydecor){ const t=d.buydecor, c=DECOR[t]; if(S.coins<c.cost) return; S.coins-=c.cost; S.decorInv[t]=(S.decorInv[t]||0)+1; Snd.coin(); saveNow(); renderHUD(); closeSheet(); startPlace(t); }
@@ -2226,8 +2284,31 @@ $('sheetTabs').addEventListener('click',e=>{
   else shopTab=b.dataset.tab;
   renderSheet(); $('sheetBody').scrollTop=0; $('sheetTabs').querySelector('.on')?.focus({preventScroll:true});
 });
-function sell(t,n,btn){ if(!S.basket[t]) return; n=Math.min(n,S.basket[t]); S.basket[t]-=n; gain(n*CROPS[t].price,btn); }
-function gain(amount,btn){ if(!amount) return; S.coins+=amount; S.flags.sold=true; Snd.coin(); const [x,y]=centerOf(btn,.3); floatText(x,y,`+${amount}`); const cp=$('coinPill'); cp.classList.remove('bounce'); void cp.offsetWidth; cp.classList.add('bounce'); saveNow(); renderHUD(); renderHint(); renderSheet(); }
+function sellCrops(types,quantity,btn){
+  let amount=0;
+  const unlocked=[];
+  for(const type of types){
+    const sold=Math.min(quantity,S.basket[type]||0);
+    if(!sold) continue;
+    S.basket[type]-=sold;
+    amount+=sold*CROPS[type].price;
+    const marks=S.saleMarks[type];
+    if(!marks) continue;
+    const remaining=marks.filter(mark=>mark>sold).map(mark=>mark-sold);
+    if(remaining.length) S.saleMarks[type]=remaining;
+    else delete S.saleMarks[type];
+    const before=S.plantSales[type]||0, after=before+marks.length-remaining.length;
+    if(after===before) continue;
+    S.plantSales[type]=after;
+    unlocked.push(...CROP_TITLES.filter(title=>title.type===type&&title.at>before&&title.at<=after));
+  }
+  if(!amount) return;
+  S.coins+=amount; S.flags.sold=true; Snd.coin();
+  const [x,y]=centerOf(btn,.3); floatText(x,y,`+${amount}`);
+  const cp=$('coinPill'); cp.classList.remove('bounce'); void cp.offsetWidth; cp.classList.add('bounce');
+  saveNow(); renderHUD(); renderHint(); renderSheet();
+  if(unlocked.length) toast(unlocked.length===1?`🏅 새 칭호 · ${unlocked[0].name}`:`🏅 새 칭호 ${unlocked.length}개 · 도감에서 확인해요`);
+}
 
 $('basketBtn').addEventListener('click',()=>openSheet('basket'));
 $('bookBtn').addEventListener('click',()=>openFarmBook());
@@ -2251,7 +2332,7 @@ addEventListener('keydown',e=>{
   }
   const dialog=sheetOpen?sheet:popAnchor?pop:null;
   if(e.key!=='Tab'||!dialog) return;
-  const controls=[...dialog.querySelectorAll('button:not(:disabled),input:not(:disabled)')].filter(el=>el.getClientRects().length);
+  const controls=[...dialog.querySelectorAll('button:not(:disabled),input:not(:disabled),select:not(:disabled)')].filter(el=>el.getClientRects().length);
   const first=controls[0], last=controls.at(-1);
   if(!dialog.contains(document.activeElement)||(e.shiftKey?document.activeElement===first:document.activeElement===last)){
     e.preventDefault(); (e.shiftKey?last:first)?.focus({preventScroll:true});
