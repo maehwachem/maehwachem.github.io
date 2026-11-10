@@ -935,9 +935,9 @@ function drawCarrot(s){
   if(s===0) return mound('carrot');
   if(s===1) return shadow(7)+`<g class="sway">${leaf(50,141,-14,13,1.5,'#7cc84c',false,.3)}${leaf(50,141,12,11,1.5,'#66b240',false,.3)}</g>`;
   let g='';
-  if(s===2){ [-32,-5,30].forEach((a,i)=>g+=frond(a,22+i%2*7)); return shadow(11)+`<g class="sway">${g}</g>`; }
-  if(s===3){ [-43,-20,8,37].forEach((a,i)=>g+=frond(a,28+i%3*5)); return shadow(15)+`<g class="sway">${g}</g>`+carrotTop(5); }
-  [-50,-29,-7,20,43].forEach((a,i)=>g+=frond(a,32+(i%3)*5));
+  if(s===2){ [[-16,21],[-2,29],[15,23]].forEach(([a,len])=>g+=frond(a,len)); return shadow(11)+`<g class="sway">${g}</g>`; }
+  if(s===3){ [[-22,26],[-9,35],[9,38],[21,28]].forEach(([a,len])=>g+=frond(a,len)); return shadow(15)+`<g class="sway">${g}</g>`+carrotTop(5); }
+  [[-24,29],[-14,36],[-2,42],[12,38],[23,31]].forEach(([a,len])=>g+=frond(a,len));
   return shadow(19)+`<g class="sway">${g}</g>`+carrotTop(10.5)+`<circle cx="36" cy="141" r="1.2" fill="#7a5233"/><circle cx="64" cy="140.6" r="1" fill="#7a5233"/>`;
 }
 /* ---- 토마토: 지지대를 타고 높이 자라는 덩굴, 줄기 옆에 둥근 열매 ---- */
