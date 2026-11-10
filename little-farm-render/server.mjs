@@ -18,8 +18,21 @@ if (FARM_SERVICE_ACCOUNT && FARM_BRIDGE_URL && FARM_BRIDGE_KEY && FARM_ENROLLMEN
   });
 }
 const source = await readFile(new URL('./index.html', import.meta.url), 'utf8');
-if (source.includes('__FARM_FIREBASE_CONFIG__')) throw new Error('The Firebase client build has not been generated.');
-const html = source.replace('__FARM_SAVE_ENDPOINT__', api && endpoint ? endpoint + '/api/farm-save' : '');
+const configMarker = '/* __FARM_FIREBASE_CONFIG__ */ {}';
+if (!source.includes(configMarker)) throw new Error('The Firebase web config placeholder is missing.');
+
+const firebaseWebApiKey = process.env.FARM_FIREBASE_WEB_API_KEY || '';
+const firebaseConfig = api && endpoint && /^AIza[A-Za-z0-9_-]{35}$/.test(firebaseWebApiKey)
+  ? {
+      apiKey: firebaseWebApiKey,
+      authDomain: firebaseProject + '.firebaseapp.com',
+      projectId: firebaseProject,
+      appId: '1:125750963712:web:4a3637f7e2d086b99df2e5'
+    }
+  : {};
+const html = source
+  .replace(configMarker, JSON.stringify(firebaseConfig))
+  .replace('__FARM_SAVE_ENDPOINT__', firebaseConfig.apiKey ? endpoint + '/api/farm-save' : '');
 const json = {'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'};
 const port = Number(process.env.PORT || 10000);
 

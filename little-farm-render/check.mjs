@@ -5,6 +5,10 @@ import vm from 'node:vm';
 import {createHandler} from './handler.mjs';
 import {firebaseIdentity,farmStore} from './google.mjs';
 
+const html = readFileSync(new URL('./index.html',import.meta.url),'utf8');
+assert.ok(!/AIza[A-Za-z0-9_-]{35}/.test(html), 'Remove the embedded Google API key before publishing the farm HTML.');
+assert.ok(html.includes('const FIREBASE_CONFIG=/* __FARM_FIREBASE_CONFIG__ */ {};'), 'Keep Firebase web config as a placeholder in the farm HTML.');
+
 const sampleKey='01'.repeat(32);
 const folder='sampleFolder012345';
 const props=new Map([['FARM_BRIDGE_KEY',sampleKey],['FARM_FOLDER_ID',folder]]);
@@ -142,6 +146,6 @@ assert.equal(tokenExchanges,1);
 assert.equal(certRequests,1);
 await Promise.all(background);
 assert.equal([...files.values()].filter(file=>!file.trashed).length,1);
-const code=readFileSync(new URL('./index.html',import.meta.url),'utf8').match(/<script>([\s\S]*?)<\/script>/)[1];
+const code=html.match(/<script>([\s\S]*?)<\/script>/)[1];
 new vm.Script(code);
 console.log('PASS: Firebase identity and project validation, scoped Firestore access and Google assertion, sign-in required, owner isolation, invite, HMAC replay protection, create/read/update, concurrent revision conflict, idempotent retry, file cleanup, and browser script syntax');
