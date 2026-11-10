@@ -862,11 +862,11 @@ function heartLeaf(x,y,a,L,w,fill='url(#g-leaf2)'){ // 해바라기 하트 잎
   const p=`M0 0 C${r1(w*1.4)} ${r1(-L*.12)} ${r1(w*.9)} ${r1(-L*.8)} 0 ${r1(-L)} C${r1(-w*.9)} ${r1(-L*.8)} ${r1(-w*1.4)} ${r1(-L*.12)} 0 0Z`;
   return `<g transform="translate(${r1(x)} ${r1(y)}) rotate(${r1(a)})"><path d="${p}" fill="${fill}" stroke="${OL}" stroke-width=".9" stroke-linejoin="round"/><path d="M0 ${r1(-L*.08)} V${r1(-L*.85)} M0 ${r1(-L*.4)} l${r1(w*.5)} ${r1(-L*.14)} M0 ${r1(-L*.4)} l${r1(-w*.5)} ${r1(-L*.14)}" stroke="#eaf7c8" stroke-width=".6" fill="none" opacity=".7"/></g>`;
 }
-function ruffle(x,y,a,L,w,fill,edge){ // 상추처럼 가장자리가 물결치는 잎
-  let s='';
-  for(let i=0;i<5;i++){ const t=(-.5+i/4)*Math.PI*.92; s+=`<circle cx="${r1(Math.sin(t)*w*.78)}" cy="${r1(-L*.6-Math.cos(t)*L*.3)}" r="${r1(w*.38)}" fill="${fill}" stroke="${edge}" stroke-width=".9"/>`; }
-  const body=`<path d="M0 0 C${r1(w*1.05)} ${r1(-L*.15)} ${r1(w*1.02)} ${r1(-L*.66)} 0 ${r1(-L*.76)} C${r1(-w*1.02)} ${r1(-L*.66)} ${r1(-w*1.05)} ${r1(-L*.15)} 0 0Z" fill="${fill}"/>`;
-  return `<g transform="translate(${r1(x)} ${r1(y)}) rotate(${r1(a)})">${s}${body}<path d="M0 -1 Q${r1(w*.1)} ${r1(-L*.4)} 0 ${r1(-L*.72)}" stroke="#f6ffe0" stroke-width=".9" fill="none" opacity=".85"/></g>`;
+function lettuceLeaf(x,y,angle,length,width,fill){
+  return `<g transform="translate(${x} ${y}) rotate(${angle}) scale(${r1(width/7)} ${r1(length/20)})">
+    <path d="M0 0 C2 -2 5 -3 5 -6 Q8 -7 6 -9 Q9 -11 7 -13 Q8 -16 5 -16 Q6 -19 3 -19 Q2 -22 0 -20 Q-2 -22 -4 -19 Q-7 -19 -6 -16 Q-9 -15 -7 -13 Q-9 -11 -6 -9 Q-8 -7 -5 -6 C-5 -3 -2 -2 0 0Z" fill="${fill}" stroke="${OL}" stroke-width=".9" stroke-linejoin="round"/>
+    <path d="M0 -1 Q-1 -9 0 -18 M0 -6 Q2 -8 4 -9 M0 -9 Q-3 -11 -5 -13 M0 -12 Q3 -14 5 -15 M0 -14 L-3 -17" stroke="#e4f6b4" stroke-width=".75" fill="none" stroke-linecap="round" opacity=".78"/>
+  </g>`;
 }
 function stem(d,w,col='#5f9a3a'){ return `<path d="${d}" stroke="${OL}" stroke-width="${r1(w+1.5)}" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${col}" stroke-width="${w}" fill="none" stroke-linecap="round"/>`; }
 const TAG={lettuce:'#86c454',carrot:'#f28c28',tomato:'#e2412f',strawberry:'#e8384a',sunflower:'#f7c62f',paprika:'#f49b35'};
@@ -876,19 +876,18 @@ function mound(t){ // 씨앗을 심은 흙 둔덕 + 작물 이름표
 }
 function shadow(rx=18){ return `<ellipse class="shd" cx="47" cy="142.2" rx="${rx}" ry="${r1(rx*.28)}" fill="#3b2412"/>`; }
 
-/* ---- 상추: 낮고 넓게 퍼지는 물결 잎 → 동그란 결구 ---- */
+/* ---- 상추: 뿌리에서 잎이 부채처럼 펼쳐져요 ---- */
 function drawLettuce(s){
   if(s===0) return mound('lettuce');
   if(s===1) return shadow(9)+`<g class="sway">${stem('M50 141 Q49.6 135 50 130',1.6,'#8cc95a')}${leafR(50,130.5,-62,8.5,4.4,'url(#g-lett)',false)}${leafR(50,130.5,62,8.5,4.4,'url(#g-lett)',false)}</g>`;
-  let g='';
-  const ring=(angles,L,w,fill,edge)=>angles.forEach(a=>{ g+=ruffle(50,140.5,a,L,w,fill,edge); });
-  if(s===2){ ring([-62,-30,30,62],13,6.5,'url(#g-leaf)',OL); ring([0],12,6,'url(#g-lett)',OL); return shadow(14)+`<g class="sway">${g}</g>`; }
-  if(s===3){ ring([-80,-52,-24,24,52,80],18,8.5,'url(#g-leaf)',OL); ring([-30,0,30],14,7,'url(#g-lett)',OL); return shadow(21)+`<g class="sway">${g}</g>`; }
-  // s===4 수확: 바깥 잎이 넓게 펼쳐지고 가운데에 둥근 결구
-  ring([-92,-64,-34,34,64,92],24,11,'url(#g-leaf2)',OL);
-  ring([-50,-18,18,50],20,10,'url(#g-leaf)',OL);
-  g+=`<ellipse cx="50" cy="129" rx="13.5" ry="11.5" fill="url(#g-lett)" stroke="${OL}" stroke-width=".9"/><path d="M39 131 Q44 120 50 119 M61 131 Q56 120 50 119 M42 136 Q50 127 58 136" stroke="#7fb64c" stroke-width=".9" fill="none"/><path d="M53 121.5 q4 1.5 5.5 5" stroke="#fbffe8" stroke-width="1.2" fill="none" stroke-linecap="round"/>`;
-  return shadow(31)+`<g class="sway">${g}</g>`;
+  const dark='url(#g-leaf2)',green='url(#g-leaf)',light='url(#g-lett)';
+  const leaves=s===2
+    ? [[-44,16,4,dark],[30,15,4,green],[-8,18,4,light]]
+    : s===3
+      ? [[-57,23,5,dark],[44,25,5,dark],[-23,26,5,green],[12,24,5,green],[37,16,4,light]]
+      : [[-64,29,6,dark],[58,31,7,dark],[-35,34,7,green],[30,35,7,green],[-6,39,7,green],[-76,20,6,green],[73,23,6,green],[12,23,6,light]];
+  const g=leaves.map(([angle,length,width,fill])=>lettuceLeaf(50,140.5,angle,length,width,fill)).join('');
+  return shadow(s===2?13:s===3?20:29)+`<g class="sway">${g}</g>`;
 }
 /* ---- 당근: 가는 깃털 잎이 위로, 다 자라면 주황 어깨가 흙 위로 ---- */
 function frond(a,len){
@@ -1023,7 +1022,7 @@ function itemIcon(t){
   const v='viewBox="0 0 40 40"', o='stroke-linejoin="round"';
   switch(t){
     case 'paprika': return `<svg ${v} class="ic"><path d="M20 12 C8 8 6 20 10 29 Q13 36 17 34 Q20 31.5 23 34 Q27 36 30 29 C34 20 32 8 20 12Z" fill="url(#g-orange)" stroke="#a9520f" stroke-width="1.4" ${o}/><path d="M14 12.5 Q20 9 26 12.5 Q20 15 14 12.5Z" fill="#4f8f34"/><path d="M20 11 Q18 6 23 4" stroke="#3f7a2a" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M25 17 Q28 22 26 28" stroke="#fff" stroke-width="1.8" fill="none" opacity=".5" stroke-linecap="round"/></svg>`;
-    case 'lettuce': return `<svg ${v} class="ic"><path d="M5 26 Q4 16 12 15 Q14 8 20 9 Q26 8 28 15 Q36 16 35 26 Q34 34 20 34 Q6 34 5 26Z" fill="url(#g-leaf)" stroke="${OL}" stroke-width="1.3" ${o}/><ellipse cx="20" cy="23" rx="9" ry="8.5" fill="url(#g-lett)" stroke="${OL}" stroke-width="1.1"/><path d="M13 26 Q16 18 20 17.5 M27 26 Q24 18 20 17.5" stroke="#7fb64c" stroke-width="1" fill="none"/><path d="M22 17 q3 1 4 4" stroke="#fff" stroke-width="1.3" fill="none" opacity=".8" stroke-linecap="round"/></svg>`;
+    case 'lettuce': return `<svg ${v} class="ic"><g transform="translate(20 35) scale(.58) translate(-50 -140)">${drawLettuce(4)}</g></svg>`;
     case 'carrot': return `<svg ${v} class="ic"><path d="M11 15 Q20 9 29 13 Q30 17 27 19 L14 33 Q11 33 10 30 Q8 22 11 15Z" fill="url(#g-orange)" stroke="#a9520f" stroke-width="1.3" ${o}/><path d="M14 18 l4 1 M15 23 l4 .4 M13 27 l3 .8" stroke="#c35e17" stroke-width="1.1"/><path d="M27 13 Q31 6 28 3 M28 13 Q35 9 37 5 M29 15 Q36 15 38 12" stroke="#5aa83a" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>`;
     case 'tomato': return `<svg ${v} class="ic"><circle cx="20" cy="23" r="13" fill="url(#g-red)" stroke="#8f1d14" stroke-width="1.3"/><ellipse cx="25" cy="17.5" rx="3.6" ry="2.2" fill="#fff" opacity=".55" transform="rotate(25 25 17.5)"/><path d="M20 11.5 l-6 -2 M20 11.5 l6 -2 M20 11.5 l-2.4 4.6 M20 11.5 l2.8 4 M20 11.5 V5.5" stroke="#2f6e22" stroke-width="2.2" stroke-linecap="round"/></svg>`;
     case 'strawberry': return `<svg ${v} class="ic"><path d="M20 12 C33 10 33 23 20 36 C7 23 7 10 20 12Z" fill="url(#g-straw)" stroke="#8f1626" stroke-width="1.3" ${o}/>${[[15,17],[24,17],[20,22],[14,24],[26,24],[20,29]].map(([x,y])=>`<ellipse cx="${x}" cy="${y}" rx=".9" ry="1.3" fill="#ffe58a"/>`).join('')}<path d="M12 12.5 L16 9 L20 11.5 L24 9 L28 12.5 M20 10 V4.5" stroke="#2f6e22" stroke-width="2.2" fill="none" stroke-linecap="round" ${o}/></svg>`;
