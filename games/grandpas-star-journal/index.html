@@ -776,6 +776,12 @@ body[data-chapter="4"] #intro { background: radial-gradient(ellipse at 70% 16%,#
 .meteor-frame text { font: 700 11px system-ui,sans-serif; stroke: #0b1424; stroke-width: 2.5; paint-order: stroke; }
 .meteor-extension { stroke-width: 1.4; stroke-dasharray: 3 3; opacity: .9; }
 .meteor-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 6px; }
+.meteor-star-zoom { margin-top: 8px; border: 1px solid #bc9f78; border-radius: 7px; padding: 0 8px 6px; }
+.meteor-star-zoom summary { min-height: 36px; padding: 8px 0; cursor: pointer; font-size: 13px; font-weight: 700; }
+.meteor-zoom-pair { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; max-width: 300px; margin: 2px auto 0; }
+.meteor-zoom-pair figure { margin: 0; text-align: center; }
+.meteor-zoom-pair canvas { display: block; width: 100%; height: auto; border-radius: 5px; background: #0c1424; image-rendering: pixelated; }
+.meteor-zoom-pair figcaption { margin-top: 4px; font-size: 12px; }
 #meteorPanel .meteor-choice { position: absolute; display: grid; place-items: center; width: 39px; height: 39px; min-height: 39px; padding: 0; transform: translate(-50%,-50%); border-radius: 50%; border: 1px solid #8f724d; background: #fff1d9ed; color: #59412a; font-weight: 700; }
 #meteorPanel .meteor-choice:hover,#meteorPanel .meteor-choice:focus-visible { background: #604734; color: #fff3db; }
 .meteor-note { display: block; color: #6b513a; margin-top: 8px; font-size: 12px; line-height: 1.4; }
@@ -2226,7 +2232,7 @@ const METEOR_TIME='1989-08-13T03:00:00+09:00';
 const METEOR_TASKS=[
   {id:'meteor_1',name:'첫 번째 유성 사진',hint:'유성이 오기 전에 장노출을 시작하고 기다려 보렴. 촬영이 끝나면 사진을 일지에 남기자.',frag:'첫 유성은 말을 꺼낼 새도 없이 지나갔다. 미리 장노출을 시작해 둔 덕분에 별들 사이에 그 빛이 남았다.'},
   {id:'meteor_2',name:'두 번째 유성 사진',hint:'카메라는 그대로 두고 한 장 더 찍으렴. 유성이 어느 쪽으로 지나가는지도 살펴보자.',frag:'두 번째 유성은 다른 곳을 지나갔다. 손주와 나는 어느 별 쪽에서 나타나 어느 쪽으로 사라졌는지 서로 확인했다.'},
-  {id:'meteor_3',name:'세 번째 유성 사진',hint:'별의 자리가 조금씩 달라졌지? 같은 별을 찾아 사진을 맞춘 뒤 빛줄기를 비교해 보렴.',frag:'사진마다 별의 자리가 조금씩 달랐다. 같은 별끼리 포개어 놓으니 유성이 지나간 자리가 한눈에 보였다. 나는 빛이 지나온 쪽을 거꾸로 따라가 보자고 했다.'},
+  {id:'meteor_3',name:'세 번째 유성 사진',hint:'별의 자리가 조금씩 달라졌지? 같은 별을 찾아 사진을 맞추고 빛줄기를 비교해 보렴.',frag:'사진마다 별의 자리가 조금씩 달랐다. 같은 별을 기준으로 사진을 포개니 유성이 지나간 자리가 한눈에 보였다. 나는 빛이 지나온 쪽을 거꾸로 따라가 보자고 했다.'},
   {id:'meteor_radiant',name:'복사점 찾기',hint:'세 궤적을 진행 방향과 반대로 연장해, 한곳으로 모이는 지점을 골라 보렴.',frag:'거의 나란히 들어오는 유성들이 멀리 한 점에서 퍼져 나오는 것처럼 보인다. 그 겉보기 출발 방향이 복사점이다.'},
 ];
 const BEACH_PAGE={title:'별똥별이 지나간 자리',short:BEACH_SITE.name,night:'다섯 번째 밤',
@@ -2287,7 +2293,7 @@ const meteorSky=document.getElementById('meteorSky');
 const meteorWait=document.getElementById('meteorWait');
 const meteorRecord=document.getElementById('meteorRecord');
 const meteorStatus=document.getElementById('meteorStatus');
-let meteorTimer,meteorFrame,meteorSeen=false,meteorExtended=false,meteorMarks=true,meteorPhotoIndex=-1;
+let meteorTimer,meteorFrame,meteorSeen=false,meteorExtended=false,meteorMarks=true,meteorPhotoIndex=-1,meteorZoomOpen=false;
 function nextMeteor(){return METEOR_TASKS.slice(0,3).findIndex(t=>!taskDone(t));}
 function recordedMeteors(){return METEORS.filter((_,i)=>taskDone(METEOR_TASKS[i]));}
 
@@ -2297,16 +2303,20 @@ function makeMeteorBackdrop(rotations){
   const bg=pen.createLinearGradient(0,0,0,meteorHeight);
   bg.addColorStop(0,'#090f21');bg.addColorStop(1,'#122638');
   pen.fillStyle=bg;pen.fillRect(0,0,meteorWidth,meteorHeight);
+  const stars=document.createElement('canvas');stars.width=canvas.width;stars.height=canvas.height;
+  const starPen=stars.getContext('2d');starPen.scale(meteorScale,meteorScale);
+  starPen.globalCompositeOperation='lighter';
   const moonAlt=horOf('Moon',meteorTime).alt;
   const moonlight=moonAlt>0?A.Illumination('Moon',meteorTime).phase_fraction*clamp(moonAlt/20,0,1):0;
   const limit=BEACH_SITE.baseLim-.9*moonlight;
   for(const rotation of rotations){
     plotStars(rotation,limit,meteorProject,(i,x,y,me)=>{
       if(x>=-2&&x<=meteorWidth+2&&y>=-2&&y<=meteorHeight+2){
-        drawStarDot(x,y,me,SBV[i],i,.43,pen,limit,null,1/rotations.length);
+        drawStarDot(x,y,me,SBV[i],i,.28,starPen,limit,null,1/rotations.length);
       }
     });
   }
+  pen.resetTransform();pen.drawImage(stars,0,0);
   return canvas;
 }
 function paintMeteorImage(canvas,backdrop,meteors,progress,photo){
@@ -2333,9 +2343,25 @@ function paintMeteorImage(canvas,backdrop,meteors,progress,photo){
 function meteorExposureBackdrop(m){
   return m.exposureBackdrop??=makeMeteorBackdrop(m.rotations);
 }
+function meteorPreviewBackdrop(m){
+  return m.previewBackdrop??=makeMeteorBackdrop([m.rotations[2]]);
+}
 function paintMeteorFrame(canvas,m,progress=0,photo=false){
-  const backdrop=photo?meteorExposureBackdrop(m):(m.previewBackdrop??=makeMeteorBackdrop([m.rotations[2]]));
+  const backdrop=photo?meteorExposureBackdrop(m):meteorPreviewBackdrop(m);
   paintMeteorImage(canvas,backdrop,[m.raw],progress,photo);
+}
+function paintMeteorStarZoom(zoom,m){
+  const star=findStar('Bellatrix');
+  const position=rotation=>meteorProject(toENU(SV,star*3,[0,0,0],rotation)).map(v=>v*meteorScale);
+  const [x,y]=position(m.rotations[2]),size=12;
+  const [startX,startY]=position(m.rotations[0]),[endX,endY]=position(m.rotations.at(-1));
+  const distance=Math.hypot(endX-startX,endY-startY);
+  const backdrops=[meteorPreviewBackdrop(m),meteorExposureBackdrop(m)];
+  for(const [i,canvas] of Array.from(zoom.querySelectorAll('canvas')).entries()){
+    const pen=canvas.getContext('2d');pen.imageSmoothingEnabled=false;
+    pen.drawImage(backdrops[i],Math.round(x)-size/2,Math.round(y)-size/2,size,size,0,0,canvas.width,canvas.height);
+  }
+  zoom.querySelector('p').textContent=`${m.clock} 촬영 · 벨라트릭스는 ${meteorExposureSeconds}초 동안 원본에서 약 ${distance.toFixed(1)}픽셀 이동했어요.`;
 }
 function prepareMeteor(){
   const m=METEORS[nextMeteor()];
@@ -2419,9 +2445,16 @@ function meteorPanel(){
       ${instructions}
       ${!raw?`<div class="meteor-actions"><button id="meteorMarks" type="button" aria-pressed="${meteorMarks}">이동 방향 표시</button>
       ${ready&&!solved&&showMarks?`<button id="meteorExtend" type="button" aria-pressed="${meteorExtended}">궤적을 뒤로 연장하기</button>`:''}</div>`:''}
-      ${ready&&!solved&&showMarks?'<p id="meteorFeedback" role="status"></p>':''}`:''}
+      ${ready&&!solved&&showMarks?'<p id="meteorFeedback" role="status"></p>':''}
+      <details class="meteor-star-zoom" id="meteorStarZoom"${meteorZoomOpen?' open':''}>
+        <summary>별빛이 늘어난 모습 확대</summary>
+        <div class="meteor-zoom-pair">
+          <figure><canvas width="144" height="144" role="img" aria-label="순간 모습으로 그린 벨라트릭스 확대"></canvas><figcaption>중간 시각의 순간 모습</figcaption></figure>
+          <figure><canvas width="144" height="144" role="img" aria-label="60초 동안 노출한 벨라트릭스 확대"></canvas><figcaption>60초 노출</figcaption></figure>
+        </div><p></p>
+      </details>`:''}
     ${solved?'<p class="trail-result"><b>페르세우스자리 방향의 복사점을 찾았어요.</b> 유성들은 하늘 여러 곳에 나타나요. 지나온 방향을 거꾸로 따라가면 같은 쪽에서 퍼져 나오는 것처럼 보여요.</p>':''}
-    <small class="meteor-note">별은 노출 중에도 조금씩 움직여요. 합성할 때 장 사이의 이동을 맞춰도, 한 장의 짧은 별 자국은 남아요. 모의 촬영에서는 기다리는 시간을 줄였어요.</small></section>`;
+    <small class="meteor-note">셔터가 열린 동안 별빛은 이동 방향으로 늘어나요. 사진을 합성해 장 사이의 별 위치를 맞춘 뒤에도, 노출 중에 생긴 별빛의 늘어남은 남아요.</small></section>`;
 }
 function openMeteorPanel(){
   openJournal();document.getElementById('meteorPanel').scrollIntoView({block:'start'});
@@ -2436,6 +2469,10 @@ function bindMeteor(){
     const raw=METEORS[meteorPhotoIndex];
     if(raw)paintMeteorFrame(photo,raw,1,true);
     else paintMeteorImage(photo,meteorExposureBackdrop(METEORS[0]),recordedMeteors(),1,true);
+    const zoom=document.getElementById('meteorStarZoom');
+    const drawZoom=()=>paintMeteorStarZoom(zoom,raw??METEORS[0]);
+    zoom.ontoggle=()=>{meteorZoomOpen=zoom.open;if(zoom.open)drawZoom();};
+    if(zoom.open)drawZoom();
     for(const button of pageEl.querySelectorAll('[data-meteor-photo]'))button.onclick=()=>{
       meteorPhotoIndex=+button.dataset.meteorPhoto;
       redrawTrail(`[data-meteor-photo="${meteorPhotoIndex}"]`);
@@ -2682,7 +2719,7 @@ function setChapter(index){
   document.getElementById('coverCaption').textContent=journalDate(PAGE);
   document.getElementById('startBtn').textContent=index===0?'일지 펼치기':PAGE.short+' 이어 보기';
   moonDatePanel.hidden=index!==2;trailBtn.hidden=index!==3;meteorBtn.hidden=index!==4;
-  if(index===4){meteorExtended=false;meteorMarks=true;meteorPhotoIndex=-1;}
+  if(index===4){meteorExtended=false;meteorMarks=true;meteorPhotoIndex=-1;meteorZoomOpen=false;}
   dateBtn.textContent=index===2?'달력':'날짜';
   updateLamp();setView(S.view);
   return true;
