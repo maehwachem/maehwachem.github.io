@@ -232,7 +232,7 @@ body.placing #placeBar{display:flex}
 #scrim.clear{background:transparent}
 .sheet{position:fixed;left:50%;bottom:0;z-index:55;width:min(100%,520px);max-height:78vh;background:var(--paper);border:1.5px solid var(--edge);border-bottom:0;border-radius:24px 24px 0 0;transform:translate(-50%,105%);transition:transform .32s cubic-bezier(.2,.9,.3,1);display:flex;flex-direction:column;box-shadow:0 -8px 30px rgba(0,0,0,.18);padding-bottom:env(safe-area-inset-bottom)}
 .sheet.show{transform:translate(-50%,0)}
-.sheet[data-kind="profiles"]{
+.sheet:is([data-kind="profiles"],[data-kind="titleReward"]){
   top:50%;bottom:auto;width:min(calc(100% - 24px),520px);
   max-height:calc(100vh - 32px);
   max-height:calc(100dvh - 32px - 2 * max(env(safe-area-inset-top),env(safe-area-inset-bottom)));
@@ -240,9 +240,25 @@ body.placing #placeBar{display:flex}
   transform:translate(-50%,calc(-50% + 12px));opacity:0;visibility:hidden;
   transition:transform .22s ease,opacity .22s ease,visibility .22s;
 }
-.sheet[data-kind="profiles"].show{transform:translate(-50%,-50%);opacity:1;visibility:visible}
-.sheet[data-kind="profiles"] :is(header,.tabs){flex-shrink:0}
-.sheet[data-kind="profiles"] .body{min-height:0;overscroll-behavior:contain}
+.sheet:is([data-kind="profiles"],[data-kind="titleReward"]).show{transform:translate(-50%,-50%);opacity:1;visibility:visible}
+.sheet:is([data-kind="profiles"],[data-kind="titleReward"]) :is(header,.tabs){flex-shrink:0}
+.sheet:is([data-kind="profiles"],[data-kind="titleReward"]) .body{min-height:0;overscroll-behavior:contain}
+.sheet[data-kind="titleReward"]{width:min(calc(100% - 24px),430px);background:radial-gradient(ellipse at 50% 30%,#fff0bf 0,transparent 63%),var(--paper);border-color:#c7994e}
+.sheet[data-kind="titleReward"] .tabs{display:none}
+.reward-panel{text-align:center;padding:0 4px 6px}
+.reward-emblem{position:relative;width:126px;height:115px;display:grid;place-items:center;margin:0 auto}
+.reward-emblem::before{content:"";position:absolute;inset:0;border-radius:50%;background:repeating-conic-gradient(from 5deg,#f4c76080 0 10deg,transparent 10deg 25deg);mask-image:radial-gradient(circle,#000 25%,transparent 70%);animation:reward-rays 1.05s ease-out both}
+.reward-emblem svg{position:relative;width:106px;height:106px;animation:reward-rise .55s cubic-bezier(.19,1.48,.45,1) both}
+.reward-message{margin:0 auto 12px;font-size:13px;line-height:1.5;color:#685036}
+.reward-card{display:grid;gap:6px;padding:10px 8px 12px;border:1px solid #e6c681;border-radius:14px;background:#fff9e9;margin:8px 0}
+.reward-card h4{margin:0;font-size:clamp(18px,5.8vw,24px);line-height:1.2;color:#754a1d}
+.reward-card p{margin:0;font-size:13px;color:#785020}
+.reward-card .small,.reward-panel>.small{min-height:44px;white-space:normal}
+.reward-card .small{justify-self:center;margin-top:3px}
+.reward-panel>.small{width:100%;margin-top:4px}
+@keyframes reward-rise{from{transform:translateY(13px) scale(.58) rotate(-12deg);opacity:0}}
+@keyframes reward-rays{from{transform:scale(.55) rotate(-28deg);opacity:0}}
+@media (prefers-reduced-motion:reduce){.reward-emblem::before,.reward-emblem svg{animation:none}}
 .sheet header{display:flex;align-items:center;padding:16px 18px 10px;gap:8px;border-bottom:1.5px dashed rgba(122,88,52,.22);margin:0 6px 8px}
 .sheet header h3{margin:0;font-size:18px;flex:1}
 .sheet .close{width:40px;height:40px;border-radius:50%;background:#f0e1c3;border:1.5px solid rgba(122,88,52,.25);font-size:19px;font-weight:800}
@@ -255,6 +271,7 @@ body.placing #placeBar{display:flex}
 .row .info{flex:1;min-width:0}
 .row .info b{display:block;font-size:15px}
 .row .info span{font-size:12.5px;opacity:.7}
+.row .info .sale-bonus{display:block;color:#416328;font-size:11px;font-weight:700;opacity:1}
 .row .acts{display:flex;gap:6px;flex:none}
 .small{background:var(--sage);color:#fff;border-radius:12px;padding:8px 12px;min-height:36px;font-weight:800;font-size:13px;box-shadow:0 2px 0 var(--sage-dk);white-space:nowrap}
 .small.alt{background:#f0e1c3;color:var(--ink);box-shadow:0 2px 0 #c9ab7c}
@@ -417,13 +434,20 @@ const CROPS = {
   paprika:   {name:'파프리카',stages:5, price:18, yield:3, free:true, cost:0, regrow:3, greenhouse:true, desc:'온실에서 열리는 달콤한 열매'},
 };
 const CROP_ORDER = ['lettuce','carrot','tomato','strawberry','sunflower','paprika'];
-const TITLE_TIERS = [{at:5,label:'재배가'},{at:15,label:'장인'},{at:30,label:'명인'}];
+const TITLE_TIERS = [{at:5,label:'재배가',bonus:10},{at:15,label:'장인',bonus:20},{at:30,label:'명인',bonus:30}];
 const TITLE_MAX = TITLE_TIERS.at(-1).at;
-const CROP_TITLES = CROP_ORDER.flatMap(type=>TITLE_TIERS.map(({at,label})=>({
-  id:`${type}-${at}`, type, at, name:`${CROPS[type].name} ${label}`
+const CROP_TITLES = CROP_ORDER.flatMap(type=>TITLE_TIERS.map(({at,label,bonus})=>({
+  id:`${type}-${at}`, type, at, bonus, name:`${CROPS[type].name} ${label}`
 })));
 function earnedTitle(id,sales){
   return CROP_TITLES.find(title=>title.id===id&&(sales[title.type]||0)>=title.at);
+}
+function cropSaleBonus(type){
+  const sold=S.plantSales[type]||0;
+  return TITLE_TIERS.findLast(tier=>sold>=tier.at)?.bonus||0;
+}
+function cropSalePrice(type){
+  return Math.round(CROPS[type].price*(100+cropSaleBonus(type))/100);
 }
 const CROP_PHOTO_NOTES = {
   lettuce:'잎이 둥글게 뭉치지 않고 뿌리 가까이에서 바깥으로 펼쳐져요.',
@@ -1153,7 +1177,17 @@ const Snd = (()=>{
     if(kind==='carrot'){ const src=noise(), lp=ctx.createBiquadFilter(), g=ctx.createGain(); lp.type='lowpass'; lp.frequency.value=600; g.gain.setValueAtTime(.25,t); g.gain.exponentialRampToValueAtTime(.001,t+.25); src.connect(lp).connect(g).connect(ctx.destination); src.start(t); src.stop(t+.3); }
     const o=ctx.createOscillator(), g=ctx.createGain(); o.type='triangle'; o.frequency.setValueAtTime(320,t+.05); o.frequency.exponentialRampToValueAtTime(880,t+.16); g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.18,t+.07); g.gain.exponentialRampToValueAtTime(.0001,t+.3); o.connect(g).connect(ctx.destination); o.start(t); o.stop(t+.32);
   }
-  function coin(){ if(!S.sound.sfx || !ensure()) return; const t=ctx.currentTime; [988,1319].forEach((f,i)=>{ const o=ctx.createOscillator(), g=ctx.createGain(); o.type='triangle'; o.frequency.value=f; g.gain.setValueAtTime(.0001,t+i*.08); g.gain.exponentialRampToValueAtTime(.12,t+i*.08+.01); g.gain.exponentialRampToValueAtTime(.0001,t+i*.08+.25); o.connect(g).connect(ctx.destination); o.start(t+i*.08); o.stop(t+i*.08+.3); }); }
+  function coin(reward=false){
+    if(!S.sound.sfx || !ensure()) return;
+    const notes=reward?[523.25,659.25,783.99,1046.50]:[988,1319], step=reward ? .115 : .08;
+    notes.forEach((frequency,i)=>{
+      const t=ctx.currentTime+i*step, o=ctx.createOscillator(), g=ctx.createGain();
+      o.type='triangle'; o.frequency.value=frequency;
+      g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.12,t+.01);
+      g.gain.exponentialRampToValueAtTime(.0001,t+.25);
+      o.connect(g).connect(ctx.destination); o.start(t); o.stop(t+.3);
+    });
+  }
   function plant(){ if(!S.sound.sfx || !ensure()) return; const t=ctx.currentTime; const src=noise(), lp=ctx.createBiquadFilter(), g=ctx.createGain(); lp.type='lowpass'; lp.frequency.value=500; g.gain.setValueAtTime(.18,t); g.gain.exponentialRampToValueAtTime(.001,t+.18); src.connect(lp).connect(g).connect(ctx.destination); src.start(t); src.stop(t+.2); }
   function updateRain(){
     const want = S.sound.rain && S.weather==='rain';
@@ -1883,6 +1917,7 @@ function onSlot(k,el){
 }
 
 /* ---- 시트 ---- */
+let rewardTitles=[];
 function openSheet(kind){
   if(busy) return;
   closePopover(); cancelPlace(); if(careMode) setCareMode(false);
@@ -1895,6 +1930,10 @@ function openSheet(kind){
 }
 function closeSheet(force=false){
   if(!sheetOpen||(sheetOpen==='profiles'&&force!==true&&(!profile||profileBusy))) return;
+  if(sheetOpen==='titleReward'){
+    rewardTitles=[];
+    if(force!==true) return openSheet('basket');
+  }
   sheetOpen=null; sheet.inert=true; sheet.classList.remove('show'); syncOverlay();
   sheetAnchor?.focus({preventScroll:true}); sheetAnchor=null;
 }
@@ -1903,17 +1942,39 @@ let bookTab='crops';
 function openFarmBook(tab='crops'){
   bookTab=tab; openSheet('book');
 }
+function equipTitle(id){
+  const next=earnedTitle(id,S.plantSales)?.id||'';
+  if(S.activeTitle===next) return;
+  S.activeTitle=next;
+  saveNow(); updateSaveStatus();
+}
+function titleRewardPanel(){
+  const medal=`<div class="reward-emblem" aria-hidden="true"><svg viewBox="0 0 106 106">
+    <defs><linearGradient id="rewardGold" x2=".85" y2="1" gradientUnits="objectBoundingBox"><stop stop-color="#fff09e"/><stop offset="1" stop-color="#e8a23c"/></linearGradient></defs>
+    <path d="M27 41 44 72 36 100 27 91 15 92 27 62M79 41 62 72 70 100 79 91 91 92 79 62" fill="#c96a53" stroke="#a44a36" stroke-width="2" stroke-linejoin="round"/>
+    <circle cx="53" cy="47" r="32" fill="url(#rewardGold)" stroke="#ac6f26" stroke-width="3"/>
+    <circle cx="53" cy="47" r="25" fill="#fff2b2" stroke="#d18c35" stroke-width="2"/>
+    <path d="m53 29 5.2 11 12 1.6-8.8 8.4 2.3 11.9L53 56l-10.7 5.9L44.6 50l-8.8-8.4 12-1.6Z" fill="#e9a543" stroke="#b6752c" stroke-width="1.4" stroke-linejoin="round"/>
+    <path d="m10 14 2.7 6.4 6.3 2.6-6.3 2.6L10 32l-2.7-6.4L1 23l6.3-2.6ZM94 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2ZM95 61l2.2 5.6 5.8 2.4-5.8 2.4L95 77l-2.2-5.6L87 69l5.8-2.4Z" fill="#c68931"/>
+  </svg></div>`;
+  const cards=rewardTitles.map(({id,type,at,bonus,name})=>`<article class="reward-card">
+    <h4>${name}</h4><p>${at}포기 판매 달성 · ${CROPS[type].name} 판매가 +${bonus}%</p>
+    <button class="small" data-equip-reward="${id}" aria-label="${name} 이름 옆에 달기">이름 옆에 달기</button>
+  </article>`).join('');
+  return `<div class="reward-panel">${medal}<p class="reward-message">정성껏 키운 작물이 새 칭호를 가져왔어요.<br>판매가 보너스는 다음 판매부터 적용돼요.</p>
+    ${cards}<button class="small alt" id="rewardContinue">계속하기</button></div>`;
+}
 function cropTitlesPanel(){
   const titles=CROP_TITLES.filter(({type,at})=>(S.plantSales[type]||0)>=at);
   const options=titles.map(({id,name})=>`<option value="${id}"${S.activeTitle===id?' selected':''}>${name}</option>`).join('');
   const cards=CROP_ORDER.map(type=>{
     const sold=S.plantSales[type]||0;
-    const ranks=CROP_TITLES.filter(title=>title.type===type).map(({at,name})=>sold>=at
-      ?`<li class="earned"><span>${name}</span><span>획득 ✓</span></li>`
-      :`<li><span>${name}</span><span>${sold}/${at}포기</span></li>`).join('');
+    const ranks=CROP_TITLES.filter(title=>title.type===type).map(({at,name,bonus})=>sold>=at
+      ?`<li class="earned"><span>${name}</span><span>획득 ✓ · +${bonus}%</span></li>`
+      :`<li><span>${name}</span><span>${sold}/${at}포기 · +${bonus}%</span></li>`).join('');
     return `<article class="book-card"><h4>${itemIcon(type)}${CROPS[type].name}</h4><ul class="title-ranks">${ranks}</ul></article>`;
   }).join('');
-  return `<p class="book-intro">한 포기의 수확물을 처음 팔 때 1포기로 기록해요. 칭호는 5·15·30포기에서 열려요.</p>
+  return `<p class="book-intro">한 포기의 수확물을 처음 팔 때 1포기로 기록해요.<br>작물마다 획득한 가장 높은 판매가 보너스가 자동 적용돼요.</p>
     <label class="title-picker">이름 옆에 표시할 칭호
       <select id="titleChoice"${titles.length?'':' disabled'}><option value="">${titles.length?'칭호 표시 안 함':'아직 획득한 칭호가 없어요'}</option>${options}</select>
     </label><div class="book-grid">${cards}</div>`;
@@ -2102,8 +2163,7 @@ $('sheetBody').addEventListener('submit',e=>{
 });
 $('sheetBody').addEventListener('change',e=>{
   if(e.target.id==='titleChoice'){
-    S.activeTitle=earnedTitle(e.target.value,S.plantSales)?.id||'';
-    saveNow(); updateSaveStatus();
+    equipTitle(e.target.value);
     return;
   }
   if(e.target.id!=='importFarm') return;
@@ -2198,11 +2258,18 @@ function renderSheet(){
     const items=CROP_ORDER.filter(t=>S.basket[t]>0);
     let h='<button class="small alt book-launch" id="basketBook">📖 농장 도감</button>';
     if(!items.length) h+=`<div class="empty-note">아직 바구니가 비어 있어요.<br>다 자라 반짝이는 작물을 눌러 수확해 보세요.</div>`;
-    else { let total=0; h+=items.map(t=>{ const c=CROPS[t], n=S.basket[t]; total+=n*c.price; return `<div class="row">${itemIcon(t)}<div class="info"><b>${c.name} ×${n}</b><span>하나에 ${COIN_SVG} ${c.price}</span></div><div class="acts"><button class="small alt" data-sell1="${t}">1개 팔기</button><button class="small" data-sellall="${t}">모두</button></div></div>`; }).join('');
+    else { let total=0; h+=items.map(t=>{
+      const n=S.basket[t], price=cropSalePrice(t), bonus=cropSaleBonus(t);
+      total+=n*price;
+      return `<div class="row">${itemIcon(t)}<div class="info"><b>${CROPS[t].name} ×${n}</b><span>하나에 ${COIN_SVG} ${price}</span>${bonus?`<span class="sale-bonus">칭호 +${bonus}%</span>`:''}</div><div class="acts"><button class="small alt" data-sell1="${t}">1개 팔기</button><button class="small" data-sellall="${t}">모두</button></div></div>`;
+    }).join('');
       h+=`<button class="small sellall" id="sellEvery">전부 팔기 · ${COIN_SVG} +${total}</button><div class="empty-note" style="padding:8px">팔지 않고 모아 두어도 괜찮아요.</div>`; }
     const inv=DECOR_ORDER.filter(t=>S.decorInv[t]>0);
     if(inv.length){ h+=`<div class="sec">장식 보관함</div>`+inv.map(t=>`<div class="row"><svg class="ic" viewBox="0 0 100 100">${decorSVG(t).replace(/<svg[^>]*>|<\/svg>/g,'')}</svg><div class="info"><b>${DECOR[t].name} ×${S.decorInv[t]}</b><span>밭 둘레에 놓을 수 있어요</span></div><div class="acts"><button class="small" data-place="${t}">놓기</button></div></div>`).join(''); }
     body.innerHTML=h;
+  } else if(sheetOpen==='titleReward'){
+    $('sheetTitle').textContent=rewardTitles.length===1?'새 칭호 획득!':`새 칭호 ${rewardTitles.length}개 획득!`;
+    body.innerHTML=titleRewardPanel();
   } else if(sheetOpen==='book'){
     $('sheetTitle').textContent='📖 농장 도감';
     tabs.innerHTML=[['crops','작물 도감'],['postcards','농장 엽서'],['titles','칭호']].map(([key,label])=>`<button data-book-tab="${key}" class="${key===bookTab?'on':''}" aria-pressed="${key===bookTab}">${label}</button>`).join('');
@@ -2221,7 +2288,7 @@ function renderSheet(){
       h+=`<div class="sec">기본 씨앗 · 언제든 무료로 받아 심어요</div>`;
       h+=CROP_ORDER.filter(t=>CROPS[t].free&&(!CROPS[t].greenhouse||S.greenhouse)).map(t=>{const c=CROPS[t]; return `<div class="row">${seedIcon(t)}<div class="info"><b>${c.name}</b><span>${c.desc} · ${c.stages}회 성장</span></div><div class="acts"><span class="small alt" style="box-shadow:none">무료 ∞</span></div></div>`;}).join('');
       h+=`<div class="sec">특별한 씨앗</div>`;
-      h+=CROP_ORDER.filter(t=>!CROPS[t].free).map(t=>{const c=CROPS[t]; return `<div class="row">${seedIcon(t)}<div class="info"><b>${c.name} <span style="font-weight:600;opacity:.6;font-size:12px">보유 ${S.seeds[t]||0}</span></b><span>${c.desc} · ${c.stages}회 성장 · 수확 ${COIN_SVG}${c.price*c.yield}</span></div><div class="acts"><button class="small" data-buyseed="${t}" ${S.coins<c.cost?'disabled':''}>${COIN_SVG} ${c.cost}</button></div></div>`;}).join('');
+      h+=CROP_ORDER.filter(t=>!CROPS[t].free).map(t=>{const c=CROPS[t]; return `<div class="row">${seedIcon(t)}<div class="info"><b>${c.name} <span style="font-weight:600;opacity:.6;font-size:12px">보유 ${S.seeds[t]||0}</span></b><span>${c.desc} · ${c.stages}회 성장 · 수확 ${COIN_SVG}${cropSalePrice(t)*c.yield}</span></div><div class="acts"><button class="small" data-buyseed="${t}" ${S.coins<c.cost?'disabled':''}>${COIN_SVG} ${c.cost}</button></div></div>`;}).join('');
     } else if(shopTab==='decor'){
       h+=`<div class="sec">사서 밭 위·아래 빈자리에 놓아요</div>`;
       h+=DECOR_ORDER.map(t=>{const d=DECOR[t]; const owned=(S.decorInv[t]||0)+S.decor.filter(x=>x===t).length; return `<div class="row"><svg class="ic" viewBox="0 0 100 100">${decorSVG(t).replace(/<svg[^>]*>|<\/svg>/g,'')}</svg><div class="info"><b>${d.name}${owned?` <span style="font-weight:600;opacity:.6;font-size:12px">가진 것 ${owned}</span>`:''}</b><span>${d.desc}</span></div><div class="acts"><button class="small" data-buydecor="${t}" ${S.coins<d.cost?'disabled':''}>${COIN_SVG} ${d.cost}</button></div></div>`;}).join('');
@@ -2244,6 +2311,12 @@ $('sheetBody').addEventListener('click',e=>{
   const b=e.target.closest('button'); if(!b||b.disabled) return;
   if(sheetOpen==='profiles'){ if(!b.form||b.type!=='submit') profileButton(b); return; }
   const d=b.dataset;
+  if(sheetOpen==='titleReward'){
+    if(d.equipReward&&rewardTitles.some(title=>title.id===d.equipReward)){
+      equipTitle(d.equipReward); closeSheet();
+    }else if(b.id==='rewardContinue') closeSheet();
+    return;
+  }
   if(d.sell1||d.sellall) sellCrops([d.sell1||d.sellall],d.sell1?1:Infinity,b);
   else if(b.id==='sellEvery') sellCrops(CROP_ORDER,Infinity,b);
   else if(d.place){ closeSheet(); startPlace(d.place); }
@@ -2291,7 +2364,7 @@ function sellCrops(types,quantity,btn){
     const sold=Math.min(quantity,S.basket[type]||0);
     if(!sold) continue;
     S.basket[type]-=sold;
-    amount+=sold*CROPS[type].price;
+    amount+=sold*cropSalePrice(type);
     const marks=S.saleMarks[type];
     if(!marks) continue;
     const remaining=marks.filter(mark=>mark>sold).map(mark=>mark-sold);
@@ -2303,11 +2376,14 @@ function sellCrops(types,quantity,btn){
     unlocked.push(...CROP_TITLES.filter(title=>title.type===type&&title.at>before&&title.at<=after));
   }
   if(!amount) return;
-  S.coins+=amount; S.flags.sold=true; Snd.coin();
+  S.coins+=amount; S.flags.sold=true; Snd.coin(unlocked.length>0);
   const [x,y]=centerOf(btn,.3); floatText(x,y,`+${amount}`);
   const cp=$('coinPill'); cp.classList.remove('bounce'); void cp.offsetWidth; cp.classList.add('bounce');
-  saveNow(); renderHUD(); renderHint(); renderSheet();
-  if(unlocked.length) toast(unlocked.length===1?`🏅 새 칭호 · ${unlocked[0].name}`:`🏅 새 칭호 ${unlocked.length}개 · 도감에서 확인해요`);
+  saveNow(); renderHUD(); renderHint();
+  if(unlocked.length){
+    rewardTitles=unlocked;
+    openSheet('titleReward');
+  }else renderSheet();
 }
 
 $('basketBtn').addEventListener('click',()=>openSheet('basket'));
