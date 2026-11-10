@@ -521,11 +521,12 @@ const SDK_VERSION='13.2.0';
 const SAVE_API='__FARM_SAVE_ENDPOINT__';
 const CLOUD_CONFIGURED=/^https:\/\/[a-z0-9-]+\.onrender\.com\/api\/farm-save$/.test(SAVE_API)&&Boolean(FIREBASE_CONFIG.projectId);
 let cloudAuth=null, cloudSdk=null, cloudSetup=null, cloudSession=null, cloudFarms=[], cloudListLoad=null, lastCloudWrite=0;
-let cloudApproval='none', cloudOperator=false, approvalRequests=null;
+const APPROVAL_FILTERS=[['pending','대기'],['approved','승인'],['rejected','거절'],['revoked','승인 취소']];
+let cloudApproval='none', cloudOperator=false, approvalRequests=null, approvalFilter='pending';
 
 function setCloudUser(user){
   if(cloudSession?.owner!==user?.uid){
-    cloudApproval='none'; cloudOperator=false; approvalRequests=null;
+    cloudApproval='none'; cloudOperator=false; approvalRequests=null; approvalFilter='pending';
   }
   cloudSession=user?{owner:user.uid}:null;
 }
@@ -619,10 +620,16 @@ async function serverRecord(action,data={}){
   }
   if(action==='review-list'){
     if(!Array.isArray(body?.requests)) throw saveProblem('network');
-    return body.requests.filter(row=>/^[a-f0-9]{64}$/.test(row.id)&&typeof row.email==='string');
+    return {requests:body.requests.filter(row=>/^[a-f0-9]{64}$/.test(row.id)&&
+      (row.email===null||typeof row.email==='string')&&typeof row.version==='string'),
+      next:/^[a-f0-9]{64}$/.test(body.next??'')?body.next:null};
+  }
+  if(action==='review-delete'){
+    if(body?.deleted!==true) throw saveProblem('network');
+    return true;
   }
   if(action==='request-approval'||action==='review'){
-    if(!['pending','approved','rejected'].includes(body?.approval)) throw saveProblem('network');
+    if(!['pending','approved','rejected','revoked'].includes(body?.approval)) throw saveProblem('network');
     return body.approval;
   }
   if(!body||typeof body.name!=='string'||!Number.isInteger(body.revision)||body.state?.v!==1) throw saveProblem('network');
@@ -1569,19 +1576,28 @@ function htmlText(s){
 }
 function cloudApprovalPanel(){
   if(cloudOperator){
-    const requests=approvalRequests===null?'':approvalRequests.length
-      ? approvalRequests.map(({id,email})=>`<div class="farm-profile-current"><b>${htmlText(email)}</b>
-        <div class="farm-profile-actions"><button class="small" data-review-id="${id}" data-review-decision="approved">승인</button>
-        <button class="small alt" data-review-id="${id}" data-review-decision="rejected">거절</button></div></div>`).join('')
-      : '<p class="farm-profile-note" role="status">승인 대기 중인 신청이 없어요.</p>';
-    return `<div class="sec">관리자 · 저장 신청</div>
-      <button class="small alt" id="cloudReviewList">${approvalRequests===null?'신청 목록 보기':'신청 목록 새로고침'}</button>${requests}`;
+    const filters=approvalRequests===null?'':`<div class="farm-profile-actions" aria-label="신청 상태 필터">${APPROVAL_FILTERS.map(([status,label])=>
+      `<button class="small ${approvalFilter===status?'':'alt'}" aria-pressed="${approvalFilter===status}" data-approval-filter="${status}">${label}</button>`).join('')}</div>`;
+    const requests=approvalRequests===null?'':approvalRequests.requests.length
+      ? approvalRequests.requests.map(({id,email})=>{
+        const buttons=approvalFilter==='pending'?[['approved','승인'],['rejected','거절']]
+          :approvalFilter==='approved'?[['revoked','승인 취소']]:[['approved','다시 승인']];
+        if(approvalFilter!=='approved') buttons.push(['delete','신청 기록 삭제']);
+        return `<div class="farm-profile-current"><b>${htmlText(email||'이전 기록 · '+id.slice(0,8))}</b>
+          <div class="farm-profile-actions">${buttons.map(([decision,label])=>
+            `<button class="small alt" data-review-id="${id}" data-review-decision="${decision}">${label}</button>`).join('')}</div></div>`;
+      }).join('')
+      : '<p class="farm-profile-note" role="status">이 상태에 해당하는 신청이 없어요.</p>';
+    return `<div class="sec">관리자 · 저장 신청</div><div class="farm-profile-actions">
+      <button class="small alt" id="cloudReviewList">${approvalRequests===null?'신청 목록 보기':'신청 목록 새로고침'}</button>
+      ${approvalRequests?.next?'<button class="small alt" id="cloudReviewNext">다음 목록</button>':''}</div>${filters}${requests}`;
   }
   if(cloudApproval==='unavailable') return '<p class="farm-profile-note">승인 상태를 가져오지 못했어요. 기존 농장은 이어 할 수 있어요.</p><button class="small alt" id="retryCloudList">승인 상태 다시 확인</button>';
   if(cloudApproval==='approved') return '<p class="farm-profile-note" role="status">승인됐어요. 새 클라우드 농장을 만들 수 있어요.</p>';
   if(cloudApproval==='pending') return '<p class="farm-profile-note" role="status">승인 대기 중이에요.</p><button class="small alt" id="retryCloudList">승인 상태 확인</button>';
-  if(cloudApproval==='rejected') return '<p class="farm-profile-note" role="status">신청이 거절됐어요. 기존 농장은 이어 할 수 있어요.</p>';
-  return '<p class="farm-profile-note">새 클라우드 농장을 만들려면 한 번만 신청하세요. 신청하면 구글 계정 이메일을 운영자가 확인할 수 있어요.</p><button class="small alt" id="cloudRequestApproval">클라우드 저장 신청</button>';
+  if(cloudApproval==='revoked') return '<p class="farm-profile-note" role="status">새 클라우드 농장 생성 승인이 취소됐어요. 기존 농장은 이어 할 수 있어요.</p><button class="small alt" id="retryCloudList">승인 상태 확인</button>';
+  if(cloudApproval==='rejected') return '<p class="farm-profile-note" role="status">신청이 거절됐어요. 기존 농장은 이어 할 수 있어요.</p><button class="small alt" id="retryCloudList">승인 상태 확인</button>';
+  return '<p class="farm-profile-note">새 클라우드 농장을 만들려면 한 번만 신청하세요. 신청하면 운영자가 구글 계정 이메일과 승인 상태를 확인하고 관리할 수 있어요.</p><button class="small alt" id="cloudRequestApproval">클라우드 저장 신청</button>';
 }
 function renderProfiles(body,tabs){
   $('sheetTitle').textContent='🌱 내 농장 · 플레이어';
@@ -1632,7 +1648,7 @@ function profileErrorMessage(e){
     approval:'새 클라우드 농장을 만들려면 먼저 승인을 받아야 해요.',
     verified:'이메일이 확인된 구글 계정으로 다시 로그인해 주세요.',
     forbidden:'이 작업은 운영자만 할 수 있어요.',
-    reviewed:'이미 처리된 신청이에요. 신청 목록을 새로고침해 주세요.',
+    reviewed:'신청 상태가 바뀌었어요. 신청 목록을 새로고침해 주세요.',
     rate:'저장 요청이 잠시 밀렸어요. 잠시 뒤 다시 저장해 주세요.',
     name:'이미 같은 이름이 있어요. 목록에서 이어 하거나 다른 이름을 써 주세요.',
     conflict:'다른 곳의 진행이 더 최신이에요.',
@@ -1769,18 +1785,34 @@ function profileButton(button){
       cloudApproval=await serverRecord('request-approval');
       renderSheet();
     });
-  }else if(button.id==='cloudReviewList'){
+  }else if(button.id==='cloudReviewList'||button.id==='cloudReviewNext'||button.dataset.approvalFilter){
     void profileAction(async()=>{
-      approvalRequests=await serverRecord('review-list');
+      const status=button.dataset.approvalFilter||approvalFilter;
+      const after=button.id==='cloudReviewNext'?approvalRequests?.next:undefined;
+      const owner=cloudSession?.owner;
+      const result=await serverRecord('review-list',{status,after});
+      if(cloudSession?.owner!==owner) return;
+      approvalRequests=result;
+      approvalFilter=status;
       renderSheet();
     });
   }else if(button.dataset.reviewId){
+    const {reviewId,reviewDecision}=button.dataset;
+    const record=approvalRequests?.requests.find(row=>row.id===reviewId);
+    if(!record) return;
+    if(['delete','revoked'].includes(reviewDecision)&&!button.dataset.sure){
+      button.dataset.sure='1';
+      button.textContent=reviewDecision==='delete'?'한 번 더 누르면 삭제 · 다시 신청 가능':'한 번 더 누르면 승인 취소';
+      return;
+    }
     void profileAction(async()=>{
-      const {reviewId,reviewDecision}=button.dataset;
-      await serverRecord('review',{id:reviewId,decision:reviewDecision});
-      approvalRequests=approvalRequests.filter(request=>request.id!==reviewId);
+      const owner=cloudSession?.owner;
+      const action=reviewDecision==='delete'?'review-delete':'review';
+      await serverRecord(action,{id:reviewId,version:record.version,decision:reviewDecision});
+      if(cloudSession?.owner!==owner||!approvalRequests) return;
+      approvalRequests.requests=approvalRequests.requests.filter(request=>request.id!==reviewId);
       renderSheet();
-      toast(reviewDecision==='approved'?'클라우드 저장을 승인했어요.':'클라우드 저장 신청을 거절했어요.');
+      toast(({approved:'클라우드 저장을 승인했어요.',rejected:'신청을 거절했어요.',revoked:'승인을 취소했어요.',delete:'신청 기록을 삭제했어요.'})[reviewDecision]);
     });
   }else if(button.id==='retryCloudList'){
     void openCloudStorage();

@@ -1,6 +1,8 @@
 import { FarmError as Failure } from './google.mjs';
 const CODE = /^[a-f0-9]{32}$/;
 const HASH = /^[a-f0-9]{64}$/;
+const APPROVAL_STATES=['pending','approved','rejected','revoked'];
+const REVIEW_DECISIONS={pending:['approved','rejected'],approved:['revoked'],rejected:['approved'],revoked:['approved']};
 const FILE_ID = /^[A-Za-z0-9_-]{10,150}$/;
 const encoder = new TextEncoder();
 const hex = bytes => Array.from(new Uint8Array(bytes), n => n.toString(16).padStart(2,'0')).join('');
@@ -123,17 +125,29 @@ export function createHandler({identity, store, bridgeUrl, bridgeKey, operatorEm
         if (!existing) throw new Failure(503,'network');
         return reply(200,{approval:existing.status});
       }
-      if (data.action==='review-list'||data.action==='review') {
+      if (['review-list','review','review-delete'].includes(data.action)) {
         if (!isOperator) throw new Failure(403,'forbidden');
-        if (data.action==='review-list') return reply(200,{requests:await store.listApprovals()});
-        const {id,decision}=data;
-        if (typeof id!=='string'||!HASH.test(id)||!['approved','rejected'].includes(decision)) throw new Failure(400,'invalid');
+        if (data.action==='review-list') {
+          const {status='pending',after}=data;
+          if (!APPROVAL_STATES.includes(status)||(after!==undefined&&
+              (typeof after!=='string'||!HASH.test(after)))) throw new Failure(400,'invalid');
+          return reply(200,await store.listApprovals(status,after));
+        }
+        const {id,decision,version}=data;
+        if (typeof id!=='string'||!HASH.test(id)||typeof version!=='string'||!version||version.length>50) {
+          throw new Failure(400,'invalid');
+        }
         const current=await store.getApproval(id);
-        if (!current) throw new Failure(404,'missing');
-        if (current.status===decision) return reply(200,{approval:decision});
-        if (current.status==='pending'&&await store.setApproval(id,{status:decision},current)) return reply(200,{approval:decision});
-        if ((await store.getApproval(id))?.status===decision) return reply(200,{approval:decision});
-        throw new Failure(409,'reviewed');
+        if (!current) throw new Failure(409,'reviewed');
+        if (current.etag!==version) throw new Failure(409,'reviewed');
+        if (data.action==='review-delete') {
+          if (current.status==='approved'||!await store.deleteApproval(id,current)) throw new Failure(409,'reviewed');
+          return reply(200,{deleted:true});
+        }
+        if (!REVIEW_DECISIONS[current.status]?.includes(decision)) throw new Failure(409,'reviewed');
+        const next={status:decision,...(current.email?{email:current.email}:{})};
+        if (!await store.setApproval(id,next,current)) throw new Failure(409,'reviewed');
+        return reply(200,{approval:decision});
       }
       if (typeof data.id!=='string'||!CODE.test(data.id)||!['create','read','write'].includes(data.action)) throw new Failure(400,'invalid');
       const key=await hash(user+':'+data.id), row=await store.get(user,data.id);
@@ -145,9 +159,14 @@ export function createHandler({identity, store, bridgeUrl, bridgeKey, operatorEm
       const stateText=JSON.stringify(data.state??null);
       if (data.state?.v!==1||Array.isArray(data.state)||encoder.encode(stateText).byteLength>12000) throw new Failure(400,'invalid');
       if (typeof data.operation!=='string'||!CODE.test(data.operation)) throw new Failure(400,'invalid');
+      let approval=null;
       if (data.action==='create') {
         if (typeof data.name!=='string'||!data.name.trim()||data.name.trim().length>24) throw new Failure(400,'invalid');
-        if (!isOperator&&(await store.getApproval(accountKey))?.status!=='approved') throw new Failure(403,'approval');
+        if (!isOperator){
+          const current=await store.getApproval(accountKey);
+          if (current?.status!=='approved') throw new Failure(403,'approval');
+          approval={id:accountKey,etag:current.etag};
+        }
         await takeBudget(accountKey,'create');
       } else {
         if (!row) throw new Failure(404,'missing');
@@ -159,16 +178,19 @@ export function createHandler({identity, store, bridgeUrl, bridgeKey, operatorEm
         await takeBudget(await hash(user),'write');
       }
 
-      const candidate=await drive({action:'put',key,operation:data.operation,
+      // A retry under a new approval must get its own file while the stale attempt is cleaned up.
+      const operation=approval?(await hash(approval.etag+':'+data.operation)).slice(0,32):data.operation;
+      const candidate=await drive({action:'put',key,operation,
         stateHash:await hash(stateText),state:data.state});
       if (typeof candidate!=='string'||!FILE_ID.test(candidate)) throw new Failure(503,'network');
       const updated_at=new Date().toISOString();
       const next={save_id:data.id,name:row?.name??data.name.trim(),file_id:candidate,
         revision:row?row.revision+1:0,operation:data.operation,updated_at};
-      if (!await store.set(user,data.id,next,row)) {
+      if (!await store.set(user,data.id,next,row,approval)) {
         const current=await store.get(user,data.id);
         if (current?.file_id!==candidate) tidy(candidate);
         if (current&&(data.action==='create'||current.operation===data.operation)) return reply(200,await read(current,user,data.id));
+        if (approval&&(await store.getApproval(accountKey))?.status!=='approved') throw new Failure(403,'approval');
         throw new Failure(409,'conflict');
       }
       if (row&&row.file_id!==candidate) tidy(row.file_id);

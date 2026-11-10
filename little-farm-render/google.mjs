@@ -133,19 +133,33 @@ export function farmStore(projectId, credentials, fetcher = fetch) {
     get: (owner, id) => get(path(owner, id)),
     getApproval: id => get(approvalPath(id)),
     setApproval: (id, row, old) => commit([write(approvalPath(id), row, old)]),
-    async listApprovals() {
+    deleteApproval: (id, old) => commit([{
+      delete: prefix+'/'+approvalPath(id), currentDocument: {updateTime: old.etag}
+    }]),
+    async listApprovals(status, after) {
+      const pageSize=30;
       const structuredQuery = {
         from: [{collectionId: 'farmApprovals'}],
-        where: {fieldFilter: {field: {fieldPath: 'status'}, op: 'EQUAL', value: {stringValue: 'pending'}}},
-        limit: 50
+        where: {fieldFilter: {field: {fieldPath: 'status'}, op: 'EQUAL', value: {stringValue: status}}},
+        orderBy: [{field: {fieldPath: '__name__'}, direction: 'ASCENDING'}],
+        limit: pageSize+1
       };
+      if(after) structuredQuery.startAt={values:[{referenceValue:prefix+'/'+approvalPath(after)}],before:false};
       const response = await request(':runQuery', {method: 'POST', body: JSON.stringify({structuredQuery})});
       if (!response.ok) throw new FarmError(503, 'network');
-      return (await response.json()).filter(row => row.document).map(({document}) => ({
-        id: document.name.split('/').at(-1), email: decode(document).email
-      }));
+      const rows=(await response.json()).filter(row => row.document).map(({document}) => {
+        const {email,etag}=decode(document);
+        return {id:document.name.split('/').at(-1),email:email??null,version:etag};
+      });
+      const requests=rows.slice(0,pageSize);
+      return {requests,next:rows.length>pageSize?requests.at(-1).id:null};
     },
-    set: (owner, id, row, old) => commit([write(path(owner, id), row, old)]),
+    set(owner,id,row,old,approval) {
+      const writes=[write(path(owner,id),row,old)];
+      if(approval) writes.push({...write(approvalPath(approval.id),{status:'approved'},approval),
+        updateMask:{fieldPaths:['status']}});
+      return commit(writes);
+    },
     async list(owner) {
       const response = await request('/players/' + owner + '/farms?pageSize=100&orderBy=updated_at%20desc');
       if (!response.ok) throw new FarmError(503, 'network');
