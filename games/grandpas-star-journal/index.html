@@ -1093,7 +1093,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 
 <form id="datePanel" hidden>
   <div id="moonDatePanel" hidden></div>
-  <label for="dateIn">관측 날짜와 시간 · 한국 시각</label>
+  <label for="dateIn">자유 관측 날짜와 시간 · 한국 시각</label>
   <div class="date-fields">
     <input type="datetime-local" id="dateIn" required>
     <button class="main" type="submit">적용</button>
@@ -1113,8 +1113,8 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 </dialog>
 
 <dialog id="meteorDialog" aria-labelledby="meteorDialogTitle">
-  <div class="camera-heading"><div><h2 id="meteorDialogTitle">바닷가 유성 관측</h2><small>1989.08.13 03:00 · 북동쪽 하늘</small></div><button id="meteorClose" type="button">닫기</button></div>
-  <div class="meteor-field"><canvas id="meteorSky" width="840" height="516" role="img" aria-label="1989년 8월 13일 새벽 북동쪽 하늘의 별과 유성 움직임"></canvas></div>
+  <div class="camera-heading"><div><h2 id="meteorDialogTitle">바닷가 유성 관측</h2><small>8월 13일 03:00 · 북동쪽 하늘</small></div><button id="meteorClose" type="button">닫기</button></div>
+  <div class="meteor-field"><canvas id="meteorSky" width="840" height="516" role="img" aria-label="8월 13일 새벽 북동쪽 하늘의 별과 유성 움직임"></canvas></div>
   <p id="meteorStatus" role="status"></p>
   <div class="camera-footer"><button id="meteorWait" type="button">하늘 기다리기</button><button id="meteorRecord" class="main" type="button" disabled>궤적 기록하기</button></div>
 </dialog>
@@ -1139,7 +1139,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       <p class="credit">별과 별자리 자료 d3-celestial · 천체 위치 계산 Astronomy Engine</p>
     </div>
     <div class="cover-art">
-      <div class="cover-caption" id="coverCaption">1987.11.14 · 첫 관측</div>
+      <div class="cover-caption" id="coverCaption"></div>
       <button id="coverMemory" type="button" aria-haspopup="dialog"><span>그림과 손주의 일기</span></button>
     </div>
   </div>
@@ -1183,7 +1183,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     <p class="finale-kicker">마지막 밤 · 페르세우스자리 유성우</p>
     <h2 id="finaleTitle">우리가 함께 본 하늘</h2>
     <p>마지막 장을 덮기 전, 두 사람은 파도 소리를 들으며 한동안 더 하늘을 바라봤어요.</p>
-    <p class="finale-meta">1989년 8월 13일 새벽 · 동해 바닷가</p>
+    <p class="finale-meta" id="finaleDate"></p>
     <div class="finale-actions"><button id="finaleReplay" type="button">유성우 다시 보기</button><button id="finaleGrandpa" type="button">할아버지의 마지막 일지</button></div>
   </div>
 </dialog>
@@ -1505,7 +1505,7 @@ function skyline(az){
 }
 
 /* ---------- state ---------- */
-const S = {t:new Date(), speed:1, view:'map', mode:'guide', chapter:0, lamp:true, az:250, alt:30, fov:75, lines:true, gyro:false, sel:null, found:{}, starTargets:[], moonNotes:{}, trailMode:'photo', trailPhotos:[], trailPhotoSolved:false, azOff:0};
+const S = {t:new Date(), storySky:true, speed:1, view:'map', mode:'guide', chapter:0, lamp:true, az:250, alt:30, fov:75, lines:true, gyro:false, sel:null, found:{}, starTargets:[], moonNotes:{}, trailMode:'photo', trailPhotos:[], trailPhotoSolved:false, azOff:0};
 const SPEEDS=[[0,'멈춤'],[1,'실시간'],[60,'×60'],[600,'×600'],[3600,'×3600']];
 let speedIdx=1;
 const STORE='gstarjournal-v1';
@@ -1903,25 +1903,25 @@ function describe(o){
 /* ---------- journal / tasks ---------- */
 const ROOFTOP_TASKS=[
  {id:'polaris',star:findStar('Polaris'),name:'북극성',hint:'북쪽 지평선에서 약 38° 위를 보렴. 카시오페이아의 W 모양을 먼저 찾으면 길을 알려 줄 거야.',frag:'북극성은 밤새 북쪽 가까이에 있다. 길을 잃으면 북쪽부터 보거라.'},
- {id:'vega',star:findStar('Vega'),name:'직녀성 (베가)',hint:'일지 날짜의 하늘에서 북서쪽 지평선 위 약 30°. 거문고자리의 푸른빛을 찾아보렴.',frag:'직녀는 여름 별인데, 가을 저녁까지 서쪽에 남아 인사를 한다.'},
- {id:'altair',star:findStar('Altair'),name:'견우성 (알타이르)',hint:'일지 날짜의 하늘에서 서쪽 지평선 위 약 27°. 양옆에 작은 별 두 개를 거느린 별이 있단다.',frag:'견우와 직녀 사이로 은하수가 흐른다는데, 여기선 보이지 않는구나. 언젠가 시골에서 보여 주마.'},
+ {id:'vega',star:findStar('Vega'),name:'직녀성 (베가)',hint:'일지 속 하늘에서 북서쪽 지평선 위 약 30°. 거문고자리의 푸른빛을 찾아보렴.',frag:'직녀는 여름 별인데, 가을 저녁까지 서쪽에 남아 인사를 한다.'},
+ {id:'altair',star:findStar('Altair'),name:'견우성 (알타이르)',hint:'일지 속 하늘에서 서쪽 지평선 위 약 27°. 양옆에 작은 별 두 개를 거느린 별이 있단다.',frag:'견우와 직녀 사이로 은하수가 흐른다는데, 여기선 보이지 않는구나. 언젠가 시골에서 보여 주마.'},
  {id:'capella',star:findStar('Capella'),name:'카펠라',hint:'북동쪽 하늘에 떠오르는 노란 별. 마차부자리의 으뜸별이다.',frag:'카펠라가 높이 오르면 겨울이 가까이 왔다는 뜻이다.'},
  {id:'betelgeuse',star:findStar('Betelgeuse'),name:'베텔게우스',hint:'밤이 깊으면 동쪽에서 오리온이 올라온다. 오리온의 붉은 어깨별을 찾아라. (시간을 앞으로 돌려 보렴)',frag:'베텔게우스는 나이 든 별이라 붉게 탄다. 나처럼 말이다.'},
  {id:'planet',planet:true,name:'떠돌이별 하나',hint:'별보다 덜 반짝이는 밝은 점을 찾아보렴. 그날 밤 떠 있는 행성이면 무엇이든 좋다.',frag:'행성은 별자리 사이를 떠돌아다닌다. 그래서 옛사람들은 떠돌이별이라 불렀지.'},
 ];
-const ROOFTOP_PAGE={title:'첫 번째 페이지', short:'집 옥상', night:'첫 번째 밤', date:'1987년 11월 14일 토요일 밤 · 옥상에서',
- travel:'1987-11-14T21:00:00+09:00', caption:'1987.11.14 · 첫 관측', az:250, alt:30,
+const ROOFTOP_PAGE={title:'첫 번째 페이지', short:'집 옥상', night:'첫 번째 밤', age:8, date:'11월 14일 밤',
+ travel:'1987-11-14T21:00:00+09:00', az:250, alt:30,
  intro:'집 옥상에서 할아버지와 첫 관측을 시작해요. 북극성을 비롯한 밝은 별과 행성을 찾아 기록해 보세요.',
  end:'오늘 만난 친구들을 여기 적어 둔다. 언젠가 손주 녀석도 이 별들을 찾을 수 있으면 좋겠다.',
  site:ROOFTOP_SITE, tasks:ROOFTOP_TASKS};
 const COUNTRY_TASKS=[
- {id:'rural_deneb',star:findStar('Deneb'),name:'데네브',hint:'일지 날짜의 하늘에서 북동쪽 높은 곳을 보렴. 베가, 알타이르와 큰 삼각형을 이루는 백조의 꼬리별이란다.',frag:'직녀와 견우 사이 위쪽에 데네브가 있다. 세 별을 이으면 여름 하늘에 커다란 삼각형이 생긴다.'},
+ {id:'rural_deneb',star:findStar('Deneb'),name:'데네브',hint:'일지 속 하늘에서 북동쪽 높은 곳을 보렴. 베가, 알타이르와 큰 삼각형을 이루는 백조의 꼬리별이란다.',frag:'직녀와 견우 사이 위쪽에 데네브가 있다. 세 별을 이으면 여름 하늘에 커다란 삼각형이 생긴다.'},
  {id:'rural_antares',star:findStar('Antares'),name:'안타레스',hint:'남서쪽, 산등성이 위로 낮게 보이는 붉은 별이란다. 전갈자리의 심장이지.',frag:'전갈의 심장이 붉게 빛난다. 같은 밤에 보아도 별마다 색이 다르다는 걸 손주에게 보여 주고 싶다.'},
  {id:'rural_cygnus',region:true,name:'백조자리 쪽 은하수',hint:'등불을 끄고 데네브 주변에서 하늘을 가로지르는 뿌연 띠를 찾아보렴. 백조자리 쪽 띠를 가운데 원에 맞추어 보자.',frag:'백조자리 쪽에 우윳빛 띠가 길게 놓였다. 눈으로 하나씩 가를 수 없을 만큼 많은 별빛이 모인 거란다.'},
  {id:'rural_sagittarius',region:true,name:'궁수자리 쪽 은하수',hint:'백조자리에서 시작한 띠를 낮은 남쪽 하늘로 따라가 보렴. 궁수자리 쪽이 더 짙고 넓어 보일 거야.',frag:'남쪽 궁수자리 쪽으로 은하수의 밝은 부분이 모여 있다. 저쪽으로 우리 은하의 중심이 있는 방향을 바라본다.'},
 ];
-const COUNTRY_PAGE={title:'은하수가 흐르는 마당', short:'시골 외가', night:'두 번째 밤', date:'1988년 8월 13일 토요일 밤 10시 30분 · 시골 외가에서',
- travel:'1988-08-13T22:30:00+10:00', caption:'1988.08.13 · 시골 외가', az:146, alt:43,
+const COUNTRY_PAGE={title:'은하수가 흐르는 마당', short:'시골 외가', night:'두 번째 밤', age:9, date:'8월 13일 밤',
+ travel:'1988-08-13T22:30:00+10:00', az:146, alt:43,
  intro:'시골 외가 마당에서 할아버지와 밤을 맞아요. 등불을 끄고 여름 별과 은하수를 찾아 기록해 보세요.',
  end:'백조자리부터 궁수자리까지 띠를 따라왔다. 오래전 옥상에서 못 보여 준 하늘을 오늘은 손주와 함께 보았다.',
  site:COUNTRY_SITE, tasks:COUNTRY_TASKS};
@@ -1937,8 +1937,8 @@ const MOON_TASKS=[
   frag:'오늘 달은 둥글게 빛난다. 태양빛이 비추는 면을 지구에서 보는 각도가 달라지며 달의 모양이 바뀌어 보인다.'},
 ];
 const RIVER_SITE={name:'겨울 강가',lat:37.53,lon:126.94,h:14,baseLim:4.4};
-const RIVER_PAGE={title:'달을 그리는 강가', short:'겨울 강가', night:'세 번째 장', date:'1989년 1월 10일~22일 · 강가에서',
- travel:MOON_TASKS[0].travel, caption:'1989.01 · 겨울 강가', az:234, alt:17,
+const RIVER_PAGE={title:'달을 그리는 강가', short:'겨울 강가', night:'세 번째 장', age:9, date:'1월 10~22일',
+ travel:MOON_TASKS[0].travel, az:234, alt:17,
  intro:'겨울 강가에서 할아버지와 달을 바라봐요. 세 날짜의 하늘을 열어 달의 밝은 부분을 기록해 보세요.',
  end:'세 그림 옆에 날짜를 적었다. 손주는 다음에도 달이 바뀌면 먼저 알아볼 수 있겠다고 했다. 강바람이 불어 수첩이 넘어갈까 봐 둘이 한쪽씩 꼭 잡고 있었다.',
  site:RIVER_SITE,tasks:MOON_TASKS};
@@ -1964,7 +1964,7 @@ const TRAIL_TASKS=[...TRAIL_TIMES.map((t,i)=>({...t,name:t.label+' 위치 기록
    frag:'지구가 자전하니 별들은 북쪽 하늘의 한 점 주위를 도는 것처럼 보인다. 북극성은 그 점에 가까워 자리 변화가 아주 작다.'},
 ];
 const HILL_PAGE={title:'별이 돌아가는 밤',short:'봄 언덕',night:'네 번째 밤',
- date:'1989년 5월 6일 밤~7일 새벽 · 봄 언덕',travel:TRAIL_TIMES[0].travel,caption:'1989.05 · 봄 언덕',az:0,alt:HILL_SITE.lat,
+ age:10,date:'5월 6일 밤~7일 새벽',travel:TRAIL_TIMES[0].travel,az:0,alt:HILL_SITE.lat,
  intro:'봄 언덕에서 할아버지와 북쪽 하늘을 지켜봐요. 같은 구도로 세 시각의 별을 기록하고 위치가 어떻게 달라졌는지 비교해 보세요.',
  end:'내려갈 채비를 하는데 손주가 수첩을 다시 펼쳤다. 북극성은 처음 찍은 점 바로 곁에 있었다. 나도 카메라를 내려놓고, 손주와 함께 한 번 더 북쪽을 올려다봤다.',
  site:HILL_SITE,tasks:TRAIL_TASKS};
@@ -2167,7 +2167,7 @@ function photoMotionMarks(ready){
 function photoLegend(solved){
   return `<aside class="photo-key" aria-label="사진 범례">
     <ul aria-label="별 색상">${photoCandidates.map((star,i)=>`<li><i style="--pin-color:${star.color}" aria-hidden="true"></i>${star.letter}${solved?` ${TRAIL_STARS[i].name}`:''}</li>`).join('')}</ul>
-    <ol aria-label="촬영 순서와 시각">${S.trailPhotos.map(i=>`<li><b>${i+1}</b> <time datetime="${TRAIL_TIMES[i].travel}">${TRAIL_TIMES[i].label}</time></li>`).join('')}</ol>
+    <ol aria-label="촬영 순서와 시각">${S.trailPhotos.map(i=>`<li><b>${i+1}</b> <time>${TRAIL_TIMES[i].label}</time></li>`).join('')}</ol>
   </aside>`;
 }
 function photoPanel(){
@@ -2226,7 +2226,7 @@ const METEOR_TASKS=[
   {id:'meteor_radiant',name:'복사점 찾기',hint:'세 궤적을 진행 방향과 반대로 연장해, 한곳으로 모이는 지점을 골라 보렴.',frag:'거의 나란히 들어오는 유성들이 멀리 한 점에서 퍼져 나오는 것처럼 보인다. 그 겉보기 출발 방향이 복사점이다.'},
 ];
 const BEACH_PAGE={title:'별똥별이 지나간 자리',short:BEACH_SITE.name,night:'다섯 번째 밤',
-  date:'1989년 8월 13일 새벽 · 동해 바닷가',travel:METEOR_TIME,caption:'1989.08 · 여름 바닷가',az:44,alt:54,
+  age:10,date:'8월 13일 새벽',travel:METEOR_TIME,az:44,alt:54,
  intro:'여름 바닷가에서 할아버지와 별똥별을 기다려요. 유성 세 개가 지나간 방향을 기록하고 그 궤적을 거꾸로 이어 보세요.',
   end:'수첩에는 가느다란 화살표 세 줄이 남았다. 한 줄도 같은 자리에서 시작하지 않았지만, 뒤로 이어 보니 한곳을 가리켰다. 집에 가자는 말을 하려다, 손주 옆에 누워 파도 소리를 한 번 더 들었다.',
   site:BEACH_SITE,tasks:METEOR_TASKS};
@@ -2382,6 +2382,7 @@ function bindMeteor(){
   };
 }
 const CHAPTERS=[ROOFTOP_PAGE,COUNTRY_PAGE,RIVER_PAGE,HILL_PAGE,BEACH_PAGE];
+function journalDate(page){return `손주 ${page.age}살 · ${page.date}`;}
 
 function extraStarTasks(page,prefix,names){
   const {lat,lon,h}=page.site;
@@ -2391,7 +2392,7 @@ function extraStarTasks(page,prefix,names){
     const [alt,az]=altAz(toENU(SV,star*3,[0,0,0],rotation));
     const position=`${dirName(az)}쪽 지평선 위 약 ${Math.round(alt)}°`;
     return {id:prefix+en.toLowerCase().replaceAll(' ','_'),star,name,
-      hint:`일지 날짜의 하늘에서 ${position}. ${constellation}에서 찾아보렴.`,
+      hint:`일지 속 하늘에서 ${position}. ${constellation}에서 찾아보렴.`,
       frag:`${constellation}의 ${name}. 첫 관측 시각에는 ${position}에 있었다.`};
   });
 }
@@ -2434,7 +2435,7 @@ let finaleFrame,finaleEpoch=0;
 function openGrandpaJournal(){
   if(!TASKS.every(taskDone)||grandpaReader.open||memoryReader.open||trailCamera.open||meteorDialog.open||finale.open)return;
   document.getElementById('grandpaKicker').textContent=`${S.chapter+1}장 · ${PAGE.title}`;
-  document.getElementById('grandpaDate').textContent=PAGE.date;
+  document.getElementById('grandpaDate').textContent=journalDate(PAGE);
   document.getElementById('grandpaNotes').replaceChildren(...TASKS.map(t=>{
     const note=document.createElement('div'),heading=document.createElement('h3');
     const paragraph=document.createElement('p'),ink=document.createElement('span');
@@ -2498,6 +2499,7 @@ function resizeFinale(){
 }
 function openFinale(){
   if(S.chapter!==CHAPTERS.length-1||!TASKS.every(taskDone)||finale.open)return;
+  document.getElementById('finaleDate').textContent=journalDate(PAGE)+' · 동해 바닷가';
   finale.showModal();finaleEpoch=performance.now();resizeFinale();
   document.getElementById('finaleReplay').hidden=finaleMotion.matches;
 }
@@ -2567,7 +2569,7 @@ function openMemory(){
   const paragraphs=memoryUnlocked(TASKS.filter(taskDone).length);
   document.getElementById('memoryKicker').textContent=`${S.chapter+1}장 · 손주의 일기`;
   document.getElementById('memoryTitle').textContent=MEMORY_TITLES[S.chapter];
-  document.getElementById('memoryCaption').textContent=PAGE.caption;
+  document.getElementById('memoryCaption').textContent=journalDate(PAGE)+' · '+PAGE.short;
   const cssArt=getComputedStyle(document.documentElement).getPropertyValue(['--roof-art','--country-art','--river-art','--hill-art','--meteor-art'][S.chapter]).trim();
   memoryArtwork.src=cssArt.slice(4,-1).trim().replace(/^["']|["']$/g,'');
   memoryArtwork.alt=MEMORY_ALTS[S.chapter];
@@ -2604,7 +2606,7 @@ function setChapter(index){
   document.getElementById('nightLabel').textContent=`할아버지의 별 일지 · ${PAGE.night}`;
   document.getElementById('coverChapter').textContent=['옥상 관측 일지 · 01','시골 관측 일지 · 02','강가 관측 일지 · 03','언덕 관측 일지 · 04','바닷가 관측 일지 · 05'][index];
   document.getElementById('coverStory').textContent=PAGE.intro;
-  document.getElementById('coverCaption').textContent=PAGE.caption;
+  document.getElementById('coverCaption').textContent=journalDate(PAGE);
   document.getElementById('startBtn').textContent=index===0?'일지 펼치기':PAGE.short+' 이어 보기';
   moonDatePanel.hidden=index!==2;trailBtn.hidden=index!==3;meteorBtn.hidden=index!==4;
   if(index===4)meteorExtended=false;
@@ -2673,10 +2675,10 @@ function renderJournal(revealNext=false){
   const nav=CHAPTERS.map((page,i)=>`<button type="button" data-chapter="${i}"${i===S.chapter?' aria-current="page"':''}${chapterAvailable(i)?'':' disabled'}>${i+1}장 · ${page.short}${chapterAvailable(i)?'':' (잠김)'}</button>`).join('');
   let h=`<button class="close" id="jClose">닫기</button>
     <div class="journal-kicker">관측 안내 · 0${S.chapter+1}</div>
-    <h2 id="journalTitle">${PAGE.title}</h2><p class="date"><span class="graphite-writing">${PAGE.date}</span></p>
+    <h2 id="journalTitle">${PAGE.title}</h2><p class="date"><span class="graphite-writing">${journalDate(PAGE)}</span></p>
     <nav class="chapter-nav" aria-label="관측 장 선택">${nav}</nav>
     <section class="chapter-opening"><div class="journal-kicker">이번 관측</div><p>${PAGE.intro}</p></section>
-    <div class="acts"><button class="travel" id="jTravel">일지 날짜의 하늘</button><button id="jToday">오늘 밤 하늘</button></div>
+    <div class="acts"><button class="travel" id="jTravel">일지 속 하늘</button><button id="jToday">오늘 밤 하늘</button></div>
     <button id="journalMemory" class="chapter-vignette memory-open" type="button" aria-haspopup="dialog">
       <span class="memory-photo-label">${PAGE.short}</span><span class="memory-expand">그림과 손주의 일기</span>
     </button>`;
@@ -2723,7 +2725,7 @@ function renderJournal(revealNext=false){
   if(nextChapter)nextChapter.onclick=()=>openChapter(S.chapter+1);
   document.getElementById('jClose').onclick=closeJournal;
   document.getElementById('jTravel').onclick=()=>{jumpTo(new Date(PAGE.travel));closeJournal();};
-  document.getElementById('jToday').onclick=()=>{jumpTo(tonight());closeJournal();};
+  document.getElementById('jToday').onclick=()=>{jumpTo(tonight(),false);closeJournal();};
   const reset=document.getElementById('jReset'), note=document.getElementById('resetNote');
   reset.onclick=()=>{
     if(note.hidden){
@@ -2852,13 +2854,15 @@ function tonight(){
   return dateInSeoul(`${p.year}-${p.month}-${p.day}T21:30`)||now;
 }
 function setTime(d){S.t=new Date(d.getTime());lastBodyT=-1e15;lastRotT=-1e15;}
-function jumpTo(d){setTime(d);speedIdx=1;applySpeed();}
+function jumpTo(d,storySky=true){S.storySky=storySky;setTime(d);speedIdx=1;applySpeed();updateClock();}
 const clockEl=document.getElementById('clock'),limEl=document.getElementById('limv');
-function updateClock(){const p=kstParts(S.t);clockEl.textContent=`${p.year}.${p.month}.${p.day} (${p.weekday}) ${(+p.hour%24+'').padStart(2,'0')}:${p.minute}`;
+function updateClock(){
+  const p=kstParts(S.t),time=`${String(+p.hour%24).padStart(2,'0')}:${p.minute}`;
+  clockEl.textContent=S.storySky?`${PAGE.age}살 · ${+p.month}월 ${+p.day}일 ${time}`:`${p.year}.${p.month}.${p.day} (${p.weekday}) ${time}`;
   limEl.textContent=LIM<0?'낮이라 거의 없음':`~${LIM.toFixed(1)}등급까지`;}
 document.getElementById('tBack').onclick=()=>setTime(new Date(S.t.getTime()-3600e3));
 document.getElementById('tFwd').onclick=()=>setTime(new Date(S.t.getTime()+3600e3));
-document.getElementById('tNow').onclick=()=>jumpTo(new Date());
+document.getElementById('tNow').onclick=()=>jumpTo(new Date(),false);
 const speedBtn=document.getElementById('speed');
 function applySpeed(){S.speed=SPEEDS[speedIdx][0];speedBtn.textContent=SPEEDS[speedIdx][1];speedBtn.classList.toggle('on',speedIdx!==1);speedBtn.setAttribute('aria-label','시간 배속 · '+SPEEDS[speedIdx][1]);}
 speedBtn.onclick=()=>{speedIdx=(speedIdx+1)%SPEEDS.length;applySpeed();};
@@ -2868,7 +2872,7 @@ moonDatePanel.innerHTML=moonDates();bindMoonDates(moonDatePanel);
 function setDatePanel(open){
   datePanel.hidden=!open;dateBtn.setAttribute('aria-expanded',String(open));
   if(open){
-    const p=kstParts(S.t);
+    const p=kstParts(S.storySky?new Date():S.t);
     dateIn.value=`${p.year}-${p.month}-${p.day}T${String(+p.hour%24).padStart(2,'0')}:${p.minute}`;
     hideInfo();dateIn.focus();
   }
@@ -2877,7 +2881,7 @@ dateBtn.onclick=()=>setDatePanel(datePanel.hidden);
 datePanel.onsubmit=e=>{
   e.preventDefault();
   const d=dateInSeoul(dateIn.value);
-  if(d){jumpTo(d);setDatePanel(false);dateBtn.focus();}
+  if(d){jumpTo(d,false);setDatePanel(false);dateBtn.focus();}
   else{toast('그날 한국 시각에 없는 시간이에요. 다른 시간을 골라 주세요.');dateIn.focus();}
 };
 
