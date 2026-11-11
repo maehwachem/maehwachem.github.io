@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="no-referrer">
-<title>마이크로비트 센서 대시보드 | 콩 실험실</title>
+<title>마이크로비트 다중 센서 대시보드 | 콩 실험실</title>
 <style>
   :root {
     color-scheme: only light; --ink: #352a35; --muted: #665963; --plum: #553d50;
@@ -67,7 +67,7 @@
   .plot { border: 1px solid var(--line); border-radius: 9px; padding: 8px 8px 0; min-width: 0; }
   .plot h3 { padding: 0 3px; }
   .plot h3 span { color: var(--muted); font-size: .77rem; font-weight: 550; margin-left: .35rem; }
-  canvas { display: block; width: 100%; height: 133px; }
+  canvas { display: block; width: 100%; height: 170px; }
   .plots .plot:last-child { margin-bottom: 3px; }
   .legend { display: flex; flex-wrap: wrap; column-gap: 14px; row-gap: 5px; min-height: 22px; }
   .legend label { display: flex; gap: 5px; align-items: center; cursor: pointer; font-size: .83rem; font-weight: 680; }
@@ -109,7 +109,7 @@
   @media (max-width: 410px) {
     header { align-items: flex-start; flex-direction: column; gap: 6px; }
     .panel { padding: 11px; }
-    canvas { height: 123px; }
+    canvas { height: 157px; }
   }
 </style>
 </head>
@@ -118,10 +118,10 @@
   <header>
     <div>
       <div class="brand">콩 실험실 · 과학 데이터 도구</div>
-      <h1>마이크로비트 센서 대시보드</h1>
-      <p class="sub">여러 모둠의 측정값을 같은 시간축에서 비교합니다.</p>
+      <h1>마이크로비트 다중 센서 대시보드</h1>
+      <p class="sub">온도·습도·기압·조도·이산화탄소 등 여러 센서값을 같은 시간축에서 비교합니다.</p>
     </div>
-    <a class="firmware-download" href="./microbit-v2-bme280.hex" download>마이크로비트 v2용 HEX 받기</a>
+    <a class="firmware-download" href="./microbit-v2-bme280.hex" download>BME280용 HEX 받기</a>
   </header>
 
   <section class="panel control" aria-labelledby="capture-title">
@@ -177,10 +177,12 @@
             </select>
           </label>
         </div>
-        <p class="note">가로축은 첫 수신 이후의 경과 시간입니다. 위치를 바꾼 시점에는 선이 끊어지며, 구간별 측정 위치는 최근 기록과 CSV에서 확인할 수 있습니다. 범례를 누르면 해당 기기의 선을 숨길 수 있습니다.</p>
+        <p class="note">가로축의 0:00은 전체 기록의 첫 수신 시각입니다. 범례를 누르면 기기별 선을 숨길 수 있고, 자동 범위는 화면에 보이는 값에 맞춰 조정됩니다. 측정 위치는 최근 기록과 CSV에서 확인할 수 있습니다.</p>
         <div id="legend" class="legend" aria-label="기기별 범례"></div>
       </div>
-      <div id="plots" class="plots"></div>
+      <div id="plots" class="plots">
+        <p class="note" id="plots-empty" hidden>연결한 기기의 측정값을 받으면 항목별 그래프가 표시됩니다.</p>
+      </div>
     </section>
 
     <section class="panel device-section" aria-labelledby="devices-title">
@@ -203,14 +205,15 @@
     <details class="panel" id="setup">
       <summary>실제 마이크로비트 연결과 MakeCode 예제</summary>
       <div class="guide">
+        <p class="note">연결한 센서에 맞는 MakeCode 프로그램에서 측정값을 블루투스 UART나 USB 직렬로 보내면 이 대시보드에 표시됩니다.</p>
         <div>
           <h3>마이크로비트 v2 · BME280 온도·습도·기압</h3>
           <ol>
             <li>전원을 끈 뒤 확장 보드로 <strong>SDA → P20, SCL → P19, VCC → 3V, GND → GND</strong>를 연결합니다.</li>
-            <li>페이지 상단에서 HEX를 내려받고, USB로 연결한 마이크로비트의 <strong>MICROBIT</strong> 드라이브에 복사합니다. BME280의 주소 0x76과 0x77은 자동으로 확인합니다.</li>
+            <li>페이지 상단에서 <strong>BME280용 HEX</strong>를 내려받고, USB로 연결한 마이크로비트의 <strong>MICROBIT</strong> 드라이브에 복사합니다. BME280의 주소 0x76과 0x77은 자동으로 확인합니다.</li>
             <li>Chrome 또는 Edge에서 <strong>실제 기기</strong>로 바꾸고, 위치를 선택한 뒤 <strong>블루투스 기기 추가</strong> 또는 컴퓨터의 <strong>USB 기기 추가</strong>로 연결합니다. 안드로이드 휴대폰·태블릿은 HTTPS 주소를 Chrome에서 엽니다. 아이폰·아이패드의 기본 Safari는 Web Bluetooth를 지원하지 않습니다.</li>
             <li>기기 카드에서 <strong>보드 번호(1~12)</strong>를 고르고 <strong>번호 보내기</strong>를 누릅니다. 보드가 확인한 번호가 LED·기기 카드·그래프 범례에 표시됩니다. 보드의 A 버튼은 현재 번호, B 버튼은 블루투스 기기 코드를 표시합니다. LED에 X가 보이면 센서 배선을 확인합니다.</li>
-            <li>약 1초마다 외부 온도(°C), 상대습도(%), 기압(hPa)이 갱신됩니다. CSV에는 측정 당시의 위치 번호와 보드 번호가 각각 기록됩니다.</li>
+            <li>약 1초마다 외부 온도(°C), 상대습도(%), 기압(hPa)이 갱신됩니다. BME280의 기압은 측정 위치의 기압이며, CSV에는 측정 위치 번호와 보드 번호가 각각 기록됩니다.</li>
           </ol>
         </div>
         <h3>내장 센서로 연결 시험</h3>
@@ -237,7 +240,7 @@ basic.forever(function () {
     }
     basic.pause(1000)
 })</code></pre>
-          <p class="note">온도는 보드에서 읽은 값이며 조도는 LED의 상대 밝기(0~255)입니다. CO₂는 외부 센서에서 측정한 ppm 값을 <code>C=620</code>처럼 별도 줄로 보냅니다. 외부 온도는 <code>TA=23.4</code>, lux 출력은 <code>LX=130</code>으로 구분합니다. 센서 모델에 맞는 읽기 코드를 추가해야 합니다. BLE UART는 줄바꿈을 포함한 짧은 ASCII 줄을 권장합니다(전송 단위 최대 20바이트).</p>
+          <p class="note">보드 온도는 프로세서에서 읽은 온도이고, 상대 밝기(0–255)는 LED에서 감지한 값입니다. CO₂는 외부 센서에서 측정한 ppm 값을 <code>C=620</code>처럼 별도 줄로 보냅니다. 외부 온도는 <code>TA=23.4</code>, 조도(lx)는 <code>LX=130</code>으로 구분합니다. 센서 모델에 맞는 읽기 코드를 추가해야 합니다. BLE UART는 줄바꿈을 포함한 짧은 ASCII 줄을 권장합니다(전송 단위 최대 20바이트).</p>
         </div>
         <div>
           <h3>USB 직렬 연결 · 기존 MakeCode 예제</h3>
@@ -304,10 +307,14 @@ const MAX_LINE = 512;
 const RECEIVE_QUIET_MS = 10000;
 const BLE_CONNECT_TIMEOUT_MS = 15000;
 const SENSOR = {
-  T: ["보드 온도", "°C"], L: ["조도", "상대값 0~255"], C: ["이산화탄소", "ppm"],
+  T: ["보드 온도", "°C"], L: ["상대 밝기", "0–255"], C: ["이산화탄소", "ppm"],
   TA: ["외부 온도", "°C"], LX: ["조도", "lx"], A: ["아날로그 입력", "ADC"],
   RH: ["상대습도", "%"], P: ["기압", "hPa"]
 };
+const CHART_BOUNDS = new Map([["L", [0, 255, 85]], ["RH", [0, 100, 25]]]);
+const CONSTANT_PADDING = new Map([["T", .25], ["TA", .25], ["P", .2], ["C", 5], ["LX", 1], ["A", 1]]);
+const NONNEGATIVE_AXES = new Set(["C", "LX", "A", "P"]);
+const TIME_AXIS = "경과 시간 (분:초)";
 const ALIASES = new Map([
   ["t", "T"], ["temp", "T"], ["temperature", "T"], ["온도", "T"],
   ["ta", "TA"], ["외부온도", "TA"], ["l", "L"], ["light", "L"], ["조도", "L"],
@@ -1463,27 +1470,31 @@ function refreshCards() {
 }
 
 function syncPlots() {
-  const keys = [...new Set(["T", "L", "C", ...modes[mode].sensors])];
+  const preset = mode === "demo" ? ["T", "L", "C"] : [];
+  const keys = new Set([...preset, ...modes[mode].sensors]);
+  $("plots-empty").hidden = keys.size > 0;
   for (const [key, plot] of plots) {
-    if (keys.includes(key)) continue;
+    if (keys.has(key)) continue;
     plot.container.remove();
     plots.delete(key);
   }
   for (const key of keys) {
     if (plots.has(key)) continue;
     const [name, unit] = sensorInfo(key);
+    const axisUnit = key === "A" ? "ADC 카운트" : unit;
+    const yAxis = axisUnit || !name.includes("단위 미지정")
+      ? name + " (" + (axisUnit || "단위 미지정") + ")" : name;
     const container = document.createElement("section");
     container.className = "plot";
     const title = document.createElement("h3");
-    const suffix = document.createElement("span");
-    suffix.textContent = unit;
-    title.append(name, suffix);
+    const rangeLabel = document.createElement("span");
+    title.append(name, rangeLabel);
     const canvas = document.createElement("canvas");
     canvas.setAttribute("role", "img");
-    canvas.setAttribute("aria-label", name + " 시간 그래프. 측정값은 측정 기기 및 최근 수신 기록에서 읽을 수 있습니다.");
+    canvas.setAttribute("aria-label", "가로축 " + TIME_AXIS + ", 세로축 " + yAxis + ". 측정값은 최근 수신 기록에서 읽을 수 있습니다.");
     container.append(title, canvas);
     $("plots").append(container);
-    plots.set(key, { container, canvas, ctx: canvas.getContext("2d") });
+    plots.set(key, { container, canvas, ctx: canvas.getContext("2d"), rangeLabel, yAxis });
   }
 }
 
@@ -1615,21 +1626,57 @@ function drawPlots(log) {
       }
     }
 
-    if (key === "L") { min = Math.min(min, 0); max = Math.max(max, 255); }
-    if (!series.length && key !== "L") { min = 0; max = 1; }
-    if (series.length && key !== "L") {
-      const pad = (max - min) * .08 || Math.max(Math.abs(min) * .02, .25);
-      min = Math.max(key === "C" || key === "LX" ? 0 : -Infinity, min - pad);
-      max += pad;
-    }
-    if (!Number.isFinite(max - min) || max <= min) { min = 0; max = 1; }
-    drawChart(plot, series, { start, end, origin: first, min, max });
+    const scale = chartScale(key, min, max);
+    if (plot.rangeLabel.textContent !== scale.label) plot.rangeLabel.textContent = scale.label;
+    drawChart(plot, series, { start, end, origin: first, ...scale });
   }
 }
 
-function drawChart({ canvas, ctx }, series, { start, end, origin, min, max }) {
+function chartScale(key, min, max) {
+  const bounds = CHART_BOUNDS.get(key);
+  if (bounds) {
+    const [baseMin, baseMax, step] = bounds;
+    const extra = (baseMax - baseMin) * .04;
+    const low = min < baseMin ? min - extra : baseMin;
+    const high = max > baseMax ? max + extra : baseMax;
+    const first = Math.ceil(low / step);
+    const last = Math.floor(high / step);
+    if (Number.isFinite(high - low) && last - first <= 8) {
+      const label = low === baseMin && high === baseMax ? "기준 범위" : "기준 범위 밖 측정값 포함";
+      return { min: low, max: high, step, label,
+        ticks: Array.from({ length: last - first + 1 }, (_, i) => (first + i) * step) };
+    }
+    min = Math.min(min, baseMin);
+    max = Math.max(max, baseMax);
+  }
+  if (!Number.isFinite(max - min) || max < min) return { min: 0, max: 1, step: 1, ticks: [], label: "" };
+  const canStartAtZero = (bounds || NONNEGATIVE_AXES.has(key)) && min >= 0;
+  const span = max - min;
+  const minimumPad = CONSTANT_PADDING.get(key) ?? (span === 0 ? (Math.abs(min) * .05 || .5) : 0);
+  const pad = Math.max(span * .08, minimumPad - span / 2);
+  const low = canStartAtZero ? Math.max(0, min - pad) : min - pad;
+  const high = Math.max(max + pad, low + 2 * minimumPad);
+  const roughStep = (high - low) / 4;
+  const magnitude = 10 ** Math.floor(Math.log10(roughStep));
+  const step = [1, 2, 2.5, 5, 10].find(factor => factor >= roughStep / magnitude) * magnitude;
+  const first = Math.floor(low / step);
+  const last = Math.ceil(high / step);
+  const label = bounds ? "기준 범위 밖 측정값 포함" : "자동 범위";
+  if (!Number.isFinite(first) || !Number.isFinite(last) || last <= first || last - first > 8 ||
+      !Number.isFinite((last - first) * step) || !Number.isFinite(first * step) || !Number.isFinite(last * step)) {
+    return { min: low, max: high, step: high - low, ticks: [], label };
+  }
+  return { min: first * step, max: last * step, step, label,
+    ticks: Array.from({ length: last - first + 1 }, (_, i) => (first + i) * step) };
+}
+
+function drawChart({ canvas, ctx, yAxis }, series, { start, end, origin, min, max, step, ticks: yTicks }) {
   const { width, height } = resizeCanvas(canvas, ctx);
-  const margin = { left: 51, right: 19, top: 11, bottom: 26 };
+  ctx.font = "12px system-ui, sans-serif";
+  const tickLabels = yTicks.map(value => formatAxis(value, step));
+  const tickWidth = Math.max(23, ...tickLabels.map(label => ctx.measureText(label).width));
+  const compact = width < 440;
+  const margin = { left: Math.max(76, Math.ceil(tickWidth) + 28), right: 12, top: compact ? 29 : 11, bottom: 41 };
   const plotW = Math.max(10, width - margin.left - margin.right);
   const plotH = Math.max(10, height - margin.top - margin.bottom);
   const right = margin.left + plotW;
@@ -1639,19 +1686,18 @@ function drawChart({ canvas, ctx }, series, { start, end, origin, min, max }) {
   ctx.lineWidth = 1;
   ctx.strokeStyle = theme.getPropertyValue("--line").trim();
   ctx.fillStyle = theme.getPropertyValue("--muted").trim();
-  ctx.font = "11px system-ui, sans-serif";
   ctx.textAlign = "right";
   ctx.textBaseline = "middle";
   ctx.beginPath();
-  for (let i = 0; i <= 3; i++) {
-    const y = margin.top + plotH * i / 3;
+  for (const [index, value] of yTicks.entries()) {
+    const y = bottom - plotH * (value - min) / (max - min);
     ctx.moveTo(margin.left, y);
     ctx.lineTo(right, y);
-    if (series.length) ctx.fillText(formatAxis(max - (max - min) * i / 3), margin.left - 6, y);
+    ctx.fillText(tickLabels[index], margin.left - 6, y);
   }
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
-  const ticks = width < 440 ? 3 : 5;
+  const ticks = compact ? 3 : 5;
   for (let i = 0; i <= ticks; i++) {
     const x = margin.left + plotW * i / ticks;
     ctx.moveTo(x, margin.top);
@@ -1660,6 +1706,20 @@ function drawChart({ canvas, ctx }, series, { start, end, origin, min, max }) {
     if (series.length) ctx.fillText(formatElapsed((start - origin + (end - start) * i / ticks) / 1000), x, bottom + 7);
   }
   ctx.stroke();
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(TIME_AXIS, margin.left + plotW / 2, height - 9);
+  ctx.save();
+  if (compact) {
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+    ctx.fillText(yAxis, margin.left, 5, plotW);
+  } else {
+    ctx.translate(8, margin.top + plotH / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText(yAxis, 0, 0, plotH);
+  }
+  ctx.restore();
 
   if (!series.length) {
     ctx.textAlign = "center";
@@ -1710,16 +1770,19 @@ function formatNumber(value) {
   return Number(value.toPrecision(8)).toLocaleString("ko-KR");
 }
 
-function formatAxis(value) {
+function formatAxis(value, step) {
   const absolute = Math.abs(value);
-  if (absolute >= 1000000 || (absolute > 0 && absolute < .001)) return value.toExponential(1);
-  if (absolute >= 1000) return (value / 1000).toFixed(2) + "k";
-  return String(Number(value.toFixed(2)));
+  if (!absolute) return "0";
+  if (absolute >= 10000000 || absolute < .00001 || step < .000001) {
+    const digits = Math.min(16, Math.max(1, Math.floor(Math.log10(absolute)) - Math.floor(Math.log10(step)) + 1));
+    return value.toExponential(digits);
+  }
+  const digits = Math.max(0, 1 - Math.floor(Math.log10(step)));
+  return value.toLocaleString("ko-KR", { maximumFractionDigits: digits });
 }
 
 function formatElapsed(seconds) {
   const rounded = Math.round(seconds);
-  if (rounded < 60) return rounded + "초";
   const minutes = Math.floor(rounded / 60);
   const tail = String(rounded % 60).padStart(2, "0");
   return minutes + ":" + tail;
