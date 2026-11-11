@@ -1533,7 +1533,7 @@ function skyline(az){
 }
 
 /* ---------- state ---------- */
-const S = {t:new Date(), storySky:true, speed:1, view:'map', mode:'guide', chapter:0, lamp:true, az:250, alt:30, fov:75, lines:true, gyro:false, sel:null, found:{}, starTargets:[], moonNotes:{}, trailMode:'photo', trailPhotos:[], trailPhotoSolved:false, azOff:0};
+const S = {t:new Date(), storySky:true, speed:1, view:'map', mode:'guide', chapter:0, lamp:true, az:250, alt:30, fov:75, lines:true, gyro:false, sel:null, found:{}, starTargets:[], moonNotes:{}, trailMode:'photo', trailPhotos:[], trailPhotoSolved:false};
 const SPEEDS=[[0,'멈춤'],[1,'실시간'],[60,'×60'],[600,'×600'],[3600,'×3600']];
 let speedIdx=1;
 const STORE='gstarjournal-v1';
@@ -1601,6 +1601,9 @@ if(typeof ResizeObserver!=='undefined'){
   hudObserver.observe(topHud);hudObserver.observe(bottomHud);
 }
 let CAM={};
+const dot3=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+const cross3=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+const unit3=v=>{const length=Math.hypot(...v);return v.map(n=>n/length);};
 const clampSkyPitch=pitch=>clamp(pitch,-10,190);
 function viewBearing(){
   return S.alt>90
@@ -1608,14 +1611,15 @@ function viewBearing(){
     :{az:S.az,alt:S.alt};
 }
 function setupCam(){const a=S.alt*D2R,z=S.az*D2R;
-  const f=[Math.cos(a)*Math.sin(z),Math.cos(a)*Math.cos(z),Math.sin(a)];
-  const r=[Math.cos(z),-Math.sin(z),0];
-  const u=[r[1]*f[2]-r[2]*f[1], r[2]*f[0]-r[0]*f[2], r[0]*f[1]-r[1]*f[0]];
+  const forward=[Math.cos(a)*Math.sin(z),Math.cos(a)*Math.cos(z),Math.sin(a)];
+  const levelRight=[Math.cos(z),-Math.sin(z),0],levelUp=cross3(levelRight,forward);
+  const [r,u,f]=gyroView??[levelRight,levelUp,forward];
   const sc=(Math.min(W,H*1.2)/2)/(2*Math.tan(S.fov*D2R/4));
-  CAM={f,r,u,sc,cx:W/2,cy:skyY,ppd:sc*D2R};}
+  CAM={f,r,u,levelRight,levelUp,sc,cx:W/2,cy:skyY,ppd:sc*D2R};
+}
 const P=[0,0,0];
-function camXYZ(e){return [e[0]*CAM.r[0]+e[1]*CAM.r[1], e[0]*CAM.u[0]+e[1]*CAM.u[1]+e[2]*CAM.u[2], e[0]*CAM.f[0]+e[1]*CAM.f[1]+e[2]*CAM.f[2]];}
-function projLook(e,lo){const x=e[0]*CAM.r[0]+e[1]*CAM.r[1], y=e[0]*CAM.u[0]+e[1]*CAM.u[1]+e[2]*CAM.u[2], z=e[0]*CAM.f[0]+e[1]*CAM.f[1]+e[2]*CAM.f[2];
+function camXYZ(e){return [dot3(e,CAM.r),dot3(e,CAM.u),dot3(e,CAM.f)];}
+function projLook(e,lo){const [x,y,z]=camXYZ(e);
   if(z<(lo??-0.2))return null;const k=2/(1+z);P[0]=CAM.cx+k*x*CAM.sc;P[1]=CAM.cy-k*y*CAM.sc;P[2]=z;return P;}
 let MAP={};
 function setupMap(){
@@ -1782,7 +1786,7 @@ function drawLookSky(top,horizon){
     skyBackdrop.width=width;skyBackdrop.height=height;
     skyPixels=skyBackdropCtx.createImageData(width,height);
   }
-  const key=[top,horizon,W,H,CAM.cy,CAM.sc,CAM.f[2],CAM.u[2]].join('|');
+  const key=[top,horizon,W,H,CAM.cy,CAM.sc,CAM.f[2],CAM.r[2],CAM.u[2]].join('|');
   if(key!==skyBackdropKey){
     const rgb=color=>color.startsWith('#')
       ?[1,3,5].map(i=>parseInt(color.slice(i,i+2),16))
@@ -1794,7 +1798,7 @@ function drawLookSky(top,horizon){
       for(let x=0;x<width;x++){
         const u=(x+0.5-width/2)*xScale,r2=u*u+v*v;
         // Invert the sky projection to get the world direction's up component.
-        const up=((1-r2)*CAM.f[2]+2*v*CAM.u[2])/(1+r2);
+        const up=((1-r2)*CAM.f[2]+2*u*CAM.r[2]+2*v*CAM.u[2])/(1+r2);
         const altitude=clamp(up/0.65,0,1);
         const tint=0.72*(1-altitude)*(1-altitude);
         const offset=4*(y*width+x);
@@ -1894,8 +1898,18 @@ function drawGround(){
   const {az}=viewBearing();
   const flipped=S.alt>90;
   const nearZenith=Math.abs(S.alt-90)<45;
-  drawGroundSilhouette(az,flipped,nearZenith?90:120);
-  if(nearZenith)drawGroundSilhouette(az+180,!flipped,90);
+  const view=CAM,pad=gyroView?Math.hypot(W,H):0;
+  if(gyroView){
+    const angle=Math.atan2(-dot3(view.levelRight,view.u),dot3(view.levelRight,view.r));
+    ctx.save();ctx.translate(view.cx,view.cy);ctx.rotate(angle);ctx.translate(-view.cx,-view.cy);
+    CAM={...view,r:view.levelRight,u:view.levelUp};
+  }
+  try{
+    drawGroundSilhouette(az,flipped,nearZenith?90:120,pad);
+    if(nearZenith)drawGroundSilhouette(az+180,!flipped,90,pad);
+  }finally{
+    if(gyroView){ctx.restore();CAM=view;}
+  }
   ctx.textAlign='center';
   const DIRS=['북','북동','동','남동','남','남서','서','북서'];
   for(let k=0;k<8;k++){
@@ -1904,7 +1918,7 @@ function drawGround(){
       label(p[0],Math.min(p[1],skyBottom-14),DIRS[k],k%2?'rgba(200,205,225,.5)':'#ffd98a',k%2?11:14);
   }
 }
-function drawGroundSilhouette(bearing,above,span){
+function drawGroundSilhouette(bearing,above,span,pad){
   const pts=[];
   for(let d=-span;d<=span;d+=1){
     const az=bearing+d;
@@ -1913,7 +1927,7 @@ function drawGroundSilhouette(bearing,above,span){
   }
   if(pts.length<2)return;
   ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);for(const p of pts)ctx.lineTo(p[0],p[1]);
-  const edge=above?-3000:H+3000;
+  const edge=above?-3000-pad:H+3000+pad;
   const last=pts[pts.length-1];ctx.lineTo(last[0],edge);ctx.lineTo(pts[0][0],edge);ctx.closePath();
   ctx.fillStyle=['#06070c','#061015','#081322','#090f1b','#071521'][S.chapter];ctx.fill();
   if(S.chapter===0){
@@ -1923,18 +1937,18 @@ function drawGroundSilhouette(bearing,above,span){
     const delta=((norm360(az-bearing)+180)%360)-180;
     if(delta < -span||delta>=span)continue;
     const p=projLook(enu(h,az));
-    if(!p||p[0]<-5||p[0]>W+5)continue;
+    if(!p||p[0]<-5-pad||p[0]>W+5+pad)continue;
     ctx.fillStyle='rgba(255,214,140,.55)';ctx.fillRect(p[0]-ww/2,p[1]-wh/2,ww,wh);
   }
   // Rooftop rail follows the ground side of the view.
   const p0=projLook(enu(-6,bearing),-0.99);
-  if(p0&&p0[1]>0&&p0[1]<H){
+  if(p0&&p0[1]>-pad&&p0[1]<H+pad){
     const y=p0[1],edge=y+(above?-6:6);
     const rail=ctx.createLinearGradient(0,y,0,edge);
     rail.addColorStop(0,'rgba(11,12,18,0)');
     rail.addColorStop(1,'#0b0c12');
     ctx.fillStyle=rail;
-    if(above)ctx.fillRect(0,0,W,y);else ctx.fillRect(0,y,W,H-y);
+    if(above)ctx.fillRect(-pad,-pad,W+2*pad,y+pad);else ctx.fillRect(-pad,y,W+2*pad,H+pad-y);
   }
   }
 }
@@ -3199,54 +3213,51 @@ lineBtn.onclick=()=>{S.lines=!S.lines;showLineState();save();};
 document.getElementById('jBtn').onclick=()=>openJournal();
 
 /* gyro */
-let gyroAz=null,gyroAlt=null,gyroAltOffset=0,gyroTimer;
-let gyroVector=null,gyroBearing=null,gyroPastZenith=false;
+let gyroPose=null,gyroView=null,gyroYawOffset=0,gyroPitchOffset=0,gyroTimer;
 function stopGyro(){
   S.gyro=false;clearTimeout(gyroTimer);
+  gyroPose=gyroView=null;gyroYawOffset=gyroPitchOffset=0;
   gyroBtn.classList.remove('on');gyroBtn.setAttribute('aria-pressed','false');
 }
-function trackGyroVector(vector){
-  const [east,north,up]=vector;
-  if(Math.hypot(east,north)>1e-5){
-    const az=norm360(Math.atan2(east,north)*R2D);
-    if(gyroBearing!==null&&up>Math.sin(75*D2R)){
-      const delta=((az-gyroBearing+540)%360)-180;
-      gyroPastZenith=Math.abs(delta)>90;
-    }
-    gyroBearing=norm360(az+(gyroPastZenith?180:0));
-  }
-  if(gyroBearing===null)gyroBearing=S.az;
-  const smooth=gyroVector?vector.map((value,i)=>gyroVector[i]*0.75+value*0.25):vector;
-  const length=Math.hypot(...smooth);
-  gyroVector=smooth.map(value=>value/length);
-  const [x,y,z]=gyroVector;
-  const bearing=gyroBearing*D2R;
-  const radial=x*Math.sin(bearing)+y*Math.cos(bearing);
-  const horizontal=Math.hypot(x,y);
-  const pastZenith=radial<0;
-  gyroAz=horizontal<1e-5?gyroBearing:norm360(Math.atan2(x,y)*R2D+(pastZenith?180:0));
-  const pitch=Math.atan2(z,pastZenith?-horizontal:horizontal)*R2D;
-  gyroAlt=pastZenith?norm360(pitch):pitch;
+function updateGyroView(){
+  const [right,screenUp,forward]=gyroPose;
+  const pitch=gyroPitchOffset*D2R,yaw=gyroYawOffset*D2R;
+  const adjustedForward=forward.map((v,i)=>v*Math.cos(pitch)+screenUp[i]*Math.sin(pitch));
+  const sin=Math.sin(yaw),cos=Math.cos(yaw);
+  const rotateBearing=([x,y,z])=>[x*cos+y*sin,y*cos-x*sin,z];
+  gyroView=[right,cross3(right,adjustedForward),adjustedForward].map(rotateBearing);
+  const [east,north,up]=gyroView[2];
+  if(Math.hypot(east,north)>1e-4)S.az=norm360(Math.atan2(east,north)*R2D);
+  S.alt=Math.atan2(up,Math.hypot(east,north))*R2D;
 }
 function onOrient(e){
-  if(!S.gyro||S.view!=='look'||e.alpha==null)return;
-  let al=e.alpha;
-  if(e.webkitCompassHeading!=null)al=360-e.webkitCompassHeading;
-  const a=al*D2R,b=e.beta*D2R,g=e.gamma*D2R;
+  if(!S.gyro||S.view!=='look'||![e.alpha,e.beta,e.gamma].every(Number.isFinite))return;
+  const a=(e.webkitCompassHeading!=null?360-e.webkitCompassHeading:e.alpha)*D2R;
+  const b=e.beta*D2R,g=e.gamma*D2R;
   const ca=Math.cos(a),sa=Math.sin(a),cb=Math.cos(b),sb=Math.sin(b),cg=Math.cos(g),sg=Math.sin(g);
-  const vx=-ca*sg-sa*sb*cg, vy=-sa*sg+ca*sb*cg, vz=-cb*cg;
-  trackGyroVector([vx,vy,vz]);
-  S.az=norm360(gyroAz+S.azOff);S.alt=clampSkyPitch(gyroAlt+gyroAltOffset);
+  const forward=[-ca*sg-sa*sb*cg,-sa*sg+ca*sb*cg,-cb*cg];
+  const naturalRight=[ca*cg-sa*sb*sg,sa*cg+ca*sb*sg,-cb*sg];
+  const naturalUp=cross3(naturalRight,forward);
+  const screenAngle=(window.screen?.orientation?.angle??window.orientation??0)*D2R;
+  const right=naturalRight.map((v,i)=>v*Math.cos(screenAngle)-naturalUp[i]*Math.sin(screenAngle));
+  let nextRight=right,nextForward=forward;
+  if(gyroPose&&dot3(gyroPose[2],forward)>0.5&&dot3(gyroPose[0],right)>0.5){
+    nextForward=unit3(forward.map((v,i)=>v*.25+gyroPose[2][i]*.75));
+    const blend=right.map((v,i)=>v*.25+gyroPose[0][i]*.75);
+    const along=dot3(blend,nextForward);
+    nextRight=unit3(blend.map((v,i)=>v-along*nextForward[i]));
+  }
+  gyroPose=[nextRight,cross3(nextRight,nextForward),nextForward];
+  updateGyroView();
 }
 async function toggleGyro(){
   if(S.gyro){stopGyro();return;}
   try{if(typeof DeviceOrientationEvent!=='undefined'&&DeviceOrientationEvent.requestPermission){const r=await DeviceOrientationEvent.requestPermission();if(r!=='granted'){toast('기울기 센서 사용이 허용되지 않았어요');return;}}}
   catch(e){toast('이 브라우저에서는 기울기 센서를 쓸 수 없어요');return;}
   if(!('DeviceOrientationEvent' in window)){toast('이 기기에는 기울기 센서가 없어요');return;}
-  S.gyro=true;gyroAz=null;gyroAltOffset=0;S.azOff=0;
-  gyroVector=null;gyroBearing=null;gyroPastZenith=false;gyroBtn.classList.add('on');gyroBtn.setAttribute('aria-pressed','true');
+  S.gyro=true;gyroPose=gyroView=null;gyroYawOffset=gyroPitchOffset=0;gyroBtn.classList.add('on');gyroBtn.setAttribute('aria-pressed','true');
   toast('폰을 하늘로 들어 보세요. 방향이 어긋나면 화면을 끌어 맞출 수 있어요');
-  gyroTimer=setTimeout(()=>{if(S.gyro&&gyroAz==null){stopGyro();toast('센서 신호를 받지 못했어요. 화면을 끌어 관측할 수 있어요.');}},2500);
+  gyroTimer=setTimeout(()=>{if(S.gyro&&!gyroPose){stopGyro();toast('센서 신호를 받지 못했어요. 화면을 끌어 관측할 수 있어요.');}},2500);
 }
 gyroBtn.onclick=toggleGyro;
 addEventListener('deviceorientationabsolute',onOrient);
@@ -3261,14 +3272,14 @@ function panSky(dx,dy){
   moveSky(-degrees(dx),degrees(dy));
 }
 function moveSky(yaw,pitch){
-  const az=norm360(S.az+(S.alt>90?-yaw:yaw));
-  const alt=clampSkyPitch(S.alt+pitch);
-  if(S.gyro&&gyroAz!==null){
-    S.azOff=az-gyroAz;
-    gyroAltOffset=alt-gyroAlt;
+  if(gyroView){
+    gyroYawOffset=norm360(gyroYawOffset+yaw);
+    gyroPitchOffset=clamp(gyroPitchOffset+pitch,-90,90);
+    updateGyroView();
+    return;
   }
-  S.az=az;
-  S.alt=alt;
+  S.az=norm360(S.az+(S.alt>90?-yaw:yaw));
+  S.alt=clampSkyPitch(S.alt+pitch);
 }
 cv.addEventListener('pointerdown',e=>{
   if(e.button!==0||!started||!datePanel.hidden)return;
