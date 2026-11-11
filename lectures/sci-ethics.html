@@ -1554,7 +1554,7 @@ Deck.scene('aiissues',{steps:3,
 Deck.scene('decide',{steps:5,
   build(root){let s='';const cx=330,cy=520;
     s+=`<g data-in="100" data-fx="pop"><circle cx="${cx}" cy="${cy}" r="80" fill="#1d1d1f" stroke="var(--light)" stroke-width="4"/>${txt(cx,cy+12,'쟁점',36,'var(--light)','middle','font-weight="700"')}</g>`;
-    const P=[[-150,-170,'var(--elec)'],[150,-170,'var(--kin)'],[-190,10,'var(--sound)'],[190,130,'var(--chem)']];
+    const P=[[-150,-170,'var(--elec)'],[150,-170,'var(--kin)'],[-190,130,'var(--sound)'],[190,130,'var(--chem)']];
     P.forEach(([dx,dy,col],i)=>{s+=`<g data-step="1" data-fx="pop" data-delay="${i*120}">${person(cx+dx,cy+dy,col,.9)}<circle cx="${cx+dx+(dx>0?34:-34)}" cy="${cy+dy-62}" r="18" fill="${col}" fill-opacity=".2" stroke="${col}" stroke-width="2"/>${txt(cx+dx+(dx>0?34:-34),cy+dy-54,'!',24,col,'middle','font-weight="800"')}</g>`;});
     s+=`<g data-step="1" data-fx="fade" data-delay="500">${txt(cx,cy+140,'여러 입장 · 이해관계',26,'#86868b')}</g>`;
     s+=`<g data-step="2" data-fx="fade">${arrow(cx,cy+170,cx,cy+260,'var(--heat)',4)}<rect x="${cx-150}" y="${cy+270}" width="300" height="90" rx="18" fill="var(--heat)" fill-opacity=".14" stroke="var(--heat)" stroke-width="3"/>${txt(cx,cy+312,'방치하면',24,'var(--heat)')}${txt(cx,cy+346,'사회적 갈등',30,'#f5f5f7','middle','font-weight="700"')}</g>`;
