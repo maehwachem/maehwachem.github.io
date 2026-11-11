@@ -1468,7 +1468,7 @@ scene.add(aimDot);
 
 // ================= 입력 =================
 const keys = {};
-let crouchToggle = false, mouseAimFallback = false, locked = false;
+let crouchToggle = false, mouseAimFallback = false, locked = false, keyboardInput = false;
 let followingOpponent = isTouch;
 
 function setFollowingOpponent(enabled) {
@@ -1478,20 +1478,28 @@ function setFollowingOpponent(enabled) {
   button.setAttribute('aria-pressed', String(enabled));
 }
 
+const gameKey = e => e.code.startsWith('Key') ? e.code.slice(3).toLowerCase() : e.key.toLowerCase();
+function clearKeys() { for (const k in keys) keys[k] = false; }
+addEventListener('pointerdown', () => { keyboardInput = false; });
 addEventListener('keydown', e => {
-  const k = e.key.toLowerCase(); keys[k] = true;
-  if (e.code === 'KeyC' && state === 'play') crouchToggle = !crouchToggle;
+  if (e.isComposing || e.ctrlKey || e.metaKey || e.altKey) return;
+  keyboardInput = true;
+  if (state !== 'play' && state !== 'countdown') return;
+  if (e.target.closest?.('input, select, textarea, [contenteditable]')) return;
+  if (e.code === 'Space' && e.target.closest?.('button')) return;
+  const k = gameKey(e); keys[k] = true;
+  if (e.code === 'KeyC' && !e.repeat && state === 'play') crouchToggle = !crouchToggle;
   if (e.code === 'KeyF' && !e.repeat && state === 'play' && practiceStep === null) setFollowingOpponent(!followingOpponent);
   if ((e.code === 'KeyP' || e.code === 'Escape') && state === 'play' && !teamSession?.round) pauseGame();
   if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(k)) e.preventDefault();
   if (e.code === 'Space' && state === 'play') playerThrow();
 });
-addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
-addEventListener('blur', () => { for (const k in keys) keys[k] = false; });
+addEventListener('keyup', e => { keys[gameKey(e)] = false; });
+addEventListener('blur', clearKeys);
 const kd = c => keys[c];
 
 function requestLock() {
-  if (isTouch) return;
+  if (isTouch || keyboardInput) return;
   try {
     const r = canvas.requestPointerLock();
     if (r && r.catch) r.catch(() => { mouseAimFallback = true; });
@@ -1502,7 +1510,7 @@ document.addEventListener('pointerlockchange', () => {
   if (locked) mouseAimFallback = false;
   else if (state === 'play' && !mouseAimFallback && !isTouch && !teamSession?.round) pauseGame();
 });
-document.addEventListener('pointerlockerror', () => { mouseAimFallback = true; showHint('마우스를 움직여 조준하고 클릭해서 던져요'); });
+document.addEventListener('pointerlockerror', () => { mouseAimFallback = true; showHint('방향키로 조준 · Space로 던지기'); });
 document.addEventListener('mousemove', e => {
   if (!(locked || mouseAimFallback) || (state !== 'play' && state !== 'countdown')) return;
   if (practiceStep === null && followingOpponent && Math.abs(e.movementX) > Math.max(3, Math.abs(e.movementY))) {
@@ -1930,8 +1938,7 @@ function startGame(mode = 'duel', stage = 0, saved = null) {
   $('msg').textContent = ''; $('msg').style.opacity = '0'; msgT = 0;
   $('flash').style.opacity = '0'; shake = 0;
   state = practice ? 'play' : 'countdown'; cdT = 3.0; cdLast = 4;
-  const mouseHint = practice ? 'WASD 이동 · 마우스 조준 · 클릭 던지기' : 'WASD 이동 · 마우스 조준 · 클릭 던지기 · F 상대 추적';
-  const controlHint = isTouch ? '왼쪽 조이스틱으로 이동 · 오른쪽 위아래로 조준' : mouseHint;
+  const controlHint = isTouch ? '왼쪽 조이스틱으로 이동 · 오른쪽 위아래로 조준' : 'WASD 이동 · 방향키 조준 · Space 던지기';
   $('hint').classList.toggle('trial-hint', trialStage !== null);
   showHint(trialStage !== null ? mapCfg.hint : guardMode ? '파란 눈사람을 지키고 빨간 눈사람을 맞혀요' : controlHint);
   trialClock = 0; logTrial('start', { ammo: maxAmmo, touch: isTouch });
@@ -1940,6 +1947,8 @@ function startGame(mode = 'duel', stage = 0, saved = null) {
 function pauseGame() {
   if (state !== 'play') return;
   state = 'paused'; $('pause').classList.remove('hidden');
+  clearKeys();
+  if (keyboardInput) $('resumeBtn').focus({preventScroll:true});
   saveSoloRound();
   resetTouchInput();
   if (document.pointerLockElement) document.exitPointerLock();
@@ -1961,6 +1970,7 @@ function toMenu() {
   updateLevelMenu();
   updateSoloContinue();
   $('menu').classList.remove('hidden');
+  if (keyboardInput) ($('continueSolo').classList.contains('hidden') ? $('trialBtn') : $('continueSolo')).focus({preventScroll:true});
   if (document.pointerLockElement) document.exitPointerLock();
 }
 function endGame() {
@@ -1988,6 +1998,7 @@ function endGame() {
   $('practiceCard').classList.add('hidden');
   $('hint').classList.add('hidden');
   $('result').classList.remove('hidden');
+  if (keyboardInput) ($('nextStageBtn').classList.contains('hidden') ? $('againBtn') : $('nextStageBtn')).focus({preventScroll:true});
   ['prompt', 'touch', 'bThrow', 'bCrouch', 'bRun', 'bGather', 'bFocus', 'joyBase', 'offL', 'offR'].forEach(id => $(id).classList.add('hidden'));
   won ? sfx.win() : sfx.lose();
 }
@@ -2005,7 +2016,7 @@ $('optAssist').checked = isTouch;
 if (!isTouch) $('sensRow').classList.add('hidden');
 $('ctlText').innerHTML = isTouch
   ? '<b>왼쪽 조이스틱</b>으로 이동 · <b>달리기</b>를 눌러 켜기·끄기<br><b>상대 추적</b>을 켜면 보이는 상대를 계속 바라봐요<br><b>오른쪽 화면</b>을 위아래로 끌어 조준 높이 조절 · 좌우로 끌면 추적 해제<br><b>숙이기</b>로 담 뒤에 숨기 · 눈더미 근처에서 <b>눈 뭉치기</b> 길게 누르기'
-  : '<b>WASD</b> 이동 · <b>Q</b>(누르기) 달리기<br><b>마우스</b> 조준 · <b>클릭</b> 던지기 · <b>F</b> 상대 추적 켜기·끄기<br>마우스를 위로 올리면 높게 던져 <b>담 너머로</b><br><b>Shift</b>(누르기) / <b>C</b>(전환) 숙이기<br>눈더미 근처에서 <b>R</b>을 누르고 있으면 눈 뭉치기 · <b>Esc</b> 일시정지';
+  : '<b>WASD</b> 이동 · <b>Q</b> 누르고 달리기<br><b>방향키</b> 조준 · <b>Space</b> 던지기<br>마우스로 조준하고 클릭으로 던져도 돼요<br><b>F</b> 상대 추적 · <b>Shift</b> 누르기 또는 <b>C</b>로 숙이기<br><b>R</b> 누르고 눈 뭉치기 · <b>Esc</b> 일시정지<br><b>Tab</b>으로 메뉴 이동 · <b>Enter</b>로 선택';
 document.querySelectorAll('#diff button').forEach(b => b.addEventListener('click', () => {
   document.querySelectorAll('#diff button').forEach(x => x.classList.remove('on')); b.classList.add('on');
   diffKey = b.dataset.d; D = DIFFS[diffKey];
@@ -2143,9 +2154,16 @@ function animateFighter(c, dt) {
   m.root.visible = !(c.invuln > 0 && Math.floor(c.invuln * 12) % 2 === 0);
   m.root.position.copy(c.pos); m.root.rotation.y = c.yaw;
 }
+function updateKeyboardAim(dt) {
+  const turn = (kd('arrowleft') ? 1 : 0) - (kd('arrowright') ? 1 : 0);
+  const tilt = (kd('arrowup') ? 1 : 0) - (kd('arrowdown') ? 1 : 0);
+  if (turn && followingOpponent) setFollowingOpponent(false);
+  P.yaw += turn * 1.8 * dt;
+  P.pitch = Math.max(-0.12, Math.min(1.25, P.pitch + tilt * 1.1 * dt));
+}
 function movementIntent() {
-  let mx = (kd('d') || kd('arrowright') ? 1 : 0) - (kd('a') || kd('arrowleft') ? 1 : 0) + touch.mx;
-  let my = (kd('w') || kd('arrowup') ? 1 : 0) - (kd('s') || kd('arrowdown') ? 1 : 0) + touch.my;
+  let mx = (kd('d') ? 1 : 0) - (kd('a') ? 1 : 0) + touch.mx;
+  let my = (kd('w') ? 1 : 0) - (kd('s') ? 1 : 0) + touch.my;
   const l = Math.hypot(mx, my); if (l > 1) { mx /= l; my /= l; }
   return {mx,my,run:Boolean(kd('q') || touch.run)};
 }
@@ -2540,6 +2558,7 @@ function updatePrompt(dt) {
 // ================= 메인 루프 =================
 let last = performance.now();
 function update(dt) {
+  if (state === 'play' || state === 'countdown') updateKeyboardAim(dt);
   if (state === 'countdown') {
     cdT -= dt;
     const n = Math.ceil(cdT);
@@ -2901,7 +2920,7 @@ function beginTeamClient(session,data,local) {
   state='play';
   mouseAimFallback=false;
   showHint(isTouch?(duel?'상대를 먼저 세 번 맞히면 이겨요':'우리 눈사람을 지키고 상대 눈사람을 맞혀요'):
-    '클릭해서 마우스로 조준 · Q를 누르고 이동하면 달려요');
+    '방향키 조준 · Space 던지기 · Q 달리기');
 }
 
 function updateTeamFrame(dt) {
@@ -2915,6 +2934,7 @@ function updateTeamFrame(dt) {
   P.ammo=local.ammo;P.gathering=local.gathering;P.gatherT=local.gatherTime;P.throwAnim=local.throwAnim;
   if(local.shot!==session.soundShot){session.soundShot=local.shot;sfx.throw();}
   if(local.hit!==session.hit){session.hit=local.hit;shake=.3;sfx.hit();}
+  if (state === 'play' && session.connected && !data.waiting) updateKeyboardAim(dt);
   const target=teamGoal();
   if(followingOpponent && target && canTrackTarget(target)) turnTo(P,yawTo(P.pos,target.pos),dt,12);
   animateFighter(P,Math.max(.001,dt));
