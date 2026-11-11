@@ -1,0 +1,1806 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>마이크로비트 센서 대시보드 | 콩 실험실</title>
+<style>
+  :root {
+    color-scheme: only light; --ink: #352a35; --muted: #665963; --plum: #553d50;
+    --accent: #f28c28; --bg: #f7f3eb; --panel: #fcfaf5; --line: #ded5d7;
+    --wash: #f1eae9; --input-line: #baadb4;
+    --series1: #553d50; --series2: #a44b13; --series3: #286499;
+    --series4: #a3376a; --series5: #71621e; --series6: #436970;
+    font-family: system-ui, -apple-system, "Malgun Gothic", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); }
+  button, input, select { font: inherit; }
+  button, select { cursor: pointer; }
+  button, select, input { min-height: 39px; border-radius: 8px; border: 1px solid var(--input-line); color: var(--ink); background: var(--panel); padding: .46rem .75rem; }
+  button { font-weight: 720; }
+  button:hover:enabled, select:hover { border-color: var(--plum); background: var(--wash); }
+  button:disabled { opacity: .48; cursor: default; }
+  :focus-visible { outline: 3px solid #a14b15; outline-offset: 3px; }
+  .primary { background: var(--accent); color: var(--ink); border-color: #a14b15; }
+  .primary:hover:enabled { background: #ffab55; color: var(--ink); border-color: #a14b15; }
+  .danger { color: #94381d; }
+  .quiet { font-weight: 600; }
+  main { width: min(1190px, calc(100% - 48px)); margin: auto; padding-bottom: 34px; }
+  header { padding: 37px 0 22px; display: flex; justify-content: space-between; align-items: end; gap: 18px; }
+  .brand { font-size: .76rem; letter-spacing: .15em; color: var(--plum); font-weight: 850; }
+  h1 { font-size: clamp(1.65rem, 4.2vw, 2.85rem); letter-spacing: -.065em; margin: .3rem 0 .4rem; line-height: 1.2; }
+  h2 { font-size: 1.14rem; letter-spacing: -.025em; margin: 0; }
+  h3 { font-size: .98rem; margin: 0; }
+  p { margin: 0; line-height: 1.6; }
+  .sub, .note { color: var(--muted); font-size: .86rem; }
+  .firmware-download { display: inline-flex; align-items: center; min-height: 44px; white-space: nowrap; border: 1px solid var(--line); border-radius: 100px; color: var(--plum); background: var(--wash); padding: .35rem .8rem; font-size: .8rem; font-weight: 730; text-decoration: none; }
+  .firmware-download:hover { text-decoration: underline; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; min-width: 0; }
+  .control { display: grid; gap: 12px; margin-bottom: 16px; }
+  .placement { border-top: 1px solid var(--line); padding-top: 9px; }
+  .placement summary { font-size: .89rem; }
+  .placement-body, .placement-list { display: grid; gap: 8px; }
+  .placement-list { grid-template-columns: repeat(auto-fit, minmax(min(205px, 100%), 1fr)); }
+  .placement-list label { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 7px; align-items: center; color: var(--muted); font-size: .83rem; }
+  .placement-list input { width: 100%; min-width: 0; }
+  .target { display: inline-flex; gap: 5px; align-items: center; color: var(--muted); font-size: .84rem; }
+  .target select { max-width: min(260px, 70vw); }
+  .device-location { overflow-wrap: anywhere; color: var(--muted); font-size: .79rem; }
+  .device-board { overflow-wrap: anywhere; color: var(--plum); font-size: .86rem; }
+  .board-assignment { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .bar, .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .spread { justify-content: space-between; }
+  .mode { display: inline-flex; background: var(--wash); padding: 3px; border-radius: 9px; gap: 3px; }
+  .mode button { border-color: transparent; background: transparent; min-height: 34px; padding: .35rem .67rem; }
+  .mode button[aria-pressed="true"] { border-color: var(--input-line); color: var(--plum); background: white; }
+  .tag { display: inline-block; border-radius: 5px; padding: .17rem .45rem; font-size: .76rem; font-weight: 740; color: var(--plum); background: var(--wash); white-space: nowrap; }
+  .tag.demo { color: #873c20; background: #faeadb; }
+  .summary { display: flex; align-items: center; flex-wrap: wrap; column-gap: 17px; row-gap: 5px; color: var(--muted); font-size: .86rem; font-variant-numeric: tabular-nums; }
+  .summary strong { color: var(--ink); font-weight: 800; }
+  .workspace { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 325px); gap: 16px; align-items: start; }
+  .chart-head { display: grid; gap: 6px; padding-bottom: 11px; }
+  .chart-head label { color: var(--muted); font-size: .84rem; }
+  select { min-height: 34px; font-size: .85rem; }
+  .plots, .devices { display: grid; gap: 8px; }
+  .plot { border: 1px solid var(--line); border-radius: 9px; padding: 8px 8px 0; min-width: 0; }
+  .plot h3 { padding: 0 3px; }
+  .plot h3 span { color: var(--muted); font-size: .77rem; font-weight: 550; margin-left: .35rem; }
+  canvas { display: block; width: 100%; height: 133px; }
+  .plots .plot:last-child { margin-bottom: 3px; }
+  .legend { display: flex; flex-wrap: wrap; column-gap: 14px; row-gap: 5px; min-height: 22px; }
+  .legend label { display: flex; gap: 5px; align-items: center; cursor: pointer; font-size: .83rem; font-weight: 680; }
+  .legend input { min-height: 0; margin: 0; accent-color: var(--plum); }
+  .line-key { width: 18px; height: 8px; flex: 0 0 auto; }
+  .device-section h2 { margin-bottom: 4px; }
+  .device-section > p { margin-bottom: 10px; }
+  .device { border: 1px solid var(--line); border-left: 4px solid var(--device-color); background: #faf6f3; border-radius: 9px; padding: 9px 10px; display: grid; gap: 6px; }
+  .device-name { width: 100%; min-width: 0; min-height: 35px; font-size: .91rem; font-weight: 760; background: white; padding: .33rem .5rem; }
+  .device-info { display: flex; flex-wrap: wrap; justify-content: space-between; column-gap: 8px; color: var(--muted); font-size: .77rem; }
+  .device-info strong { color: var(--plum); }
+  .values { display: flex; flex-wrap: wrap; gap: 4px 9px; color: var(--muted); font-size: .8rem; font-variant-numeric: tabular-nums; }
+  .values b { color: var(--ink); }
+  .device button { min-height: 32px; font-size: .79rem; justify-self: start; padding: .31rem .62rem; }
+  .device .warning { color: #93391c; overflow-wrap: anywhere; }
+  .empty { padding: .8rem; border: 1px dashed var(--input-line); border-radius: 8px; color: var(--muted); font-size: .85rem; }
+  .lower { margin-top: 16px; display: grid; gap: 10px; }
+  details summary { font-weight: 750; cursor: pointer; }
+  details[open] summary { margin-bottom: 9px; }
+  .guide { display: grid; gap: 10px; }
+  .guide ol, .guide ul { margin: 0; padding-left: 1.3rem; }
+  .guide li + li { margin-top: .35rem; }
+  .guide a { color: var(--plum); }
+  .guide code { overflow-wrap: anywhere; }
+  .guide pre { padding: 11px; margin: 6px 0; background: var(--wash); border-radius: 8px; font-size: .85rem; line-height: 1.4; overflow: auto; }
+  .scroll { overflow: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: .85rem; }
+  th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  thead { background: var(--wash); }
+  .log-table th:first-child, .log-table td:first-child { white-space: nowrap; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+  [hidden] { display: none !important; }
+  @media (max-width: 800px) {
+    main { width: min(100% - 24px, 690px); }
+    .workspace { grid-template-columns: 1fr; }
+    .devices { grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); }
+    header { padding-top: 23px; }
+  }
+  @media (max-width: 410px) {
+    header { align-items: flex-start; flex-direction: column; gap: 6px; }
+    .panel { padding: 11px; }
+    canvas { height: 123px; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <div class="brand">콩 실험실 · 과학 데이터 도구</div>
+      <h1>마이크로비트 센서 대시보드</h1>
+      <p class="sub">여러 모둠의 측정값을 같은 시간축에서 비교합니다.</p>
+    </div>
+    <a class="firmware-download" href="./microbit-v2-bme280.hex" download>마이크로비트 v2용 HEX 받기</a>
+  </header>
+
+  <section class="panel control" aria-labelledby="capture-title">
+    <h2 class="sr-only" id="capture-title">측정과 기록</h2>
+    <div class="bar spread">
+      <div class="mode" role="group" aria-label="기록 종류">
+        <button type="button" id="demo-mode" aria-pressed="true">가상 측정</button>
+        <button type="button" id="real-mode" aria-pressed="false">실제 기기</button>
+      </div>
+      <div class="row">
+        <button type="button" id="demo-run" class="primary">가상 측정 시작</button>
+        <label id="target-label" class="target" hidden>연결할 위치
+          <select id="target" disabled></select>
+        </label>
+        <button type="button" id="add-ble" class="primary" hidden>블루투스 기기 추가</button>
+        <button type="button" id="add-usb" hidden>USB 기기 추가</button>
+        <button type="button" id="export" disabled>CSV 저장</button>
+        <button type="button" id="clear" class="quiet danger" disabled>기록 지우기</button>
+      </div>
+    </div>
+    <div class="bar spread">
+      <div class="summary">
+        <span id="mode-tag" class="tag demo">가상 데이터</span>
+        <span>기록 <strong id="record-count">0</strong>줄</span>
+        <span><span id="active-label">가동</span> <strong id="active-count">0</strong> / 설정 <strong id="planned-count">3</strong>대</span>
+        <span id="store-state">로컬 저장 확인 중</span>
+      </div>
+      <p id="message" class="note" role="status">가상 측정을 시작하면 설정한 기기의 값이 표시됩니다.</p>
+    </div>
+    <details class="placement" id="placement">
+      <summary>기기 수·측정 위치 설정</summary>
+      <div class="placement-body">
+        <div class="row">
+          <label class="target">측정 기기 수 <select id="placement-count" disabled></select></label>
+          <p class="note" id="placement-hint"></p>
+        </div>
+        <div class="placement-list" id="placement-list"></div>
+      </div>
+    </details>
+    <p id="capabilities" class="note" hidden></p>
+    <p id="limit-status" class="note" role="status" hidden>기록 한도에 도달했습니다. CSV를 저장한 뒤 기록을 지우면 다시 기록할 수 있습니다.</p>
+  </section>
+
+  <div class="workspace">
+    <section class="panel" aria-labelledby="chart-title">
+      <div class="chart-head">
+        <div class="bar spread">
+          <h2 id="chart-title">시간에 따른 측정값</h2>
+          <label>표시 구간
+            <select id="window" aria-label="표시 구간">
+              <option value="60">최근 1분</option><option value="300">최근 5분</option>
+              <option value="900">최근 15분</option><option value="all">전체 기록</option>
+            </select>
+          </label>
+        </div>
+        <p class="note">가로축은 첫 수신 이후의 경과 시간입니다. 위치를 바꾼 시점에는 선이 끊어지며, 구간별 측정 위치는 최근 기록과 CSV에서 확인할 수 있습니다. 범례를 누르면 해당 기기의 선을 숨길 수 있습니다.</p>
+        <div id="legend" class="legend" aria-label="기기별 범례"></div>
+      </div>
+      <div id="plots" class="plots"></div>
+    </section>
+
+    <section class="panel device-section" aria-labelledby="devices-title">
+      <h2 id="devices-title">측정 기기</h2>
+      <p class="note">이름을 수정하고 Enter를 누르거나 입력칸 밖을 누르면 저장됩니다.</p>
+      <div id="devices" class="devices"></div>
+    </section>
+  </div>
+
+  <div class="lower">
+    <details class="panel" id="recent">
+      <summary>최근 수신 기록</summary>
+      <div class="scroll">
+        <table class="log-table">
+          <thead><tr><th scope="col">수신 시각</th><th scope="col">기기</th><th scope="col">측정 위치</th><th scope="col">측정값</th></tr></thead>
+          <tbody id="recent-rows"></tbody>
+        </table>
+      </div>
+    </details>
+    <details class="panel" id="setup">
+      <summary>실제 마이크로비트 연결과 MakeCode 예제</summary>
+      <div class="guide">
+        <div>
+          <h3>마이크로비트 v2 · BME280 온도·습도·기압</h3>
+          <ol>
+            <li>전원을 끈 뒤 확장 보드로 <strong>SDA → P20, SCL → P19, VCC → 3V, GND → GND</strong>를 연결합니다.</li>
+            <li>페이지 상단에서 HEX를 내려받고, USB로 연결한 마이크로비트의 <strong>MICROBIT</strong> 드라이브에 복사합니다. BME280의 주소 0x76과 0x77은 자동으로 확인합니다.</li>
+            <li>Chrome 또는 Edge에서 <strong>실제 기기</strong>로 바꾸고, 위치를 선택한 뒤 <strong>블루투스 기기 추가</strong> 또는 컴퓨터의 <strong>USB 기기 추가</strong>로 연결합니다. 안드로이드 휴대폰·태블릿은 HTTPS 주소를 Chrome에서 엽니다. 아이폰·아이패드의 기본 Safari는 Web Bluetooth를 지원하지 않습니다.</li>
+            <li>기기 카드에서 <strong>보드 번호(1~12)</strong>를 고르고 <strong>번호 보내기</strong>를 누릅니다. 보드가 확인한 번호가 LED·기기 카드·그래프 범례에 표시됩니다. 보드의 A 버튼은 현재 번호, B 버튼은 블루투스 기기 코드를 표시합니다. LED에 X가 보이면 센서 배선을 확인합니다.</li>
+            <li>약 1초마다 외부 온도(°C), 상대습도(%), 기압(hPa)이 갱신됩니다. CSV에는 측정 당시의 위치 번호와 보드 번호가 각각 기록됩니다.</li>
+          </ol>
+        </div>
+        <h3>내장 센서로 연결 시험</h3>
+        <ol>
+          <li><a href="https://makecode.microbit.org/" target="_blank" rel="noreferrer">MakeCode</a>에서 새 프로젝트를 열고 <strong>Bluetooth 확장</strong>을 추가합니다. JavaScript 화면에 아래 예제를 붙여 넣고 내려받은 HEX를 마이크로비트에 넣습니다.</li>
+          <li>지원되는 컴퓨터용 Chrome 또는 Edge에서 HTML을 브라우저 탭으로 직접 엽니다. 연결 기능을 사용할 수 없으면 아래 로컬 실행 방법으로 엽니다. 블루투스를 켜고 필요한 경우 운영체제의 페어링을 완료합니다.</li>
+          <li><strong>실제 기기</strong>에서 연결할 위치를 고르고 <strong>블루투스 기기 추가</strong>로 1대를 선택합니다. 약 1초마다 보드 온도와 상대 밝기가 들어오는지 확인합니다. 연결됨 상태는 UART 구독 상태이고, <strong>수신 중</strong>이 실제 데이터가 들어왔다는 뜻입니다.</li>
+          <li>연결 해제 후 같은 카드의 <strong>다시 연결</strong>을 눌러 이름과 기록이 이어지는지 확인합니다. 한 대가 정상일 때 <strong>블루투스 기기 추가</strong>로 다음 기기를 선택합니다. 처음에는 한 대씩 전원을 켜면 기기 이름을 구분하기 쉽습니다.</li>
+        </ol>
+        <div>
+          <h3>MakeCode JavaScript · 내장 센서로 블루투스 먼저 시험</h3>
+          <pre><code id="ble-code">let connected = false
+bluetooth.onBluetoothConnected(function () {
+    connected = true
+})
+bluetooth.onBluetoothDisconnected(function () {
+    connected = false
+})
+bluetooth.startUartService()
+input.lightLevel()
+basic.forever(function () {
+    if (connected) {
+        bluetooth.uartWriteLine("T=" + input.temperature() + ",L=" + input.lightLevel())
+    }
+    basic.pause(1000)
+})</code></pre>
+          <p class="note">온도는 보드에서 읽은 값이며 조도는 LED의 상대 밝기(0~255)입니다. CO₂는 외부 센서에서 측정한 ppm 값을 <code>C=620</code>처럼 별도 줄로 보냅니다. 외부 온도는 <code>TA=23.4</code>, lux 출력은 <code>LX=130</code>으로 구분합니다. 센서 모델에 맞는 읽기 코드를 추가해야 합니다. BLE UART는 줄바꿈을 포함한 짧은 ASCII 줄을 권장합니다(전송 단위 최대 20바이트).</p>
+        </div>
+        <div>
+          <h3>USB 직렬 연결 · 기존 MakeCode 예제</h3>
+          <pre><code id="usb-code">// MakeCode JavaScript 예제
+// P1 센서값, 내장 온도, 조도를 0.2초마다 HTML로 보냅니다.
+
+serial.redirectToUSB()
+serial.setBaudRate(BaudRate.BaudRate115200)
+
+basic.forever(function () {
+    let 센서값 = pins.analogReadPin(AnalogPin.P1)
+    let 온도 = input.temperature()
+    let 조도 = input.lightLevel()
+
+    serial.writeLine(
+        &quot;센서값=&quot; + 센서값 +
+        &quot;,온도=&quot; + 온도 +
+        &quot;,조도=&quot; + 조도
+    )
+
+    basic.pause(200)
+})</code></pre>
+          <p class="note">데이터 전송이 가능한 케이블로 연결하고 <strong>실제 기기 → USB 기기 추가</strong>를 누릅니다(115200 baud). 기존 <code>센서값=523,온도=24.6,조도=120</code>, <code>pulse:523,temp:24.6</code>, 숫자만 있는 줄을 읽습니다. 다른 프로그램에서 직렬 포트를 사용 중이면 닫아 주세요. 새로고침 후 USB 기기를 다시 연결할 때는 카드와 같은 기기의 포트를 직접 선택합니다.</p>
+        </div>
+        <div>
+          <h3>인터넷 없이 열기</h3>
+          <p class="note">받아 둔 HTML을 직접 열면 가상 측정·그래프·CSV 저장을 이용할 수 있습니다. 기기 접근이나 브라우저 자동 저장이 제한되면 HTML이 있는 폴더에서 <code>python -m http.server 8000 --bind 127.0.0.1</code>을 실행하고 <code>http://127.0.0.1:8000/microbit_sensor_dashboard.html</code>을 엽니다. 이 접속에는 인터넷이 필요 없습니다. 처음 MakeCode를 열고 확장을 받거나 온라인 페이지에 접속할 때는 인터넷이 필요할 수 있습니다. 원격 업로드는 추후 별도 연동이 필요합니다.</p>
+        </div>
+      </div>
+    </details>
+    <details class="panel">
+      <summary>수집 방식 비교와 저장 기준</summary>
+      <div class="guide">
+        <div class="scroll">
+          <table>
+            <thead><tr><th scope="col">수집 방식</th><th scope="col">적합한 상황</th><th scope="col">필요한 조건</th></tr></thead>
+            <tbody>
+              <tr><td>블루투스 UART</td><td>전원만 연결한 여러 모둠을 한 화면에 모을 때</td><td>Web Bluetooth 지원 환경과 기기별 접근 허가. 동시 연결 수와 안정성은 실제 기기에서 확인.</td></tr>
+              <tr><td>USB 직렬</td><td>고정된 자리에서 1대씩 시험하거나 여러 대를 케이블로 모을 때</td><td>데이터 케이블·USB 포트 또는 허브·Web Serial. 기기마다 직렬 포트 선택.</td></tr>
+              <tr><td>수집용 마이크로비트 + USB</td><td>무선 측정 지점이 많고 컴퓨터에는 케이블 하나만 연결하고 싶을 때</td><td>측정용 보드의 micro:bit Radio 송신과 수집용 보드의 중계 코드가 별도로 필요. 송신기 ID와 유실 확인용 순번을 포함해 USB로 전달하는 방식. 이 시제품에서 중계 모드는 후속 구현 항목.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">가상과 실제는 따로 저장합니다. 자동 저장이 가능하면 같은 브라우저와 주소에서 새로고침 후 기록을 다시 볼 수 있습니다. CSV는 모드별 전체 기록을 센서값 한 개당 한 행으로 저장합니다. 기록 한도는 모드당 수신 60,000줄이며 한도에 도달하면 기존 기록을 보존한 채 추가 기록이 멈춥니다. 화면의 시간 범위와 범례 설정은 CSV에 영향을 주지 않습니다. 측정 위치와 번호는 수신 당시 값으로 저장됩니다. 위치 또는 번호가 기록되기 전의 자료는 해당 칸이 비어 있습니다. 기록 충돌을 피하려면 같은 주소에서 대시보드를 한 탭만 열어 사용하세요.</p>
+        <p class="note"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API" target="_blank" rel="noreferrer">Web Bluetooth</a> · <a href="https://makecode.microbit.org/reference/bluetooth/start-uart-service" target="_blank" rel="noreferrer">MakeCode UART</a> · <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Serial_API" target="_blank" rel="noreferrer">Web Serial</a> · <a href="https://support.microbit.org/support/solutions/articles/19000083637-using-the-micro-bit-wirelessly-" target="_blank" rel="noreferrer">micro:bit Radio</a></p>
+      </div>
+    </details>
+  </div>
+</main>
+<script>
+"use strict";
+
+const $ = id => document.getElementById(id);
+const theme = getComputedStyle(document.documentElement);
+const SERIES_COLORS = Array.from({ length: 6 }, (_, index) =>
+  theme.getPropertyValue("--series" + (index + 1)).trim()
+);
+const DASHES = [[], [8, 4], [2, 4], [9, 3, 2, 3], [5, 3], [13, 4]];
+const UART_SERVICE = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
+const UART_TX = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";
+const UART_RX = "6e400003-b5a3-f393-e0a9-e50e24dcca9e";
+const MAX_RECORDS = 60000;
+const MAX_LINE = 512;
+const RECEIVE_QUIET_MS = 10000;
+const BLE_CONNECT_TIMEOUT_MS = 15000;
+const SENSOR = {
+  T: ["보드 온도", "°C"], L: ["조도", "상대값 0~255"], C: ["이산화탄소", "ppm"],
+  TA: ["외부 온도", "°C"], LX: ["조도", "lx"], A: ["아날로그 입력", "ADC"],
+  RH: ["상대습도", "%"], P: ["기압", "hPa"]
+};
+const ALIASES = new Map([
+  ["t", "T"], ["temp", "T"], ["temperature", "T"], ["온도", "T"],
+  ["ta", "TA"], ["외부온도", "TA"], ["l", "L"], ["light", "L"], ["조도", "L"],
+  ["lx", "LX"], ["lux", "LX"], ["c", "C"], ["co2", "C"], ["co₂", "C"],
+  ["이산화탄소", "C"], ["a", "A"], ["센서값", "A"], ["rh", "RH"], ["p", "P"]
+]);
+const MAX_DEVICES = 12;
+const DEMO_POSITIONS = ["창가", "교실 중앙", "복도 쪽"];
+const DEMOS = Array.from({ length: MAX_DEVICES }, (_, slot) => ({
+  id: "SIM-" + String(slot + 1).padStart(2, "0"),
+  name: (slot + 1) + "모둠", type: "demo", style: slot, slot
+}));
+const plan = {
+  id: "placement",
+  demo: { count: 3, positions: [...DEMO_POSITIONS] },
+  real: { count: 3, positions: [] }
+};
+const SOURCE = { demo: "가상", ble: "블루투스", usb: "USB" };
+const modes = { demo: newMode(), real: newMode() };
+const devices = new Map(DEMOS.map(meta => [meta.id, newDevice(meta)]));
+const plots = new Map();
+const cards = new Map();
+const hiddenDevices = new Set();
+const bleSupported = window.isSecureContext && typeof navigator.bluetooth?.requestDevice === "function";
+const usbSupported = window.isSecureContext && typeof navigator.serial?.requestPort === "function";
+const clock = new Intl.DateTimeFormat("ko-KR", { hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" });
+let mode = "demo";
+let demoTimer = null;
+let db = null;
+let storageProblem = false;
+let blockedByTab = false;
+let ready = false;
+let pending = 0;
+let adding = false;
+let renderTimer = null;
+let needsLayout = false;
+let runSequence = 0;
+
+function newMode() {
+  return { rows: [], series: new Map(), sensors: new Set(), limitReached: false };
+}
+
+function newDevice(meta) {
+  return {
+    meta, state: "idle", segment: "", latest: new Map(), lastReceivedAt: null,
+    diagnostics: "", invalid: 0, link: null,
+    activeBoardId: null, boardIssue: "", boardWithoutSample: false,
+    boardChange: null, boardNotice: ""
+  };
+}
+
+function boardLabel(board) {
+  return board.number ? "보드 " + board.number + "번" : "보드 번호 미지정";
+}
+
+function identifiedName(name, board) {
+  return board ? boardLabel(board) + " · " + name : name;
+}
+
+function boardIsConnected(device) {
+  return device.state === "connected" || device.state === "connecting";
+}
+
+function sensorInfo(key) {
+  return Object.hasOwn(SENSOR, key) ? SENSOR[key] : [key, ""];
+}
+
+function csvUnit(key) {
+  return key === "L" ? "relative_0_255" : sensorInfo(key)[1];
+}
+
+function nextSegment() {
+  return Date.now().toString(36) + "-" + (++runSequence);
+}
+
+function parseNumeric(value) {
+  const trimmed = value.trim();
+  if (trimmed === "") return null;
+  const number = Number(trimmed);
+  return Number.isFinite(number) ? number : null;
+}
+
+// Preserves the older USB monitor's named and positional line formats.
+function parseLine(line) {
+  const clean = line.trim();
+  if (!clean) return null;
+  const parts = clean.split(/[,;\t]+/).map(part => part.trim()).filter(Boolean);
+  const named = Object.create(null);
+
+  for (const part of parts) {
+    const match = part.match(/^([^=:]{1,60})\s*[:=]\s*(-?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)$/);
+    if (!match) break;
+    const label = match[1].trim();
+    const number = parseNumeric(match[2]);
+    let key = ALIASES.get(label.toLowerCase()) ?? label;
+    if (!label || number === null) return null;
+    if (key === "L" && (number < 0 || number > 255)) {
+      if (label !== "조도") return null;
+      key = "조도(단위 미지정)";
+    }
+    if ((key === "C" || key === "LX") && number < 0) return null;
+    if (Object.hasOwn(named, key)) return null;
+    named[key] = number;
+  }
+  if (parts.length && Object.keys(named).length === parts.length) return named;
+
+  const numbers = parts.map(parseNumeric);
+  if (numbers.length && numbers.every(number => number !== null)) {
+    return Object.fromEntries(numbers.map((number, index) => [
+      numbers.length === 1 ? "값" : "값" + (index + 1), number
+    ]));
+  }
+  return null;
+}
+
+function acceptFrame(device, line) {
+  if (!line.startsWith("@MB1:")) {
+    const values = parseLine(line);
+    if (!values) noteInvalid(device, line.slice(0, 80));
+    else if (device.meta.board) {
+      device.boardIssue = "이 카드에 등록된 보드 번호를 확인할 수 없습니다. 연결한 보드와 HEX를 확인하세요.";
+      queueRender();
+    } else accept(device, values);
+    return;
+  }
+
+  const match = /^@MB1:(-?\d{1,10}):(\d{1,2}):([a-z0-9]{5});(.*)$/i.exec(line);
+  if (!match || Number(match[2]) > MAX_DEVICES) {
+    noteInvalid(device, "보드 식별 정보를 읽을 수 없습니다.");
+    return;
+  }
+  const board = { id: match[1], number: Number(match[2]), code: match[3].toLowerCase() };
+  const values = match[4] ? parseLine(match[4]) : null;
+  if (match[4] && !values) {
+    noteInvalid(device, "보드의 측정값 형식을 읽을 수 없습니다.");
+    return;
+  }
+
+  const previous = device.meta.board;
+  if (previous && previous.id !== board.id) {
+    device.boardIssue = "연결된 기기는 " + boardLabel(board) + "(" + board.code + ")입니다. 이 카드에 등록된 기기와 달라 기록하지 않습니다.";
+  } else if ([...devices.values()].some(other => other !== device && boardIsConnected(other) && other.activeBoardId === board.id)) {
+    device.boardIssue = "같은 보드가 이미 다른 카드에 연결되어 있어 이 카드에는 기록하지 않습니다.";
+  } else {
+    device.activeBoardId = board.id;
+    device.boardIssue = "";
+    device.boardWithoutSample = !values;
+    if (!previous || previous.number !== board.number || previous.code !== board.code) {
+      device.meta.board = board;
+      saveDevice(device);
+      if (mode === "real") renderLegend();
+    }
+    if (device.boardChange?.number === board.number) {
+      finishBoardChange(device, boardLabel(board) + " 저장 완료");
+    }
+    if (values) accept(device, values);
+  }
+  queueRender();
+}
+
+// Each transport owns its UTF-8 decoder and partial line. Dropping a line never splices it into the next one.
+function receiveBytes(device) {
+  const decoder = new TextDecoder();
+  let buffer = "";
+  let dropping = false;
+
+  return bytes => {
+    const pieces = decoder.decode(bytes, { stream: true }).split("\n");
+    for (let index = 0; index < pieces.length; index++) {
+      if (!dropping) {
+        buffer += pieces[index];
+        if (buffer.length > MAX_LINE) {
+          dropping = true;
+          noteInvalid(device, "너무 긴 줄을 건너뛰었습니다.");
+        }
+      }
+      if (index === pieces.length - 1) break;
+      if (!dropping && buffer.trim()) acceptFrame(device, buffer.trim());
+      buffer = "";
+      dropping = false;
+    }
+  };
+}
+
+function noteInvalid(device, detail) {
+  device.invalid++;
+  device.diagnostics = detail;
+  queueRender();
+}
+
+function finishBoardChange(device, notice) {
+  if (device.boardChange) clearTimeout(device.boardChange.timeout);
+  device.boardChange = null;
+  device.boardNotice = notice;
+  queueRender();
+}
+
+function resetBoardLink(device) {
+  device.activeBoardId = null;
+  device.boardIssue = "";
+  device.boardWithoutSample = false;
+  finishBoardChange(device, "");
+}
+
+function canAssignBoard(device) {
+  const link = device.link;
+  return device.state === "connected" && device.activeBoardId && !device.boardIssue &&
+    (device.meta.type === "ble" ? link?.writeCharacteristic : link?.port.writable);
+}
+
+async function assignBoardNumber(device, number) {
+  if (!canAssignBoard(device) || device.boardChange || !Number.isInteger(number) || number < 1 || number > MAX_DEVICES) return;
+  const taken = [...devices.values()].some(other => other !== device && boardIsConnected(other) &&
+    (other.boardChange?.number === number || (other.activeBoardId && other.meta.board?.number === number)));
+  if (taken) {
+    finishBoardChange(device, "보드 " + number + "번을 다른 연결에서 사용 중입니다.");
+    return;
+  }
+
+  const link = device.link;
+  const bytes = new TextEncoder().encode("SET:" + number + "\n");
+  const change = { number, timeout: setTimeout(() => {
+    if (device.boardChange === change) finishBoardChange(device, "보드의 응답이 없습니다. 연결을 확인한 뒤 다시 보내세요.");
+  }, 6500) };
+  device.boardChange = change;
+  device.boardNotice = "보드 " + number + "번 저장 확인 중…";
+  queueRender();
+  try {
+    if (device.meta.type === "ble") {
+      const characteristic = link.writeCharacteristic;
+      if (characteristic.properties.write && characteristic.writeValueWithResponse) {
+        await characteristic.writeValueWithResponse(bytes);
+      } else if (characteristic.properties.writeWithoutResponse && characteristic.writeValueWithoutResponse) {
+        await characteristic.writeValueWithoutResponse(bytes);
+      } else {
+        await characteristic.writeValue(bytes);
+      }
+    } else {
+      const writer = link.port.writable.getWriter();
+      try { await writer.write(bytes); } finally { writer.releaseLock(); }
+    }
+  } catch {
+    if (device.boardChange === change) finishBoardChange(device, "번호를 보내지 못했습니다. 연결을 확인하고 다시 보내세요.");
+  }
+}
+
+function modeOf(device) {
+  return device.meta.type === "demo" ? "demo" : "real";
+}
+
+function indexRow(log, row) {
+  log.rows.push(row);
+  if (!log.series.has(row.device)) log.series.set(row.device, new Map());
+  const series = log.series.get(row.device);
+  const latest = devices.get(row.device)?.latest;
+  let newSensor = false;
+  for (const [key, value] of Object.entries(row.values)) {
+    if (!log.sensors.has(key)) {
+      log.sensors.add(key);
+      newSensor = true;
+    }
+    if (!series.has(key)) series.set(key, []);
+    series.get(key).push({ time: row.time, segment: row.segment, value });
+    latest?.set(key, { value, segment: row.segment });
+  }
+  return newSensor;
+}
+
+function accept(device, values, time = Date.now()) {
+  const group = modeOf(device);
+  const log = modes[group];
+  if (log.rows.length >= MAX_RECORDS) return;
+
+  // Keep rows ordered even if the operating-system clock is adjusted during recording.
+  time = Math.max(time, log.rows.at(-1)?.time ?? time);
+  const row = {
+    group, device: device.meta.id, time, segment: device.segment,
+    slot: device.meta.slot, position: plan[group].positions[device.meta.slot] ?? "", values
+  };
+  if (device.meta.board) row.board = device.meta.board;
+  const newSensor = indexRow(log, row);
+  device.lastReceivedAt = performance.now();
+  write("records", store => store.add(row));
+  if (log.rows.length === MAX_RECORDS) {
+    log.limitReached = true;
+    if (group === "demo") stopDemo();
+  }
+  queueRender(mode === group && newSensor);
+}
+
+function openDb() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open("kong-microbit-dashboard-v1", 2);
+    request.onupgradeneeded = event => {
+      const database = request.result;
+      if (event.oldVersion === 0) {
+        database.createObjectStore("devices", { keyPath: "id" });
+        const rows = database.createObjectStore("records", { keyPath: "record", autoIncrement: true });
+        rows.createIndex("group", "group");
+      }
+      database.createObjectStore("settings", { keyPath: "id" });
+    };
+    let blocked = false;
+    request.onsuccess = () => {
+      if (blocked) message(modeHint(mode));
+      resolve(request.result);
+    };
+    request.onerror = () => reject(request.error);
+    request.onblocked = () => {
+      blocked = true;
+      message("이전 버전이 다른 탭에서 열려 있습니다. 해당 탭을 닫으면 기록을 불러옵니다.");
+    };
+  });
+}
+
+function getAll(database, name) {
+  return new Promise((resolve, reject) => {
+    const request = database.transaction(name).objectStore(name).getAll();
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+function storeFailure() {
+  storageProblem = true;
+  queueRender();
+}
+
+function write(name, update) {
+  if (!db || storageProblem) return;
+  let transaction;
+  try {
+    transaction = db.transaction(name, "readwrite");
+    update(transaction.objectStore(name));
+  } catch (error) {
+    transaction?.abort();
+    storeFailure();
+    return;
+  }
+  pending++;
+  transaction.oncomplete = () => {
+    pending--;
+    queueRender();
+  };
+  transaction.onabort = () => {
+    pending--;
+    storeFailure();
+  };
+  return transaction;
+}
+
+function saveDevice(device) {
+  write("devices", store => store.put(device.meta));
+}
+
+async function initialize() {
+  try {
+    const database = await openDb();
+    const [saved, rows, settings] = await Promise.all(
+      ["devices", "records", "settings"].map(name => getAll(database, name))
+    );
+    const savedPlan = settings.find(item => item.id === plan.id);
+    if (savedPlan) {
+      plan.demo = savedPlan.demo;
+      plan.real = savedPlan.real;
+    }
+
+    // Older versions stored the connection order as style and did not have placement slots.
+    for (const meta of saved) {
+      if (meta.type === "demo") {
+        meta.slot ??= meta.style;
+        if (meta.name === (meta.slot + 1) + "모둠 · " + DEMO_POSITIONS[meta.slot]) {
+          meta.name = DEMOS[meta.slot].name;
+        }
+      } else {
+        if (!Object.hasOwn(meta, "slot")) meta.slot = meta.style;
+        if (!savedPlan) plan.real.count = Math.max(plan.real.count, meta.slot + 1);
+      }
+      devices.set(meta.id, newDevice(meta));
+    }
+    for (const row of rows) indexRow(modes[row.group], row);
+    for (const log of Object.values(modes)) log.limitReached = log.rows.length >= MAX_RECORDS;
+    db = database;
+    db.onversionchange = () => {
+      db.close();
+      db = null;
+      storeFailure();
+    };
+  } catch (error) {
+    storeFailure();
+  } finally {
+    ready = true;
+    renderLayout();
+    renderLive();
+  }
+}
+
+function clearRecords() {
+  const group = mode;
+  if (!modes[group].rows.length) return;
+  const localOnly = !db || storageProblem;
+  const question = localOnly
+    ? "화면의 기록만 지울까요? 저장소에 남은 기록은 새로고침하면 다시 표시될 수 있습니다."
+    : "현재 모드의 측정 기록을 지울까요? 기기 이름과 연결은 유지됩니다.";
+  if (!window.confirm(question)) return;
+
+  modes[group] = newMode();
+  for (const device of devices.values()) {
+    if (modeOf(device) === group) device.latest.clear();
+  }
+  const deletion = write("records", store => {
+    const cursor = store.index("group").openCursor(IDBKeyRange.only(group));
+    cursor.onsuccess = () => {
+      const entry = cursor.result;
+      if (!entry) return;
+      entry.delete();
+      entry.continue();
+    };
+  });
+  const localOnlyMessage = "화면 기록만 지웠습니다. 저장소에 남은 기록은 새로고침하면 다시 표시될 수 있습니다.";
+  if (deletion) {
+    message("브라우저 저장소의 기록을 지우는 중입니다.");
+    deletion.addEventListener("complete", () => {
+      if (mode === group) message("현재 모드의 기록을 지웠습니다.");
+    });
+    deletion.addEventListener("abort", () => {
+      if (mode === group) message(localOnlyMessage);
+    });
+  } else {
+    message(localOnlyMessage);
+  }
+  renderLayout();
+  renderLive();
+}
+
+function modeHint(group) {
+  return group === "demo"
+    ? "가상 측정을 시작하면 설정한 기기의 값이 표시됩니다."
+    : "연결할 위치를 고른 뒤 마이크로비트를 추가하세요.";
+}
+
+function changeMode(next) {
+  if (mode === next) return;
+  if (mode === "demo") stopDemo();
+  mode = next;
+  message(modeHint(next));
+  renderLayout();
+  renderLive();
+}
+
+function message(text) {
+  $("message").textContent = text;
+}
+
+function stopDemo() {
+  clearInterval(demoTimer);
+  demoTimer = null;
+  for (const meta of DEMOS) devices.get(meta.id).state = "idle";
+  queueRender();
+}
+
+function toggleDemo() {
+  if (demoTimer !== null) {
+    stopDemo();
+    message("가상 측정을 멈췄습니다. 기록은 CSV로 저장할 수 있습니다.");
+    renderLive();
+    return;
+  }
+
+  let sample = 0;
+  const tick = () => {
+    const time = Date.now();
+    for (const meta of DEMOS.slice(0, plan.demo.count)) {
+      const index = meta.slot;
+      const wave = Math.sin(sample / 7 + index);
+      const lightBase = [165, 105, 74][index] ?? (88 + (index * 37) % 110);
+      const co2Base = [475, 705, 555][index] ?? (480 + (index * 53) % 255);
+      const light = lightBase + 14 * Math.sin(sample / 5 + index);
+      const co2 = co2Base + 29 * Math.sin(sample / 9 + index) + sample % 70;
+      accept(devices.get(meta.id), {
+        T: Math.round((23.4 + (index % 5) * .85 + wave * .6) * 10) / 10,
+        L: Math.round(light), C: Math.round(co2)
+      }, time);
+      if (demoTimer === null) break;
+    }
+    sample++;
+  };
+
+  demoTimer = setInterval(tick, 1000);
+  syncDemoDevices();
+  message("가상 기기가 1초마다 측정값을 보냅니다.");
+  tick();
+}
+
+function syncDemoDevices() {
+  for (const meta of DEMOS) {
+    const device = devices.get(meta.id);
+    if (meta.slot >= plan.demo.count) device.state = "idle";
+    else if (device.state !== "connected") {
+      device.segment = nextSegment();
+      device.state = "connected";
+    }
+  }
+}
+
+function createRealDevice(type, binding, slot) {
+  const next = [...devices.values()].filter(device => device.meta.type === type).length + 1;
+  const prefix = type === "ble" ? "BLE" : "USB";
+  const id = prefix + "-" + String(next).padStart(2, "0");
+  const style = [...devices.values()].filter(device => modeOf(device) === "real").length;
+  return newDevice({ id, type, binding, name: id, style, slot });
+}
+
+function registerRealDevice(device) {
+  devices.set(device.meta.id, device);
+  saveDevice(device);
+  renderLayout();
+}
+
+function deviceForBinding(type, binding) {
+  return [...devices.values()].find(device => device.meta.type === type && device.meta.binding === binding);
+}
+
+function renameDevice(device, input) {
+  const name = input.value.trim();
+  const taken = [...devices.values()].some(other =>
+    other !== device && modeOf(other) === modeOf(device) && other.meta.name.toLocaleLowerCase() === name.toLocaleLowerCase()
+  );
+  if (!name || taken) {
+    input.value = device.meta.name;
+    message(!name ? "기기 이름을 입력하세요." : "같은 이름을 쓰는 기기가 있습니다.");
+    return;
+  }
+  if (device.meta.name === name) return;
+  device.meta.name = name;
+  input.value = name;
+  saveDevice(device);
+  renderLegend();
+  queueRender();
+}
+
+function isBusy(device) {
+  return device.state === "connecting" || device.state === "disconnecting";
+}
+
+function connectionError(error) {
+  if (error.name === "NotFoundError") return "기기를 선택하지 않았거나 서비스를 찾을 수 없습니다.";
+  if (error.name === "SecurityError" || error.name === "NotAllowedError") {
+    return "기기 접근이 제한됐습니다. 브라우저 권한과 로컬 실행 주소를 확인하세요.";
+  }
+  return error.message || "기기 연결에 실패했습니다.";
+}
+
+function chooseBle() {
+  return navigator.bluetooth.requestDevice({
+    filters: [{ namePrefix: "BBC micro:bit" }, { namePrefix: "micro:bit" }, { services: [UART_SERVICE] }],
+    optionalServices: [UART_SERVICE]
+  });
+}
+
+async function addBle(slot) {
+  const peripheral = await chooseBle();
+  const owner = deviceForBinding("ble", peripheral.id);
+  if (owner && owner.meta.slot !== null) {
+    message(owner.meta.name + " 기기는 " + slotLabel("real", owner.meta.slot) + "에 이미 배정됐습니다. 해당 기기 카드에서 연결을 관리하세요.");
+    return;
+  }
+  const device = owner ?? createRealDevice("ble", peripheral.id, slot);
+  if (owner) assignSlot(owner, slot);
+  else registerRealDevice(device);
+  device.peripheral = peripheral;
+  await connectBle(device);
+}
+
+async function connectBle(device) {
+  device.state = "connecting";
+  device.diagnostics = "";
+  device.invalid = 0;
+  resetBoardLink(device);
+  queueRender();
+  let link;
+  let timeoutId;
+
+  try {
+    const peripheral = device.peripheral;
+    device.segment = nextSegment();
+    const feed = receiveBytes(device);
+    link = {
+      peripheral,
+      disconnect: () => {
+        if (!peripheral.gatt.connected) {
+          finishBle(device, link, "연결이 끊겼습니다. 다시 연결할 수 있습니다.");
+        }
+      },
+      data: event => {
+        if (device.link === link && event.target.value) feed(event.target.value);
+      }
+    };
+    device.link = link;
+    const timeout = new Promise((_, reject) => {
+      timeoutId = setTimeout(() => reject(new Error("블루투스 연결 대기 시간이 지났습니다.")), BLE_CONNECT_TIMEOUT_MS);
+    });
+    await Promise.race([subscribeBle(device, link), timeout]);
+    if (device.link !== link) return;
+    device.state = "connected";
+    if (mode === "real") message(device.meta.name + " · 블루투스 연결됨");
+  } catch (error) {
+    if (device.link !== link) return;
+    finishBle(device, link, connectionError(error) + " Bluetooth UART 프로그램과 페어링 상태를 확인하세요.");
+    link.peripheral.gatt?.disconnect();
+  } finally {
+    clearTimeout(timeoutId);
+    queueRender();
+  }
+}
+
+async function subscribeBle(device, link) {
+  const { peripheral } = link;
+  const server = await peripheral.gatt.connect();
+  if (device.link !== link) {
+    if (!device.link && server.connected) server.disconnect();
+    return;
+  }
+  peripheral.addEventListener("gattserverdisconnected", link.disconnect);
+  const service = await server.getPrimaryService(UART_SERVICE);
+  const characteristics = await service.getCharacteristics();
+  if (device.link !== link) return;
+
+  // Prefer the micro:bit TX characteristic among those supporting notifications or indications.
+  const readable = characteristics.filter(item => item.properties.notify || item.properties.indicate);
+  link.characteristic = readable.find(item => item.uuid === UART_TX) ?? readable[0];
+  link.writeCharacteristic = characteristics.find(item => item.uuid === UART_RX &&
+    (item.properties.write || item.properties.writeWithoutResponse));
+  if (!link.characteristic) throw new Error("UART 수신 특성이 없습니다. MakeCode 프로그램을 확인하세요.");
+  link.characteristic.addEventListener("characteristicvaluechanged", link.data);
+  await link.characteristic.startNotifications();
+}
+
+function finishBle(device, link, detail) {
+  if (device.link !== link) return;
+  link.characteristic?.removeEventListener("characteristicvaluechanged", link.data);
+  link.peripheral.removeEventListener("gattserverdisconnected", link.disconnect);
+  device.link = null;
+  device.state = "idle";
+  device.diagnostics = detail;
+  resetBoardLink(device);
+}
+
+const usbOwners = new WeakMap();
+
+async function addUsb(slot) {
+  const port = await navigator.serial.requestPort();
+  const owner = usbOwners.get(port);
+  if (owner && owner.meta.slot !== null) {
+    message(owner.meta.name + " 기기는 " + slotLabel("real", owner.meta.slot) + "에 이미 배정됐습니다. 해당 기기 카드에서 연결을 관리하세요.");
+    return;
+  }
+  const device = owner ?? createRealDevice("usb", undefined, slot);
+  if (owner) assignSlot(owner, slot);
+  await connectUsb(device, port);
+}
+
+async function connectUsb(device, port) {
+  const owner = usbOwners.get(port);
+  if (owner && owner !== device) throw new Error("이 포트는 " + owner.meta.name + " 카드에 등록돼 있습니다.");
+  device.state = "connecting";
+  device.diagnostics = "";
+  device.invalid = 0;
+  resetBoardLink(device);
+  queueRender();
+  const link = { port, reader: null, opened: false, stopping: false };
+  device.link = link;
+
+  try {
+    await port.open({ baudRate: 115200, bufferSize: 65536 });
+    link.opened = true;
+    if (!port.readable) throw new Error("USB에서 읽기 스트림을 열 수 없습니다.");
+    if (!devices.has(device.meta.id)) registerRealDevice(device);
+    usbOwners.set(port, device);
+    if (device.port && device.port !== port) usbOwners.delete(device.port);
+    device.port = port;
+    device.segment = nextSegment();
+    device.state = "connected";
+    if (mode === "real") message(device.meta.name + " · USB 연결됨");
+    readUsb(device, link);
+  } catch (error) {
+    const detail = error.name === "NetworkError" || error.name === "InvalidStateError"
+      ? "USB 포트를 열 수 없습니다. 다른 앱의 직렬 모니터를 닫고 케이블을 확인한 뒤 다시 시도하세요."
+      : connectionError(error);
+    await finishUsb(device, link, detail);
+    if (mode === "real") message(detail);
+  }
+  queueRender();
+}
+
+async function readUsb(device, link) {
+  let detail = "";
+  try {
+    while (!link.stopping && link.port.readable) {
+      const stream = link.port.readable;
+      const reader = stream.getReader();
+      const feed = receiveBytes(device);
+      link.reader = reader;
+      let readFailed = false;
+
+      try {
+        while (!link.stopping) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          if (value && !link.stopping) feed(value);
+        }
+      } catch (error) {
+        readFailed = true;
+      } finally {
+        reader.releaseLock();
+        link.reader = null;
+      }
+
+      if (link.stopping) break;
+      // Web Serial may replace the readable stream after a recoverable read error.
+      if (readFailed && link.port.readable && link.port.readable !== stream) {
+        device.segment = nextSegment();
+        queueRender();
+        continue;
+      }
+      if (readFailed) detail = "USB 읽기 오류. 케이블을 다시 연결해 주세요.";
+      break;
+    }
+  } catch (error) {
+    detail = "USB 읽기 오류. 케이블을 다시 연결해 주세요.";
+  } finally {
+    if (!link.stopping && !detail) detail = "USB 연결이 끊겼습니다. 케이블과 포트를 확인하세요.";
+    await finishUsb(device, link, detail);
+  }
+}
+
+async function finishUsb(device, link, detail) {
+  device.state = "disconnecting";
+  queueRender();
+  try {
+    if (link.opened) await link.port.close();
+  } catch (error) {
+    if (!detail) detail = "USB 포트가 이미 닫혔거나 케이블이 빠졌습니다.";
+  }
+  device.link = null;
+  if (detail && device.port === link.port) device.port = null;
+  device.state = "idle";
+  device.diagnostics = detail;
+  resetBoardLink(device);
+}
+
+async function toggleConnection(device) {
+  if (isBusy(device) || !deviceEnabled(device)) return;
+  const type = device.meta.type;
+  if (device.state === "connected") {
+    const link = device.link;
+    if (type === "ble") {
+      finishBle(device, link, "");
+      link.peripheral.gatt.disconnect();
+    } else {
+      device.state = "disconnecting";
+      link.stopping = true;
+      queueRender();
+      try { await link.reader?.cancel(); } catch (error) { /* The read loop closes the port. */ }
+    }
+    message(device.meta.name + " 연결을 해제했습니다. 기존 기록을 보존합니다.");
+    return;
+  }
+
+  if (adding) return;
+  adding = true;
+  queueRender();
+  try {
+    if (type === "ble") {
+      if (!device.peripheral) {
+        // For a saved card after refresh, a new picker gesture works even without getDevices().
+        const peripheral = await chooseBle();
+        if (peripheral.id !== device.meta.binding) throw new Error("이 카드에 등록된 블루투스 기기를 선택해 주세요.");
+        device.peripheral = peripheral;
+      }
+      await connectBle(device);
+    } else {
+      const port = device.port && device.port.connected !== false
+        ? device.port
+        : await navigator.serial.requestPort();
+      await connectUsb(device, port);
+    }
+  } catch (error) {
+    message(connectionError(error));
+  } finally {
+    adding = false;
+    queueRender();
+  }
+}
+
+async function addDevice(type) {
+  if (adding) return;
+  const target = $("target");
+  if (target.value === "") return;
+  const slot = Number(target.value);
+  adding = true;
+  queueRender();
+  try {
+    if (type === "ble") await addBle(slot);
+    else await addUsb(slot);
+  } catch (error) {
+    message(connectionError(error));
+  } finally {
+    adding = false;
+    queueRender();
+  }
+}
+
+function deviceEnabled(device) {
+  return device.meta.slot !== null && device.meta.slot < plan[modeOf(device)].count;
+}
+
+function slotLabel(group, slot) {
+  const position = plan[group].positions[slot];
+  return (slot + 1) + "번" + (position ? " · " + position : "");
+}
+
+function savePlan() {
+  write("settings", store => store.put(plan));
+}
+
+function setCount(count) {
+  if (!ready || !Number.isInteger(count) || count < 1 || count > $("placement-count").options.length) return;
+  const real = [...devices.values()].filter(device => modeOf(device) === "real");
+  if (mode === "real" && (adding || real.some(device => device.meta.slot >= count && device.state !== "idle"))) {
+    $("placement-count").value = String(plan.real.count);
+    message("줄이려는 번호의 기기 연결을 먼저 해제하세요.");
+    return;
+  }
+
+  plan[mode].count = count;
+  if (mode === "demo" && demoTimer !== null) syncDemoDevices();
+  savePlan();
+  message("측정 기기 수를 " + count + "대로 설정했습니다.");
+  renderLayout();
+  renderLive();
+}
+
+function setPosition(group, slot, input) {
+  const value = input.value.trim();
+  input.value = value;
+  if (value === (plan[group].positions[slot] ?? "")) return;
+  plan[group].positions[slot] = value;
+  for (const device of devices.values()) {
+    if (modeOf(device) === group && device.meta.slot === slot && device.state === "connected") {
+      device.segment = nextSegment();
+    }
+  }
+  savePlan();
+  renderTargets();
+  renderLegend();
+  for (const device of visibleDevices()) {
+    const location = cards.get(device.meta.id)?.location;
+    if (location) location.textContent = deviceLocation(device);
+  }
+  queueRender();
+}
+
+function commitTextOnExit(input, commit) {
+  input.addEventListener("change", commit);
+  input.addEventListener("blur", commit);
+  input.addEventListener("keydown", event => {
+    if (event.key === "Enter" && !event.isComposing) {
+      commit();
+      input.blur();
+    }
+  });
+}
+
+function renderPlacement() {
+  const count = $("placement-count");
+  const group = mode;
+  const max = group === "demo" ? MAX_DEVICES : Math.max(MAX_DEVICES, plan.real.count, ...[...devices.values()]
+    .filter(device => modeOf(device) === "real").map(device => device.meta.slot + 1));
+  if (count.options.length !== max) {
+    count.replaceChildren(...Array.from({ length: max }, (_, index) => new Option((index + 1) + "대", index + 1)));
+  }
+  count.value = String(plan[group].count);
+  $("placement-hint").textContent = group === "demo"
+    ? "설정한 대수만큼 가상으로 측정합니다. 대수를 줄여도 이전 기록은 남습니다."
+    : "위치 이름을 입력하고 위의 ‘연결할 위치’를 골라 기기를 배정하세요. 연결을 해제한 기기는 카드에서 위치 배정을 바꿀 수 있습니다.";
+
+  const placement = $("placement-list");
+  const key = group + ":" + plan[group].count + ":" + ready;
+  if (placement.dataset.view === key) return;
+  placement.dataset.view = key;
+
+  const inputs = Array.from({ length: plan[group].count }, (_, slot) => {
+    const label = document.createElement("label");
+    const input = document.createElement("input");
+    input.type = "text";
+    input.placeholder = "예: 교실 앞";
+    input.maxLength = 36;
+    input.value = plan[group].positions[slot] ?? "";
+    input.disabled = !ready;
+    input.setAttribute("aria-label", (slot + 1) + "번 측정 위치");
+    commitTextOnExit(input, () => setPosition(group, slot, input));
+    label.append((slot + 1) + "번", input);
+    return label;
+  });
+  placement.replaceChildren(...inputs);
+}
+
+function renderTargets() {
+  const select = $("target");
+  if (mode !== "real") {
+    select.replaceChildren();
+    return;
+  }
+  const selected = select.value;
+  const occupied = new Set([...devices.values()].filter(device => modeOf(device) === "real").map(device => device.meta.slot));
+  const options = [];
+  for (let slot = 0; slot < plan.real.count; slot++) {
+    if (!occupied.has(slot)) options.push(new Option(slotLabel("real", slot), slot));
+  }
+  select.replaceChildren(...(options.length ? options : [new Option("빈 위치 없음", "")]));
+  if (options.some(option => option.value === selected)) select.value = selected;
+}
+
+function assignSlot(device, slot) {
+  device.meta.slot = slot;
+  saveDevice(device);
+  renderLayout();
+  renderLive();
+}
+
+function toggleAssignment(device) {
+  if (adding || device.state !== "idle") return;
+  if (device.meta.slot !== null) {
+    assignSlot(device, null);
+    message(device.meta.name + " 위치 배정을 해제했습니다. 기존 기록은 남습니다.");
+  } else if ($("target").value !== "") {
+    const slot = Number($("target").value);
+    assignSlot(device, slot);
+    message(device.meta.name + " 기기를 " + slotLabel("real", slot) + "에 배정했습니다.");
+  }
+}
+
+function deviceLocation(device) {
+  if (device.meta.slot === null) return "측정 위치 미배정";
+  const group = modeOf(device);
+  return "측정 위치 " + slotLabel(group, device.meta.slot) + (plan[group].positions[device.meta.slot] ? "" : " · 미입력");
+}
+
+function visibleDevices() {
+  return [...devices.values()].filter(device => modeOf(device) === mode &&
+    (mode === "real" || deviceEnabled(device) || modes.demo.series.has(device.meta.id))
+  ).sort((first, second) => (first.meta.slot ?? Infinity) - (second.meta.slot ?? Infinity));
+}
+
+function lineKey(device) {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("class", "line-key");
+  svg.setAttribute("viewBox", "0 0 18 8");
+  svg.setAttribute("aria-hidden", "true");
+  const line = document.createElementNS(svg.namespaceURI, "path");
+  line.setAttribute("d", "M0 4H18");
+  line.setAttribute("stroke", colorOf(device));
+  line.setAttribute("stroke-width", "3");
+  line.setAttribute("stroke-dasharray", dashOf(device).join(" "));
+  svg.append(line);
+  return svg;
+}
+
+function colorOf(device) {
+  const style = device.meta.style;
+  return SERIES_COLORS[style % SERIES_COLORS.length];
+}
+
+function dashOf(device) {
+  const style = device.meta.style;
+  return DASHES[(style + Math.floor(style / SERIES_COLORS.length)) % DASHES.length];
+}
+
+function renderLegend() {
+  const items = visibleDevices().map(device => {
+    const label = document.createElement("label");
+    const input = document.createElement("input");
+    input.type = "checkbox";
+    input.checked = !hiddenDevices.has(device.meta.id);
+    input.addEventListener("change", () => {
+      if (input.checked) hiddenDevices.delete(device.meta.id);
+      else hiddenDevices.add(device.meta.id);
+      queueRender();
+    });
+    const position = plan[mode].positions[device.meta.slot];
+    label.append(input, lineKey(device), identifiedName(device.meta.name, device.meta.board) +
+      (position ? " (현재: " + position + ")" : ""));
+    return label;
+  });
+  $("legend").replaceChildren(...items);
+}
+
+function buildCard(device) {
+  const card = document.createElement("article");
+  card.className = "device";
+  card.style.setProperty("--device-color", colorOf(device));
+  const input = document.createElement("input");
+  input.className = "device-name";
+  input.value = device.meta.name;
+  input.maxLength = 32;
+  input.setAttribute("aria-label", device.meta.id + " 기기 이름");
+  commitTextOnExit(input, () => renameDevice(device, input));
+  const info = document.createElement("div");
+  info.className = "device-info";
+  const status = document.createElement("strong");
+  info.append(device.meta.id + " · " + SOURCE[device.meta.type], status);
+  const identity = document.createElement("strong");
+  identity.className = "device-board";
+  identity.hidden = true;
+  const boardControls = document.createElement("div");
+  boardControls.className = "board-assignment";
+  boardControls.hidden = true;
+  const number = document.createElement("select");
+  number.disabled = true;
+  number.setAttribute("aria-label", device.meta.id + " 보드 번호");
+  number.append(new Option("보드 번호 선택", ""));
+  for (let i = 1; i <= MAX_DEVICES; i++) number.append(new Option(i + "번", i));
+  const send = document.createElement("button");
+  send.type = "button";
+  send.textContent = "번호 보내기";
+  send.disabled = true;
+  const boardNotice = document.createElement("p");
+  boardNotice.className = "note";
+  boardNotice.hidden = true;
+  boardNotice.setAttribute("role", "status");
+  number.addEventListener("change", refreshCards);
+  send.addEventListener("click", () => assignBoardNumber(device, Number(number.value)));
+  boardControls.append(number, send);
+  const values = document.createElement("div");
+  values.className = "values";
+  const diagnostic = document.createElement("p");
+  diagnostic.className = "note warning";
+  const location = document.createElement("p");
+  location.className = "device-location";
+  location.textContent = deviceLocation(device);
+  card.append(input, info, identity, location, boardControls, boardNotice, values, diagnostic);
+  const button = document.createElement("button");
+  button.type = "button";
+  const assignment = document.createElement("button");
+  assignment.type = "button";
+  if (device.meta.type !== "demo") {
+    button.addEventListener("click", () => toggleConnection(device));
+    assignment.addEventListener("click", () => toggleAssignment(device));
+    const actions = document.createElement("div");
+    actions.className = "row";
+    actions.append(button, assignment);
+    card.append(actions);
+  }
+  return { device, card, input, status, identity, boardControls, number, send, boardNotice,
+    values, diagnostic, button, assignment, location };
+}
+
+function buildCards() {
+  const list = $("devices");
+  const devicesInView = visibleDevices();
+  const ids = new Set(devicesInView.map(device => device.meta.id));
+  for (const [id, view] of cards) {
+    if (!ids.has(id)) {
+      view.card.remove();
+      cards.delete(id);
+    }
+  }
+
+  const emptyMessage = list.querySelector(".empty");
+  if (devicesInView.length) emptyMessage?.remove();
+  else if (!emptyMessage) {
+    const empty = document.createElement("p");
+    empty.className = "empty";
+    empty.textContent = "등록된 기기가 없습니다. 위에서 블루투스 또는 USB 기기를 추가하세요.";
+    list.append(empty);
+  }
+
+  devicesInView.forEach((device, index) => {
+    let view = cards.get(device.meta.id);
+    if (view?.device !== device) {
+      view?.card.remove();
+      view = buildCard(device);
+      cards.set(device.meta.id, view);
+    }
+    view.location.textContent = deviceLocation(device);
+    const next = list.children[index];
+    if (view.card !== next) list.insertBefore(view.card, next ?? null);
+  });
+}
+
+function refreshCards() {
+  const now = performance.now();
+  for (const device of visibleDevices()) {
+    const { input, status, identity, boardControls, number, send, boardNotice,
+      values, diagnostic, button, assignment } = cards.get(device.meta.id);
+    input.disabled = !ready;
+    const enabled = deviceEnabled(device);
+    const connected = device.state === "connected";
+    const board = device.meta.board;
+    identity.hidden = !board;
+    identity.textContent = board ? boardLabel(board) + " · " + board.code : "";
+    boardControls.hidden = !board || !connected;
+    const currentNumber = String(board?.number || "");
+    if (number.dataset.current !== currentNumber) {
+      number.dataset.current = currentNumber;
+      number.value = currentNumber;
+    }
+    number.disabled = !canAssignBoard(device) || Boolean(device.boardChange);
+    send.disabled = number.disabled || !number.value;
+    boardNotice.hidden = !device.boardNotice;
+    if (boardNotice.textContent !== device.boardNotice) boardNotice.textContent = device.boardNotice;
+    const received = [...device.latest.values()].some(item => item.segment === device.segment);
+    const quiet = device.meta.type !== "demo" && device.lastReceivedAt !== null &&
+      now - device.lastReceivedAt >= RECEIVE_QUIET_MS;
+    const receiving = device.boardIssue ? "보드 확인 필요" : device.boardWithoutSample ? "센서값 수신 대기" :
+      !received ? "첫 수신 대기" : quiet ? "최근 10초 수신 없음" : "수신 중";
+    status.textContent = !enabled ? (device.meta.slot === null ? "미배정" : "측정 제외") : {
+      idle: device.meta.type === "demo" ? "대기" : "연결 해제",
+      connecting: "연결 중", disconnecting: "해제 중",
+      connected: receiving
+    }[device.state];
+    const parts = [...device.latest].map(([key, item]) => {
+      const [label] = sensorInfo(key);
+      const part = document.createElement("span");
+      const value = document.createElement("b");
+      value.textContent = formatNumber(item.value);
+      const unit = key === "L" ? "" : csvUnit(key);
+      const previous = !connected || quiet || device.boardIssue || device.boardWithoutSample || item.segment !== device.segment;
+      part.append(label + " ", value, (unit ? " " + unit : "") + (previous ? " (이전)" : ""));
+      return part;
+    });
+    if (!parts.length) parts.push("수신된 값이 없습니다.");
+    values.replaceChildren(...parts);
+    const duplicate = connected && board?.number && [...devices.values()].some(other =>
+      other !== device && boardIsConnected(other) && other.activeBoardId &&
+      other.activeBoardId !== board.id && other.meta.board?.number === board.number);
+    const diagnosticText = device.invalid
+      ? "형식 오류 " + device.invalid + "줄 · " + device.diagnostics
+      : device.diagnostics;
+    diagnostic.textContent = [device.boardIssue, duplicate && (boardLabel(board) + "을 두 기기가 사용 중입니다."),
+      diagnosticText].filter(Boolean).join(" · ");
+    diagnostic.hidden = !diagnostic.textContent;
+    const assigned = device.meta.slot !== null;
+    button.hidden = !assigned;
+    assignment.hidden = device.state !== "idle";
+    assignment.textContent = assigned ? "위치 배정 해제" : "선택 위치에 다시 배정";
+    assignment.disabled = adding || (!assigned && $("target").value === "");
+    button.textContent = connected ? "연결 해제" : "다시 연결";
+    button.disabled = !enabled || isBusy(device) || (!connected && adding) ||
+      (device.meta.type === "ble" && !bleSupported) || (device.meta.type === "usb" && !usbSupported);
+  }
+}
+
+function syncPlots() {
+  const keys = [...new Set(["T", "L", "C", ...modes[mode].sensors])];
+  for (const [key, plot] of plots) {
+    if (keys.includes(key)) continue;
+    plot.container.remove();
+    plots.delete(key);
+  }
+  for (const key of keys) {
+    if (plots.has(key)) continue;
+    const [name, unit] = sensorInfo(key);
+    const container = document.createElement("section");
+    container.className = "plot";
+    const title = document.createElement("h3");
+    const suffix = document.createElement("span");
+    suffix.textContent = unit;
+    title.append(name, suffix);
+    const canvas = document.createElement("canvas");
+    canvas.setAttribute("role", "img");
+    canvas.setAttribute("aria-label", name + " 시간 그래프. 측정값은 측정 기기 및 최근 수신 기록에서 읽을 수 있습니다.");
+    container.append(title, canvas);
+    $("plots").append(container);
+    plots.set(key, { container, canvas, ctx: canvas.getContext("2d") });
+  }
+}
+
+function renderLayout() {
+  $("demo-mode").setAttribute("aria-pressed", String(mode === "demo"));
+  $("real-mode").setAttribute("aria-pressed", String(mode === "real"));
+  $("demo-run").hidden = mode !== "demo";
+  $("add-ble").hidden = $("add-usb").hidden = $("target-label").hidden = mode !== "real";
+  renderPlacement();
+  renderTargets();
+  $("capabilities").hidden = mode !== "real";
+  $("capabilities").textContent = "이 브라우저의 기기 접근 기능 · 블루투스 " +
+    (bleSupported ? "있음" : "사용 불가") + " · USB " + (usbSupported ? "있음" : "사용 불가") +
+    ((!bleSupported || !usbSupported) ? " · 지원 브라우저 또는 아래 로컬 실행 방법을 확인하세요." : "");
+  $("mode-tag").classList.toggle("demo", mode === "demo");
+  $("mode-tag").textContent = mode === "demo" ? "가상 데이터" : "실제 데이터";
+  renderLegend();
+  buildCards();
+  syncPlots();
+}
+
+function renderRecent() {
+  if (!$("recent").open) return;
+  const last = modes[mode].rows.slice(-10).reverse();
+  const rows = last.map(row => {
+    const tr = document.createElement("tr");
+    const list = Object.entries(row.values).map(([key, value]) =>
+      sensorInfo(key)[0] + " " + formatNumber(value) + (key !== "L" && csvUnit(key) ? " " + csvUnit(key) : "")
+    );
+    const name = identifiedName(devices.get(row.device)?.meta.name ?? row.device, row.board);
+    const number = Number.isInteger(row.slot) ? (row.slot + 1) + "번" : "";
+    const location = [number, row.position].filter(Boolean).join(" · ") || "—";
+    for (const text of [clock.format(row.time), name, location, list.join(" · ")]) {
+      const td = document.createElement("td");
+      td.textContent = text;
+      tr.append(td);
+    }
+    return tr;
+  });
+  if (!rows.length) {
+    const tr = document.createElement("tr");
+    const cell = document.createElement("td");
+    cell.colSpan = 4;
+    cell.textContent = "수신된 기록이 없습니다.";
+    tr.append(cell);
+    rows.push(tr);
+  }
+  $("recent-rows").replaceChildren(...rows);
+}
+
+function renderLive() {
+  const log = modes[mode];
+  const live = visibleDevices().filter(device => device.state === "connected").length;
+  $("record-count").textContent = log.rows.length.toLocaleString("ko-KR");
+  $("active-label").textContent = mode === "demo" ? "가동" : "연결";
+  $("active-count").textContent = live;
+  $("planned-count").textContent = plan[mode].count;
+  $("placement-count").disabled = !ready || (mode === "real" && adding);
+  $("store-state").textContent = blockedByTab ? "다른 탭에서 사용 중" :
+    storageProblem ? "자동 저장 오류 · CSV 저장 권장" :
+    !ready ? "로컬 저장 확인 중" : pending ? "브라우저에 저장 중" : "브라우저 자동 저장";
+  $("limit-status").hidden = !log.limitReached;
+  $("demo-run").disabled = !ready || log.limitReached;
+  $("demo-run").textContent = demoTimer === null ? "가상 측정 시작" : "가상 측정 멈춤";
+  const noTarget = $("target").value === "";
+  $("target").disabled = !ready || adding || noTarget;
+  $("add-ble").disabled = !ready || !bleSupported || adding || noTarget;
+  $("add-usb").disabled = !ready || !usbSupported || adding || noTarget;
+  $("clear").disabled = $("export").disabled = !ready || !log.rows.length;
+  refreshCards();
+  renderRecent();
+  drawPlots(log);
+}
+
+function queueRender(layout = false) {
+  needsLayout ||= layout;
+  if (renderTimer !== null) return;
+  renderTimer = setTimeout(() => {
+    renderTimer = null;
+    if (needsLayout) syncPlots();
+    needsLayout = false;
+    renderLive();
+  }, 120);
+}
+
+function resizeCanvas(canvas, ctx) {
+  const rect = canvas.getBoundingClientRect();
+  const ratio = window.devicePixelRatio || 1;
+  const width = Math.max(1, Math.round(rect.width * ratio));
+  const height = Math.max(1, Math.round(rect.height * ratio));
+  if (canvas.width !== width || canvas.height !== height) {
+    canvas.width = width;
+    canvas.height = height;
+  }
+  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+  return { width: rect.width, height: rect.height };
+}
+
+function firstAtOrAfter(points, time) {
+  let lo = 0, hi = points.length;
+  while (lo < hi) {
+    const mid = Math.floor((lo + hi) / 2);
+    if (points[mid].time < time) lo = mid + 1;
+    else hi = mid;
+  }
+  return lo;
+}
+
+function drawPlots(log) {
+  const first = log.rows[0]?.time ?? Date.now();
+  const last = log.rows.at(-1)?.time ?? first;
+  const windowSeconds = $("window").value;
+  const start = windowSeconds === "all" ? first : Math.max(first, last - Number(windowSeconds) * 1000);
+  const end = Math.max(last, start + 5000);
+  const active = visibleDevices().filter(device => !hiddenDevices.has(device.meta.id));
+
+  for (const [key, plot] of plots) {
+    const series = [];
+    let min = Infinity, max = -Infinity;
+    for (const device of active) {
+      const points = log.series.get(device.meta.id)?.get(key);
+      if (!points?.length) continue;
+      const from = firstAtOrAfter(points, start);
+      if (from === points.length) continue;
+      series.push({ device, points, from });
+      for (let index = from; index < points.length; index++) {
+        min = Math.min(min, points[index].value);
+        max = Math.max(max, points[index].value);
+      }
+    }
+
+    if (key === "L") { min = Math.min(min, 0); max = Math.max(max, 255); }
+    if (!series.length && key !== "L") { min = 0; max = 1; }
+    if (series.length && key !== "L") {
+      const pad = (max - min) * .08 || Math.max(Math.abs(min) * .02, .25);
+      min = Math.max(key === "C" || key === "LX" ? 0 : -Infinity, min - pad);
+      max += pad;
+    }
+    if (!Number.isFinite(max - min) || max <= min) { min = 0; max = 1; }
+    drawChart(plot, series, { start, end, origin: first, min, max });
+  }
+}
+
+function drawChart({ canvas, ctx }, series, { start, end, origin, min, max }) {
+  const { width, height } = resizeCanvas(canvas, ctx);
+  const margin = { left: 51, right: 19, top: 11, bottom: 26 };
+  const plotW = Math.max(10, width - margin.left - margin.right);
+  const plotH = Math.max(10, height - margin.top - margin.bottom);
+  const right = margin.left + plotW;
+  const bottom = margin.top + plotH;
+
+  ctx.clearRect(0, 0, width, height);
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = theme.getPropertyValue("--line").trim();
+  ctx.fillStyle = theme.getPropertyValue("--muted").trim();
+  ctx.font = "11px system-ui, sans-serif";
+  ctx.textAlign = "right";
+  ctx.textBaseline = "middle";
+  ctx.beginPath();
+  for (let i = 0; i <= 3; i++) {
+    const y = margin.top + plotH * i / 3;
+    ctx.moveTo(margin.left, y);
+    ctx.lineTo(right, y);
+    if (series.length) ctx.fillText(formatAxis(max - (max - min) * i / 3), margin.left - 6, y);
+  }
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+  const ticks = width < 440 ? 3 : 5;
+  for (let i = 0; i <= ticks; i++) {
+    const x = margin.left + plotW * i / ticks;
+    ctx.moveTo(x, margin.top);
+    ctx.lineTo(x, bottom);
+    ctx.textAlign = i === 0 ? "left" : i === ticks ? "right" : "center";
+    if (series.length) ctx.fillText(formatElapsed((start - origin + (end - start) * i / ticks) / 1000), x, bottom + 7);
+  }
+  ctx.stroke();
+
+  if (!series.length) {
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("표시 구간에 측정값이 없습니다", margin.left + plotW / 2, margin.top + plotH / 2);
+    return;
+  }
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(margin.left - 3, margin.top - 3, plotW + 6, plotH + 6);
+  ctx.clip();
+  for (const { device, points, from } of series) {
+    ctx.strokeStyle = ctx.fillStyle = colorOf(device);
+    ctx.lineWidth = 2;
+    ctx.setLineDash(dashOf(device));
+    ctx.beginPath();
+    let segment;
+    let lastX, lastY;
+    const dots = [];
+    for (let index = from; index < points.length; index++) {
+      const point = points[index];
+      const x = margin.left + plotW * (point.time - start) / (end - start);
+      const y = bottom - plotH * (point.value - min) / (max - min);
+      if (segment === point.segment) ctx.lineTo(x, y);
+      else {
+        ctx.moveTo(x, y);
+        dots.push([x, y]);
+      }
+      segment = point.segment;
+      lastX = x;
+      lastY = y;
+    }
+    ctx.stroke();
+    ctx.beginPath();
+    for (const [x, y] of [...dots, [lastX, lastY]]) {
+      ctx.moveTo(x + 2.6, y);
+      ctx.arc(x, y, 2.6, 0, Math.PI * 2);
+    }
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+function formatNumber(value) {
+  if (!Number.isFinite(value)) return "—";
+  if (Number.isInteger(value)) return value.toLocaleString("ko-KR");
+  return Number(value.toPrecision(8)).toLocaleString("ko-KR");
+}
+
+function formatAxis(value) {
+  const absolute = Math.abs(value);
+  if (absolute >= 1000000 || (absolute > 0 && absolute < .001)) return value.toExponential(1);
+  if (absolute >= 1000) return (value / 1000).toFixed(2) + "k";
+  return String(Number(value.toFixed(2)));
+}
+
+function formatElapsed(seconds) {
+  const rounded = Math.round(seconds);
+  if (rounded < 60) return rounded + "초";
+  const minutes = Math.floor(rounded / 60);
+  const tail = String(rounded % 60).padStart(2, "0");
+  return minutes + ":" + tail;
+}
+
+function csvEscape(value) {
+  let text = String(value ?? "");
+  if (typeof value === "string" && /^[\s\uFEFF]*[=+\-@＝＋－＠]/u.test(text)) text = "'" + text;
+  return /[",\r\n]/.test(text) ? '"' + text.replaceAll('"', '""') + '"' : text;
+}
+
+function downloadCsv() {
+  const log = modes[mode];
+  if (!log.rows.length) return;
+  const lines = ["수신시각_UTC,경과시간_초,기기_ID,기기명,연결방식,센서_코드,센서,단위,값,측정_위치,측정_번호,보드_번호,보드_코드"];
+  const first = log.rows[0].time;
+  for (const row of log.rows) {
+    const device = devices.get(row.device);
+    for (const [key, value] of Object.entries(row.values)) {
+      const fields = [
+        new Date(row.time).toISOString(), ((row.time - first) / 1000).toFixed(3),
+        row.device, device?.meta.name ?? row.device, SOURCE[device?.meta.type],
+        key, sensorInfo(key)[0], csvUnit(key), value, row.position,
+        Number.isInteger(row.slot) ? row.slot + 1 : "", row.board?.number || "", row.board?.code ?? ""
+      ];
+      lines.push(fields.map(csvEscape).join(","));
+    }
+  }
+
+  const blob = new Blob(["\uFEFF" + lines.join("\r\n") + "\r\n"], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "microbit_" + mode + "_" + new Date().toISOString().slice(0, 19).replace(/:/g, "-") + ".csv";
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+$("demo-mode").addEventListener("click", () => changeMode("demo"));
+$("real-mode").addEventListener("click", () => changeMode("real"));
+$("demo-run").addEventListener("click", toggleDemo);
+$("placement-count").addEventListener("change", event => setCount(Number(event.target.value)));
+$("add-ble").addEventListener("click", () => addDevice("ble"));
+$("add-usb").addEventListener("click", () => addDevice("usb"));
+$("export").addEventListener("click", downloadCsv);
+$("clear").addEventListener("click", clearRecords);
+$("window").addEventListener("change", () => queueRender());
+$("recent").addEventListener("toggle", renderRecent);
+new ResizeObserver(() => queueRender()).observe($("plots"));
+setInterval(() => {
+  if (mode === "real" && visibleDevices().some(device => device.state === "connected")) refreshCards();
+}, 1000);
+window.addEventListener("beforeunload", event => {
+  if (pending || (storageProblem && (modes.demo.rows.length || modes.real.rows.length))) {
+    event.preventDefault();
+    event.returnValue = "";
+  }
+});
+renderLayout();
+renderLive();
+if (navigator.locks?.request) {
+  navigator.locks.request("kong-microbit-dashboard-v1", { ifAvailable: true }, async lock => {
+    if (!lock) {
+      blockedByTab = true;
+      $("demo-mode").disabled = $("real-mode").disabled = true;
+      message("다른 탭을 닫은 뒤 이 탭을 새로고침하세요.");
+      renderLive();
+      return;
+    }
+    await initialize();
+    // Keep the lock for the lifetime of this tab to protect the local device registry and log.
+    await new Promise(resolve => window.addEventListener("pagehide", resolve, { once: true }));
+  }).catch(initialize);
+  window.addEventListener("pageshow", event => {
+    if (event.persisted) window.location.reload();
+  });
+} else {
+  initialize();
+}
+</script>
+</body>
+</html>

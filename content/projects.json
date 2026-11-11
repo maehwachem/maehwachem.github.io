@@ -475,12 +475,16 @@
       {
         "title": "마이크로비트 센서 기록기",
         "subject": "tools",
-        "desc": "전압과 온도 값을 받아 그래프로 살펴보고, 실험 조건별 기록을 CSV로 저장하는 도구.",
+        "desc": "마이크로비트로 전압·온도를 기록하거나, 여러 BME280 보드에 번호를 붙여 온도·습도·기압을 비교하고 CSV로 저장합니다.",
         "tag": "센서 · 웹 블루투스",
         "cover": "/assets/uploads/cover-watercolor-sensor-recorder-v2.webp",
         "poster": "sensor",
         "words": "마이크로비트\n센서 기록기",
         "links": [
+          {
+            "label": "온습도·기압 대시보드",
+            "url": "/microbit-bme280/"
+          },
           {
             "label": "전압 기록기",
             "url": "https://maehwachem.github.io/science-tools/sensor/"
