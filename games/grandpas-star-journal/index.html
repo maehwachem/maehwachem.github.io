@@ -1823,7 +1823,10 @@ function draw(){
       ctx.beginPath();ctx.arc(o.x,o.y,clamp(MAP.ppd*4,5,9),0,Math.PI*2);ctx.stroke();
       ctx.setLineDash([]);
     }
-    if(!expert&&(isFound||isSel||o.type==='moon'&&!look)){label(o.x+8,o.y-6,nm,isSel?'#ffd98a':'rgba(255,230,180,.85)',12);}
+    const isMeteorGuideStar=!look&&S.chapter===4&&o.type==='star'&&o.i===meteorGuideStar;
+    if(!expert&&(isFound||isSel||o.type==='moon'&&!look||isMeteorGuideStar)){
+      label(o.x+8,o.y-6,nm,isSel||isMeteorGuideStar?'#ffd98a':'rgba(255,230,180,.85)',12);
+    }
     if(isSel){ctx.strokeStyle='#ffd98a';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(o.x,o.y,11,0,7);ctx.stroke();}
   }
   if(look&&S.sel)drawSelArrow();
@@ -2245,7 +2248,10 @@ const meteorWidth=280,meteorHeight=172,meteorScale=3;
 const meteorTime=A.MakeTime(new Date(METEOR_TIME));
 const meteorObs=new A.Observer(BEACH_SITE.lat,BEACH_SITE.lon,BEACH_SITE.h);
 const meteorExposureSeconds=60,meteorIntervalSeconds=240;
-const meteorSamples=[0,.25,.5,.75,1];
+const meteorGuideStar=findStar('Bellatrix');
+const meteorExposureSteps=32;
+const meteorSamples=Array.from({length:meteorExposureSteps+1},(_,i)=>i/meteorExposureSteps);
+const meteorMidRotation=rotations=>rotations[(rotations.length-1)/2];
 function meteorRotationAt(seconds){
   const time=A.MakeTime(new Date(Date.parse(METEOR_TIME)+seconds*1000));
   return A.Rotation_EQJ_HOR(time,meteorObs).rot;
@@ -2265,12 +2271,12 @@ function meteorProject(v){
   if(depth<=.05)return null;
   return [meteorWidth/2+120*dot(meteorRight)/depth,meteorHeight/2-120*dot(meteorUp)/depth];
 }
-function meteorCameraPoint([x,y],rotation){
+function meteorCameraPoint([x,y],sourceRotation,targetRotation){
   const right=(x-meteorWidth/2)/120,up=(meteorHeight/2-y)/120;
   const [east,north,height]=meteorForward.map((v,i)=>v+right*meteorRight[i]+up*meteorUp[i]);
-  // Invert the reference sky rotation, then project into the fixed camera at this exposure.
-  const eqj=meteorRotation.map(row=>row[0]*north-row[1]*east+row[2]*height);
-  return meteorProject(toENU(eqj,0,[0,0,0],rotation));
+  // Undo the source sky rotation, then project at the target time.
+  const eqj=sourceRotation.map(row=>row[0]*north-row[1]*east+row[2]*height);
+  return meteorProject(toENU(eqj,0,[0,0,0],targetRotation));
 }
 const radiant=meteorProject(radiantVector);
 const METEORS=[
@@ -2280,11 +2286,18 @@ const METEORS=[
 ].map((m,i)=>{
   const offset=i*meteorIntervalSeconds;
   const rotations=meteorSamples.map(sample=>meteorRotationAt(offset+sample*meteorExposureSeconds));
-  const middle=rotations[2];
+  const middle=meteorMidRotation(rotations);
   const from=[radiant[0]+m.dx*m.start,radiant[1]+m.dy*m.start];
   const to=[radiant[0]+m.dx*m.end,radiant[1]+m.dy*m.end];
-  return {...m,from,to,rotations,clock:`03:${String(offset/60).padStart(2,'0')}`,
-    raw:{from:meteorCameraPoint(from,middle),to:meteorCameraPoint(to,middle)}};
+  const raw={
+    from:meteorCameraPoint(from,meteorRotation,middle),
+    to:meteorCameraPoint(to,meteorRotation,middle)
+  };
+  const aligned={
+    from:meteorCameraPoint(raw.from,middle,meteorRotation),
+    to:meteorCameraPoint(raw.to,middle,meteorRotation)
+  };
+  return {...m,raw,aligned,rotations,clock:`03:${String(offset/60).padStart(2,'0')}`};
 });
 const meteorChoices=[[66,108],radiant,[211,98]];
 
@@ -2295,7 +2308,7 @@ const meteorRecord=document.getElementById('meteorRecord');
 const meteorStatus=document.getElementById('meteorStatus');
 let meteorTimer,meteorFrame,meteorSeen=false,meteorExtended=false,meteorMarks=true,meteorPhotoIndex=-1,meteorZoomOpen=false;
 function nextMeteor(){return METEOR_TASKS.slice(0,3).findIndex(t=>!taskDone(t));}
-function recordedMeteors(){return METEORS.filter((_,i)=>taskDone(METEOR_TASKS[i]));}
+function recordedMeteors(){return METEORS.filter((_,i)=>taskDone(METEOR_TASKS[i])).map(m=>m.aligned);}
 
 function makeMeteorBackdrop(rotations){
   const canvas=document.createElement('canvas');canvas.width=meteorSky.width;canvas.height=meteorSky.height;
@@ -2309,10 +2322,13 @@ function makeMeteorBackdrop(rotations){
   const moonAlt=horOf('Moon',meteorTime).alt;
   const moonlight=moonAlt>0?A.Illumination('Moon',meteorTime).phase_fraction*clamp(moonAlt/20,0,1):0;
   const limit=BEACH_SITE.baseLim-.9*moonlight;
-  for(const rotation of rotations){
+  const last=rotations.length-1;
+  for(const [index,rotation] of rotations.entries()){
+    const endpoint=index===0||index===last;
+    const weight=last===0?1:(endpoint ? 0.5 : 1)/last;
     plotStars(rotation,limit,meteorProject,(i,x,y,me)=>{
       if(x>=-2&&x<=meteorWidth+2&&y>=-2&&y<=meteorHeight+2){
-        drawStarDot(x,y,me,SBV[i],i,.28,starPen,limit,null,1/rotations.length);
+        drawStarDot(x,y,me,SBV[i],i,.28,starPen,limit,null,weight);
       }
     });
   }
@@ -2344,16 +2360,15 @@ function meteorExposureBackdrop(m){
   return m.exposureBackdrop??=makeMeteorBackdrop(m.rotations);
 }
 function meteorPreviewBackdrop(m){
-  return m.previewBackdrop??=makeMeteorBackdrop([m.rotations[2]]);
+  return m.previewBackdrop??=makeMeteorBackdrop([meteorMidRotation(m.rotations)]);
 }
 function paintMeteorFrame(canvas,m,progress=0,photo=false){
   const backdrop=photo?meteorExposureBackdrop(m):meteorPreviewBackdrop(m);
   paintMeteorImage(canvas,backdrop,[m.raw],progress,photo);
 }
 function paintMeteorStarZoom(zoom,m){
-  const star=findStar('Bellatrix');
-  const position=rotation=>meteorProject(toENU(SV,star*3,[0,0,0],rotation)).map(v=>v*meteorScale);
-  const [x,y]=position(m.rotations[2]),size=12;
+  const position=rotation=>meteorProject(toENU(SV,meteorGuideStar*3,[0,0,0],rotation)).map(v=>v*meteorScale);
+  const [x,y]=position(meteorMidRotation(m.rotations)),size=12;
   const [startX,startY]=position(m.rotations[0]),[endX,endY]=position(m.rotations.at(-1));
   const distance=Math.hypot(endX-startX,endY-startY);
   const backdrops=[meteorPreviewBackdrop(m),meteorExposureBackdrop(m)];
@@ -2361,7 +2376,7 @@ function paintMeteorStarZoom(zoom,m){
     const pen=canvas.getContext('2d');pen.imageSmoothingEnabled=false;
     pen.drawImage(backdrops[i],Math.round(x)-size/2,Math.round(y)-size/2,size,size,0,0,canvas.width,canvas.height);
   }
-  zoom.querySelector('p').textContent=`${m.clock} 촬영 · 벨라트릭스는 ${meteorExposureSeconds}초 동안 원본에서 약 ${distance.toFixed(1)}픽셀 이동했어요.`;
+  zoom.querySelector('p').textContent=`${m.clock} 촬영 · ${meteorExposureSeconds}초 동안 벨라트릭스의 중심이 원본에서 약 ${distance.toFixed(1)}픽셀 이동했어요.`;
 }
 function prepareMeteor(){
   const m=METEORS[nextMeteor()];
@@ -2415,12 +2430,15 @@ function meteorPanel(){
   const raw=METEORS[meteorPhotoIndex],showMarks=meteorMarks&&!raw;
   const paths=METEORS.map((m,i)=>{
     if(!showMarks||!taskDone(METEOR_TASKS[i]))return '';
-    const angle=Math.atan2(m.dy,m.dx)*R2D;
-    const point=m.from.map((v,j)=>(v+m.to[j])/2);
+    const {from,to}=m.aligned;
+    const delta=to.map((value,axis)=>value-from[axis]);
+    const angle=Math.atan2(delta[1],delta[0])*R2D;
+    const point=from.map((value,axis)=>value+delta[axis]/2);
+    const extension=from.map((value,axis)=>value-delta[axis]);
     return `<g stroke="${m.color}" fill="none">
-      ${meteorExtended||solved?`<path class="meteor-extension" d="M${m.from.join(' ')}L${radiant.map((v,j)=>v-(j?m.dy:m.dx)*13).join(' ')}"/>`:''}
+      ${meteorExtended||solved?`<path class="meteor-extension" d="M${from.join(' ')}L${extension.join(' ')}"/>`:''}
       <path class="meteor-direction" d="M-5 -4L1 0L-5 4M-8 0H1" transform="translate(${point.join(' ')}) rotate(${angle})" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-      <text x="${m.to[0]}" y="${m.to[1]-6}" fill="${m.color}">${i+1}</text>
+      <text x="${to[0]}" y="${to[1]-6}" fill="${m.color}">${i+1}</text>
     </g>`;
   }).join('');
   const options=ready&&!solved&&showMarks?meteorChoices.map(([x,y],i)=>
@@ -2429,7 +2447,7 @@ function meteorPanel(){
       '화살표는 촬영 중 본 이동 방향이에요. '+(solved?'점선은 유성이 지나온 쪽을 가리켜요.':'그 반대로 되짚어 <b>한곳으로 모이는 위치</b>를 골라요.'):
       '‘이동 방향 표시’를 켜면 세 빛줄기를 비교할 수 있어요.'}</p>`:
       raw?'<p>사진 사이에 별의 자리가 조금씩 달라져요. 원본을 번갈아 본 뒤, ‘별 맞춰 합성’으로 돌아가 비교해 보세요.</p>':
-      '<p>카메라를 북동쪽에 고정하고 4분 간격으로 60초씩 노출해 유성 사진 세 장을 모아요.</p>';
+      '<p>카메라를 북동쪽에 고정하고 4분 간격으로 60초씩 노출해요. 유성이 담긴 세 장을 일지에 남겨요.</p>';
   return `<section id="meteorPanel" aria-labelledby="meteorTitle"><h3 id="meteorTitle">같은 구도, 세 장의 유성 사진</h3>
     ${count?'':instructions}
     ${!ready?`<div class="meteor-actions"><button class="travel" id="meteorOpen" type="button">유성 카메라 열기</button><small>${count} / 3장 촬영</small></div>`:''}
@@ -2441,7 +2459,7 @@ function meteorPanel(){
       ${showMarks?`<svg viewBox="0 0 280 172" aria-hidden="true">
         ${paths}${solved?`<circle cx="${radiant[0]}" cy="${radiant[1]}" r="4" fill="#0b1424" stroke="#ffe4ac" stroke-width="2"/><text x="${radiant[0]+9}" y="${radiant[1]-4}" fill="#ffe4ac">복사점</text>`:''}
       </svg>`:''}${options}</div>
-      <figcaption>${raw?`${raw.clock} · ${meteorExposureSeconds}초 노출 · 삼각대 고정`:`첫 사진의 별 위치에 맞춤 · ${count}장`}</figcaption></figure>
+      <figcaption>${raw?`${raw.clock} · ${meteorExposureSeconds}초 노출 · 삼각대 고정`:`첫 사진의 노출 중간 시각에 맞춤 · ${count}장`}</figcaption></figure>
       ${instructions}
       ${!raw?`<div class="meteor-actions"><button id="meteorMarks" type="button" aria-pressed="${meteorMarks}">이동 방향 표시</button>
       ${ready&&!solved&&showMarks?`<button id="meteorExtend" type="button" aria-pressed="${meteorExtended}">궤적을 뒤로 연장하기</button>`:''}</div>`:''}
