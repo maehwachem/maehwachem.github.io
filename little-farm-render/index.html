@@ -696,7 +696,9 @@ async function beginCloudSignIn(){
     return;
   }
   try{
-    const {user}=await cloudSdk.signInWithPopup(cloudAuth,new cloudSdk.GoogleAuthProvider());
+    const provider=new cloudSdk.GoogleAuthProvider();
+    provider.setCustomParameters({prompt:'select_account'});
+    const {user}=await cloudSdk.signInWithPopup(cloudAuth,provider);
     setCloudUser(user);
   }catch(error){
     if(error.code==='auth/popup-closed-by-user') return;
@@ -2049,7 +2051,7 @@ function renderProfiles(body,tabs){
         <p class="farm-profile-note">클라우드를 선택하면 Firebase에 로그인용 이메일과 계정 식별자, 농장 이름과 저장 정보가 저장되고, 농장 진행 파일은 운영자의 비공개 Google Drive 폴더에 보관돼요. 플레이어 이름은 별명을 써도 돼요. 탭을 닫으면 다시 로그인해야 해요.</p>
         ${/KAKAOTALK|Instagram|FBAN|FBAV|NAVER\(inapp/i.test(navigator.userAgent)?'<p class="farm-profile-note">구글 로그인이 열리지 않으면 크롬이나 사파리에서 이 페이지를 열어 주세요.</p>':''}
         <label><input type="checkbox" id="cloudConsent" required> 저장 방식을 확인했고 클라우드 저장에 동의해요.</label>
-        <button type="submit" class="small alt">구글 계정으로 로그인</button></form>`
+        <button type="submit" class="small alt">구글 계정 선택해 로그인</button></form>`
     : `<div class="farm-profile-actions"><button class="small alt" id="cloudSignOut">클라우드 로그아웃</button>${ready||cloudListLoad?'':'<button class="small alt" id="retryCloudList">클라우드 다시 연결</button>'}</div>
       ${cloudListLoad?'<p class="farm-profile-note" role="status">클라우드에 연결 중이에요. 첫 연결에는 약 1분이 걸릴 수 있어요.</p>':''}`;
   const current=profile?`<div class="farm-profile-current"><b>${htmlText(profile.name)} · ${S.day}일째</b><small id="profileSaveNotice" aria-live="polite"></small>
