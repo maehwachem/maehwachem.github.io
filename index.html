@@ -199,9 +199,9 @@ html{color-scheme:only light;scroll-behavior:smooth}body{margin:0;background:lig
 #kje-portfolio .kje-project-tag{font-size:11px;margin-top:16px}#kje-portfolio .kje-poster-cap{font-size:11px;letter-spacing:.5px}
 #kje-portfolio .kje-project-desc{margin-top:8px}#kje-portfolio .kje-project:hover .kje-poster{transform:none}
 #kje-portfolio .kje-project-links{display:flex;flex-wrap:wrap;gap:10px 19px;align-items:center;margin-top:auto;padding-top:14px;min-height:49px}
-#kje-portfolio .kje-star-journal-links{gap:8px}
-#kje-portfolio .kje-star-journal-links .kje-project-go{padding:6px 12px;border:1px solid currentColor;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;min-height:44px}
-#kje-portfolio .kje-star-journal-links .kje-project-go:hover{text-decoration:underline}
+#kje-portfolio .kje-project-links:has(> a[href$="?stars=fixed"]){gap:8px}
+#kje-portfolio .kje-project-links:has(> a[href$="?stars=fixed"]) .kje-project-go{padding:6px 12px;border:1px solid currentColor;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;min-height:44px}
+#kje-portfolio .kje-project-links:has(> a[href$="?stars=fixed"]) .kje-project-go:hover{text-decoration:underline}
 #kje-portfolio .kje-project-go{display:inline-flex;gap:12px;align-items:center;color:var(--kje-green);font-size:12px;line-height:1.8;min-height:40px;padding:5px 0;text-decoration:underline;text-underline-offset:5px}
 #kje-portfolio .kje-project-status{font-size:11px;color:var(--kje-muted);line-height:1.8}
 #kje-portfolio .kje-eyebrow{font-size:11px}#kje-portfolio .kje-explore{border-top:1px solid var(--kje-line)}
