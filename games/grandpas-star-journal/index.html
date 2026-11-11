@@ -1795,7 +1795,8 @@ function drawLookSky(top,horizon){
         const u=(x+0.5-width/2)*xScale,r2=u*u+v*v;
         // Invert the sky projection to get the world direction's up component.
         const up=((1-r2)*CAM.f[2]+2*v*CAM.u[2])/(1+r2);
-        const tint=Math.pow(1-clamp(up/0.65,0,1),2);
+        const altitude=clamp(up/0.65,0,1);
+        const tint=0.72*(1-altitude)*(1-altitude);
         const offset=4*(y*width+x);
         for(let c=0;c<3;c++)skyPixels.data[offset+c]=high[c]+(low[c]-high[c])*tint;
         skyPixels.data[offset+3]=255;
@@ -1915,7 +1916,6 @@ function drawGroundSilhouette(bearing,above,span){
   const edge=above?-3000:H+3000;
   const last=pts[pts.length-1];ctx.lineTo(last[0],edge);ctx.lineTo(pts[0][0],edge);ctx.closePath();
   ctx.fillStyle=['#06070c','#061015','#081322','#090f1b','#071521'][S.chapter];ctx.fill();
-  ctx.strokeStyle='rgba(255,170,110,.12)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);for(const p of pts)ctx.lineTo(p[0],p[1]);ctx.stroke();
   if(S.chapter===0){
   // windows
   const ww=Math.max(1.5,0.35*CAM.ppd), wh=Math.max(1.2,0.25*CAM.ppd);
@@ -1929,9 +1929,12 @@ function drawGroundSilhouette(bearing,above,span){
   // Rooftop rail follows the ground side of the view.
   const p0=projLook(enu(-6,bearing),-0.99);
   if(p0&&p0[1]>0&&p0[1]<H){
-    ctx.fillStyle='#0b0c12';
-    if(above)ctx.fillRect(0,0,W,p0[1]);else ctx.fillRect(0,p0[1],W,H-p0[1]);
-    ctx.strokeStyle='rgba(120,130,160,.25)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,p0[1]);ctx.lineTo(W,p0[1]);ctx.stroke();
+    const y=p0[1],edge=y+(above?-6:6);
+    const rail=ctx.createLinearGradient(0,y,0,edge);
+    rail.addColorStop(0,'rgba(11,12,18,0)');
+    rail.addColorStop(1,'#0b0c12');
+    ctx.fillStyle=rail;
+    if(above)ctx.fillRect(0,0,W,y);else ctx.fillRect(0,y,W,H-y);
   }
   }
 }
