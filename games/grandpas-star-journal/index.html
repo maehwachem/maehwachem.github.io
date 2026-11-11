@@ -2968,7 +2968,10 @@ function renderJournal(revealNext=false){
     <div class="journal-kicker">관측 안내 · 0${S.chapter+1}</div>
     <h2 id="journalTitle">${PAGE.title}</h2><p class="date"><span class="graphite-writing">${journalDate(PAGE)}</span></p>
     <nav class="chapter-nav" aria-label="관측 장 선택">${nav}</nav>
-    <section class="chapter-opening"><div class="journal-kicker">이번 관측</div><p>${PAGE.intro}</p></section>`;
+    <section class="chapter-opening"><div class="journal-kicker">이번 관측</div><p>${PAGE.intro}</p></section>
+    <button id="journalMemory" class="chapter-vignette memory-open" type="button" aria-haspopup="dialog">
+      <span class="memory-photo-label">${PAGE.short}</span><span class="memory-expand">그림과 손주의 일기</span>
+    </button>`;
   if(!next){
     h+=`<section class="chapter-finished"><div class="journal-kicker">이 장의 관측을 마쳤어요</div>
       <div class="acts"><button id="jGrandpa" class="travel" type="button" aria-haspopup="dialog">할아버지의 일지 읽기</button>
@@ -3002,9 +3005,7 @@ function renderJournal(revealNext=false){
       `<details class="task" data-id="${t.id}"${revealNext&&t===next?' open':''}><summary>${badge}</summary>
       <div class="hint"><span class="graphite-writing">${t.hint}</span></div></details>`;
   }
-  h+=`<button id="journalMemory" class="chapter-vignette memory-open" type="button" aria-haspopup="dialog">
-      <span class="memory-photo-label">${PAGE.short}</span><span class="memory-expand">그림과 손주의 일기</span>
-    </button><div class="journal-reset"><button id="jReset">진행 초기화</button>
+  h+=`<div class="journal-reset"><button id="jReset">진행 초기화</button>
     <span id="resetNote" role="status" hidden>다섯 장의 관측 기록을 모두 지우려면 한 번 더 누르세요.</span></div>`;
   pageEl.innerHTML=h;bindMoonDates(pageEl);
   if(S.chapter===3)bindTrail();
