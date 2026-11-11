@@ -2991,8 +2991,9 @@ function renderJournal(revealNext=false){
   }
   if(S.chapter===3)h+=trailPanel();
   if(S.chapter===4)h+=meteorPanel();
-  h+=`<div class="journal-kicker">관측 대상</div>
-    <div class="acts"><button class="travel" id="jTravel" type="button">일지 속 하늘</button><button id="jToday" type="button">오늘 밤 하늘</button></div>
+  h+=`<div class="journal-kicker">관측할 하늘</div>
+    <div class="acts"><button class="travel" id="jTravel" type="button">일지 속 하늘 보기</button><button id="jToday" type="button">오늘 밤 하늘 보기</button></div>
+    <div class="journal-kicker">관측 대상</div>
     <div class="journal-progress"><b>되살린 기록 ${done} / ${TASKS.length}</b><div class="meter" aria-hidden="true">${meter}</div></div>`;
   for(const [i,t] of TASKS.entries()){
     const d=taskDone(t);
