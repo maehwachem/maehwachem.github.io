@@ -288,9 +288,10 @@
       {
         "title": "할아버지의 별 일지",
         "subject": "earth",
-        "desc": "1987년의 옥상으로 돌아가 할아버지가 기록한 별과 행성을 찾아봅니다. 성도와 올려다보기 화면을 오가며 찢어진 일지의 첫 페이지를 채워 보세요.",
+        "desc": "할아버지와 함께 별을 보던 옥상으로 돌아갑니다. 성도를 펼쳐 일지에 남은 별과 행성을 찾으며, 함께 보낸 밤의 이야기를 한 장씩 되살려 보세요.",
         "tag": "지구과학 · 천체 관측",
-        "cover": "/assets/uploads/star-journal-gameplay.webp",
+        "cover": "/assets/uploads/star-journal-story-cover.webp",
+        "cover_label": "할아버지와 별을 보던 밤",
         "poster": "star",
         "words": "할아버지의\n별 일지",
         "links": [
