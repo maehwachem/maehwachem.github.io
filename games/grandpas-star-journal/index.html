@@ -71,7 +71,10 @@ button.main { color: #2e210f; background: var(--gold); border-color: var(--gold)
   border: 1px solid #9badcf57; border-radius: 13px; text-align: center;
   box-shadow: 0 7px 30px #05070e80; visibility: hidden; pointer-events: none;
 }
-#info.show { visibility: visible; pointer-events: auto; }
+#info.show { visibility: visible; }
+#infoGo:not([hidden]) { pointer-events: auto; }
+body[data-view="look"] #sky { cursor: grab; }
+body[data-view="look"] #sky:active { cursor: grabbing; }
 #infoName { font-size: 17px; font-weight: 750; }
 #infoSub { font-size: 12px; color: var(--muted); margin-top: 4px; }
 #infoCue { font-size: 12px; color: var(--gold); margin-top: 4px; }
@@ -2872,11 +2875,7 @@ function renderJournal(revealNext=false){
     <div class="journal-kicker">관측 안내 · 0${S.chapter+1}</div>
     <h2 id="journalTitle">${PAGE.title}</h2><p class="date"><span class="graphite-writing">${journalDate(PAGE)}</span></p>
     <nav class="chapter-nav" aria-label="관측 장 선택">${nav}</nav>
-    <section class="chapter-opening"><div class="journal-kicker">이번 관측</div><p>${PAGE.intro}</p></section>
-    <div class="acts"><button class="travel" id="jTravel">일지 속 하늘</button><button id="jToday">오늘 밤 하늘</button></div>
-    <button id="journalMemory" class="chapter-vignette memory-open" type="button" aria-haspopup="dialog">
-      <span class="memory-photo-label">${PAGE.short}</span><span class="memory-expand">그림과 손주의 일기</span>
-    </button>`;
+    <section class="chapter-opening"><div class="journal-kicker">이번 관측</div><p>${PAGE.intro}</p></section>`;
   if(!next){
     h+=`<section class="chapter-finished"><div class="journal-kicker">이 장의 관측을 마쳤어요</div>
       <div class="acts"><button id="jGrandpa" class="travel" type="button" aria-haspopup="dialog">할아버지의 일지 읽기</button>
@@ -2899,7 +2898,9 @@ function renderJournal(revealNext=false){
   }
   if(S.chapter===3)h+=trailPanel();
   if(S.chapter===4)h+=meteorPanel();
-  h+=`<div class="journal-progress"><b>되살린 기록 ${done} / ${TASKS.length}</b><div class="meter" aria-hidden="true">${meter}</div></div>`;
+  h+=`<div class="journal-kicker">관측 대상</div>
+    <div class="acts"><button class="travel" id="jTravel" type="button">일지 속 하늘</button><button id="jToday" type="button">오늘 밤 하늘</button></div>
+    <div class="journal-progress"><b>되살린 기록 ${done} / ${TASKS.length}</b><div class="meter" aria-hidden="true">${meter}</div></div>`;
   for(const [i,t] of TASKS.entries()){
     const d=taskDone(t);
     const badge=`<span class="mk" aria-hidden="true">${d?'✓':i+1}</span><span class="tt ${d?'fountain-writing':'graphite-writing'}">${t.name}</span><span class="task-state">${d?'기록 완료':t===next?'다음 관측':'힌트'}</span>`;
@@ -2907,7 +2908,9 @@ function renderJournal(revealNext=false){
       `<details class="task" data-id="${t.id}"${revealNext&&t===next?' open':''}><summary>${badge}</summary>
       <div class="hint"><span class="graphite-writing">${t.hint}</span></div></details>`;
   }
-  h+=`<div class="journal-reset"><button id="jReset">진행 초기화</button>
+  h+=`<button id="journalMemory" class="chapter-vignette memory-open" type="button" aria-haspopup="dialog">
+      <span class="memory-photo-label">${PAGE.short}</span><span class="memory-expand">그림과 손주의 일기</span>
+    </button><div class="journal-reset"><button id="jReset">진행 초기화</button>
     <span id="resetNote" role="status" hidden>다섯 장의 관측 기록을 모두 지우려면 한 번 더 누르세요.</span></div>`;
   pageEl.innerHTML=h;bindMoonDates(pageEl);
   if(S.chapter===3)bindTrail();
@@ -3130,7 +3133,7 @@ lineBtn.onclick=()=>{S.lines=!S.lines;showLineState();save();};
 document.getElementById('jBtn').onclick=()=>openJournal();
 
 /* gyro */
-let gyroAz=null,gyroAlt=null,gyroTimer;
+let gyroAz=null,gyroAlt=null,gyroAltOffset=0,gyroTimer;
 function stopGyro(){
   S.gyro=false;clearTimeout(gyroTimer);
   gyroBtn.classList.remove('on');gyroBtn.setAttribute('aria-pressed','false');
@@ -3145,15 +3148,15 @@ function onOrient(e){
   const az=norm360(Math.atan2(vx,vy)*R2D), alt=Math.asin(clamp(vz,-1,1))*R2D;
   if(gyroAz==null){gyroAz=az;gyroAlt=alt;}
   let d=((az-gyroAz+540)%360)-180;gyroAz=norm360(gyroAz+d*0.25);gyroAlt+=(alt-gyroAlt)*0.25;
-  S.az=norm360(gyroAz+S.azOff);S.alt=clamp(gyroAlt,-10,89);
+  S.az=norm360(gyroAz+S.azOff);S.alt=clamp(gyroAlt+gyroAltOffset,-10,89);
 }
 async function toggleGyro(){
   if(S.gyro){stopGyro();return;}
   try{if(typeof DeviceOrientationEvent!=='undefined'&&DeviceOrientationEvent.requestPermission){const r=await DeviceOrientationEvent.requestPermission();if(r!=='granted'){toast('기울기 센서 사용이 허용되지 않았어요');return;}}}
   catch(e){toast('이 브라우저에서는 기울기 센서를 쓸 수 없어요');return;}
   if(!('DeviceOrientationEvent' in window)){toast('이 기기에는 기울기 센서가 없어요');return;}
-  S.gyro=true;gyroAz=null;S.azOff=0;gyroBtn.classList.add('on');gyroBtn.setAttribute('aria-pressed','true');
-  toast('폰을 하늘로 들어 보세요. 방향이 어긋나면 화면을 좌우로 끌어 맞출 수 있어요');
+  S.gyro=true;gyroAz=null;gyroAltOffset=0;S.azOff=0;gyroBtn.classList.add('on');gyroBtn.setAttribute('aria-pressed','true');
+  toast('폰을 하늘로 들어 보세요. 방향이 어긋나면 화면을 끌어 맞출 수 있어요');
   gyroTimer=setTimeout(()=>{if(S.gyro&&gyroAz==null){stopGyro();toast('센서 신호를 받지 못했어요. 화면을 끌어 관측할 수 있어요.');}},2500);
 }
 gyroBtn.onclick=toggleGyro;
@@ -3161,17 +3164,63 @@ addEventListener('deviceorientationabsolute',onOrient);
 addEventListener('deviceorientation',e=>{if(!('ondeviceorientationabsolute' in window)||e.webkitCompassHeading!=null)onOrient(e);});
 
 /* ---------- pointer input ---------- */
-const ptrs=new Map();let pinch0=null,moved=0,downT=0;
-cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});moved=0;downT=performance.now();if(ptrs.size===2){const [a,b]=[...ptrs.values()];pinch0={d:Math.hypot(a.x-b.x,a.y-b.y),fov:S.fov};}});
-cv.addEventListener('pointermove',e=>{const p=ptrs.get(e.pointerId);if(!p)return;const dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;moved+=Math.abs(dx)+Math.abs(dy);
-  if(ptrs.size===2&&pinch0){const [a,b]=[...ptrs.values()];const d=Math.hypot(a.x-b.x,a.y-b.y);if(S.view==='look')S.fov=clamp(pinch0.fov*pinch0.d/d,15,110);return;}
-  if(S.view!=='look')return;
-  const dpp=S.fov/Math.min(W,H*1.2)*1.0;
-  if(S.gyro){S.azOff-=dx*dpp;S.az=norm360((gyroAz??S.az)+S.azOff);return;}
-  S.az=norm360(S.az-dx*dpp);S.alt=clamp(S.alt+dy*dpp,-10,88);});
-function endPtr(e){const had=ptrs.has(e.pointerId);ptrs.delete(e.pointerId);if(ptrs.size<2)pinch0=null;if(had&&moved<8&&performance.now()-downT<500&&ptrs.size===0)tap(e.clientX,e.clientY);}
-cv.addEventListener('pointerup',endPtr);cv.addEventListener('pointercancel',e=>{ptrs.delete(e.pointerId);pinch0=null;});
-cv.addEventListener('wheel',e=>{e.preventDefault();if(S.view==='look')S.fov=clamp(S.fov*Math.exp(e.deltaY*0.001),15,110);},{passive:false});
+const ptrs=new Map();
+let canTap=false;
+function panSky(dx,dy){
+  setupCam();
+  const degrees=pixels=>2*Math.atan(pixels/(2*CAM.sc))*R2D;
+  const az=norm360(S.az-degrees(dx));
+  const alt=clamp(S.alt+degrees(dy),-10,89);
+  if(S.gyro&&gyroAz!==null){
+    S.azOff=az-gyroAz;
+    gyroAltOffset=alt-gyroAlt;
+  }
+  S.az=az;
+  S.alt=alt;
+}
+cv.addEventListener('pointerdown',e=>{
+  if(e.button!==0||!started||!datePanel.hidden)return;
+  cv.setPointerCapture(e.pointerId);
+  canTap=ptrs.size===0;
+  ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY,downAt:performance.now()});
+});
+cv.addEventListener('pointermove',e=>{
+  const p=ptrs.get(e.pointerId);
+  if(!p)return;
+  const dx=e.clientX-p.x,dy=e.clientY-p.y;
+  const x=p.x,y=p.y;
+  p.x=e.clientX;p.y=e.clientY;
+  const startsDrag=canTap&&Math.hypot(p.x-p.startX,p.y-p.startY)>5;
+  if(startsDrag)canTap=false;
+  if(S.view!=='look'||!datePanel.hidden)return;
+  if(ptrs.size===1){
+    if(startsDrag)panSky(p.x-p.startX,p.y-p.startY);
+    else if(!canTap)panSky(dx,dy);
+  }else if(ptrs.size===2){
+    const other=[...ptrs.values()].find(point=>point!==p);
+    const before=Math.hypot(x-other.x,y-other.y);
+    const after=Math.hypot(p.x-other.x,p.y-other.y);
+    if(before>1&&after>1)S.fov=clamp(S.fov*before/after,15,110);
+    panSky(dx/2,dy/2);
+  }
+});
+function endPtr(e){
+  const pointer=ptrs.get(e.pointerId);
+  if(!pointer)return;
+  ptrs.delete(e.pointerId);
+  const isTap=e.type==='pointerup'&&canTap&&ptrs.size===0&&performance.now()-pointer.downAt<500;
+  canTap=false;
+  if(isTap)tap(e.clientX,e.clientY);
+}
+cv.addEventListener('pointerup',endPtr);
+cv.addEventListener('pointercancel',endPtr);
+cv.addEventListener('lostpointercapture',endPtr);
+cv.addEventListener('wheel',e=>{
+  if(S.view!=='look'||!datePanel.hidden)return;
+  e.preventDefault();
+  const unit=e.deltaMode===1?16:e.deltaMode===2?H:1;
+  S.fov=clamp(S.fov*Math.exp(e.deltaY*unit*.001),15,110);
+},{passive:false});
 function tap(x,y){if(!datePanel.hidden)return;const best=objectNear(x,y,28);
   if(best){S.sel=best.type==='star'?{type:'star',i:best.i}:{type:best.type,name:best.name};showInfo(best,true,S.view==='map');}
   else{S.sel=null;hideInfo();}
