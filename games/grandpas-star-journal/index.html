@@ -1601,6 +1601,12 @@ if(typeof ResizeObserver!=='undefined'){
   hudObserver.observe(topHud);hudObserver.observe(bottomHud);
 }
 let CAM={};
+const clampSkyPitch=pitch=>clamp(pitch,-10,190);
+function viewBearing(){
+  return S.alt>90
+    ?{az:norm360(S.az+180),alt:180-S.alt}
+    :{az:S.az,alt:S.alt};
+}
 function setupCam(){const a=S.alt*D2R,z=S.az*D2R;
   const f=[Math.cos(a)*Math.sin(z),Math.cos(a)*Math.cos(z),Math.sin(a)];
   const r=[Math.cos(z),-Math.sin(z),0];
@@ -1776,9 +1782,22 @@ function draw(){
   if(look){ctx.fillStyle='#02030a';ctx.fillRect(0,0,W,H);}
   else{ctx.clearRect(0,0,W,H);}
   if(look){
-    const hp=projLook(enu(0,S.az),-0.99);const hy=hp?hp[1]:(S.alt>0?H*2:-H);
-    const g=ctx.createLinearGradient(0,Math.min(hy-H*1.4,0),0,hy);g.addColorStop(0,cTop);g.addColorStop(0.82,mix(cTop,cHor,.45));g.addColorStop(1,cHor);
-    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+    ctx.fillStyle=cTop;
+    ctx.fillRect(0,0,W,H);
+    // Fade toward each horizon independently as it enters the view.
+    for(const [az,side] of [[S.az,1],[S.az+180,-1]]){
+      const edge=projLook(enu(0,az),-0.99);
+      if(!edge)continue;
+      const horizon=edge[1];
+      if(side*(horizon-skyY)<0 && Math.abs(S.alt-90)<45)continue;
+      const g=ctx.createLinearGradient(0,horizon-side*H*1.4,0,horizon);
+      g.addColorStop(0,'transparent');
+      g.addColorStop(0.82,mix(cTop,cHor,.45));
+      g.addColorStop(1,cHor);
+      ctx.fillStyle=g;
+      if(side>0)ctx.fillRect(0,Math.min(skyY,horizon),W,H);
+      else ctx.fillRect(0,0,W,Math.max(skyY,horizon));
+    }
   }else{
     const g=ctx.createRadialGradient(MAP.cx,MAP.cy,0,MAP.cx,MAP.cy,MAP.R);g.addColorStop(0,cTop);g.addColorStop(.75,mix(cTop,cHor,.35));g.addColorStop(1,cHor);
     ctx.fillStyle=g;ctx.beginPath();ctx.arc(MAP.cx,MAP.cy,MAP.R,0,7);ctx.fill();
@@ -1852,26 +1871,50 @@ function draw(){
   if(look)checkReticle();
 }
 function drawGround(){
-  // 지평선·건물 실루엣
+  const {az}=viewBearing();
+  const flipped=S.alt>90;
+  const nearZenith=Math.abs(S.alt-90)<45;
+  drawGroundSilhouette(az,flipped,nearZenith?90:120);
+  if(nearZenith)drawGroundSilhouette(az+180,!flipped,90);
+  ctx.textAlign='center';
+  const DIRS=['북','북동','동','남동','남','남서','서','북서'];
+  for(let k=0;k<8;k++){
+    const p=projLook(enu(-2.5,k*45),-0.6);
+    if(p&&p[0]>10&&p[0]<W-10&&p[1]>skyTop&&p[1]<skyBottom)
+      label(p[0],Math.min(p[1],skyBottom-14),DIRS[k],k%2?'rgba(200,205,225,.5)':'#ffd98a',k%2?11:14);
+  }
+}
+function drawGroundSilhouette(bearing,above,span){
   const pts=[];
-  for(let d=-120;d<=120;d+=1){const az=S.az+d;const h=skyline(az);const p=projLook(enu(h,az),-0.99);if(p)pts.push([p[0],p[1]]);}
+  for(let d=-span;d<=span;d+=1){
+    const az=bearing+d;
+    const p=projLook(enu(skyline(az),az),-0.99);
+    if(p)pts.push([p[0],p[1]]);
+  }
   if(pts.length<2)return;
   ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);for(const p of pts)ctx.lineTo(p[0],p[1]);
-  const last=pts[pts.length-1];ctx.lineTo(last[0],H+3000);ctx.lineTo(pts[0][0],H+3000);ctx.closePath();
+  const edge=above?-3000:H+3000;
+  const last=pts[pts.length-1];ctx.lineTo(last[0],edge);ctx.lineTo(pts[0][0],edge);ctx.closePath();
   ctx.fillStyle=['#06070c','#061015','#081322','#090f1b','#071521'][S.chapter];ctx.fill();
   ctx.strokeStyle='rgba(255,170,110,.12)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);for(const p of pts)ctx.lineTo(p[0],p[1]);ctx.stroke();
   if(S.chapter===0){
   // windows
   const ww=Math.max(1.5,0.35*CAM.ppd), wh=Math.max(1.2,0.25*CAM.ppd);
-  for(const [az,h] of WINDOWS){const p=projLook(enu(h,az));if(!p||p[0]<-5||p[0]>W+5)continue;ctx.fillStyle='rgba(255,214,140,.55)';ctx.fillRect(p[0]-ww/2,p[1]-wh/2,ww,wh);}
-  // rooftop rail
-  const p0=projLook(enu(-6,S.az),-0.99);
-  if(p0&&p0[1]<H){ctx.fillStyle='#0b0c12';ctx.fillRect(0,p0[1],W,H-p0[1]);ctx.strokeStyle='rgba(120,130,160,.25)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,p0[1]);ctx.lineTo(W,p0[1]);ctx.stroke();}
+  for(const [az,h] of WINDOWS){
+    const delta=((norm360(az-bearing)+180)%360)-180;
+    if(delta < -span||delta>=span)continue;
+    const p=projLook(enu(h,az));
+    if(!p||p[0]<-5||p[0]>W+5)continue;
+    ctx.fillStyle='rgba(255,214,140,.55)';ctx.fillRect(p[0]-ww/2,p[1]-wh/2,ww,wh);
   }
-  // compass ticks
-  ctx.textAlign='center';
-  const DIRS=['북','북동','동','남동','남','남서','서','북서'];
-  for(let k=0;k<8;k++){const az=k*45;const p=projLook(enu(-2.5,az),-0.6);if(p&&p[0]>10&&p[0]<W-10)label(p[0],Math.min(p[1],skyBottom-14),DIRS[k],k%2?'rgba(200,205,225,.5)':'#ffd98a',k%2?11:14);}
+  // Rooftop rail follows the ground side of the view.
+  const p0=projLook(enu(-6,bearing),-0.99);
+  if(p0&&p0[1]>0&&p0[1]<H){
+    ctx.fillStyle='#0b0c12';
+    if(above)ctx.fillRect(0,0,W,p0[1]);else ctx.fillRect(0,p0[1],W,H-p0[1]);
+    ctx.strokeStyle='rgba(120,130,160,.25)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,p0[1]);ctx.lineTo(W,p0[1]);ctx.stroke();
+  }
+  }
 }
 function drawMapFrame(){
   // skyline ring
@@ -1886,7 +1929,8 @@ function drawMapFrame(){
   // altitude rings
   ctx.strokeStyle='rgba(255,255,255,.06)';for(const al of [30,60]){ctx.beginPath();ctx.arc(MAP.cx,MAP.cy,MAP.R*(90-al)/90,0,7);ctx.stroke();}
   // look direction marker
-  const r=MAP.R*(90-S.alt)/90,a=S.az*D2R;const x=MAP.cx-r*Math.sin(a),y=MAP.cy-r*Math.cos(a);
+  const {az,alt}=viewBearing();
+  const r=MAP.R*(90-alt)/90,a=az*D2R;const x=MAP.cx-r*Math.sin(a),y=MAP.cy-r*Math.cos(a);
   ctx.strokeStyle='rgba(255,217,138,.6)';ctx.setLineDash([4,4]);ctx.beginPath();ctx.arc(x,y,MAP.ppd*S.fov/2,0,7);ctx.stroke();ctx.setLineDash([]);
   label(x,y+MAP.ppd*S.fov/2+13,'보던 방향','rgba(255,217,138,.7)',11);
 }
@@ -3148,7 +3192,7 @@ function onOrient(e){
   const az=norm360(Math.atan2(vx,vy)*R2D), alt=Math.asin(clamp(vz,-1,1))*R2D;
   if(gyroAz==null){gyroAz=az;gyroAlt=alt;}
   let d=((az-gyroAz+540)%360)-180;gyroAz=norm360(gyroAz+d*0.25);gyroAlt+=(alt-gyroAlt)*0.25;
-  S.az=norm360(gyroAz+S.azOff);S.alt=clamp(gyroAlt+gyroAltOffset,-10,89);
+  S.az=norm360(gyroAz+S.azOff);S.alt=clampSkyPitch(gyroAlt+gyroAltOffset);
 }
 async function toggleGyro(){
   if(S.gyro){stopGyro();return;}
@@ -3169,8 +3213,11 @@ let canTap=false;
 function panSky(dx,dy){
   setupCam();
   const degrees=pixels=>2*Math.atan(pixels/(2*CAM.sc))*R2D;
-  const az=norm360(S.az-degrees(dx));
-  const alt=clamp(S.alt+degrees(dy),-10,89);
+  moveSky(-degrees(dx),degrees(dy));
+}
+function moveSky(yaw,pitch){
+  const az=norm360(S.az+(S.alt>90?-yaw:yaw));
+  const alt=clampSkyPitch(S.alt+pitch);
   if(S.gyro&&gyroAz!==null){
     S.azOff=az-gyroAz;
     gyroAltOffset=alt-gyroAlt;
@@ -3235,10 +3282,10 @@ addEventListener('keydown',e=>{
   }
   if(!started||S.view!=='look'||journalEl.classList.contains('open')||!datePanel.hidden)return;
   const s=S.fov/30;
-  if(e.key==='ArrowLeft')S.az=norm360(S.az-s*3);
-  if(e.key==='ArrowRight')S.az=norm360(S.az+s*3);
-  if(e.key==='ArrowUp')S.alt=clamp(S.alt+s*3,-10,88);
-  if(e.key==='ArrowDown')S.alt=clamp(S.alt-s*3,-10,88);
+  if(e.key==='ArrowLeft')moveSky(-s*3,0);
+  if(e.key==='ArrowRight')moveSky(s*3,0);
+  if(e.key==='ArrowUp')moveSky(0,s*3);
+  if(e.key==='ArrowDown')moveSky(0,-s*3);
 });
 
 /* ---------- intro ---------- */
