@@ -1772,6 +1772,40 @@ function objectNear(x,y,limit){
   return region&&(!best||!observationTask(best))?region:best;
 }
 
+const skyBackdrop=document.createElement('canvas');
+const skyBackdropCtx=skyBackdrop.getContext('2d');
+let skyPixels,skyBackdropKey='';
+function drawLookSky(top,horizon){
+  const width=Math.max(2,Math.round(72*W/Math.max(W,H)));
+  const height=Math.max(2,Math.round(72*H/Math.max(W,H)));
+  if(skyBackdrop.width!==width||skyBackdrop.height!==height||!skyPixels){
+    skyBackdrop.width=width;skyBackdrop.height=height;
+    skyPixels=skyBackdropCtx.createImageData(width,height);
+  }
+  const key=[top,horizon,W,H,CAM.cy,CAM.sc,CAM.f[2],CAM.u[2]].join('|');
+  if(key!==skyBackdropKey){
+    const rgb=color=>color.startsWith('#')
+      ?[1,3,5].map(i=>parseInt(color.slice(i,i+2),16))
+      :color.match(/\d+/g).map(Number);
+    const high=rgb(top),low=rgb(horizon);
+    const xScale=W/(2*CAM.sc*width),yScale=H/(2*CAM.sc*height);
+    for(let y=0;y<height;y++){
+      const v=CAM.cy/(2*CAM.sc)-(y+0.5)*yScale;
+      for(let x=0;x<width;x++){
+        const u=(x+0.5-width/2)*xScale,r2=u*u+v*v;
+        // Invert the sky projection to get the world direction's up component.
+        const up=((1-r2)*CAM.f[2]+2*v*CAM.u[2])/(1+r2);
+        const tint=Math.pow(1-clamp(up/0.65,0,1),2);
+        const offset=4*(y*width+x);
+        for(let c=0;c<3;c++)skyPixels.data[offset+c]=high[c]+(low[c]-high[c])*tint;
+        skyPixels.data[offset+3]=255;
+      }
+    }
+    skyBackdropCtx.putImageData(skyPixels,0,0);
+    skyBackdropKey=key;
+  }
+  ctx.drawImage(skyBackdrop,0,0,W,H);
+}
 function draw(){
   updateAstro();
   const look=S.view==='look', expert=S.mode==='expert', guides=!expert&&S.lines;
@@ -1782,22 +1816,7 @@ function draw(){
   if(look){ctx.fillStyle='#02030a';ctx.fillRect(0,0,W,H);}
   else{ctx.clearRect(0,0,W,H);}
   if(look){
-    ctx.fillStyle=cTop;
-    ctx.fillRect(0,0,W,H);
-    // Fade toward each horizon independently as it enters the view.
-    for(const [az,side] of [[S.az,1],[S.az+180,-1]]){
-      const edge=projLook(enu(0,az),-0.99);
-      if(!edge)continue;
-      const horizon=edge[1];
-      if(side*(horizon-skyY)<0 && Math.abs(S.alt-90)<45)continue;
-      const g=ctx.createLinearGradient(0,horizon-side*H*1.4,0,horizon);
-      g.addColorStop(0,'transparent');
-      g.addColorStop(0.82,mix(cTop,cHor,.45));
-      g.addColorStop(1,cHor);
-      ctx.fillStyle=g;
-      if(side>0)ctx.fillRect(0,Math.min(skyY,horizon),W,H);
-      else ctx.fillRect(0,0,W,Math.max(skyY,horizon));
-    }
+    drawLookSky(cTop,cHor);
   }else{
     const g=ctx.createRadialGradient(MAP.cx,MAP.cy,0,MAP.cx,MAP.cy,MAP.R);g.addColorStop(0,cTop);g.addColorStop(.75,mix(cTop,cHor,.35));g.addColorStop(1,cHor);
     ctx.fillStyle=g;ctx.beginPath();ctx.arc(MAP.cx,MAP.cy,MAP.R,0,7);ctx.fill();
@@ -3178,9 +3197,33 @@ document.getElementById('jBtn').onclick=()=>openJournal();
 
 /* gyro */
 let gyroAz=null,gyroAlt=null,gyroAltOffset=0,gyroTimer;
+let gyroVector=null,gyroBearing=null,gyroPastZenith=false;
 function stopGyro(){
   S.gyro=false;clearTimeout(gyroTimer);
   gyroBtn.classList.remove('on');gyroBtn.setAttribute('aria-pressed','false');
+}
+function trackGyroVector(vector){
+  const [east,north,up]=vector;
+  if(Math.hypot(east,north)>1e-5){
+    const az=norm360(Math.atan2(east,north)*R2D);
+    if(gyroBearing!==null&&up>Math.sin(75*D2R)){
+      const delta=((az-gyroBearing+540)%360)-180;
+      gyroPastZenith=Math.abs(delta)>90;
+    }
+    gyroBearing=norm360(az+(gyroPastZenith?180:0));
+  }
+  if(gyroBearing===null)gyroBearing=S.az;
+  const smooth=gyroVector?vector.map((value,i)=>gyroVector[i]*0.75+value*0.25):vector;
+  const length=Math.hypot(...smooth);
+  gyroVector=smooth.map(value=>value/length);
+  const [x,y,z]=gyroVector;
+  const bearing=gyroBearing*D2R;
+  const radial=x*Math.sin(bearing)+y*Math.cos(bearing);
+  const horizontal=Math.hypot(x,y);
+  const pastZenith=radial<0;
+  gyroAz=horizontal<1e-5?gyroBearing:norm360(Math.atan2(x,y)*R2D+(pastZenith?180:0));
+  const pitch=Math.atan2(z,pastZenith?-horizontal:horizontal)*R2D;
+  gyroAlt=pastZenith?norm360(pitch):pitch;
 }
 function onOrient(e){
   if(!S.gyro||S.view!=='look'||e.alpha==null)return;
@@ -3189,9 +3232,7 @@ function onOrient(e){
   const a=al*D2R,b=e.beta*D2R,g=e.gamma*D2R;
   const ca=Math.cos(a),sa=Math.sin(a),cb=Math.cos(b),sb=Math.sin(b),cg=Math.cos(g),sg=Math.sin(g);
   const vx=-ca*sg-sa*sb*cg, vy=-sa*sg+ca*sb*cg, vz=-cb*cg;
-  const az=norm360(Math.atan2(vx,vy)*R2D), alt=Math.asin(clamp(vz,-1,1))*R2D;
-  if(gyroAz==null){gyroAz=az;gyroAlt=alt;}
-  let d=((az-gyroAz+540)%360)-180;gyroAz=norm360(gyroAz+d*0.25);gyroAlt+=(alt-gyroAlt)*0.25;
+  trackGyroVector([vx,vy,vz]);
   S.az=norm360(gyroAz+S.azOff);S.alt=clampSkyPitch(gyroAlt+gyroAltOffset);
 }
 async function toggleGyro(){
@@ -3199,7 +3240,8 @@ async function toggleGyro(){
   try{if(typeof DeviceOrientationEvent!=='undefined'&&DeviceOrientationEvent.requestPermission){const r=await DeviceOrientationEvent.requestPermission();if(r!=='granted'){toast('기울기 센서 사용이 허용되지 않았어요');return;}}}
   catch(e){toast('이 브라우저에서는 기울기 센서를 쓸 수 없어요');return;}
   if(!('DeviceOrientationEvent' in window)){toast('이 기기에는 기울기 센서가 없어요');return;}
-  S.gyro=true;gyroAz=null;gyroAltOffset=0;S.azOff=0;gyroBtn.classList.add('on');gyroBtn.setAttribute('aria-pressed','true');
+  S.gyro=true;gyroAz=null;gyroAltOffset=0;S.azOff=0;
+  gyroVector=null;gyroBearing=null;gyroPastZenith=false;gyroBtn.classList.add('on');gyroBtn.setAttribute('aria-pressed','true');
   toast('폰을 하늘로 들어 보세요. 방향이 어긋나면 화면을 끌어 맞출 수 있어요');
   gyroTimer=setTimeout(()=>{if(S.gyro&&gyroAz==null){stopGyro();toast('센서 신호를 받지 못했어요. 화면을 끌어 관측할 수 있어요.');}},2500);
 }
