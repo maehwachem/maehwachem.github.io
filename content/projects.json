@@ -294,7 +294,11 @@
         "words": "할아버지의\n별 일지",
         "links": [
           {
-            "label": "게임 열기",
+            "label": "고정형 · 수업용",
+            "url": "/games/grandpas-star-journal/?stars=fixed"
+          },
+          {
+            "label": "랜덤형 · 개인용",
             "url": "/games/grandpas-star-journal/"
           }
         ],
