@@ -1536,7 +1536,9 @@ function skyline(az){
 const S = {t:new Date(), storySky:true, speed:1, view:'map', mode:'guide', chapter:0, lamp:true, az:250, alt:30, fov:75, lines:true, gyro:false, sel:null, found:{}, starTargets:[], moonNotes:{}, trailMode:'photo', trailPhotos:[], trailPhotoSolved:false};
 const SPEEDS=[[0,'멈춤'],[1,'실시간'],[60,'×60'],[600,'×600'],[3600,'×3600']];
 let speedIdx=1;
-const STORE='gstarjournal-v1';
+const fixedStars=new URLSearchParams(location.search).get('stars')==='fixed';
+const STORE=fixedStars?'gstarjournal-fixed-v1':'gstarjournal-v1';
+if(fixedStars)document.title='할아버지의 별 일지 · 수업용 고정 별';
 function load(){try{const d=JSON.parse(localStorage.getItem(STORE)||'{}');S.found=d.found&&typeof d.found==='object'&&!Array.isArray(d.found)?d.found:{};S.chapter=Number.isInteger(d.chapter)?d.chapter:0;S.moonNotes=d.moonNotes&&typeof d.moonNotes==='object'&&!Array.isArray(d.moonNotes)?d.moonNotes:{};S.lamp=d.lamp!==false;
   S.starTargets=Array.isArray(d.starTargets)?d.starTargets:[];
   S.trailMode=d.trailMode==='simple'?'simple':'photo';
@@ -2634,6 +2636,7 @@ const STAR_TARGETS=[
       ['Altair','Arcturus','Dubhe','Kaus Australis','Rasalhague','Alpheratz'])]},
 ];
 function prepareStarTargets(){
+  if(fixedStars)return;
   for(const [index,{page,legacy,count,before,after,candidates}] of STAR_TARGETS.entries()){
     const byId=new Map([...legacy,...candidates].map(task=>[task.id,task]));
     const saved=S.starTargets[index];
@@ -2963,13 +2966,13 @@ function renderJournal(revealNext=false){
         '<button type="button" id="jFinale" aria-haspopup="dialog">유성우 엔딩 보기</button>'}</div></section>`;
   }else if(S.chapter===1){
     h+=`<div class="journal-instructions"><strong>어둠에서 관측하는 법</strong>
-      등불을 끄면 은하수가 드러나요. 실제 관측에서는 눈이 어둠에 익숙해질 시간이 필요해요. 기본 모드에서는 성도의 점선 원이 은하수 관측 지점이에요. 대상을 누르고 ‘이쪽 보기’로 조준해 가운데 원을 채워 보세요. 데네브와 함께 볼 별 하나는 새 기록마다 골라져요.</div>`;
+      등불을 끄면 은하수가 드러나요. 실제 관측에서는 눈이 어둠에 익숙해질 시간이 필요해요. 기본 모드에서는 성도의 점선 원이 은하수 관측 지점이에요. 대상을 누르고 ‘이쪽 보기’로 조준해 가운데 원을 채워 보세요. ${fixedStars?'데네브와 안타레스를 찾아보세요.':'데네브와 함께 볼 별 하나는 새 기록마다 골라져요.'}</div>`;
   }else if(S.chapter===2){
     h+=`<div class="journal-instructions"><strong>세 날짜의 달을 그려 보세요</strong>
       아래 날짜를 골라 성도에서 달을 찾고 ‘이쪽 보기’로 조준해 보세요. 기록한 달의 밝은 면을 일지에서 비교할 수 있어요.</div>`;
   }else if(S.chapter===0){
     h+=`<div class="journal-instructions"><strong>별을 기록하는 법</strong>
-      성도에서 별을 눌러 ‘이쪽 보기’를 선택하거나 하늘을 직접 둘러보세요. 별을 가운데 원에 약 1초 맞추면 일지에 체크돼요. 북극성 외에 함께 볼 별 네 개는 새 기록마다 골라져요.
+      성도에서 별을 눌러 ‘이쪽 보기’를 선택하거나 하늘을 직접 둘러보세요. 별을 가운데 원에 약 1초 맞추면 일지에 체크돼요. ${fixedStars?'북극성, 직녀성, 견우성, 카펠라, 베텔게우스를 찾아보세요.':'북극성 외에 함께 볼 별 네 개는 새 기록마다 골라져요.'}
       ${canStartTutorial()?'<div><button id="journalTutorial" type="button" class="main">북극성 찾기 따라 하기</button></div>':''}</div>`;
   }
   if(S.chapter===2){
