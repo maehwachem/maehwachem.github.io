@@ -118,7 +118,7 @@
       if(data.show_dates!==false && dateKey(item.date))copy.append(postMeta(item,false));
       const links=node('div','kje-project-links');
       (Array.isArray(item.links)?item.links:[]).forEach(link=>{if(link)addLink(links,link.label,link.url);});
-      if(!links.children.length)links.append(node('span','kje-project-status','공개 준비 중'));
+      if(!links.children.length)links.append(node('span','kje-project-status',text(item.status).trim()||'공개 준비 중'));
       copy.append(links);if(hobby)card.append(copy);return card;
   }
   /* Rebuild rich text from an explicit allowlist; no scripts, event handlers, forms or embeds. */

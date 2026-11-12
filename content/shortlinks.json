@@ -114,17 +114,17 @@
     {
       "key": "molarity",
       "label": "몰 농도 슬라이드",
-      "path": "/science-tools/lectures/molarity.html"
+      "path": "/lesson-pause/"
     },
     {
       "key": "molarity-sheet",
       "label": "몰 농도 학습지",
-      "path": "/science-tools/worksheets/molarity.html"
+      "path": "/lesson-pause/"
     },
     {
       "key": "neutral",
       "label": "산·염기 중화 반응 슬라이드",
-      "path": "/science-tools/lectures/neutralization.html"
+      "path": "/lesson-pause/"
     },
     {
       "key": "elnino",
