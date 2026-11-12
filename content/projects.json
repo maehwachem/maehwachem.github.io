@@ -68,12 +68,8 @@
         "cover": "/assets/uploads/cover-series-4-v3.webp",
         "poster": "acid",
         "words": "산·염기\n가상 실험실",
-        "links": [
-          {
-            "label": "실험 열기",
-            "url": "https://maehwachem.github.io/science-tools/acid-base/virtual.html"
-          }
-        ],
+        "links": [],
+        "status": "일시 중단 · 12월 20일 재공개 예정",
         "kind": "lab"
       },
       {
