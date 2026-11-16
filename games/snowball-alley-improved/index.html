@@ -1229,9 +1229,11 @@ function rayT(a, b, types) { // a→b 선분이 장애물에 처음 닿는 비�
   let best = 1;
   const d = new V3().subVectors(b, a);
   for (const o of obstacles) {
-    if (!types.includes(o.type)) continue;
+    if (types && !types.includes(o.type)) continue;
     let t0 = 0, t1 = 1, ok = true;
-    for (const [p, dd, mn, mx] of [[a.x, d.x, o.minX - 0.2, o.maxX + 0.2], [a.y, d.y, -1, o.h + 0.2], [a.z, d.z, o.minZ - 0.2, o.maxZ + 0.2]]) {
+    // The camera can pass above low cover without borrowing the aim ray's clearance.
+    const top = o.h + (!types && o.h <= 1.15 ? 0.06 : 0.2);
+    for (const [p, dd, mn, mx] of [[a.x, d.x, o.minX - 0.2, o.maxX + 0.2], [a.y, d.y, -1, top], [a.z, d.z, o.minZ - 0.2, o.maxZ + 0.2]]) {
       if (Math.abs(dd) < 1e-9) { if (p < mn || p > mx) { ok = false; break; } }
       else { let ta = (mn - p) / dd, tb = (mx - p) / dd; if (ta > tb) [ta, tb] = [tb, ta]; t0 = Math.max(t0, ta); t1 = Math.min(t1, tb); if (t0 > t1) { ok = false; break; } }
     }
@@ -1777,6 +1779,7 @@ const practiceLessons = [
 
 function setPracticeStep(step) {
   practiceStep = step;
+  resetCamera();
   practiceHit = false;
   clearBalls();
   resetTouchInput();
@@ -1797,6 +1800,7 @@ function setPracticeStep(step) {
 }
 
 function resetRound() {
+  resetCamera();
   roundTitles.length = 0;
   clearFootprints();
   resetTouchInput();
@@ -2490,19 +2494,37 @@ function updateBalls(dt) {
 
 // ================= 카메라 · 조준선 =================
 const camPos = new V3(0, 3, 22), camLook = new V3();
+let cameraDistance = null, cameraSide = null, cameraHidesPlayer = false;
+function resetCamera() {
+  cameraDistance = null;
+  cameraSide = null;
+  cameraHidesPlayer = false;
+}
+function extendCamera(current, safe, dt) {
+  return current === null || safe <= current ? safe : safe + (current - safe) * Math.exp(-8 * dt);
+}
 function updateCamera(dt) {
   const ca = P.crouchAmt;
-  const pivot = new V3(P.pos.x, 1.6 - ca * 0.45, P.pos.z);
+  const pivot = new V3(P.pos.x, 1.6 - ca * 0.3, P.pos.z);
   const f = fwd(P.yaw), r = rightV(P.yaw);
   const cp = P.pitch * (isTouch ? 0.4 : 0.5) - 0.1;
   const look = new V3(f.x * Math.cos(cp), Math.sin(cp), f.z * Math.cos(cp));
-  const shoulder = pivot.clone().addScaledVector(r, isTouch ? 0.6 : 0.85);
-  if (rayT(pivot, shoulder, ['bld', 'fence', 'stall', 'play']) < 1) shoulder.copy(pivot);
-  const want = shoulder.clone().addScaledVector(look, -4.4); want.y += 0.7;
-  const t = rayT(shoulder, want, ['bld', 'fence', 'stall', 'play']);
-  if (t < 1) want.lerpVectors(shoulder, want, Math.max(0.12, t - 0.06));
+  const offset = isTouch ? 0.6 : 0.85;
+  const shoulder = pivot.clone().addScaledVector(r, offset);
+  const sideHit = rayT(pivot, shoulder);
+  cameraSide = extendCamera(cameraSide, Math.max(0, offset * sideHit - (sideHit < 1 ? 0.08 : 0)), dt);
+  shoulder.copy(pivot).addScaledVector(r, cameraSide);
+  const want = shoulder.clone().addScaledVector(look, -4.4);
+  want.y += 0.7;
   want.y = Math.max(0.35, want.y);
-  camPos.lerp(want, Math.min(1, dt * 14));
+  const length = shoulder.distanceTo(want);
+  const hit = rayT(shoulder, want);
+  const safeDistance = Math.max(0, length * hit - (hit < 1 ? 0.12 : 0));
+  // Follow the current angle directly. Only the return to full distance eases out.
+  cameraDistance = extendCamera(cameraDistance, safeDistance, dt);
+  camPos.lerpVectors(shoulder, want, cameraDistance / length);
+  const distanceBehind = (camPos.x - pivot.x) * -f.x + (camPos.z - pivot.z) * -f.z;
+  cameraHidesPlayer = distanceBehind < (cameraHidesPlayer ? 2.25 : 1.9);
   camera.position.copy(camPos);
   if (shake > 0) { shake -= dt; camera.position.x += rand(-1, 1) * shake * 0.3; camera.position.y += rand(-1, 1) * shake * 0.3; }
   camLook.copy(camPos).addScaledVector(look, 10);
@@ -2621,7 +2643,10 @@ function frame(now) {
     if (practiceStep === null) updateFighter(C, dt);
     updateCamera(dt);
   }
+  const playerVisible = P.m.root.visible;
+  if (state !== 'menu' && cameraHidesPlayer) P.m.root.visible = false;
   renderer.render(scene, camera);
+  P.m.root.visible = playerVisible;
 }
 addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
 document.addEventListener('visibilitychange', () => {
@@ -2903,7 +2928,6 @@ function beginTeamClient(session,data,local) {
   session.round=data.round;session.soundShot=local.shot;session.hit=local.hit;session.hudKey='';session.sendFire=false;
   P.pos.set(local.x,0,local.z);P.prev.copy(P.pos);P.yaw=local.yaw;P.pitch=local.pitch;
   P.m.jacket.color.setHex(teamColors[local.side]);
-  camPos.set(local.x,2.5,local.z+(local.side==='blue'?3:-3));
   C.m.root.visible=false;
   const duel=data.mode==='duel';
   showGuardTargets(!duel);
