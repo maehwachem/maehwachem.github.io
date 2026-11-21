@@ -353,6 +353,24 @@
     ],
     "tool": [
       {
+        "title": "피코 작업실",
+        "subject": "tools",
+        "date": "2026-11-21",
+        "desc": "피코를 USB로 연결해 부품별 배선과 MicroPython 코드를 확인하고 실행합니다. LED·버튼·온습도 등 6가지 예제, 측정 그래프·CSV 저장과 체험 모드를 제공합니다. 실제 보드 연결 확인 전의 시험판입니다.",
+        "tag": "피코 · 코딩·센서 측정 · 시험판",
+        "level": "USB 연결: PC Chrome·Edge",
+        "cover": "/assets/covers/cover-pico-workshop.svg",
+        "poster": "sensor",
+        "words": "피코\n작업실",
+        "links": [
+          {
+            "label": "작업실 열기",
+            "url": "/pico-workshop/"
+          }
+        ],
+        "kind": "tool"
+      },
+      {
         "title": "콩 OMR",
         "subject": "tools",
         "date": "2026-11-03",
