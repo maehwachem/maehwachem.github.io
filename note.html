@@ -174,7 +174,7 @@ textarea.dialog-input{min-height:130px;resize:vertical;line-height:1.5}
 .file-progress-label{color:var(--muted);font-size:13px;min-height:20px;margin:9px 0 0}
 @media(max-width:680px){#mediaToggle,#exportToggle{white-space:nowrap}}
 @media(max-width:860px){.app{grid-template-columns:219px minmax(0,1fr)}.sidebar{padding-inline:13px}.top-bar{padding-inline:16px}.doc-head{padding-inline:19px}.title-input{width:min(63vw,650px)}}
-@media(max-width:680px){.app{display:flex}.main{width:100%}.sidebar{position:fixed;z-index:14;inset:0 auto 0 0;width:min(82vw,284px);transform:translateX(-105%);transition:transform .18s ease}.app.open .sidebar{transform:translateX(0)}.app.open .shade{display:block;position:fixed;inset:0;background:#27203866;z-index:13}.mobile-menu{display:inline-flex}.top-bar{height:51px;padding-inline:8px}.breadcrumb,.top-actions{gap:5px}.breadcrumb>span,.breadcrumb>#chev{display:none}.top-actions .secondary{padding:0 7px}.save-state{font-size:10px}.doc-head{height:78px;padding-inline:12px}.title-input{width:70vw}.bar-zone{padding:8px 3px 3px}.toolbar{gap:2px;padding:3px;justify-content:center;flex-wrap:wrap}.tool{width:32px;height:34px}.tool-divider{margin:0 2px}.tool-group.colors{gap:0;padding:0 1px}.swatch{width:22px;height:30px}.tool-select{max-width:61px}.paper-deck{padding:11px 8px 22px}.bottom-bar{padding-inline:6px;gap:4px}.page-actions,.zoom-actions{gap:0}.page-add{margin-left:4px}.page-counter{min-width:48px}.zoom-value{min-width:35px}.paper-select{max-width:80px}.bottom-bar .icon-button{width:27px}.bottom-bar .secondary{font-size:11px;padding-inline:5px}}
+@media(max-width:680px){.app{display:flex}.main{width:100%}.sidebar{position:fixed;z-index:14;inset:0 auto 0 0;width:min(82vw,284px);transform:translateX(-105%);transition:transform .18s ease}.app.open .sidebar{transform:translateX(0)}.app.open .shade{display:block;position:fixed;inset:0;background:#27203866;z-index:13}.mobile-menu{display:inline-flex}.top-bar{height:51px;padding-inline:8px}.breadcrumb,.top-actions{gap:5px}.breadcrumb>span,.breadcrumb>#chev{display:none}.top-actions .secondary{padding:0 7px}.save-state{font-size:12px}.doc-head{height:78px;padding-inline:12px}.title-input{width:70vw}.bar-zone{padding:8px 3px 3px}.toolbar{gap:2px;padding:3px;justify-content:center;flex-wrap:wrap}.tool{width:32px;height:34px}.tool-divider{margin:0 2px}.tool-group.colors{gap:0;padding:0 1px}.swatch{width:24px;height:30px}.tool-select{max-width:61px}.paper-deck{padding:11px 8px 22px}.bottom-bar{padding-inline:6px;gap:4px}.page-actions,.zoom-actions{gap:0}.page-add{margin-left:4px}.page-counter{min-width:48px}.zoom-value{min-width:35px}.paper-select{max-width:80px}.bottom-bar .icon-button{width:27px}.bottom-bar .secondary{font-size:11px;padding-inline:5px}}
 @container(max-width:645px){
   .toolbar{display:grid;grid-template-columns:auto auto auto;column-gap:8px;row-gap:3px}
   .toolbar .tool-divider{display:none}
@@ -185,7 +185,7 @@ textarea.dialog-input{min-height:130px;resize:vertical;line-height:1.5}
   .toolbar>label{grid-column:3;grid-row:2;justify-self:end}
   .toolbar .swatch{height:28px}
 }
-@media(max-width:375px){.save-state span{display:none}.save-state.error span{display:inline}.bottom-bar .secondary{gap:2px}.page-add svg{width:13px}.tool-group.colors .swatch{width:20px}}
+@media(max-width:375px){.save-state span{display:none}.save-state.error span{display:inline}.bottom-bar .secondary{gap:2px}.page-add svg{width:13px}.tool-group.colors .swatch{width:24px}}
 @media(prefers-reduced-motion:reduce){.sidebar{transition:none}}
 @page{size:A4 portrait;margin:8mm}
 @media print{body{height:auto;overflow:visible;background:white}.app,.toast,dialog{display:none!important}.print-page{display:block;width:194mm;height:auto;margin:0;break-inside:avoid}}
@@ -251,7 +251,7 @@ textarea.dialog-input{min-height:130px;resize:vertical;line-height:1.5}
     </section>
     <section class="workspace" aria-label="필기 공간">
       <div class="bar-zone">
-        <div class="toolbar" aria-label="필기 도구">
+        <div class="toolbar" role="toolbar" aria-label="필기 도구">
           <div class="tool-group" id="tools">
             <button class="tool" data-tool="select" data-icon="hand" aria-label="선택·이동" title="선택·이동"></button>
             <button class="tool" data-tool="pen" data-icon="pen" aria-label="펜" title="펜"></button>
@@ -260,7 +260,7 @@ textarea.dialog-input{min-height:130px;resize:vertical;line-height:1.5}
             <button class="tool" data-tool="text" data-icon="text" aria-label="텍스트" title="텍스트"></button>
             <button class="tool" data-tool="lasso" data-icon="lasso" aria-label="올가미" title="올가미"></button>
           </div>
-          <button class="tool finger-mode" id="fingerMode" aria-pressed="false" title="손가락으로 쓰기"><span data-icon="finger"></span>손가락</button>
+          <button class="tool finger-mode" id="fingerMode" aria-pressed="false" title="손가락 필기 켜기"><span data-icon="finger"></span><span id="fingerModeLabel">손가락 꺼짐</span></button>
           <span class="tool-divider" aria-hidden="true"></span>
           <div class="tool-group colors" id="colors"></div>
           <label><select class="tool-select" id="size" aria-label="펜 굵기"><option value="3">가는 선</option><option value="5">중간 선</option><option value="9">굵은 선</option></select></label>
@@ -423,7 +423,7 @@ function initialState() {
     { tool: 'pen', color: '#5143a4', size: 3, points: [[558,154],[570,161],[590,164],[616,161],[635,150]] },
     { tool: 'pen', color: '#5143a4', size: 3, points: [[619,149],[635,150],[633,165]] }
   ];
-  return { active: note.id, inputMode: 'auto', notes: [note] };
+  return { active: note.id, inputMode: 'pen', notes: [note] };
 }
 function validDate(value) { return Number.isFinite(value) && value >= 0 && value < 8.64e15; }
 async function media() {
@@ -536,15 +536,15 @@ function saveStatus(label, error = false) {
 }
 function persist() {
   clearTimeout(saveTimer);
-  if (!dirty) return;
+  if (!dirty) return true;
   if (protectedStorage) {
     saveStatus('저장 불가 · 백업 필요', true);
-    return;
+    return false;
   }
   try {
     if (localStorage.getItem(key) !== lastStored) {
       saveStatus('다른 탭에서 변경됨 · 백업 필요', true);
-      return;
+      return false;
     }
     const next = JSON.stringify(state);
     localStorage.setItem(key, next);
@@ -552,8 +552,10 @@ function persist() {
     dirty = false;
     saveStatus('저장됨');
     if (orphanedAssets.size) clearOrphanedAssets();
+    return true;
   } catch {
     saveStatus('저장 불가 · 백업 필요', true);
+    return false;
   }
 }
 function queueSave() {
@@ -821,16 +823,19 @@ function penOnly() {
 }
 function setInputMode() {
   $('penModeLabel').textContent = penOnly() ? '펜 전용 모드 끄기' : '펜 전용 모드 켜기';
-  $('fingerMode').setAttribute('aria-pressed', state.inputMode === 'touch');
+  const finger = !penOnly();
+  $('fingerMode').setAttribute('aria-pressed', finger);
+  $('fingerMode').title = finger ? '손가락 필기 끄기' : '손가락 필기 켜기';
+  $('fingerModeLabel').textContent = finger ? '손가락 켜짐' : '손가락 꺼짐';
 }
 $('fingerMode').onclick = () => {
+  const finger = penOnly();
   setTool('pen');
-  ignoreTouchUntil = 0;
-  toast('손가락으로 종이에 쓸 수 있어요.');
-  if (state.inputMode === 'touch') return;
-  state.inputMode = 'touch';
+  if (finger) ignoreTouchUntil = 0;
+  state.inputMode = finger ? 'touch' : 'pen';
   setInputMode();
   queueSave();
+  toast(finger ? '손가락으로 종이에 쓸 수 있어요.' : '손가락은 이동·확대에만 사용해요.');
 };
 function setZoom() {
   const padding = matchMedia('(max-width: 680px)').matches ? 18 : 46;
@@ -1204,7 +1209,7 @@ function moveViewport(before, after) {
 }
 function startTouch(event) {
   if (active?.source === 'pen' || lasso?.source === 'pen' || performance.now() < ignoreTouchUntil ||
-      (Math.max(event.width, event.height) >= 44 && Math.min(event.width, event.height) >= 28) ||
+      (state.inputMode !== 'touch' && Math.max(event.width, event.height) >= 44 && Math.min(event.width, event.height) >= 28) ||
       event.target.closest('.annotation, .annotation-tools')) return;
   if (touches.size >= 2) return;
   event.preventDefault();
@@ -1658,10 +1663,39 @@ $('fileWork').addEventListener('cancel', (event) => {
   event.preventDefault();
   if (!$('cancelFileWork').disabled) fileJob?.abort();
 });
-async function commitAssets(entries, signal) {
+function importSaveError() {
+  return Error($('saveLabel').textContent.startsWith('다른 탭')
+    ? '다른 탭에서 노트가 바뀌었어요. 기존 노트를 백업한 뒤 새로고침해 주세요.'
+    : '노트 정보를 저장하지 못했어요. 기존 노트를 백업하고 브라우저 저장 공간을 확인해 주세요.');
+}
+async function commitImport(entries, apply, signal) {
   checkFileCancellation(signal);
+  // Save existing edits first; failed imports must not discard them.
+  dirty = true;
+  if (!persist()) throw importSaveError();
+  const before = JSON.stringify(state);
   $('cancelFileWork').disabled = true;
-  await (await media()).updateAssets({ entries });
+  const assets = entries.length ? await media() : null;
+  if (assets) await assets.updateAssets({ entries });
+  try {
+    const note = apply();
+    state.active = note.id;
+    dirty = true;
+    if (!persist()) throw importSaveError();
+    return note;
+  } catch (error) {
+    clearTimeout(saveTimer);
+    state = parseState(before);
+    dirty = true;
+    renderNote();
+    if (assets) {
+      try { await assets.updateAssets({ remove: entries.map(([key]) => key) }); }
+      catch (cause) {
+        throw new Error(error.message + ' 추가한 임시 자료 일부를 정리하지 못했어요.', { cause });
+      }
+    }
+    throw error;
+  }
 }
 function makeMediaPage(kind, name) {
   return { ...makePage('plain'), background: { id: id(), kind, name: name.slice(0, 200) } };
@@ -1670,7 +1704,6 @@ function openImportedNote(note) {
   state.active = note.id;
   if (filter !== 'all') filter = note.folder;
   $('search').value = '';
-  queueSave();
   renderNote();
 }
 $('pdfFile').addEventListener('change', async (event) => {
@@ -1685,10 +1718,12 @@ $('pdfFile').addEventListener('change', async (event) => {
     const assets = await (await media()).pdfRasters(file, width, height, progress, signal);
     const note = makeNote(folder, file.name.replace(/\.pdf$/i, '').slice(0, 100));
     const pages = assets.map((_, index) => makeMediaPage('pdf', `${file.name.slice(0, 175)} · ${index + 1}쪽`));
-    await commitAssets(pages.map((page, index) => [page.background.id, assets[index]]), signal);
     note.pages = pages;
     note.active = pages[0].id;
-    state.notes.push(note);
+    await commitImport(pages.map((page, index) => [page.background.id, assets[index]]), () => {
+      state.notes.push(note);
+      return note;
+    }, signal);
     openImportedNote(note);
     return pages.length;
   }, 'PDF를 가져오지 못했어요.');
@@ -1718,11 +1753,13 @@ $('photoFiles').addEventListener('change', async (event) => {
     }
     const note = state.notes.find((entry) => entry.id === noteId);
     if (!note) throw Error('사진을 넣을 노트를 찾을 수 없어요.');
-    await commitAssets(entries, signal);
-    const position = note.pages.findIndex((page) => page.id === pageId);
-    note.pages.splice(position < 0 ? note.pages.length : position + 1, 0, ...pages);
-    note.active = pages[0].id;
-    note.updated = Date.now();
+    await commitImport(entries, () => {
+      const position = note.pages.findIndex((page) => page.id === pageId);
+      note.pages.splice(position < 0 ? note.pages.length : position + 1, 0, ...pages);
+      note.active = pages[0].id;
+      note.updated = Date.now();
+      return note;
+    }, signal);
     openImportedNote(note);
     return pages.length;
   }, '사진을 넣지 못했어요.');
@@ -1750,6 +1787,106 @@ function fromDataUrl(value) {
   const prefix = 'data:image/jpeg;base64,';
   if (typeof value !== 'string' || !value.startsWith(prefix)) throw Error('백업의 페이지 자료를 읽을 수 없어요.');
   return new Blob([Uint8Array.from(atob(value.slice(prefix.length)), (byte) => byte.charCodeAt(0))], { type: 'image/jpeg' });
+}
+function restoredContent(note, title = note.title) {
+  const pages = note.pages.map((page) => ({
+    type: page.type, strokes: page.strokes,
+    texts: page.texts.map(({ id, ...item }) => item),
+    background: page.background ? { kind: page.background.kind, name: page.background.name } : null
+  }));
+  // Navigation and regenerated IDs are not edits; image bytes are checked separately.
+  return JSON.stringify({ title, folder: note.folder, created: note.created, updated: note.updated, pages },
+    (_, value) => value && typeof value === 'object' && !Array.isArray(value)
+      ? Object.fromEntries(Object.keys(value).sort().map((key) => [key, value[key]])) : value);
+}
+async function equalAssetBytes(first, second) {
+  if (first.size !== second.size) return false;
+  const [a, b] = await Promise.all([first.arrayBuffer(), second.arrayBuffer()]);
+  const bytes = new Uint8Array(b);
+  return new Uint8Array(a).every((value, index) => value === bytes[index]);
+}
+async function planBackupRestore(notes, assets, existing, progress, signal) {
+  const sourceBlobs = new Map();
+  const storedBlobs = new Map();
+  const entries = new Map();
+  const imported = [];
+  const repaired = new Map();
+  const existingIds = new Set(existing.flatMap((note) => [note.id,
+    ...note.pages.flatMap((page) => [page.id, ...page.texts.map((item) => item.id)])]));
+  const sourceBlob = async (key) => {
+    if (!sourceBlobs.has(key)) {
+      const body = fromDataUrl(assets.get(key));
+      const head = new Uint8Array(await body.slice(0, 3).arrayBuffer());
+      if (head[0] !== 255 || head[1] !== 216 || head[2] !== 255) throw Error('백업의 페이지 자료가 손상됐어요.');
+      sourceBlobs.set(key, body);
+    }
+    return sourceBlobs.get(key);
+  };
+  const storedBlob = (key) => {
+    if (!storedBlobs.has(key)) {
+      storedBlobs.set(key, media().then((store) => store.assetBlob(key)).catch((error) => {
+        if (error.message === '이 페이지의 원본 자료를 찾을 수 없어요.') return null;
+        throw error;
+      }));
+    }
+    return storedBlobs.get(key);
+  };
+  const newAsset = async (key) => {
+    if (!entries.has(key)) entries.set(key, [id(), await sourceBlob(key)]);
+    return entries.get(key)[0];
+  };
+  for (const [index, source] of notes.entries()) {
+    checkFileCancellation(signal);
+    const content = restoredContent(source);
+    const copyTitle = (titleOf(source) + ' (가져옴)').slice(0, 100);
+    let match;
+    for (const candidate of existing) {
+      if (candidate.id !== source.id && candidate.restoredFrom !== source.id) continue;
+      const title = candidate.id !== source.id && candidate.title === copyTitle ? source.title : candidate.title;
+      if (restoredContent(candidate, title) !== content) continue;
+      const missing = [];
+      let identical = true;
+      for (const [pageIndex, page] of source.pages.entries()) {
+        if (!page.background) continue;
+        checkFileCancellation(signal);
+        const current = await storedBlob(candidate.pages[pageIndex].background.id);
+        const incoming = await sourceBlob(page.background.id);
+        if (!current) missing.push(pageIndex);
+        else if (!await equalAssetBytes(current, incoming)) { identical = false; break; }
+      }
+      if (identical) { match = { note: candidate, missing }; break; }
+    }
+    if (match) {
+      if (match.missing.length) {
+        const note = JSON.parse(JSON.stringify(match.note));
+        for (const pageIndex of match.missing) {
+          note.pages[pageIndex].background.id = await newAsset(source.pages[pageIndex].background.id);
+        }
+        repaired.set(note.id, note);
+      }
+    } else {
+      const note = JSON.parse(JSON.stringify(source));
+      const noteIds = [note.id, ...note.pages.flatMap((page) => [page.id, ...page.texts.map((item) => item.id)])];
+      if (noteIds.some((value) => existingIds.has(value))) {
+        note.restoredFrom = source.id;
+        note.id = id();
+        note.title = copyTitle;
+        for (const page of note.pages) {
+          const old = page.id;
+          page.id = id();
+          if (old === note.active) note.active = page.id;
+          for (const item of page.texts) item.id = id();
+        }
+      }
+      for (const page of note.pages) {
+        if (page.background) page.background.id = await newAsset(page.background.id);
+      }
+      for (const value of [note.id, ...note.pages.flatMap((page) => [page.id, ...page.texts.map((item) => item.id)])]) existingIds.add(value);
+      imported.push(note);
+    }
+    progress(index + 1, notes.length, '개');
+  }
+  return { imported, repaired, entries: [...entries.values()] };
 }
 async function exportBackup() {
   const blob = await runFileWork('전체 노트 백업 중', async (progress, signal) => {
@@ -1796,50 +1933,18 @@ $('backupFile').addEventListener('change', async (event) => {
       }
     }
     if ([...expected].some((key) => !assets.has(key))) throw Error('백업에 페이지 자료가 빠져 있어요.');
-    const existingIds = new Set(state.notes.flatMap((note) => [note.id, ...note.pages.flatMap((page) => [page.id, ...page.texts.map((item) => item.id)])]));
-    const imported = [];
-    for (const note of backup.notes) {
-      const found = state.notes.find((candidate) => candidate.id === note.id);
-      if (found && JSON.stringify(found) === JSON.stringify(note)) {
-        const keys = [...assetKeys([note])];
-        const loads = await Promise.allSettled(keys.map(async (key) => (await media()).assetBlob(key)));
-        if (loads.every((load) => load.status === 'fulfilled')) continue;
-      }
-      const noteIds = [note.id, ...note.pages.flatMap((page) => [page.id, ...page.texts.map((item) => item.id)])];
-      if (noteIds.some((value) => existingIds.has(value))) {
-        note.id = id();
-        note.title = (titleOf(note) + ' (가져옴)').slice(0, 100);
-        for (const page of note.pages) {
-          const old = page.id;
-          page.id = id();
-          if (old === note.active) note.active = page.id;
-          for (const item of page.texts) item.id = id();
-        }
-      }
-      imported.push(note);
-    }
-    if (!imported.length) return 0;
-    if (state.notes.length + imported.length > 1000) throw Error('노트는 1000개까지 보관할 수 있어요.');
-    const imports = new Map();
-    const keys = [...assetKeys(imported)];
-    for (const [index, key] of keys.entries()) {
-      checkFileCancellation(signal);
-      progress(index, keys.length, '개');
-      const body = fromDataUrl(assets.get(key));
-      const signature = new Uint8Array(await body.slice(0, 3).arrayBuffer());
-      if (signature[0] !== 255 || signature[1] !== 216 || signature[2] !== 255) throw Error('백업의 페이지 자료가 손상됐어요.');
-      imports.set(key, [id(), body]);
-    }
-    for (const note of imported) {
-      for (const page of note.pages) {
-        if (page.background) page.background.id = imports.get(page.background.id)[0];
-      }
-    }
-    await commitAssets([...imports.values()], signal);
-    state.notes.push(...imported);
+    const plan = await planBackupRestore(backup.notes, assets, state.notes, progress, signal);
+    const count = plan.imported.length + plan.repaired.size;
+    if (!count) return 0;
+    if (state.notes.length + plan.imported.length > 1000) throw Error('노트는 1000개까지 보관할 수 있어요.');
+    const note = await commitImport(plan.entries, () => {
+      state.notes = state.notes.map((note) => plan.repaired.get(note.id) ?? note);
+      state.notes.push(...plan.imported);
+      return plan.imported[0] ?? plan.repaired.values().next().value;
+    }, signal);
     filter = 'all';
-    openImportedNote(imported[0]);
-    return imported.length;
+    openImportedNote(note);
+    return count;
   }, '백업을 가져오지 못했어요.');
   if (count === 0) toast('같은 노트가 이미 있어요.');
   else if (count) toast(`노트 ${count}개를 가져왔어요.`);
@@ -2034,3 +2139,4 @@ else queueSave();
 </script>
 </body>
 </html>
+
