@@ -1055,66 +1055,6 @@ DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
 OTHER DEALINGS IN THE FONT SOFTWARE.
 </script>
-<style>
-#nightWalk{padding:0;width:min(1120px,calc(100vw - 20px));max-width:none;max-height:96dvh;border:1px solid #a9a48580;border-radius:20px;color:#e7ecdd;background:#112423;box-shadow:0 24px 100px #000a;font-family:var(--sans)}
-#nightWalk::backdrop{background:#030b13d9;backdrop-filter:blur(7px)}
-.walk-head{position:sticky;top:0;z-index:5;padding:17px 22px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid #b7d4ac26;background:#112423}
-.walk-head h2{margin:3px 0 0;font:700 clamp(22px,3vw,32px)/1.2 var(--serif);color:#f2e2b9}
-.walk-kicker{margin:0;color:#a5c3aa;font-size:11px;letter-spacing:.13em}
-.walk-head button{border-color:#8caa9d70;background:#203a37}
-.walk-chapters{display:flex;gap:6px;padding:9px 17px;overflow-x:auto;border-bottom:1px solid #b7d4ac26;background:#102724}
-.walk-chapters button{flex-shrink:0;min-height:36px;background:transparent;font-size:12px;border-color:#78948345;color:#bfcfb9}
-.walk-chapters button[aria-current=page]{color:#203c32;background:#d6c68d;border-color:#d6c68d}
-.walk-chapters button:disabled{opacity:.45;cursor:default}
-.walk-layout{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(260px,1fr)}
-.walk-world{position:relative;isolation:isolate;min-width:0;background:#11292d;overflow:hidden}
-.walk-scene{position:relative;aspect-ratio:800/465;width:100%;overflow:hidden}
-.walk-scene>svg:first-child{display:block;width:100%;height:100%}
-.walk-map-note{position:absolute;top:11px;left:14px;color:#c4d8d4;font-size:11px;pointer-events:none}
-.walk-location{position:absolute;transform:translate(-50%,-50%);min-height:40px;padding:6px 10px;background:#132c30ec;border:1px solid #d6c59a85;color:#f9eac2;border-radius:13px;font-size:12px;box-shadow:0 3px 15px #0004}
-.walk-location:hover,.walk-location[aria-current=true]{background:#e5c989;color:#253c36;border-color:#ffedbb}
-.walk-location::before{content:'✧';margin-right:5px;color:#e9cf91}
-#walkAvatar{position:absolute;width:35px;height:53px;pointer-events:none;transform:translate(-50%,-100%);filter:drop-shadow(0 4px 3px #0006);z-index:2}
-.walk-scene .walk-avatar-shadow{fill:#071b2890}
-.walk-route{fill:none;stroke:#bfac7c;stroke-width:23;stroke-linecap:round;opacity:.4}
-.walk-route-edge{fill:none;stroke:#253c3a;stroke-width:30;stroke-linecap:round}
-.walk-tiny-star{animation:walkTwinkle 4s ease-in-out infinite alternate}
-.walk-water{animation:walkWater 6s ease-in-out infinite alternate;transform-origin:center}
-.walk-scene .walk-glow{animation:walkTwinkle 3s ease-in-out infinite alternate}
-.walk-scene .walk-firefly{animation:walkFirefly 5s ease-in-out infinite alternate}
-.walk-mission{padding:15px 20px 18px;background:#173330;border-top:1px solid #c1d4ad24;min-height:112px}
-.walk-mission small{font-size:11px;color:#abc2ac}
-.walk-mission p{margin:7px 0;font-size:14px;line-height:1.5;color:#eee4cd}
-.walk-progress{height:5px;background:#40534b;border-radius:9px;overflow:hidden;max-width:340px}
-.walk-progress span{display:block;height:100%;background:#d4c789;border-radius:9px;transition:width .4s}
-.walk-panel{padding:20px;min-height:360px;background:linear-gradient(150deg,#213b33,#152b2a);border-left:1px solid #d5d3ad25}
-.walk-panel h3{margin:4px 0 10px;color:#f3ddb4;font:700 23px/1.35 var(--serif)}
-.walk-panel p{font-size:14px;line-height:1.75;color:#d9dfd0;margin:9px 0}
-.walk-panel .walk-quote{border-left:2px solid #c6ad72;padding-left:12px;color:#f0e4c8}
-.walk-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
-.walk-actions button{background:#2b4e43;border-color:#8aa0837a;color:#f1e5c9;min-height:43px}
-.walk-actions button.main{background:#e6ce94;color:#203930;border-color:#e6ce94}
-.walk-actions button[aria-pressed=true]{border-color:#f6d99c;background:#5d6550}
-.walk-saved{display:block;color:#9fb6a1;font-size:11px;margin-top:12px}
-.walk-badge{display:inline-block;padding:4px 8px;border:1px solid #c6b67a65;border-radius:14px;color:#e3d09a;font-size:11px;margin-bottom:5px}
-.walk-focus{width:100%;max-width:280px;display:block;margin:14px auto;background:#081520;border:1px solid #9cbaa548;border-radius:14px}
-.walk-range{width:100%;accent-color:#e2c689;min-height:42px;cursor:ew-resize}
-.walk-panel label{font-size:13px;color:#e6d9b9}
-.walk-focus-note{min-height:28px;color:#f0d7a0!important}
-.walk-reward{display:flex;gap:12px;align-items:center;padding:12px;border-radius:12px;border:1px solid #cab37769;background:#d1bd7420;margin-top:12px}
-.walk-reward svg{width:44px;height:44px;flex-shrink:0}
-.walk-reward b{display:block;font-size:14px;color:#efd7a0}
-.walk-reward small{display:block;font-size:11px;line-height:1.6;color:#c9d7bb;margin-top:4px}
-#walkBtn{border-color:#c7ad7290;color:#f0d595}
-#coverWalk{display:block;width:100%;margin-top:7px;background:#253e37;border-color:#c9ad7280;color:#f3deb0}
-@keyframes walkTwinkle{from{opacity:.45}to{opacity:1}}
-@keyframes walkWater{from{opacity:.25;transform:translateX(-4px)}to{opacity:.6;transform:translateX(4px)}}
-@keyframes walkFirefly{from{opacity:.1;transform:translateY(5px)}to{opacity:.8;transform:translateY(-7px)}}
-@media(max-width:700px){.walk-head{padding:13px 15px}.walk-layout{grid-template-columns:1fr}.walk-panel{border-left:0;border-top:1px solid #d5d3ad25;padding:17px;min-height:280px}.walk-location{padding:5px 8px;font-size:11px;min-height:36px}.walk-mission{padding:12px 15px;min-height:100px}.walk-map-note{top:9px;font-size:10px}#walkAvatar{width:29px;height:44px}.walk-panel h3{font-size:21px}}
-@media(orientation:landscape) and (max-height:500px){#nightWalk{width:calc(100vw - 16px)}.walk-layout{grid-template-columns:minmax(0,1.3fr) minmax(220px,1fr)}.walk-panel{min-height:0;border-left:1px solid #d5d3ad25;border-top:0}.walk-head{padding:9px 15px}.walk-head h2{font-size:22px}}
-@media(prefers-reduced-motion:reduce){.walk-tiny-star,.walk-water,.walk-glow,.walk-firefly{animation:none}.walk-progress span{transition:none}}
-
-</style>
 </head>
 <body>
 <canvas id="sky" aria-label="관측하는 밤하늘"></canvas>
@@ -1173,18 +1113,11 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <button id="lampBtn" type="button" aria-pressed="true" hidden>등불 끄기</button>
         <button id="trailBtn" type="button" hidden>고정 관측</button>
         <button id="meteorBtn" type="button" hidden>유성 촬영</button>
-        <button id="walkBtn" type="button" aria-haspopup="dialog">별빛 산책</button>
         <button id="jBtn" class="main" type="button">일지</button>
       </div>
     </div>
   </div>
 </div>
-
-<dialog id="nightWalk" aria-labelledby="walkTitle">
-  <header class="walk-head"><div><p class="walk-kicker">별빛 산책 · 할아버지와 나</p><h2 id="walkTitle"></h2></div><button type="button" id="walkClose" autofocus>밤하늘로</button></header>
-  <nav id="walkChapters" class="walk-chapters" aria-label="산책할 장소"></nav>
-  <div class="walk-layout"><div class="walk-world"><div class="walk-scene" id="walkScene" role="group" aria-label="목적지를 누르면 손주가 걸어가는 산책 지도"></div><div class="walk-mission" id="walkMission"></div></div><section class="walk-panel" id="walkPanel" aria-live="polite" aria-atomic="false"></section></div>
-</dialog>
 
 <form id="datePanel" hidden>
   <div id="moonDatePanel" hidden></div>
@@ -1230,7 +1163,6 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <button id="pickExpert" aria-pressed="false">상급 모드</button>
       </div>
       <div id="modeNote">별자리선과 이름표를 보며 관측해요.</div>
-      <button id="coverWalk" type="button" aria-haspopup="dialog">할아버지와 산책하기</button>
       <button class="main" id="startBtn">일지 펼치기</button>
       <p class="credit">별과 별자리 자료 d3-celestial · 천체 위치 계산 Astronomy Engine</p>
     </div>
@@ -1609,11 +1541,10 @@ const STORE=fixedStars?'gstarjournal-fixed-v1':'gstarjournal-v1';
 if(fixedStars)document.title='할아버지의 별 일지 · 수업용 고정 별';
 function load(){try{const d=JSON.parse(localStorage.getItem(STORE)||'{}');S.found=d.found&&typeof d.found==='object'&&!Array.isArray(d.found)?d.found:{};S.chapter=Number.isInteger(d.chapter)?d.chapter:0;S.moonNotes=d.moonNotes&&typeof d.moonNotes==='object'&&!Array.isArray(d.moonNotes)?d.moonNotes:{};S.lamp=d.lamp!==false;
   S.starTargets=Array.isArray(d.starTargets)?d.starTargets:[];
-  if(d.walk&&typeof d.walk==='object'&&!Array.isArray(d.walk))S.walk=d.walk;
   S.trailMode=d.trailMode==='simple'?'simple':'photo';
   S.trailPhotos=Array.isArray(d.trailPhotos)?[0,1,2].filter(i=>d.trailPhotos.includes(i)):[];
   S.trailPhotoSolved=S.trailPhotos.length===3&&d.trailPhotoSolved===true;if(d.view==='look'||d.view==='map')S.view=d.view;S.lines=d.lines!==false;if(d.mode==='expert')S.mode=d.mode;}catch(e){}}
-function save(){try{localStorage.setItem(STORE,JSON.stringify({found:S.found,walk:S.walk,starTargets:S.starTargets,moonNotes:S.moonNotes,trailMode:S.trailMode,trailPhotos:S.trailPhotos,trailPhotoSolved:S.trailPhotoSolved,view:S.view,lines:S.lines,mode:S.mode,chapter:S.chapter,lamp:S.lamp}));}catch(e){}}
+function save(){try{localStorage.setItem(STORE,JSON.stringify({found:S.found,starTargets:S.starTargets,moonNotes:S.moonNotes,trailMode:S.trailMode,trailPhotos:S.trailPhotos,trailPhotoSolved:S.trailPhotoSolved,view:S.view,lines:S.lines,mode:S.mode,chapter:S.chapter,lamp:S.lamp}));}catch(e){}}
 load();
 
 /* ---------- astronomy per frame ---------- */
@@ -3099,7 +3030,7 @@ function renderJournal(revealNext=false){
       return;
     }
     clearTimeout(endingTimer);
-    S.found={};S.walk={version:1,places:[]};S.starTargets=[];S.moonNotes={};S.trailPhotos=[];S.trailPhotoSolved=false;photoShots.clear();S.lamp=true;
+    S.found={};S.starTargets=[];S.moonNotes={};S.trailPhotos=[];S.trailPhotoSolved=false;photoShots.clear();S.lamp=true;
     prepareStarTargets();setChapter(0);openJournal();
   };
 }
@@ -3129,7 +3060,7 @@ guideNext.onclick=()=>{
 let started=false, aimObj=null, aimStart=0;
 const prog=document.getElementById('prog');
 function checkReticle(){
-  if(!started||nightWalk.open||journalEl.classList.contains('open')||!datePanel.hidden){
+  if(!started||journalEl.classList.contains('open')||!datePanel.hidden){
     aimObj=null;
     prog.setAttribute('stroke-dasharray','0 200');
     return;
@@ -3426,7 +3357,7 @@ function tap(x,y){if(!datePanel.hidden)return;const best=objectNear(x,y,28);
   if(tutorialActive)updateGuide();
 }
 addEventListener('keydown',e=>{
-  if(nightWalk.open||memoryReader.open||trailCamera.open||meteorDialog.open||grandpaReader.open||finale.open)return;
+  if(memoryReader.open||trailCamera.open||meteorDialog.open||grandpaReader.open||finale.open)return;
   if(e.key==='Escape'){
     if(journalEl.classList.contains('open'))closeJournal();
     else if(!datePanel.hidden){setDatePanel(false);dateBtn.focus();}
@@ -3457,212 +3388,12 @@ document.getElementById('startBtn').onclick=()=>{
   else{setView(S.view);openJournal();}
 };
 
-/* A small walk between observations. The sky uses its own astronomy and clock. */
-const nightWalk=document.getElementById('nightWalk');
-const walkScene=document.getElementById('walkScene');
-const walkPanel=document.getElementById('walkPanel');
-const WALK_PLACES=[
-  {name:'옥상의 작은 약속',weather:'담장 너머로 저녁밥 냄새가 나요.',roof:true,ground:'#4b625d',trim:'#344c49',sky:'#183448',gift:'chair',task:'polaris',focus:61,
-    hello:'의자 하나는 네 자리로 두었단다. 오늘은 네가 먼저 하늘을 골라 보렴.',sound:'아래층에서 그릇 놓는 소리가 났다. 난간 곁 화분의 잎이 바람에 한 번 흔들렸다.'},
-  {name:'풀벌레가 우는 마당',weather:'처마 아래에서 바람이 쉬어 가요.',ground:'#344e38',trim:'#203d32',sky:'#142f40',gift:'chime',task:'rural_deneb',focus:43,
-    hello:'지난번 수첩을 가져왔구나. 오늘은 등불을 끄고 조금 기다려 볼까?',sound:'풀숲에서 울던 소리가 발소리에 잠깐 멎었다. 조용히 앉으니 하나둘 다시 들렸다.'},
-  {name:'따뜻한 물 한 모금',weather:'강 너머로 겨울바람이 불어요.',ground:'#677c83',trim:'#3a535c',sky:'#243d56',gift:'moon',task:'moon_full',focus:72,
-    hello:'손이 시리면 쉬었다 보아도 된다. 달은 내일도 모레도 다른 얼굴로 기다릴 테니.',sound:'얼지 않은 물이 돌 사이로 흘렀다. 보온병을 열자 하얀 김이 손등을 스쳤다.'},
-  {name:'언덕 아래의 불빛',weather:'낮에 데워진 풀 냄새가 남아 있어요.',ground:'#4c6241',trim:'#2b4438',sky:'#233748',gift:'photo',task:'trail_center',focus:54,
-    hello:'삼각대는 이 돌 곁에 세우자. 나중에도 같은 방향을 찾을 수 있겠지?',sound:'아래 마을의 불이 하나 꺼졌다. 멀리서 개 짖는 소리가 오고, 그 뒤로는 조용했다.'},
-  {name:'파도가 세어 주는 밤',weather:'신발 옆에 모래가 조금 쌓였어요.',ground:'#8d8c72',trim:'#526a63',sky:'#1b3b4b',gift:'shell',task:'meteor_radiant',focus:36,
-    hello:'카메라는 저기 두고 우리도 잠깐 누워 있자. 하늘을 다 잡으려다 오늘 밤을 놓치진 말자꾸나.',sound:'파도가 들어왔다가 발끝에 닿기 전에 물러갔다. 우리는 그 소리를 들으며 같은 곳에 앉아 있었다.'},
-];
-const WALK_NODES=[{x:146,y:323,label:'쉬어 가기'},{x:320,y:340,label:'할아버지'},{x:590,y:312,label:'장비 준비'},{x:508,y:425,label:'우리 쉼터'}];
-const WALK_ITEMS={mat:{name:'돗자리',color:'#b59b69'},thermos:{name:'보온병',color:'#b17959'},chair:{name:'나무 의자',color:'#c49d68'},chime:{name:'바람 풍경',color:'#b2d9c5'},moon:{name:'달 메모',color:'#f4dfab'},photo:{name:'사진집게',color:'#c5d5d7'},shell:{name:'작은 조개',color:'#eed0ad'}};
-let walkMoveFrame=0,walkDestination=0;
-let walkPoint={x:146,y:323};
-function walkState(){
-  if(!S.walk||S.walk.version!==1||!Array.isArray(S.walk.places))S.walk={version:1,places:[]};
-  let place=S.walk.places[S.chapter];
-  if(!place||typeof place!=='object'||Array.isArray(place))place={};
-  const node=Number.isInteger(place.node)&&place.node>=0&&place.node<4?place.node:0;
-  const items=Array.from({length:3},(_,i)=>Object.hasOwn(WALK_ITEMS,place.items?.[i])?place.items[i]:null);
-  Object.assign(place,{focus:place.focus===true,node,items,answer:[0,1,2].includes(place.answer)?place.answer:0});
-  S.walk.places[S.chapter]=place;
-  return place;
-}
-function walkOwnedItems(){
-  const owned=['mat'];
-  if(S.walk?.places?.some(place=>place?.focus===true))owned.push('thermos');
-  for(const place of WALK_PLACES)if(S.found[place.task])owned.push(place.gift);
-  return owned;
-}
-function walkItemArt(id,x=0,y=0,scale=1){
-  const shapes={
-    mat:'<ellipse cx="0" cy="1" rx="29" ry="12" fill="#071a2455"/><path d="m-30-7 37-8 27 18-38 10Z" fill="#baa278" stroke="#e8ce9c" stroke-width="2"/><path d="m-22-1 34-7m-27 13 34-7m-24 14 34-7" stroke="#7e7355" stroke-width="2"/>',
-    thermos:'<ellipse cy="4" rx="9" ry="4" fill="#071a2455"/><rect x="-7" y="-23" width="14" height="27" rx="4" fill="#b47350" stroke="#edc597"/><path d="M-7-17H7M-7-13H7" stroke="#613e30"/><rect x="-7" y="-27" width="14" height="6" rx="2" fill="#bdbaa0"/>',
-    chair:'<path d="M-15-26v25m30-25v25M-16-10h32M-15-24h30" stroke="#a78356" stroke-width="4"/><path d="m-15-11 8 9h29l-7-9Z" fill="#d7b17b" stroke="#6e5d45"/><path d="M-7-2v12M22-2v12" stroke="#957144" stroke-width="3"/>',
-    chime:'<path d="M0-40v12m0 17v19" stroke="#c6c2a0"/><path d="M-10-13q0-26 20 0Z" fill="#acd3c8" stroke="#d8e8ca"/><path d="m0 3 8 3-3 19-8-5Z" fill="#ecdaab"/><circle cy="-11" r="2" fill="#516d63"/>',
-    moon:'<path d="m-17-20 32 2 2 28-32-2Z" fill="#eadbb2" stroke="#a48d66"/><path d="M7-13C-7-17-15 0-3 4 9 7 15-6 7-13" fill="#f8f1d7" stroke="#7e8d7a"/><path d="M-10 6H8" stroke="#7e8d7a"/>',
-    photo:'<path d="M-22-27H23M-20-27v37M21-27v37" stroke="#8e7857" stroke-width="2"/><rect x="-15" y="-20" width="28" height="23" fill="#e4d8b1"/><rect x="-12" y="-17" width="22" height="15" fill="#1a3d50"/><circle cx="3" cy="-10" r="2" fill="#f2d7a2"/><path d="m-1-22 0 7" stroke="#ad7c4c" stroke-width="3"/>',
-    shell:'<path d="M0 2Q-26 1-21-12q4-8 10-5 3-10 11-5 8-5 11 4 11-1 13 7Q24 1 0 2" fill="#ead0b1" stroke="#b5987b"/><path d="M0 0-10-17M0 0 0-21M0 0 12-16" stroke="#bf9f80"/>',
-  };
-  return `<g transform="translate(${x} ${y}) scale(${scale})">${shapes[id]||''}</g>`;
-}
-function walkPerson(x,y,grandpa=false){
-  return `<g transform="translate(${x} ${y})"><ellipse cy="1" rx="12" ry="5" fill="#061c2c66"/><path d="M-5-11-7 0M5-11 8 0" stroke="${grandpa?'#354b49':'#3a4050'}" stroke-width="6" stroke-linecap="round"/><path d="M-12-17-15-9M12-17 15-9" stroke="${grandpa?'#9a9f86':'#cda568'}" stroke-width="5" stroke-linecap="round"/><path d="M-10-25Q0-31 10-25L12-10H-12Z" fill="${grandpa?'#899882':'#daac66'}"/><circle cy="-35" r="11" fill="#edcba1"/><path d="M-11-34Q-15-49 0-49 15-48 12-34L7-38-5-40Z" fill="${grandpa?'#d0d1bb':'#3f3836'}"/>${grandpa?'<path d="M-10-35H9M-5-35v3M5-35v3" stroke="#525b52" stroke-width="1.5"/>':'<path d="M-9-24H9" stroke="#986849" stroke-width="4"/>'}</g>`;
-}
-function walkSceneArt(){
-  const scene=WALK_PLACES[S.chapter],winter=S.chapter===2,sea=S.chapter===4;
-  let trees='';
-  for(const [x,y,s] of [[38,232,1],[735,225,1.1],[695,335,.75],[272,250,.65]]){
-    trees+=`<g transform="translate(${x} ${y}) scale(${s})"><path d="M0 0V-56" stroke="#624f40" stroke-width="7"/><path d="m0-100-34 58h18l-25 35H39L16-42h19Z" fill="${winter?'#728e8b':'#355c4b'}" stroke="#81a58b22"/>${winter?'<path d="m0-100-17 29h34Z" fill="#cfddd2"/>':''}</g>`;
-  }
-  let stars='';for(let i=0;i<24;i++){const x=22+(i*149)%756,y=15+(i*41)%127;stars+=`<circle class="walk-tiny-star" cx="${x}" cy="${y}" r="${i%4===0?1.6:.8}" fill="#e9dfb8" style="animation-delay:${i%5}s"/>`;}
-  const building=scene.roof?'<path d="M0 297 800 232V465H0Z" fill="#425c59"/><path d="m34 210 160-34 0 113-160 27Z" fill="#304d4c"/><path d="m19 211 174-39 37 24-174 39Z" fill="#62776b"/><path d="M93 219v65l42-9v-65Z" fill="#c6b17a"/><path d="M0 390 800 305" stroke="#788b75" stroke-width="12"/><path d="M3 392V347M797 307v-40" stroke="#92a48e" stroke-width="8"/>':sea?'<path d="M0 256Q255 236 450 261T800 257V465H0Z" fill="#8b8e75"/><path d="M0 223Q190 206 385 227T800 218V258Q600 276 390 257T0 263Z" fill="#3e777a"/><path class="walk-water" d="M0 239Q195 221 390 243T800 237" fill="none" stroke="#b7cec0" stroke-width="4"/>':`<path d="M0 270Q200 244 400 270T800 255V465H0Z" fill="${scene.ground}"/>${S.chapter===2?'<path d="M0 218Q260 240 435 215T800 212V272Q500 239 290 275T0 266Z" fill="#28556c"/><path class="walk-water" d="M0 248Q200 271 420 241T800 242" stroke="#a5c8c5" stroke-width="3" fill="none"/>':''}${S.chapter===1?'<path d="m52 260 0-77 106-15v83Z" fill="#c3b28b"/><path d="m23 186 118-30 48 28-119 27Z" fill="#475e56"/><path d="M84 203v53l27-4v-54" fill="#ddb67b"/><path d="M151 195v49" stroke="#8c7659" stroke-width="3"/>':''}`;
-  const trophy=walkState().items.map((id,i)=>walkOwnedItems().includes(id)?walkItemArt(id,452+i*47,407,1):'').join('');
-  const instrument=S.chapter>=3?
-    '<rect x="-18" y="-52" width="35" height="25" rx="4" fill="#526c66" stroke="#c4d0b0" stroke-width="2"/><circle cy="-40" r="10" fill="#162d3a" stroke="#c5b890" stroke-width="3"/><circle cy="-40" r="5" fill="#507c8a"/><path d="M-8-53v-5H8v5" stroke="#879b8d" stroke-width="4"/>':
-    S.chapter===2?
-    '<path d="m-10-46-7 21m27-21 7 21M-8-40H8" stroke="#476762" stroke-width="12" stroke-linecap="round"/><ellipse cx="-17" cy="-25" rx="8" ry="5" fill="#1a3440" stroke="#afbd9d" stroke-width="2"/><ellipse cx="17" cy="-25" rx="8" ry="5" fill="#1a3440" stroke="#afbd9d" stroke-width="2"/>':
-    '<path d="m-23-39 51-20 9 16-52 20Z" fill="#a6beb0" stroke="#d6ddbb" stroke-width="2"/><path d="m-26-40 8 19" stroke="#334c4e" stroke-width="5"/>';
-  const props=scene.roof?
-    '<g fill="#203b43"><path d="M0 240v-38h29v-23h28v60M236 231v-48h38v-28h23v74M688 224v-49h49v-15h31v70"/></g><g fill="#e6cb8c88"><path d="M11 214h6v7h-6m23-22h6v8h-6m210-4h6v7h-6m35-27h6v7h-6m421 9h6v8h-6m23-1h6v8h-6"/></g><g transform="translate(245 305)"><path d="m-12 0 3 18h18l3-18Z" fill="#a67b5c"/><path d="M0 0V-25m0 16q-22-16-20-8 1 15 20 8m0-8q17-20 20-9 0 12-20 9" fill="#729779" stroke="#63816c" stroke-width="2"/></g>':
-    winter?'<g fill="#c9d9cd"><ellipse cx="230" cy="311" rx="38" ry="7"/><ellipse cx="675" cy="308" rx="26" ry="6"/><path d="m51 370 49-8 16 7-42 7Z"/></g>':
-    sea?'<g fill="#c6ba91" stroke="#a89f7e"><path d="m43 354 35-14 20 14-16 6Z"/><path d="m686 398 25-14 26 12-21 7Z"/></g><g stroke="#5a765d" stroke-width="3"><path d="M78 300 73 261m5 20 13-17m-16 6-8-11M722 293l7-43m-5 25-13-13m16-1 10-12"/></g>':
-    '<g stroke="#6f8c62" stroke-width="2" fill="#d1bf8a"><path d="M80 352v-13m-5 4h10M222 378v-12m-5 3h10M666 293v-11m-5 2h10"/></g><g class="walk-firefly" fill="#c5dc91"><circle cx="249" cy="295" r="2"/><circle cx="620" cy="355" r="1.6"/><circle cx="100" cy="327" r="1.4"/></g>';
-  return `<svg viewBox="0 0 800 465" aria-hidden="true"><defs><linearGradient id="walkSky" x2="0" y2="1"><stop stop-color="#0d2033"/><stop offset="1" stop-color="${scene.sky}"/></linearGradient><radialGradient id="walkLamp"><stop stop-color="#e7ca8080"/><stop offset="1" stop-color="#dabc6500"/></radialGradient></defs>
-    <rect width="800" height="465" fill="url(#walkSky)"/>${stars}<path d="M0 211 93 142 178 192 307 134 435 201 562 133 692 183 800 147V320H0Z" fill="#203c47"/><path d="M0 243 150 194 299 237 495 185 664 229 800 200V350H0Z" fill="#294b4d"/>
-    ${building}${scene.roof?'':trees}${props}<path class="walk-route-edge" d="M146 323Q253 344 365 330Q486 316 625 302M365 330Q450 366 508 394"/><path class="walk-route" d="M146 323Q253 344 365 330Q486 316 625 302M365 330Q450 366 508 394"/>
-    <g transform="translate(365 304)"><ellipse cy="3" rx="38" ry="12" fill="#112a2b70"/><path d="M-35-6H30M-25-6v15M24-6v15" stroke="#a1926e" stroke-width="5"/></g>${walkPerson(365,300,true)}
-    <g transform="translate(625 278)" data-walk-instrument="${S.chapter>=3?'camera':S.chapter===2?'binoculars':'telescope'}"><ellipse cy="7" rx="40" ry="11" fill="#071b2b66"/><path d="M0-23-27 9M0-23 28 9M0-23v35" stroke="#c5bb94" stroke-width="4"/>${instrument}</g>
-    <circle class="walk-glow" cx="158" cy="294" r="48" fill="url(#walkLamp)"/><path d="M154 290h10v18h-10Z" fill="#d5ba70" stroke="#8b7b5c"/><path d="M152 290h14l-3-6h-8Z" fill="#718071"/>
-    <path d="m416 390 115-18 67 41-117 20Z" fill="#1d363080" stroke="#a7b79b5c"/>${trophy}
-    <g fill="#8ea57c" opacity=".7"><path d="m310 410-4-15 8 8 6-16 1 22M675 375l-6-18 13 10 4-20 3 27M230 360l-6-16 12 9 7-10-3 18"/></g>
-  </svg><span class="walk-map-note">산책 지도 · 장소를 눌러 걸어가요</span>
-  ${WALK_NODES.map((node,i)=>`<button type="button" class="walk-location" data-walk-node="${i}" aria-current="${walkState().node===i}" style="left:${node.x/8}%;top:${(node.y-53)/4.65}%">${node.label}</button>`).join('')}
-  <svg id="walkAvatar" viewBox="-22 -54 44 60" aria-hidden="true" style="left:${walkPoint.x/8}%;top:${walkPoint.y/4.65}%">${walkPerson(0,0)}</svg>`;
-}
-function walkMission(){
-  const count=TASKS.filter(taskDone).length,complete=TASKS.every(taskDone);
-  const completed=CHAPTERS.filter(page=>page.tasks.every(taskDone)).length;
-  document.getElementById('walkMission').innerHTML=`<small>${journalDate(PAGE)} · ${completed?'함께 보낸 밤 '+completed+'장':'첫 별을 기다리는 밤'}</small><p>${complete?'오늘의 관측을 마쳤어요. 할아버지 곁으로 돌아가 보세요.':WALK_PLACES[S.chapter].weather}</p><div class="walk-progress" aria-label="관측 기록 ${count} / ${TASKS.length}"><span style="width:${count/TASKS.length*100}%"></span></div>`;
-}
-function renderWalkScene(){walkScene.innerHTML=walkSceneArt();for(const button of walkScene.querySelectorAll('[data-walk-node]'))button.onclick=()=>walkTo(+button.dataset.walkNode);}
-function walkTo(index){
-  if(!WALK_NODES[index]||!nightWalk.open)return;
-  cancelAnimationFrame(walkMoveFrame);walkDestination=index;
-  walkPanel.innerHTML='<p class="walk-kicker">발소리가 이어져요</p><h3>'+WALK_NODES[index].label+' 쪽으로</h3><p>할아버지와 같은 밤을 천천히 걸어요.</p>';
-  const from={...walkPoint},to=WALK_NODES[index],start=performance.now();
-  const arrive=()=>{walkPoint={x:to.x,y:to.y};walkState().node=index;save();renderWalkScene();renderWalkPanel(index);};
-  if(finaleMotion.matches){arrive();return;}
-  const duration=Math.min(1300,Math.hypot(to.x-from.x,to.y-from.y)*3);
-  const step=now=>{
-    if(!nightWalk.open)return;
-    const t=clamp((now-start)/Math.max(1,duration),0,1),e=t*t*(3-2*t);
-    walkPoint={x:lerp(from.x,to.x,e),y:lerp(from.y,to.y,e)};
-    const avatar=document.getElementById('walkAvatar');avatar.style.left=walkPoint.x/8+'%';avatar.style.top=walkPoint.y/4.65+'%';
-    if(t<1)walkMoveFrame=requestAnimationFrame(step);else arrive();
-  };
-  walkMoveFrame=requestAnimationFrame(step);
-}
-function walkObservationText(){
-  const last=TASKS.filter(taskDone).at(-1);
-  if(!last)return '아직 빈 수첩이구나. 처음 찾는 별은 오래 기억에 남을 거야.';
-  if(TASKS.every(taskDone))return PAGE.end;
-  return `네 수첩에 ‘${last.name}’도 생겼구나. ${last.frag}`;
-}
-function walkReward(){
-  const place=WALK_PLACES[S.chapter];
-  if(!S.found[place.task])return '';
-  return `<div class="walk-reward"><svg viewBox="-35 -45 70 70" aria-hidden="true">${walkItemArt(place.gift)}</svg><div><b>${WALK_ITEMS[place.gift].name}</b><small>${CHAPTERS[S.chapter].tasks.find(task=>task.id===place.task)?.name||'이 밤의 관측'}을 함께 본 밤에 놓을 수 있어요.</small></div></div>`;
-}
-function renderWalkPanel(node){
-  const place=WALK_PLACES[S.chapter],state=walkState();
-  if(node===0){
-    walkPanel.innerHTML=`<p class="walk-kicker">잠깐 쉬어 가는 곳</p><h3>오늘 밤은 어디부터 갈까요?</h3><p>${place.sound}</p><div class="walk-actions"><button type="button" data-walk-go="1">할아버지에게</button><button type="button" data-walk-go="2">장비 살펴보기</button><button type="button" class="main" id="walkObserve">밤하늘 보기</button></div><span class="walk-saved">목적지를 눌러 이동 · 방향키로 가까운 장소 선택</span>`;
-  }else if(node===1){
-    const replies=['저도 먼저 찾아보고 싶어요.','어디를 봐야 할지 조금 어려워요.','잠깐 함께 앉아 있을래요.'];
-    walkPanel.innerHTML=`<p class="walk-kicker">할아버지 곁에서</p><h3>“오늘은 무슨 이야기를 할까?”</h3><p class="walk-quote">${TASKS.some(taskDone)?walkObservationText():place.hello}</p><div class="walk-actions">${replies.map((text,i)=>`<button type="button" data-walk-answer="${i}" aria-pressed="${state.answer===i}">${text}</button>`).join('')}</div><p id="walkReply"></p>${TASKS.every(taskDone)?'<div class="walk-actions"><button type="button" id="walkGrandpa">할아버지의 일지 읽기</button></div>':''}<div class="walk-actions"><button type="button" class="main" id="walkObserve">밤하늘 보기</button></div>${walkReward()}`;
-    for(const button of walkPanel.querySelectorAll('[data-walk-answer]'))button.onclick=()=>{
-      state.answer=+button.dataset.walkAnswer;save();
-      for(const b of walkPanel.querySelectorAll('[data-walk-answer]'))b.setAttribute('aria-pressed',String(b===button));
-      const next=TASKS.find(task=>!taskDone(task));
-      document.getElementById('walkReply').textContent=[next?'좋아. 나는 여기서 기다릴게. 다녀와서 어떤 별이었는지 들려주렴.':'네가 벌써 이렇게 많이 보았구나. 다음 밤도 함께 가자.',next?next.hint:'오늘 찾은 별은 수첩과 함께 오래 남겠지.',place.sound][state.answer];
-    };
-  }else if(node===2){renderWalkFocus();return;}
-  else{
-    const owned=walkOwnedItems();
-    walkPanel.innerHTML=`<p class="walk-kicker">우리가 앉을 작은 자리</p><h3>오늘의 쉼터</h3><p>소품을 고르고 놓을 자리를 눌러 보세요. 이곳의 배치는 다음에 와도 남아요.</p><div class="walk-actions" role="group" aria-label="쉼터 소품">${owned.map((id,i)=>`<button type="button" data-walk-item="${id}" aria-pressed="${i===0}">${WALK_ITEMS[id].name}</button>`).join('')}</div><div class="walk-actions" role="group" aria-label="소품 놓을 자리">${['왼쪽','가운데','오른쪽'].map((name,i)=>`<button type="button" data-walk-slot="${i}">${name}에 놓기</button>`).join('')}</div><div class="walk-actions"><button type="button" id="walkClear">이 자리 비우기</button><button type="button" class="main" id="walkObserve">밤하늘 보기</button></div><span id="walkDecorNote" class="walk-saved" role="status">배치는 이 기기에 저장돼요.</span>${walkReward()}`;
-    let item=owned[0];
-    for(const button of walkPanel.querySelectorAll('[data-walk-item]'))button.onclick=()=>{item=button.dataset.walkItem;for(const b of walkPanel.querySelectorAll('[data-walk-item]'))b.setAttribute('aria-pressed',String(b===button));};
-    for(const button of walkPanel.querySelectorAll('[data-walk-slot]'))button.onclick=()=>{if(!walkOwnedItems().includes(item))return;walkState().items[+button.dataset.walkSlot]=item;save();renderWalkScene();document.getElementById('walkDecorNote').textContent=WALK_ITEMS[item].name+'를 놓았어요.';};
-    document.getElementById('walkClear').onclick=()=>{walkState().items=[null,null,null];save();renderWalkScene();document.getElementById('walkDecorNote').textContent='이곳에 놓인 소품을 정리했어요.';};
-  }
-  bindWalkActions();
-}
-function renderWalkFocus(){
-  const state=walkState(),done=state.focus;
-  walkPanel.innerHTML=`<p class="walk-kicker">장비 손질 · 초점 링</p><h3>${done?'작은 빛이 또렷해졌어요':'퍼진 별빛을 모아 보세요'}</h3><p>초점 링을 천천히 움직여 별빛이 가장 작게 모이는 곳을 찾아요.</p><canvas id="walkFocusSky" class="walk-focus" width="480" height="250" role="img" aria-label="초점에 따라 둥글게 퍼지거나 작게 모이는 별빛"></canvas><label for="walkFocusRange">초점 링</label><input id="walkFocusRange" class="walk-range" type="range" min="0" max="100" step="1" value="${done?WALK_PLACES[S.chapter].focus:16}" aria-label="초점 링 조절"><p id="walkFocusNote" class="walk-focus-note" role="status"></p><div class="walk-actions"><button type="button" id="walkFocusLock" ${done?'':'disabled'}>${done?'초점 다시 확인':'이 초점으로 맞추기'}</button><button type="button" id="walkFocusHelp">할아버지 도움 받기</button><button type="button" class="main" id="walkObserve">밤하늘 보기</button></div>${done?'<span class="walk-badge">함께 준비한 밤</span><p>보온병을 쉼터에 놓을 수 있어요.</p>':''}`;
-  const range=document.getElementById('walkFocusRange'),lock=document.getElementById('walkFocusLock');
-  const draw=()=>{
-    const distance=Math.abs(+range.value-WALK_PLACES[S.chapter].focus),good=distance<=3;
-    const canvas=document.getElementById('walkFocusSky'),pen=canvas.getContext('2d');
-    pen.fillStyle='#081520';pen.fillRect(0,0,480,250);
-    for(const [x,y] of [[55,50],[420,160],[357,44],[110,211]]){pen.fillStyle='#829cb77a';pen.beginPath();pen.arc(x,y,1,0,Math.PI*2);pen.fill();}
-    const radius=3+distance*1.1,glow=pen.createRadialGradient(240,125,0,240,125,radius*1.6);
-    glow.addColorStop(0,good?'#fff8d9':'#d9e6eeb5');glow.addColorStop(.35,good?'#dae9ffa0':'#9ebccc6b');glow.addColorStop(1,'#9ebccc00');
-    pen.fillStyle=glow;pen.beginPath();pen.arc(240,125,radius*1.6,0,Math.PI*2);pen.fill();
-    pen.strokeStyle='#b9c6a54d';pen.lineWidth=1;pen.beginPath();pen.arc(240,125,35,0,Math.PI*2);pen.stroke();
-    lock.disabled=!good;document.getElementById('walkFocusNote').textContent=good?'별빛이 작고 또렷해요. 이 초점으로 맞출 수 있어요.':'별빛이 퍼져 있어요. 링을 조금 더 움직여 보세요.';
-  };
-  range.oninput=draw;
-  lock.onclick=()=>{if(Math.abs(+range.value-WALK_PLACES[S.chapter].focus)>3)return;walkState().focus=true;save();renderWalkFocus();walkMission();};
-  document.getElementById('walkFocusHelp').onclick=()=>{range.value=WALK_PLACES[S.chapter].focus;draw();range.focus();};
-  draw();bindWalkActions();
-}
-function bindWalkActions(){
-  for(const button of walkPanel.querySelectorAll('[data-walk-go]'))button.onclick=()=>walkTo(+button.dataset.walkGo);
-  const observe=document.getElementById('walkObserve');if(observe)observe.onclick=()=>{
-    nightWalk.close();jumpTo(new Date(PAGE.travel));
-    if(canStartTutorial()&&Object.keys(S.found).length===0)startTutorial();
-    else if(S.chapter>=3)openJournal();else{setView(S.view);closeJournal();}
-  };
-  const grandpa=document.getElementById('walkGrandpa');if(grandpa)grandpa.onclick=()=>{nightWalk.close();openJournal();openGrandpaJournal();};
-}
-function openNightWalk(){
-  if(document.querySelector('dialog[open]'))return;
-  clearTimeout(endingTimer);endTutorial();setDatePanel(false);closeJournal();
-  renderNightWalk();nightWalk.showModal();
-}
-function renderNightWalk(){
-  cancelAnimationFrame(walkMoveFrame);
-  const state=walkState();walkDestination=state.node;walkPoint={x:WALK_NODES[state.node].x,y:WALK_NODES[state.node].y};
-  document.getElementById('walkTitle').textContent=WALK_PLACES[S.chapter].name;
-  document.getElementById('walkChapters').innerHTML=CHAPTERS.map((page,i)=>`<button type="button" data-walk-chapter="${i}" ${chapterAvailable(i)?'':'disabled'} ${i===S.chapter?'aria-current="page"':''}>${i+1}장 · ${page.short}${chapterAvailable(i)?'':' · 잠김'}</button>`).join('');
-  for(const button of document.querySelectorAll('[data-walk-chapter]'))button.onclick=()=>{
-    if(setChapter(+button.dataset.walkChapter)){
-      renderNightWalk();
-      document.querySelector(`[data-walk-chapter="${S.chapter}"]`).focus({preventScroll:true});
-    }
-  };
-  renderWalkScene();walkMission();renderWalkPanel(state.node);
-}
-document.getElementById('walkBtn').onclick=openNightWalk;
-document.getElementById('coverWalk').onclick=()=>{started=true;document.getElementById('intro').classList.add('hide');setView(S.view);openNightWalk();};
-document.getElementById('walkClose').onclick=()=>nightWalk.close();
-nightWalk.addEventListener('close',()=>{cancelAnimationFrame(walkMoveFrame);});
-nightWalk.addEventListener('keydown',event=>{
-  if(!event.key.startsWith('Arrow')||event.target.tagName==='INPUT')return;
-  event.preventDefault();const current=WALK_NODES[walkDestination];
-  const direction={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[event.key];
-  const candidate=WALK_NODES.map((node,i)=>({i,dx:node.x-current.x,dy:node.y-current.y})).filter(node=>node.dx*direction[0]+node.dy*direction[1]>0).sort((a,b)=>Math.hypot(a.dx,a.dy)-Math.hypot(b.dx,b.dy))[0];
-  if(candidate)walkTo(candidate.i);
-});
-
-
 /* ---------- loop ---------- */
 prepareStarTargets();
 setChapter(chapterAvailable(S.chapter)?S.chapter:0);showLineState();setMode(S.mode);
 let lastFrame=performance.now(),clockTick=0;
 function loop(now){const dt=now-lastFrame;lastFrame=now;frameT=now;
-  if(S.speed&&!nightWalk.open)S.t=new Date(S.t.getTime()+dt*S.speed);
+  if(S.speed)S.t=new Date(S.t.getTime()+dt*S.speed);
   try{draw();}catch(err){console.error(err);}
   if(now-clockTick>250){clockTick=now;updateClock();}
   requestAnimationFrame(loop);}
