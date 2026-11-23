@@ -1058,7 +1058,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <style>
 #nightWalk{padding:0;width:min(1120px,calc(100vw - 20px));max-width:none;max-height:96dvh;border:1px solid #a9a48580;border-radius:20px;color:#e7ecdd;background:#112423;box-shadow:0 24px 100px #000a;font-family:var(--sans)}
 #nightWalk::backdrop{background:#030b13d9;backdrop-filter:blur(7px)}
-.walk-head{padding:17px 22px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid #b7d4ac26}
+.walk-head{position:sticky;top:0;z-index:5;padding:17px 22px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid #b7d4ac26;background:#112423}
 .walk-head h2{margin:3px 0 0;font:700 clamp(22px,3vw,32px)/1.2 var(--serif);color:#f2e2b9}
 .walk-kicker{margin:0;color:#a5c3aa;font-size:11px;letter-spacing:.13em}
 .walk-head button{border-color:#8caa9d70;background:#203a37}
@@ -3517,6 +3517,11 @@ function walkSceneArt(){
   let stars='';for(let i=0;i<24;i++){const x=22+(i*149)%756,y=15+(i*41)%127;stars+=`<circle class="walk-tiny-star" cx="${x}" cy="${y}" r="${i%4===0?1.6:.8}" fill="#e9dfb8" style="animation-delay:${i%5}s"/>`;}
   const building=scene.roof?'<path d="M0 297 800 232V465H0Z" fill="#425c59"/><path d="m34 210 160-34 0 113-160 27Z" fill="#304d4c"/><path d="m19 211 174-39 37 24-174 39Z" fill="#62776b"/><path d="M93 219v65l42-9v-65Z" fill="#c6b17a"/><path d="M0 390 800 305" stroke="#788b75" stroke-width="12"/><path d="M3 392V347M797 307v-40" stroke="#92a48e" stroke-width="8"/>':sea?'<path d="M0 256Q255 236 450 261T800 257V465H0Z" fill="#8b8e75"/><path d="M0 223Q190 206 385 227T800 218V258Q600 276 390 257T0 263Z" fill="#3e777a"/><path class="walk-water" d="M0 239Q195 221 390 243T800 237" fill="none" stroke="#b7cec0" stroke-width="4"/>':`<path d="M0 270Q200 244 400 270T800 255V465H0Z" fill="${scene.ground}"/>${S.chapter===2?'<path d="M0 218Q260 240 435 215T800 212V272Q500 239 290 275T0 266Z" fill="#28556c"/><path class="walk-water" d="M0 248Q200 271 420 241T800 242" stroke="#a5c8c5" stroke-width="3" fill="none"/>':''}${S.chapter===1?'<path d="m52 260 0-77 106-15v83Z" fill="#c3b28b"/><path d="m23 186 118-30 48 28-119 27Z" fill="#475e56"/><path d="M84 203v53l27-4v-54" fill="#ddb67b"/><path d="M151 195v49" stroke="#8c7659" stroke-width="3"/>':''}`;
   const trophy=walkState().items.map((id,i)=>walkOwnedItems().includes(id)?walkItemArt(id,452+i*47,407,1):'').join('');
+  const instrument=S.chapter>=3?
+    '<rect x="-18" y="-52" width="35" height="25" rx="4" fill="#526c66" stroke="#c4d0b0" stroke-width="2"/><circle cy="-40" r="10" fill="#162d3a" stroke="#c5b890" stroke-width="3"/><circle cy="-40" r="5" fill="#507c8a"/><path d="M-8-53v-5H8v5" stroke="#879b8d" stroke-width="4"/>':
+    S.chapter===2?
+    '<path d="m-10-46-7 21m27-21 7 21M-8-40H8" stroke="#476762" stroke-width="12" stroke-linecap="round"/><ellipse cx="-17" cy="-25" rx="8" ry="5" fill="#1a3440" stroke="#afbd9d" stroke-width="2"/><ellipse cx="17" cy="-25" rx="8" ry="5" fill="#1a3440" stroke="#afbd9d" stroke-width="2"/>':
+    '<path d="m-23-39 51-20 9 16-52 20Z" fill="#a6beb0" stroke="#d6ddbb" stroke-width="2"/><path d="m-26-40 8 19" stroke="#334c4e" stroke-width="5"/>';
   const props=scene.roof?
     '<g fill="#203b43"><path d="M0 240v-38h29v-23h28v60M236 231v-48h38v-28h23v74M688 224v-49h49v-15h31v70"/></g><g fill="#e6cb8c88"><path d="M11 214h6v7h-6m23-22h6v8h-6m210-4h6v7h-6m35-27h6v7h-6m421 9h6v8h-6m23-1h6v8h-6"/></g><g transform="translate(245 305)"><path d="m-12 0 3 18h18l3-18Z" fill="#a67b5c"/><path d="M0 0V-25m0 16q-22-16-20-8 1 15 20 8m0-8q17-20 20-9 0 12-20 9" fill="#729779" stroke="#63816c" stroke-width="2"/></g>':
     winter?'<g fill="#c9d9cd"><ellipse cx="230" cy="311" rx="38" ry="7"/><ellipse cx="675" cy="308" rx="26" ry="6"/><path d="m51 370 49-8 16 7-42 7Z"/></g>':
@@ -3526,7 +3531,7 @@ function walkSceneArt(){
     <rect width="800" height="465" fill="url(#walkSky)"/>${stars}<path d="M0 211 93 142 178 192 307 134 435 201 562 133 692 183 800 147V320H0Z" fill="#203c47"/><path d="M0 243 150 194 299 237 495 185 664 229 800 200V350H0Z" fill="#294b4d"/>
     ${building}${scene.roof?'':trees}${props}<path class="walk-route-edge" d="M146 323Q253 344 365 330Q486 316 625 302M365 330Q450 366 508 394"/><path class="walk-route" d="M146 323Q253 344 365 330Q486 316 625 302M365 330Q450 366 508 394"/>
     <g transform="translate(365 304)"><ellipse cy="3" rx="38" ry="12" fill="#112a2b70"/><path d="M-35-6H30M-25-6v15M24-6v15" stroke="#a1926e" stroke-width="5"/></g>${walkPerson(365,300,true)}
-    <g transform="translate(625 278)"><ellipse cy="7" rx="40" ry="11" fill="#071b2b66"/><path d="M0-23-27 9M0-23 28 9M0-23v35" stroke="#c5bb94" stroke-width="4"/><path d="m-23-39 51-20 9 16-52 20Z" fill="#a6beb0" stroke="#d6ddbb" stroke-width="2"/><path d="m-26-40 8 19" stroke="#334c4e" stroke-width="5"/></g>
+    <g transform="translate(625 278)" data-walk-instrument="${S.chapter>=3?'camera':S.chapter===2?'binoculars':'telescope'}"><ellipse cy="7" rx="40" ry="11" fill="#071b2b66"/><path d="M0-23-27 9M0-23 28 9M0-23v35" stroke="#c5bb94" stroke-width="4"/>${instrument}</g>
     <circle class="walk-glow" cx="158" cy="294" r="48" fill="url(#walkLamp)"/><path d="M154 290h10v18h-10Z" fill="#d5ba70" stroke="#8b7b5c"/><path d="M152 290h14l-3-6h-8Z" fill="#718071"/>
     <path d="m416 390 115-18 67 41-117 20Z" fill="#1d363080" stroke="#a7b79b5c"/>${trophy}
     <g fill="#8ea57c" opacity=".7"><path d="m310 410-4-15 8 8 6-16 1 22M675 375l-6-18 13 10 4-20 3 27M230 360l-6-16 12 9 7-10-3 18"/></g>
