@@ -178,6 +178,84 @@ export async function photoRaster(file, sheetWidth, sheetHeight) {
   src.close?.();
   return canvasBlob(canvas, 'image/jpeg', .9);
 }
+function photoEditValues(edit = {}) {
+  const rotation = edit.rotation ?? 0;
+  const crop = edit.crop ?? { x: 0, y: 0, width: 1, height: 1 };
+  if (!Number.isInteger(rotation) || ![0,1,2,3].includes(rotation) ||
+      ![crop.x, crop.y, crop.width, crop.height].every(Number.isFinite) ||
+      crop.x < 0 || crop.y < 0 || crop.width <= 0 || crop.height <= 0 ||
+      crop.x + crop.width > 1 + 1e-8 || crop.y + crop.height > 1 + 1e-8) throw Error('사진에서 남길 영역을 다시 정해 주세요.');
+  return { rotation, crop: { ...crop } };
+}
+export function photoEditGeometry(sourceWidth, sourceHeight, edit = {}) {
+  requireSpace(sourceWidth, sourceHeight, sourceWidth, sourceHeight);
+  const { rotation, crop } = photoEditValues(edit);
+  const width = rotation % 2 ? sourceHeight : sourceWidth;
+  const height = rotation % 2 ? sourceWidth : sourceHeight;
+  const x = Math.min(width - 1, Math.floor(crop.x * width + 1e-7));
+  const y = Math.min(height - 1, Math.floor(crop.y * height + 1e-7));
+  const right = Math.min(width, Math.ceil((crop.x + crop.width) * width - 1e-7));
+  const bottom = Math.min(height, Math.ceil((crop.y + crop.height) * height - 1e-7));
+  return { rotation, width, height, crop: { x, y, width: Math.max(1, right - x), height: Math.max(1, bottom - y) } };
+}
+export function rotatePhotoEdit(edit, direction) {
+  let { rotation, crop } = photoEditValues(edit);
+  if (!Number.isInteger(direction)) throw Error('회전 방향을 확인해 주세요.');
+  const turns = ((direction % 4) + 4) % 4;
+  for (let i = 0; i < turns; i++) {
+    crop = { x: Math.max(0, 1 - crop.y - crop.height), y: crop.x, width: crop.height, height: crop.width };
+    rotation = (rotation + 1) % 4;
+  }
+  return { rotation, crop };
+}
+export function photoCropFromMargins({ left, right, top, bottom }) {
+  if (![left, right, top, bottom].every((value) => Number.isFinite(value) && value >= 0 && value <= 99) || left + right >= 100 || top + bottom >= 100) {
+    throw Error('여백은 0~99%로 입력하고, 마주 보는 두 여백의 합을 100%보다 작게 해 주세요.');
+  }
+  return { x: left / 100, y: top / 100, width: (100 - left - right) / 100, height: (100 - top - bottom) / 100 };
+}
+export async function photoCanvas(blob, rotation = 0) {
+  const src = await decodeImage(blob);
+  const canvas = document.createElement('canvas');
+  try {
+    const sourceWidth = src.naturalWidth ?? src.width;
+    const sourceHeight = src.naturalHeight ?? src.height;
+    const geometry = photoEditGeometry(sourceWidth, sourceHeight, { rotation });
+    canvas.width = geometry.width;
+    canvas.height = geometry.height;
+    const context = canvas.getContext('2d', { alpha: false });
+    context.fillStyle = '#fff';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    if (rotation === 1) { context.translate(canvas.width, 0); context.rotate(Math.PI / 2); }
+    if (rotation === 2) { context.translate(canvas.width, canvas.height); context.rotate(Math.PI); }
+    if (rotation === 3) { context.translate(0, canvas.height); context.rotate(-Math.PI / 2); }
+    context.drawImage(src, 0, 0, sourceWidth, sourceHeight);
+    return canvas;
+  } catch (error) { canvas.width = canvas.height = 0; throw error; }
+  finally { src.close?.(); }
+}
+export async function editedPhotoRaster(blob, edit = {}, sheetWidth = 760, sheetHeight = 1010) {
+  const values = photoEditValues(edit);
+  const source = await decodeImage(blob);
+  const canvas = document.createElement('canvas');
+  try {
+    const sourceWidth = source.naturalWidth ?? source.width, sourceHeight = source.naturalHeight ?? source.height;
+    const geometry = photoEditGeometry(sourceWidth, sourceHeight, values);
+    const { crop, rotation } = geometry;
+    const scale = Math.min(1, requireSpace(crop.width, crop.height, sheetWidth * 2, sheetHeight * 2));
+    canvas.width = Math.max(1, Math.round(crop.width * scale));
+    canvas.height = Math.max(1, Math.round(crop.height * scale));
+    const context = canvas.getContext('2d', { alpha: false });
+    context.fillStyle = '#fff'; context.fillRect(0, 0, canvas.width, canvas.height);
+    context.scale(canvas.width / crop.width, canvas.height / crop.height);
+    context.translate(-crop.x, -crop.y);
+    if (rotation === 1) { context.translate(geometry.width, 0); context.rotate(Math.PI / 2); }
+    if (rotation === 2) { context.translate(geometry.width, geometry.height); context.rotate(Math.PI); }
+    if (rotation === 3) { context.translate(0, geometry.height); context.rotate(-Math.PI / 2); }
+    context.drawImage(source, 0, 0, sourceWidth, sourceHeight);
+    return await canvasBlob(canvas, 'image/jpeg', .92);
+  } finally { source.close?.(); canvas.width = canvas.height = 0; }
+}
 export function parsePageRange(value, numPages, maximum = 100) {
   const text = String(value ?? '').trim().replace(/[–—−~～－]/g, '-').replace(/，/g, ',');
   if (!text || text === '전체') {
