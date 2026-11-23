@@ -181,7 +181,7 @@ export async function photoRaster(file, sheetWidth, sheetHeight) {
 export function parsePageRange(value, numPages) {
   const text = String(value ?? '').trim().replace(/[–—−~～－]/g, '-').replace(/，/g, ',');
   if (!text || text === '전체') {
-    if (numPages > 100) throw Error('PDF는 한 번에 100쪽까지 넣을 수 있어요. 가져올 쪽을 골라 주세요.');
+    if (numPages > 100) throw Error('PDF는 한 번에 100쪽까지 넣을 수 있어요. 자료 넣기 → PDF를 현재 노트에 추가에서 가져올 쪽을 골라 주세요.');
     return Array.from({ length: numPages }, (_, i) => i + 1);
   }
   if (text.length > 2000) throw Error('가져올 쪽 범위를 짧게 입력해 주세요.');
