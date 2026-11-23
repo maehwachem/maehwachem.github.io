@@ -189,6 +189,12 @@ textarea.dialog-input{min-height:130px;resize:vertical;line-height:1.5}
 @media(prefers-reduced-motion:reduce){.sidebar{transition:none}}
 @page{size:A4 portrait;margin:8mm}
 @media print{body{height:auto;overflow:visible;background:white}.app,.toast,dialog{display:none!important}.print-page{display:block;width:194mm;height:auto;margin:0;break-inside:avoid}}
+.shape-menu{position:fixed;z-index:12;top:0;left:0;display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:8px;background:#fffefa;border:1px solid #dfd6ec;border-radius:10px;box-shadow:0 6px 24px #30254c25;min-width:220px}
+.shape-menu button{min-height:40px;border-radius:6px;padding:6px 12px;text-align:left}.shape-menu button:hover,.shape-menu button[aria-pressed=true]{background:var(--tint);color:var(--deep)}
+.page-extra{display:flex;gap:4px;justify-content:center;flex-wrap:wrap}.page-extra button{min-height:32px;border-radius:5px;background:#fffdfa;padding:3px 7px;font-size:11px}.page-extra button:hover{background:var(--tint)}
+.delete-notice{position:fixed;bottom:58px;left:50%;transform:translateX(-50%);z-index:22;display:flex;align-items:center;gap:10px;max-width:calc(100vw - 20px);padding:9px 10px 9px 14px;background:#fffefa;border:1px solid #d8cceb;border-radius:10px;box-shadow:0 5px 25px #30254c30}
+.delete-notice strong{font-size:13px;font-weight:600;display:block}.delete-notice small{display:block;font-size:11px;color:var(--muted)}.delete-notice .secondary{min-height:36px;padding:4px 9px;white-space:nowrap}.delete-notice .icon-button{width:28px;min-height:32px;font-size:22px}body.has-delete-undo .toast{bottom:120px}
+@media(max-width:680px){.delete-notice{gap:6px;padding:8px;min-width:min(350px,calc(100vw - 20px))}.delete-notice small{font-size:10px}}
 </style>
 </head>
 <body>
@@ -220,6 +226,7 @@ textarea.dialog-input{min-height:130px;resize:vertical;line-height:1.5}
           <button id="mediaToggle" class="secondary" aria-expanded="false" aria-controls="mediaMenu"><span data-icon="plus"></span> 자료 넣기</button>
           <div class="menu" id="mediaMenu" hidden>
             <label class="file-option"><span data-icon="file"></span> PDF를 새 노트로<input type="file" id="pdfFile" aria-label="PDF를 새 노트로" accept="application/pdf,.pdf"></label>
+            <label class="file-option"><span data-icon="file"></span> PDF를 현재 노트에 추가<input type="file" id="pdfAppendFile" aria-label="PDF를 현재 노트에 추가" accept="application/pdf,.pdf"></label>
             <label class="file-option"><span data-icon="image"></span> 사진을 페이지로 추가<input type="file" id="photoFiles" aria-label="사진을 페이지로 추가" accept="image/*,.heic,.heif,.avif" multiple></label>
           </div>
         </div>
@@ -259,6 +266,7 @@ textarea.dialog-input{min-height:130px;resize:vertical;line-height:1.5}
             <button class="tool" data-tool="eraser" data-icon="eraser" aria-label="지우개" title="부분 지우개"></button>
             <button class="tool" data-tool="text" data-icon="text" aria-label="텍스트" title="텍스트"></button>
             <button class="tool" data-tool="lasso" data-icon="lasso" aria-label="올가미" title="올가미"></button>
+            <button class="tool" id="shapeToggle" data-tool="shape" data-icon="shape" aria-label="도형" title="도형 고르기" aria-expanded="false" aria-controls="shapeMenu"></button>
           </div>
           <button class="tool finger-mode" id="fingerMode" aria-pressed="false" title="손가락 필기 켜기"><span data-icon="finger"></span><span id="fingerModeLabel">손가락 꺼짐</span></button>
           <span class="tool-divider" aria-hidden="true"></span>
@@ -270,6 +278,10 @@ textarea.dialog-input{min-height:130px;resize:vertical;line-height:1.5}
             <button id="redo" class="tool" data-icon="redo" aria-label="다시 실행" title="다시 실행"></button>
           </div>
         </div>
+      </div>
+      <div class="shape-menu" id="shapeMenu" role="group" aria-label="도형 종류" hidden>
+        <button type="button" data-shape="line">직선</button><button type="button" data-shape="arrow">화살표</button>
+        <button type="button" data-shape="rect">사각형</button><button type="button" data-shape="ellipse">원·타원</button>
       </div>
       <div class="scroller" id="scroller" aria-label="종이">
         <div class="paper-deck">
@@ -313,10 +325,28 @@ textarea.dialog-input{min-height:130px;resize:vertical;line-height:1.5}
 </div>
 <dialog id="pageOverview" class="page-overview" aria-labelledby="overviewHeading">
   <header class="overview-head">
-    <h2 class="dialog-title" id="overviewHeading">페이지 미리보기</h2>
+    <h2 class="dialog-title" id="overviewHeading">페이지 관리</h2>
     <button type="button" class="secondary" data-close="pageOverview" autofocus>닫기</button>
   </header>
   <div id="pageTiles" class="page-tiles"></div>
+</dialog>
+<dialog id="copyPageDialog" aria-labelledby="copyPageHeading">
+  <form id="copyPageForm">
+    <h2 id="copyPageHeading" class="dialog-title">다른 노트로 복사</h2>
+    <p class="dialog-label">원본을 그대로 두고, 선택한 노트의 마지막에 페이지를 추가해요.</p>
+    <label class="dialog-label" for="copyDestination">복사할 노트</label><select class="dialog-input" id="copyDestination"></select>
+    <label id="copyNewLabel" class="dialog-label" for="copyNewTitle">새 노트 이름</label><input id="copyNewTitle" class="dialog-input" maxlength="100" placeholder="새 노트 이름">
+    <div class="dialog-actions"><button class="secondary" type="button" data-close="copyPageDialog">취소</button><button class="primary" type="submit">복사</button></div>
+  </form>
+</dialog>
+<dialog id="pdfAppendDialog" aria-labelledby="pdfAppendHeading">
+  <form id="pdfAppendForm">
+    <h2 id="pdfAppendHeading" class="dialog-title">PDF를 현재 노트에 추가</h2>
+    <p id="pdfAppendName" class="dialog-label"></p>
+    <label class="dialog-label" for="pdfPageRange">가져올 쪽</label><input id="pdfPageRange" class="dialog-input" maxlength="2000" placeholder="비워 두면 전체 · 예: 1-3, 5" autocomplete="off">
+    <p class="dialog-label">현재 페이지 뒤에 PDF의 원래 순서대로 추가해요. 한 번에 100쪽까지 넣을 수 있어요.</p>
+    <div class="dialog-actions"><button class="secondary" type="button" data-close="pdfAppendDialog">취소</button><button class="primary" type="submit">추가</button></div>
+  </form>
 </dialog>
 <dialog id="textDialog" aria-labelledby="textHeading">
   <form id="textForm">
@@ -347,11 +377,13 @@ textarea.dialog-input{min-height:130px;resize:vertical;line-height:1.5}
   <div class="dialog-actions"><button type="button" class="primary" data-close="fileError" autofocus>닫기</button></div>
 </dialog>
 <input type="file" id="backupFile" accept=".json,application/json" hidden>
+<div class="delete-notice" id="deleteNotice" role="status" hidden><div><strong id="deleteNoticeText"></strong><small>이 화면에서 10초 동안 되돌릴 수 있어요.</small></div><button class="secondary" id="undoDelete" type="button">되돌리기</button><button class="icon-button" id="dismissDelete" type="button" aria-label="삭제 되돌리기 알림 닫기">×</button></div>
 <div class="toast" id="toast" role="status" hidden></div>
 <img class="print-page" id="printPage" alt="인쇄할 노트 페이지">
 <script>
 'use strict';
 const icons = {
+  shape:'<rect x="3" y="4" width="10" height="10" rx="1"/><circle cx="16" cy="16" r="5"/>',
   brand:'<path d="M5 4h11a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2zm0 13a2 2 0 0 1 2-2h11M8 9l2 2 4-4"/>',
   plus:'<path d="M12 5v14M5 12h14"/>', minus:'<path d="M5 12h14"/>',
   search:'<circle cx="10.5" cy="10.5" r="5.5"/><path d="m15 15 4.5 4.5"/>',
@@ -427,7 +459,7 @@ function initialState() {
 }
 function validDate(value) { return Number.isFinite(value) && value >= 0 && value < 8.64e15; }
 async function media() {
-  try { return await import('./note-assets/page-media.js'); }
+  try { return await import('./note-assets/page-media.js?v=20261123-phase1'); }
   catch (cause) { throw new Error('자료 처리 기능을 불러오지 못했어요. 종이노트를 새로고침한 뒤 다시 시도해 주세요.', { cause }); }
 }
 function checkFileCancellation(signal) {
@@ -460,6 +492,7 @@ function parseState(raw) {
           page.background.name.length > 200)) throw Error('invalid background');
       for (const stroke of page.strokes) {
         if (!['pen','marker','eraser'].includes(stroke?.tool) || !validColor(stroke.color) || !validShape(stroke) ||
+            (stroke.shape !== undefined && typeof stroke.shape !== 'boolean') ||
             (stroke.cuts !== undefined && (!Array.isArray(stroke.cuts) || !stroke.cuts.every(validShape)))) throw Error('invalid stroke');
       }
       for (const item of page.texts) {
@@ -505,6 +538,11 @@ let dirty = false;
 let saveTimer;
 let toastTimer;
 let fileJob = null;
+let shapeKind = 'line';
+let pendingDelete = null;
+let deleteTimer;
+let pageCopyTarget = null;
+let pendingPdfAppend = null;
 let displayedBackground = null;
 let thumbObserver;
 const orphanedAssets = new Set();
@@ -633,7 +671,7 @@ function line(context, stroke) {
   context.fillStyle = stroke.color;
   context.lineWidth = stroke.size;
   context.lineCap = 'round';
-  context.lineJoin = 'round';
+  context.lineJoin = stroke.shape ? 'miter' : 'round';
   if (stroke.tool === 'marker') context.globalAlpha = .36;
   if (stroke.tool === 'eraser') context.globalCompositeOperation = 'destination-out';
   context.beginPath();
@@ -644,7 +682,7 @@ function line(context, stroke) {
     context.moveTo(points[0][0], points[0][1]);
     for (let i = 1; i < points.length - 1; i++) {
       const [x, y] = points[i];
-      if (stroke.tool === 'eraser') context.lineTo(x, y);
+      if (stroke.tool === 'eraser' || stroke.shape) context.lineTo(x, y);
       else context.quadraticCurveTo(x, y, (x + points[i + 1][0]) / 2, (y + points[i + 1][1]) / 2);
     }
     context.lineTo(...points[points.length - 1]);
@@ -830,7 +868,7 @@ function setInputMode() {
 }
 $('fingerMode').onclick = () => {
   const finger = penOnly();
-  setTool('pen');
+  setTool(tool === 'shape' ? 'shape' : 'pen');
   if (finger) ignoreTouchUntil = 0;
   state.inputMode = finger ? 'touch' : 'pen';
   setInputMode();
@@ -1139,12 +1177,30 @@ function previewEraser(from, to, stationary = false) {
   line(ink, { ...stroke, points: stationary ? [to] : [from, to] });
   showEraser(to, stroke.size);
 }
+function makeShapePoints(kind, from, to) {
+  const [x, y] = from, [u, v] = to;
+  if (kind === 'rect') return [[x,y],[u,y],[u,v],[x,v],[x,y]];
+  if (kind === 'ellipse') {
+    const cx = (x + u) / 2, cy = (y + v) / 2;
+    return Array.from({ length: 65 }, (_, i) => {
+      const a = i / 64 * Math.PI * 2;
+      return [cx + Math.abs(u - x) / 2 * Math.cos(a), cy + Math.abs(v - y) / 2 * Math.sin(a)];
+    });
+  }
+  if (kind === 'arrow') {
+    const angle = Math.atan2(v - y, u - x), head = Math.min(24, Math.hypot(u - x, v - y) * .32);
+    return [[x,y],[u,v],[u - head * Math.cos(angle - .5), v - head * Math.sin(angle - .5)],
+      [u,v],[u - head * Math.cos(angle + .5), v - head * Math.sin(angle + .5)]];
+  }
+  return [[x,y],[u,v]];
+}
 function extendDrawing(event) {
   const p = point(event);
   const { stroke, last } = active;
   if (p[0] === last[0] && p[1] === last[1]) return;
   active.last = p;
-  stroke.points.push(p);
+  if (active.shape) stroke.points = makeShapePoints(active.shape.kind, active.shape.from, p);
+  else stroke.points.push(p);
   if (stroke.tool === 'eraser') previewEraser(last, p);
 }
 let raf = 0;
@@ -1159,12 +1215,14 @@ function beginDrawing(event, drawingTool) {
   const size = Number($('size').value);
   const erasing = drawingTool === 'eraser';
   const stroke = {
-    tool: drawingTool,
+    tool: drawingTool === 'shape' ? 'pen' : drawingTool,
     color: erasing ? '#000000' : color,
     size: erasing ? eraserSizes[size] : drawingTool === 'marker' ? size * 4 : size,
-    points: [here]
+    points: drawingTool === 'shape' ? makeShapePoints(shapeKind, here, here) : [here],
+    ...(drawingTool === 'shape' ? { shape: true } : {})
   };
   active = { pointer: event.pointerId, source: event.pointerType, page: currentPage(), last: here, stroke, erased: false };
+  if (drawingTool === 'shape') active.shape = { kind: shapeKind, from: here };
   if (erasing) previewEraser(here, here, true);
   else drawOverlay();
 }
@@ -1177,7 +1235,7 @@ function finishDrawing(commit = true) {
   if (action.source === 'pen') ignoreTouchUntil = performance.now() + 180;
   const erasing = action.stroke.tool === 'eraser';
   if (action.page !== currentPage()) { redrawInk(); return; }
-  if (commit && (!erasing || action.erased)) {
+  if (commit && (!action.shape || Math.hypot(action.last[0] - action.shape.from[0], action.last[1] - action.shape.from[1]) >= 2) && (!erasing || action.erased)) {
     const before = snapshot(action.page);
     action.page.strokes = [...action.page.strokes, action.stroke];
     record(before);
@@ -1221,7 +1279,7 @@ function startTouch(event) {
     if (lasso?.source === 'touch') finishLasso(false);
   } else if (event.target === sheet && !penOnly()) {
     if (tool === 'lasso') startLasso(event);
-    else if (['pen', 'marker', 'eraser'].includes(tool)) beginDrawing(event, tool);
+    else if (['pen', 'marker', 'eraser', 'shape'].includes(tool)) beginDrawing(event, tool);
   }
 }
 scroller.addEventListener('pointerdown', (event) => {
@@ -1432,10 +1490,19 @@ function renderBackdrop(page) {
 function assetKeys(notes) {
   return new Set(notes.flatMap((note) => note.pages.flatMap((page) => page.background ? [page.background.id] : [])));
 }
-async function clearOrphanedAssets() {
+function retainedAssetKeys() {
   const used = assetKeys(state.notes);
-  const remove = [...orphanedAssets].filter((key) => !used.has(key));
+  if (pendingDelete) {
+    const pages = pendingDelete.kind === 'note' ? pendingDelete.note.pages : [pendingDelete.page];
+    for (const key of assetKeys([{ pages }])) used.add(key);
+  }
+  return used;
+}
+async function clearOrphanedAssets() {
   try {
+    if (protectedStorage || dirty || localStorage.getItem(key) !== lastStored) return;
+    const used = retainedAssetKeys();
+    const remove = [...orphanedAssets].filter((key) => !used.has(key));
     await (await media()).updateAssets({ remove });
     for (const key of remove) orphanedAssets.delete(key);
   } catch {
@@ -1524,6 +1591,128 @@ function updateThumbnail(canvas, page) {
     if (canvas.isConnected) canvas.parentElement.title = '페이지 자료를 찾을 수 없어요.';
   });
 }
+function duplicatePageData(page) {
+  const copy = JSON.parse(JSON.stringify(page));
+  copy.id = id();
+  for (const item of copy.texts) item.id = id();
+  return copy;
+}
+async function copyPageToNote(sourceId, pageId, destinationId, title = '') {
+  finishDrawing();
+  resetLasso(true);
+  const source = state.notes.find((note) => note.id === sourceId);
+  const page = source?.pages.find((page) => page.id === pageId);
+  if (!page) throw Error('복사할 페이지를 찾을 수 없어요. 노트를 확인해 주세요.');
+  const copy = duplicatePageData(page);
+  const destination = destinationId ? state.notes.find((note) => note.id === destinationId) : makeNote(source.folder, title.trim().slice(0, 100));
+  if (!destination) throw Error('복사할 노트를 찾을 수 없어요.');
+  if (!destinationId && state.notes.length >= 1000) throw Error('노트는 1000개까지 만들 수 있어요.');
+  return commitImport([], () => {
+    if (!destinationId) {
+      destination.pages = [copy];
+      state.notes.push(destination);
+    } else {
+      const position = destination === source ? destination.pages.indexOf(page) + 1 : destination.pages.length;
+      destination.pages.splice(position, 0, copy);
+    }
+    destination.active = copy.id;
+    destination.updated = Date.now();
+    return destination;
+  }, new AbortController().signal);
+}
+function hideDeleteNotice() {
+  $('deleteNotice').hidden = true;
+  document.body.classList.remove('has-delete-undo');
+}
+function finishDeleteUndo() {
+  const record = pendingDelete;
+  if (!record) return;
+  clearTimeout(deleteTimer);
+  pendingDelete = null;
+  hideDeleteNotice();
+  const pages = record.kind === 'note' ? record.note.pages : [record.page];
+  const existing = new Set(state.notes.flatMap((note) => note.pages.map((page) => page.id)));
+  for (const page of pages) if (!existing.has(page.id)) histories.delete(page.id);
+  clearOrphanedAssets();
+}
+async function deleteWithUndo(kind, noteId, pageId) {
+  finishDrawing();
+  resetLasso(true);
+  const note = state.notes.find((note) => note.id === noteId);
+  if (!note) throw Error('삭제할 노트를 찾을 수 없어요.');
+  const index = kind === 'page' ? note.pages.findIndex((page) => page.id === pageId) : state.notes.indexOf(note);
+  if (index < 0 || (kind === 'page' && note.pages.length === 1)) throw Error('마지막 페이지는 삭제할 수 없어요.');
+  finishDeleteUndo();
+  const record = { kind, index, note: JSON.parse(JSON.stringify(note)),
+    ...(kind === 'page' ? { page: JSON.parse(JSON.stringify(note.pages[index])) } : {}) };
+  pendingDelete = record;
+  try {
+    await commitImport([], () => {
+      const removed = kind === 'page' ? note.pages.splice(index, 1) : note.pages;
+      if (kind === 'note') state.notes.splice(index, 1);
+      for (const page of removed) if (page.background) orphanedAssets.add(page.background.id);
+      if (!state.notes.length) {
+        const placeholder = makeNote(note.folder);
+        state.notes.push(placeholder);
+        record.placeholder = JSON.stringify(placeholder);
+      }
+      if (kind === 'page') {
+        note.active = note.pages[Math.min(index, note.pages.length - 1)].id;
+        note.updated = Date.now();
+        return note;
+      }
+      return state.notes.find((entry) => filter === 'all' || entry.folder === filter) ?? state.notes[0];
+    }, new AbortController().signal);
+  } catch (error) {
+    pendingDelete = null;
+    hideDeleteNotice();
+    throw error;
+  }
+  $('deleteNoticeText').textContent = kind === 'note' ? '노트를 삭제했어요.' : '페이지를 삭제했어요.';
+  $('deleteNotice').hidden = false;
+  document.body.classList.add('has-delete-undo');
+  deleteTimer = setTimeout(() => { if (pendingDelete === record) finishDeleteUndo(); }, 10000);
+  return currentNote();
+}
+async function undoDeleted() {
+  const record = pendingDelete;
+  if (!record) return null;
+  const restored = await commitImport([], () => {
+    const allIds = new Set(state.notes.flatMap((note) => [note.id, ...note.pages.flatMap((page) => [page.id, ...page.texts.map((item) => item.id)])]));
+    if (record.kind === 'note') {
+      const note = JSON.parse(JSON.stringify(record.note));
+      const ids = [note.id, ...note.pages.flatMap((page) => [page.id, ...page.texts.map((item) => item.id)])];
+      if (ids.some((value) => allIds.has(value))) {
+        note.id = id();
+        note.title = (titleOf(note) + ' (복구)').slice(0, 100);
+        const active = note.pages.findIndex((page) => page.id === note.active);
+        note.pages = note.pages.map(duplicatePageData);
+        note.active = note.pages[Math.max(0, active)].id;
+      }
+      if (record.placeholder) state.notes = state.notes.filter((candidate) => JSON.stringify(candidate) !== record.placeholder);
+      if (state.notes.length >= 1000) throw Error('노트는 1000개까지 보관할 수 있어요.');
+      state.notes.splice(Math.min(record.index, state.notes.length), 0, note);
+      return note;
+    }
+    let note = state.notes.find((note) => note.id === record.note.id);
+    let page = JSON.parse(JSON.stringify(record.page));
+    if ([page.id, ...page.texts.map((item) => item.id)].some((value) => allIds.has(value))) page = duplicatePageData(page);
+    if (!note) {
+      if (state.notes.length >= 1000) throw Error('노트는 1000개까지 보관할 수 있어요.');
+      note = makeNote(record.note.folder, (titleOf(record.note) + ' (복구)').slice(0, 100));
+      note.pages = [];
+      state.notes.push(note);
+    }
+    note.pages.splice(Math.min(record.index, note.pages.length), 0, page);
+    note.active = page.id;
+    note.updated = Date.now();
+    return note;
+  }, new AbortController().signal);
+  clearTimeout(deleteTimer);
+  pendingDelete = null;
+  hideDeleteNotice();
+  return restored;
+}
 function renderPageOverview(focusId, step) {
   const note = currentNote();
   const fragment = document.createDocumentFragment();
@@ -1570,7 +1759,35 @@ function renderPageOverview(focusId, step) {
       if (focusId === page.id && direction === step && !arrow.disabled) toFocus = arrow;
       order.append(arrow);
     }
-    card.append(preview, order);
+    const extra = document.createElement('div');
+    extra.className = 'page-extra';
+    const duplicate = document.createElement('button');
+    duplicate.type = 'button';
+    duplicate.textContent = '복제';
+    duplicate.setAttribute('aria-label', `${index + 1}쪽 복제`);
+    duplicate.onclick = async () => {
+      $('pageOverview').close();
+      const copied = await runFileWork('페이지 복사 중', () => copyPageToNote(note.id, page.id, note.id), '페이지를 복사하지 못했어요.');
+      if (copied) { openImportedNote(copied); toast('페이지를 복제했어요.'); }
+    };
+    const copy = document.createElement('button');
+    copy.type = 'button';
+    copy.textContent = '다른 노트로';
+    copy.setAttribute('aria-label', `${index + 1}쪽을 다른 노트로 복사`);
+    copy.onclick = () => {
+      pageCopyTarget = { noteId: note.id, pageId: page.id };
+      $('copyDestination').replaceChildren();
+      for (const destination of state.notes.filter((entry) => entry.id !== note.id)) {
+        $('copyDestination').append(new Option(titleOf(destination), destination.id));
+      }
+      $('copyDestination').append(new Option('새 노트 만들기', ''));
+      $('copyNewTitle').value = (titleOf(note) + ' 사본').slice(0, 100);
+      $('copyDestination').onchange();
+      $('pageOverview').close();
+      $('copyPageDialog').showModal();
+    };
+    extra.append(duplicate, copy);
+    card.append(preview, order, extra);
     fragment.append(card);
   }
   $('pageTiles').replaceChildren(fragment);
@@ -1728,6 +1945,40 @@ $('pdfFile').addEventListener('change', async (event) => {
     return pages.length;
   }, 'PDF를 가져오지 못했어요.');
   if (added) toast(`PDF ${added}쪽을 새 노트로 가져왔어요.`);
+});
+$('pdfAppendFile').addEventListener('change', (event) => {
+  const file = event.target.files[0];
+  event.target.value = '';
+  if (!file) return;
+  showMenu();
+  pendingPdfAppend = { file, noteId: currentNote().id, pageId: currentPage().id };
+  $('pdfAppendName').textContent = file.name;
+  $('pdfPageRange').value = '';
+  $('pdfAppendDialog').showModal();
+});
+$('pdfAppendDialog').addEventListener('close', () => { pendingPdfAppend = null; });
+$('pdfAppendForm').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const request = pendingPdfAppend;
+  const range = $('pdfPageRange').value;
+  $('pdfAppendDialog').close();
+  if (!request) return;
+  const added = await runFileWork('PDF 이어붙이는 중', async (progress, signal) => {
+    const result = await (await media()).selectedPdfRasters(request.file, width, height, progress, signal, range);
+    const note = state.notes.find((note) => note.id === request.noteId);
+    const index = note?.pages.findIndex((page) => page.id === request.pageId) ?? -1;
+    if (!note || index < 0) throw Error('추가할 페이지가 바뀌었어요. 노트를 확인하고 다시 시도해 주세요.');
+    const pages = result.images.map((_, i) => makeMediaPage('pdf', `${request.file.name.slice(0, 175)} · ${result.pageNumbers[i]}쪽`));
+    await commitImport(pages.map((page, i) => [page.background.id, result.images[i]]), () => {
+      note.pages.splice(index + 1, 0, ...pages);
+      note.active = pages[0].id;
+      note.updated = Date.now();
+      return note;
+    }, signal);
+    openImportedNote(note);
+    return pages.length;
+  }, 'PDF를 추가하지 못했어요.');
+  if (added) toast(`PDF ${added}쪽을 현재 노트에 추가했어요.`);
 });
 $('photoFiles').addEventListener('change', async (event) => {
   const files = [...event.target.files];
@@ -1985,40 +2236,30 @@ const actions = {
   'delete-page': () => {
     const note = currentNote();
     if (note.pages.length === 1) return;
-    const index = note.pages.indexOf(currentPage());
-    confirmDelete('이 페이지를 삭제할까요?', `${index + 1}쪽의 필기와 텍스트가 삭제돼요.`, () => {
-      const [removed] = note.pages.splice(index, 1);
-      if (removed.background) orphanedAssets.add(removed.background.id);
-      histories.delete(removed.id);
-      note.active = note.pages[Math.min(index, note.pages.length - 1)].id;
-      selected = null;
-      updateNote();
-      renderPage(true);
-      toast('페이지를 삭제했어요.');
+    const page = currentPage();
+    confirmDelete('이 페이지를 삭제할까요?', '이 화면에서 삭제 직후 10초 동안 되돌릴 수 있어요.', async () => {
+      const result = await runFileWork('삭제 내용 저장 중', () => deleteWithUndo('page', note.id, page.id), '페이지를 삭제하지 못했어요.');
+      if (result) openImportedNote(result);
     });
   },
   'delete-note': () => {
     const note = currentNote();
-    confirmDelete('이 노트를 삭제할까요?', `'${titleOf(note)}'의 모든 페이지가 삭제돼요.`, () => {
-      state.notes = state.notes.filter((entry) => entry.id !== note.id);
-      for (const page of note.pages) {
-        histories.delete(page.id);
-        if (page.background) orphanedAssets.add(page.background.id);
-      }
-      if (!state.notes.length) state.notes.push(makeNote(note.folder));
-      state.active = (state.notes.find((entry) => filter === 'all' || entry.folder === filter) ?? state.notes[0]).id;
-      if (filter !== 'all') filter = currentNote().folder;
-      queueSave();
-      renderNote();
-      toast('노트를 삭제했어요.');
+    confirmDelete('이 노트를 삭제할까요?', `'${titleOf(note)}'을 삭제해요. 이 화면에서 10초 동안 되돌릴 수 있어요.`, async () => {
+      const result = await runFileWork('삭제 내용 저장 중', () => deleteWithUndo('note', note.id), '노트를 삭제하지 못했어요.');
+      if (result) openImportedNote(result);
     });
   }
 };
-const menus = [['mediaToggle','mediaMenu'], ['exportToggle','exportMenu'], ['docToggle','docMenu']];
+const menus = [['mediaToggle','mediaMenu'], ['exportToggle','exportMenu'], ['docToggle','docMenu'], ['shapeToggle','shapeMenu']];
 function showMenu(menuId = '') {
   for (const [toggle, menu] of menus) {
     $(menu).hidden = menu !== menuId;
     $(toggle).setAttribute('aria-expanded', menu === menuId);
+  }
+  if (menuId === 'shapeMenu') {
+    const rect = $('shapeToggle').getBoundingClientRect();
+    $('shapeMenu').style.left = Math.max(8, Math.min(rect.left, window.innerWidth - 240)) + 'px';
+    $('shapeMenu').style.top = Math.max(8, Math.min(rect.bottom + 6, window.innerHeight - 116)) + 'px';
   }
 }
 for (const [toggle, menu] of menus) {
@@ -2035,7 +2276,7 @@ for (const [toggle, menu] of menus) {
     actions[action]();
   });
 }
-document.addEventListener('click', (event) => { if (!event.target.closest('.menu-wrap')) showMenu(); });
+document.addEventListener('click', (event) => { if (!event.target.closest('.menu-wrap, #shapeMenu, #shapeToggle')) showMenu(); });
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
     const open = menus.find(([,menu]) => !$(menu).hidden);
@@ -2097,6 +2338,13 @@ $('undo').onclick = () => undoRedo('undo','redo');
 $('redo').onclick = () => undoRedo('redo','undo');
 for (const button of $('tools').children) {
   button.onclick = (event) => {
+    if (button.dataset.tool === 'shape') {
+      const open = $('shapeMenu').hidden;
+      setTool('shape');
+      showMenu(open ? 'shapeMenu' : '');
+      if (open) $('shapeMenu').querySelector('button').focus();
+      return;
+    }
     setTool(button.dataset.tool);
     if (tool === 'lasso') {
       toast('옮기거나 복제할 부분을 둘러 그리세요.');
@@ -2111,6 +2359,38 @@ for (const button of $('tools').children) {
     }
   };
 }
+for (const button of $('shapeMenu').querySelectorAll('[data-shape]')) {
+  button.setAttribute('aria-pressed', button.dataset.shape === shapeKind);
+  button.onclick = () => {
+    shapeKind = button.dataset.shape;
+    setTool('shape');
+    for (const item of $('shapeMenu').querySelectorAll('[data-shape]')) item.setAttribute('aria-pressed', item === button);
+    $('shapeToggle').title = `도형: ${button.textContent}`;
+    showMenu();
+    $('shapeToggle').focus();
+    toast(`${button.textContent}의 시작점부터 끝점까지 끌어 그리세요.`);
+  };
+}
+$('copyDestination').onchange = () => {
+  const create = !$('copyDestination').value;
+  $('copyNewLabel').hidden = $('copyNewTitle').hidden = !create;
+};
+$('copyPageDialog').addEventListener('close', () => { pageCopyTarget = null; });
+$('copyPageForm').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const target = pageCopyTarget;
+  const destination = $('copyDestination').value;
+  const title = $('copyNewTitle').value;
+  $('copyPageDialog').close();
+  if (!target) return;
+  const note = await runFileWork('페이지 복사 중', () => copyPageToNote(target.noteId, target.pageId, destination, title), '페이지를 복사하지 못했어요.');
+  if (note) { openImportedNote(note); toast('다른 노트로 페이지를 복사했어요.'); }
+});
+$('undoDelete').onclick = async () => {
+  const note = await runFileWork('삭제한 내용 되살리는 중', undoDeleted, '삭제한 내용을 되살리지 못했어요.');
+  if (note) { openImportedNote(note); toast('삭제한 내용을 되살렸어요.'); }
+};
+$('dismissDelete').onclick = finishDeleteUndo;
 for (const [value, name] of colors) {
   const button = document.createElement('button');
   button.className = 'swatch';
@@ -2139,4 +2419,5 @@ else queueSave();
 </script>
 </body>
 </html>
+
 
