@@ -1509,6 +1509,7 @@ for(let i=0;i<NS;i++){eqVec(STARS[i*4],STARS[i*4+1],SV,i*3);SMAG[i]=STARS[i*4+2]
 const NAMEFIX={Polaris:'북극성',Vega:'베가(직녀성)',Altair:'알타이르(견우성)'};
 function starName(i){const n=STARNAMES[i];if(!n)return null;return NAMEFIX[n[1]]||n[0];}
 function findStar(en){for(const k in STARNAMES)if(STARNAMES[k][1]===en)return +k;return -1;}
+const cassiopeiaW=new Set(['Caph','Shedar','Navi','Ruchbah','Segin'].map(findStar));
 const CONSKO={};for(const c of CONS)CONSKO[c[0]]=c[1];
 const LV = CLINES.map(l=>{const n=l.length/2,a=new Float64Array(n*3);for(let j=0;j<n;j++)eqVec(l[j*2],l[j*2+1],a,j*3);return a;});
 const CV = CONS.map(c=>{const a=new Float64Array(3);eqVec(c[2],c[3],a,0);return {name:c[1],rank:c[4],v:a};});
@@ -1652,7 +1653,10 @@ function drawStarDot(x,y,magEff,bv,i,scale,pen=ctx,limit=LIM,time=frameT,weight=
   const d=limit-magEff;
   const sizeContrast=(S.chapter===1?Math.min(3.8,limit):limit)-magEff;
   let r=(0.55+1.05*Math.pow(Math.max(sizeContrast+0.4,0),0.85))*scale;
-  const a=clamp(d/1.3+0.3,0.25,1)*(time===null?1:0.88+0.12*Math.sin(time*0.004+i*1.7))*weight;
+  let a=clamp(d/1.3+0.3,0.25,1)*(time===null?1:0.88+0.12*Math.sin(time*0.004+i*1.7))*weight;
+  if(pen===ctx&&S.mode==='guide'&&S.lines&&cassiopeiaW.has(i)){
+    r=Math.max(r,1.4);a=Math.max(a,.78);
+  }
   const c=bvColor(bv);
   if(magEff<1.6){const g=pen.createRadialGradient(x,y,0,x,y,r*4);g.addColorStop(0,c);g.addColorStop(1,'rgba(0,0,0,0)');pen.globalAlpha=a*0.35;pen.fillStyle=g;pen.beginPath();pen.arc(x,y,r*4,0,7);pen.fill();}
   pen.globalAlpha=a;pen.fillStyle=c;pen.beginPath();pen.arc(x,y,r,0,7);pen.fill();pen.globalAlpha=1;}
@@ -1868,11 +1872,18 @@ function draw(){
       if(alt<skyline(az)+2)continue;
       const p=proj(tmp);
       if(!p)continue;
+      const size=look?12:10,halfWidth=c.name.length*size/2+3;
+      const labelY=[0,14,-14,28,-28,42,-42].map(offset=>p[1]+offset).find(y=>{
+        if(y<skyTop+size||y>(look?skyBottom:mapBottom)-4)return false;
+        if(picks.some(o=>o.type==='star'&&CONSKO[STARNAMES[o.i]?.[2]]===c.name
+          &&Math.abs(o.x-p[0])<halfWidth+3&&o.y>y-size-4&&o.y<y+4))return false;
+        return look||!mapLabels.some(l=>Math.abs(p[0]-l.x)<(c.name.length+l.len)*4.5+4&&Math.abs(y-l.y)<12);
+      });
+      if(labelY===undefined)continue;
       if(!look){
-        if(mapLabels.some(l=>Math.abs(p[0]-l.x)<(c.name.length+l.len)*4.5+4&&Math.abs(p[1]-l.y)<12))continue;
-        mapLabels.push({x:p[0],y:p[1],len:c.name.length});
+        mapLabels.push({x:p[0],y:labelY,len:c.name.length});
       }
-      label(p[0],p[1],c.name,'rgba(160,184,240,.64)',look?12:10);
+      label(p[0],labelY,c.name,'rgba(160,184,240,.64)',size);
     }
   }
   if(look){drawGround();}else{ctx.restore();drawMapFrame();}
