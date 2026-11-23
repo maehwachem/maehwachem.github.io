@@ -45,6 +45,8 @@ svg{display:block;width:19px;height:19px;flex:none;stroke:currentColor;fill:none
 .note-text{display:grid;flex:1;min-width:0}
 .note-text strong{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .note-text small,.empty-list{font-size:11px;color:var(--muted)}
+.search-info{font-size:11px;color:var(--muted);margin:-15px 7px 12px}.search-info p{margin:2px 0}.search-pages{display:grid;gap:3px;padding:0 3px 8px 22px}.search-result{display:grid;text-align:left;gap:2px;padding:7px 8px;border-left:2px solid #d8cfee;border-radius:0 6px 6px 0;min-height:40px;overflow-wrap:anywhere}.search-result:hover,.search-more:hover{background:var(--tint)}.search-result strong{font-size:12px;color:var(--deep)}.search-result small{font-size:11px;color:var(--muted)}.search-more{font-size:12px;text-align:left;padding:7px;border-radius:6px;color:var(--accent)}
+.annotation.search-match{outline:2px solid #c18d23;outline-offset:4px;background:#ffecaa66}.bookmark-indicator{font-size:11px;color:var(--accent);margin-left:8px}.overview-options{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:-3px 0 12px;font-size:12px;color:var(--muted)}.overview-options label{display:flex;align-items:center;gap:5px;min-height:32px}.page-bookmark{min-height:34px;font-size:12px;border-radius:6px;color:var(--muted)}.page-bookmark[aria-pressed=true]{color:var(--deep);background:#e6dff6}.page-bookmark:hover{background:var(--tint)}.page-tiles>.empty-list{grid-column:1/-1}.pdf-scope{margin:12px 0}.export-error{color:#a43443;font-size:13px}
 .empty-list{padding:4px 6px}
 .local-info{border-top:1px solid var(--line);display:flex;align-items:center;gap:8px;margin-top:10px;padding:13px 6px 0;color:var(--muted);font-size:11px}
 .local-info svg{width:15px;height:15px}
@@ -204,6 +206,7 @@ textarea.dialog-input{min-height:130px;resize:vertical;line-height:1.5}
     <a class="brand" href="/" aria-label="KJE의 작업실로 돌아가기" style="text-decoration:none;color:inherit"><span class="brand-mark" data-icon="brand"></span><strong>종이노트</strong></a>
     <button class="primary" id="addNote"><span data-icon="plus"></span> 새 노트</button>
     <label class="search"><span data-icon="search"></span><input id="search" type="search" placeholder="노트 검색" aria-label="노트 검색" autocomplete="off"></label>
+    <div class="search-info" id="searchInfo" hidden><p id="searchStatus" role="status"></p><p>제목과 입력한 글을 찾아요.<br>손글씨·사진·PDF 속 글자는 검색하지 않아요.</p></div>
     <section aria-labelledby="libraryLabel">
       <h2 class="section-heading" id="libraryLabel">노트함</h2>
       <div class="folders" id="folders"></div>
@@ -235,8 +238,9 @@ textarea.dialog-input{min-height:130px;resize:vertical;line-height:1.5}
           <div class="menu" id="exportMenu" hidden>
             <button data-action="png"><span data-icon="image"></span> 현재 페이지 PNG</button>
             <button data-action="print"><span data-icon="print"></span> 현재 페이지 인쇄·PDF</button>
-            <button data-action="export-pdf"><span data-icon="file"></span> 전체 노트를 PDF로 저장</button>
+            <button data-action="export-pdf"><span data-icon="file"></span> 이 노트를 PDF로 저장…</button>
             <hr>
+            <button data-action="backup-note"><span data-icon="download"></span> 이 노트만 백업</button>
             <button data-action="backup"><span data-icon="download"></span> 전체 노트 백업</button>
             <button data-action="import"><span data-icon="upload"></span> 백업 가져오기</button>
           </div>
@@ -244,10 +248,11 @@ textarea.dialog-input{min-height:130px;resize:vertical;line-height:1.5}
       </div>
     </header>
     <section class="doc-head" aria-label="현재 노트">
-      <div class="doc-name"><p class="doc-meta"><span id="docDate"></span><span class="source-label" id="sourceLabel" hidden></span></p><input class="title-input" id="title" aria-label="노트 제목" placeholder="제목 없는 노트" maxlength="100" autocomplete="off"></div>
+      <div class="doc-name"><p class="doc-meta"><span id="docDate"></span><span class="source-label" id="sourceLabel" hidden></span><span id="bookmarkIndicator" class="bookmark-indicator" hidden>★ 책갈피</span></p><input class="title-input" id="title" aria-label="노트 제목" placeholder="제목 없는 노트" maxlength="100" autocomplete="off"></div>
       <div class="menu-wrap">
         <button class="icon-button" id="docToggle" data-icon="more" aria-expanded="false" aria-controls="docMenu" aria-label="노트 옵션"></button>
         <div class="menu" id="docMenu" hidden>
+          <button data-action="bookmark" aria-pressed="false"><span data-icon="bookmark"></span><span id="bookmarkLabel">현재 페이지 책갈피 표시</span></button>
           <button data-action="move"><span data-icon="folder"></span><span id="moveLabel"></span></button>
           <button data-action="pen-mode"><span data-icon="pen"></span><span id="penModeLabel"></span></button>
           <hr>
@@ -328,7 +333,19 @@ textarea.dialog-input{min-height:130px;resize:vertical;line-height:1.5}
     <h2 class="dialog-title" id="overviewHeading">페이지 관리</h2>
     <button type="button" class="secondary" data-close="pageOverview" autofocus>닫기</button>
   </header>
+  <div class="overview-options"><label><input type="checkbox" id="bookmarksOnly"> 책갈피만 보기</label><span id="overviewCount" role="status"></span></div>
   <div id="pageTiles" class="page-tiles"></div>
+</dialog>
+<dialog id="pdfExportDialog" aria-labelledby="pdfExportHeading">
+  <form id="pdfExportForm">
+    <h2 id="pdfExportHeading" class="dialog-title">이 노트를 PDF로 저장</h2>
+    <p id="pdfExportName" class="dialog-label"></p>
+    <label for="pdfExportScope" class="dialog-label">저장할 페이지</label>
+    <select id="pdfExportScope" class="dialog-input pdf-scope"><option value="all">이 노트 전체</option><option value="current">현재 페이지</option><option value="range">범위 선택</option></select>
+    <label for="pdfExportRange" class="dialog-label">쪽 범위</label><input id="pdfExportRange" class="dialog-input" maxlength="2000" placeholder="예: 1-3, 5" autocomplete="off" disabled>
+    <p class="dialog-label">쪽 번호는 이 노트의 순서예요. 선택한 쪽을 원래 순서대로 저장해요.</p>
+    <div class="dialog-actions"><button type="button" class="secondary" data-close="pdfExportDialog">취소</button><button type="submit" class="primary">PDF 저장</button></div>
+  </form>
 </dialog>
 <dialog id="copyPageDialog" aria-labelledby="copyPageHeading">
   <form id="copyPageForm">
@@ -383,6 +400,7 @@ textarea.dialog-input{min-height:130px;resize:vertical;line-height:1.5}
 <script>
 'use strict';
 const icons = {
+  bookmark:'<path d="M6 3h12v18l-6-4-6 4z"/>',
   shape:'<rect x="3" y="4" width="10" height="10" rx="1"/><circle cx="16" cy="16" r="5"/>',
   brand:'<path d="M5 4h11a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2zm0 13a2 2 0 0 1 2-2h11M8 9l2 2 4-4"/>',
   plus:'<path d="M12 5v14M5 12h14"/>', minus:'<path d="M5 12h14"/>',
@@ -460,7 +478,7 @@ function initialState() {
 }
 function validDate(value) { return Number.isFinite(value) && value >= 0 && value < 8.64e15; }
 async function media() {
-  try { return await import('./note-assets/page-media.js?v=20261123-phase1'); }
+  try { return await import('./note-assets/page-media.js?v=20261123-phase2'); }
   catch (cause) { throw new Error('자료 처리 기능을 불러오지 못했어요. 종이노트를 새로고침한 뒤 다시 시도해 주세요.', { cause }); }
 }
 function checkFileCancellation(signal) {
@@ -492,6 +510,7 @@ function parseState(raw) {
     for (const page of note.pages) {
       keepId(page?.id);
       if (!paperTypes.includes(page.type) || !Array.isArray(page.strokes) || !Array.isArray(page.texts)) throw Error('invalid page');
+      if (page.bookmark !== undefined && typeof page.bookmark !== 'boolean') throw Error('invalid bookmark');
       if (page.background !== undefined && (!validAssetId(page.background?.id) ||
           !['pdf', 'photo'].includes(page.background.kind) || typeof page.background.name !== 'string' ||
           page.background.name.length > 200)) throw Error('invalid background');
@@ -548,6 +567,9 @@ let pendingDelete = null;
 let deleteTimer;
 let pageCopyTarget = null;
 let pendingPdfAppend = null;
+let pendingPdfExport = null;
+let searchTarget = null;
+const expandedSearchNotes = new Set();
 let displayedBackground = null;
 let thumbObserver;
 const orphanedAssets = new Set(readCleanupQueue());
@@ -745,6 +767,7 @@ function renderTexts() {
   for (const item of currentPage().texts) {
     const button = document.createElement('button');
     button.className = 'annotation';
+    button.classList.toggle('search-match', searchTarget?.pageId === currentPage().id && searchTarget.itemId === item.id);
     button.dataset.id = item.id;
     button.dataset.style = item.style;
     button.textContent = item.body;
@@ -757,6 +780,46 @@ function renderTexts() {
   }
   $('textLayer').replaceChildren(fragment);
   renderSelection();
+}
+function searchNote(note, value) {
+  const query = value.trim().normalize('NFC').toLowerCase();
+  if (!query) return { titleMatch: false, pages: [] };
+  const pages = [];
+  for (const [index, page] of note.pages.entries()) {
+    for (const item of page.texts) {
+      const body = item.body.normalize('NFC');
+      const position = body.toLowerCase().indexOf(query);
+      if (position < 0) continue;
+      const start = Math.max(0, position - 22);
+      const end = Math.min(body.length, start + 90);
+      pages.push({ pageId: page.id, index, itemId: item.id,
+        snippet: (start ? '…' : '') + body.slice(start, end).replace(/\s+/g, ' ') + (end < body.length ? '…' : '') });
+      break;
+    }
+  }
+  return { titleMatch: titleOf(note).normalize('NFC').toLowerCase().includes(query), pages };
+}
+function openNoteAt(noteId, pageId, itemId) {
+  finishDrawing();
+  const note = state.notes.find((entry) => entry.id === noteId);
+  const page = pageId ? note?.pages.find((entry) => entry.id === pageId) : null;
+  if (!note || (pageId && !page)) { toast('이동할 페이지를 찾을 수 없어요. 다시 검색해 주세요.'); return; }
+  state.active = note.id;
+  if (page) note.active = page.id;
+  searchTarget = page && itemId ? { noteId, pageId, itemId } : null;
+  queueSave();
+  renderNote();
+  setSidebar(false);
+  $('pageCounter').focus();
+  if (!searchTarget) return;
+  const target = searchTarget;
+  requestAnimationFrame(() => {
+    if (searchTarget !== target || state.active !== noteId || currentPage().id !== pageId) return;
+    const item = currentPage().texts.find((entry) => entry.id === itemId);
+    if (!item) return;
+    scroller.scrollTo(0, Math.max(0, item.y * scale - 55));
+    [...$('textLayer').children].find((node) => node.dataset.id === itemId)?.focus({ preventScroll: true });
+  });
 }
 function renderSidebar() {
   const query = $('search').value.trim().toLowerCase();
@@ -779,11 +842,16 @@ function renderSidebar() {
   }
   $('folders').replaceChildren(groupList);
   const list = document.createDocumentFragment();
-  const visible = state.notes.filter((note) =>
-    (filter === 'all' || note.folder === filter) &&
-    (!query || titleOf(note).toLowerCase().includes(query) ||
-      note.pages.some((page) => page.texts.some((item) => item.body.toLowerCase().includes(query))))
-  ).sort((a, b) => b.updated - a.updated);
+  const matches = new Map();
+  const visible = state.notes.filter((note) => {
+    if (filter !== 'all' && note.folder !== filter) return false;
+    if (!query) return true;
+    const result = searchNote(note, query);
+    matches.set(note.id, result);
+    return result.titleMatch || result.pages.length;
+  }).sort((a, b) => b.updated - a.updated);
+  $('searchInfo').hidden = !query;
+  $('searchStatus').textContent = query ? `노트 ${visible.length}개 · 본문 ${visible.reduce((total, note) => total + matches.get(note.id).pages.length, 0)}쪽 일치` : '';
   for (const note of visible) {
     const button = document.createElement('button');
     button.className = 'note-card' + (note.id === state.active ? ' active' : '');
@@ -794,17 +862,46 @@ function renderSidebar() {
     const heading = document.createElement('strong');
     const detail = document.createElement('small');
     heading.textContent = titleOf(note);
-    detail.textContent = `${folders[note.folder]} · ${note.pages.length}쪽`;
+    const match = matches.get(note.id);
+    detail.textContent = `${folders[note.folder]} · ${note.pages.length}쪽` + (match?.titleMatch ? ' · 제목 일치' : '');
     meta.append(heading, detail);
     button.append(meta);
     button.addEventListener('click', () => {
-      finishDrawing();
-      state.active = note.id;
-      queueSave();
-      renderNote();
-      setSidebar(false);
+      const first = !match?.titleMatch && match?.pages[0];
+      openNoteAt(note.id, first?.pageId, first?.itemId);
     });
     list.append(button);
+    if (match?.pages.length) {
+      const results = document.createElement('div');
+      results.className = 'search-pages';
+      const expanded = expandedSearchNotes.has(note.id);
+      for (const hit of expanded ? match.pages : match.pages.slice(0, 4)) {
+        const result = document.createElement('button');
+        result.className = 'search-result';
+        const label = document.createElement('strong');
+        label.textContent = `${hit.index + 1}쪽`;
+        const snippet = document.createElement('small');
+        snippet.textContent = hit.snippet;
+        result.append(label, snippet);
+        result.setAttribute('aria-label', `${titleOf(note)} ${hit.index + 1}쪽: ${hit.snippet}`);
+        result.onclick = () => openNoteAt(note.id, hit.pageId, hit.itemId);
+        results.append(result);
+      }
+      if (match.pages.length > 4) {
+        const more = document.createElement('button');
+        more.className = 'search-more';
+        more.textContent = expanded ? '일치한 쪽 접기' : `일치한 ${match.pages.length - 4}쪽 더 보기`;
+        more.setAttribute('aria-expanded', expanded);
+        more.onclick = () => {
+          if (expanded) expandedSearchNotes.delete(note.id); else expandedSearchNotes.add(note.id);
+          renderSidebar();
+          [...$('notes').querySelectorAll('.search-more')].find((node) => node.dataset.noteId === note.id)?.focus();
+        };
+        more.dataset.noteId = note.id;
+        results.append(more);
+      }
+      list.append(results);
+    }
   }
   if (!visible.length) {
     const empty = document.createElement('p');
@@ -827,6 +924,9 @@ function renderPage(resetScroll = false) {
   $('prev').disabled = index === 0;
   $('next').disabled = index === note.pages.length - 1;
   $('docMenu').querySelector('[data-action=delete-page]').disabled = note.pages.length === 1;
+  $('bookmarkIndicator').hidden = !page.bookmark;
+  $('bookmarkLabel').textContent = page.bookmark ? '현재 페이지 책갈피 해제' : '현재 페이지 책갈피 표시';
+  $('docMenu').querySelector('[data-action=bookmark]').setAttribute('aria-pressed', page.bookmark === true);
   redrawInk();
   renderTexts();
   updateHistoryButtons();
@@ -1769,13 +1869,30 @@ async function undoDeleted() {
     throw error;
   }
 }
-function renderPageOverview(focusId, step) {
+function overviewPages(note, onlyBookmarked) {
+  return note.pages.map((page, index) => ({ page, index })).filter(({ page }) => !onlyBookmarked || page.bookmark === true);
+}
+function togglePageBookmark(noteId, pageId) {
+  finishDrawing();
+  const note = state.notes.find((entry) => entry.id === noteId);
+  const page = note?.pages.find((entry) => entry.id === pageId);
+  if (!page) return;
+  page.bookmark = !page.bookmark;
+  note.updated = Date.now();
+  queueSave();
+  renderSidebar();
+  renderPage();
+  return page.bookmark;
+}
+function renderPageOverview(focusId, step, focusBookmark = false) {
   const note = currentNote();
   const fragment = document.createDocumentFragment();
   const mediaTiles = new Map();
   thumbObserver?.disconnect();
   let toFocus;
-  for (const [index, page] of note.pages.entries()) {
+  const visible = overviewPages(note, $('bookmarksOnly').checked);
+  $('overviewCount').textContent = `${visible.length} / ${note.pages.length}쪽` + ($('bookmarksOnly').checked ? ' · 순서 변경은 전체 보기에서' : ' · 원래 쪽 번호');
+  for (const { index, page } of visible) {
     const card = document.createElement('div');
     card.className = 'page-tile';
     const preview = document.createElement('button');
@@ -1804,7 +1921,7 @@ function renderPageOverview(focusId, step) {
       const label = `${index + 1}쪽을 ${direction < 0 ? '앞으로' : '뒤로'} 이동`;
       arrow.title = label;
       arrow.setAttribute('aria-label', label);
-      arrow.disabled = !note.pages[index + direction];
+      arrow.disabled = $('bookmarksOnly').checked || !note.pages[index + direction];
       arrow.onclick = () => {
         const next = index + direction;
         [note.pages[index], note.pages[next]] = [note.pages[next], note.pages[index]];
@@ -1843,8 +1960,25 @@ function renderPageOverview(focusId, step) {
       $('copyPageDialog').showModal();
     };
     extra.append(duplicate, copy);
-    card.append(preview, order, extra);
+    const bookmark = document.createElement('button');
+    bookmark.type = 'button';
+    bookmark.className = 'page-bookmark';
+    bookmark.textContent = page.bookmark ? '★ 책갈피' : '☆ 책갈피';
+    bookmark.setAttribute('aria-label', `${index + 1}쪽 책갈피 ${page.bookmark ? '해제' : '표시'}`);
+    bookmark.setAttribute('aria-pressed', page.bookmark === true);
+    bookmark.onclick = () => {
+      togglePageBookmark(note.id, page.id);
+      renderPageOverview(page.id, undefined, true);
+    };
+    if (focusId === page.id && focusBookmark) toFocus = bookmark;
+    card.append(preview, bookmark, order, extra);
     fragment.append(card);
+  }
+  if (!visible.length) {
+    const empty = document.createElement('p');
+    empty.className = 'empty-list';
+    empty.textContent = '책갈피한 페이지가 없어요. 책갈피만 보기를 끄고 표시할 쪽을 골라 주세요.';
+    fragment.append(empty);
   }
   $('pageTiles').replaceChildren(fragment);
   if (mediaTiles.size) {
@@ -1857,15 +1991,18 @@ function renderPageOverview(focusId, step) {
     }, { root: $('pageTiles'), rootMargin: '90px' });
     for (const canvas of mediaTiles.keys()) thumbObserver.observe(canvas);
   }
-  toFocus?.focus();
+  if (toFocus) toFocus.focus();
+  else if (focusBookmark) $('bookmarksOnly').focus();
 }
 $('pageCounter').onclick = () => {
   finishDrawing();
   resetLasso(true);
+  $('bookmarksOnly').checked = false;
   renderPageOverview();
   $('pageOverview').showModal();
 };
 $('pageOverview').addEventListener('close', () => thumbObserver?.disconnect());
+$('bookmarksOnly').onchange = () => renderPageOverview();
 function download(blob, filename) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
@@ -1876,7 +2013,7 @@ function download(blob, filename) {
   link.remove();
   setTimeout(() => URL.revokeObjectURL(url), 30000);
 }
-function fileBase() { return titleOf(currentNote()).replace(/[\\/:*?"<>|]/g, '_').slice(0, 80); }
+function fileBase(note = currentNote()) { return titleOf(note).replace(/[\\/:*?"<>|]/g, '_').slice(0, 80); }
 async function exportPng() {
   const page = currentPage();
   const index = currentNote().pages.indexOf(page) + 1;
@@ -2074,12 +2211,36 @@ $('photoFiles').addEventListener('change', async (event) => {
   }, '사진을 넣지 못했어요.');
   if (added) toast(`사진 ${added}장을 새 페이지로 넣었어요.`);
 });
-async function exportNotePdf() {
-  const note = currentNote();
-  const filename = fileBase() + '.pdf';
+function pdfExportPages(note, scope, range, parseRange) {
+  if (scope === 'all') return note.pages;
+  if (scope === 'current') {
+    const page = note.pages.find((page) => page.id === note.active);
+    if (!page) throw Error('현재 페이지를 찾을 수 없어요.');
+    return [page];
+  }
+  if (scope !== 'range' || !range.trim()) throw Error('저장할 쪽 범위를 1-3, 5처럼 입력해 주세요.');
+  try { return parseRange(range, note.pages.length, note.pages.length).map((number) => note.pages[number - 1]); }
+  catch (error) { throw new Error(error.message.replace('이 PDF의', '이 노트의'), { cause: error }); }
+}
+function openPdfExportDialog() {
+  finishDrawing();
+  resetLasso(true);
+  pendingPdfExport = JSON.parse(JSON.stringify(currentNote()));
+  $('pdfExportName').textContent = `${titleOf(pendingPdfExport)} · ${pendingPdfExport.pages.length}쪽`;
+  $('pdfExportScope').value = 'all';
+  $('pdfExportRange').value = '';
+  $('pdfExportScope').onchange();
+  $('pdfExportDialog').showModal();
+}
+async function exportNotePdf(note, scope, range) {
+  let filename;
   const file = await runFileWork('노트를 PDF로 만드는 중', async (progress, signal) => {
-    const { noteAsPdf } = await media();
-    return noteAsPdf(titleOf(note), note.pages, pageImage, progress, signal);
+    const { noteAsPdf, parsePageRange } = await media();
+    const pages = pdfExportPages(note, scope, range, parsePageRange);
+    const numbers = pages.map((page) => note.pages.indexOf(page) + 1);
+    const label = numbers.length <= 8 ? numbers.join('-') : `${numbers[0]}-${numbers.at(-1)}중${numbers.length}`;
+    filename = fileBase(note) + (scope === 'all' ? '' : `-${label}쪽`) + '.pdf';
+    return noteAsPdf(titleOf(note), pages, pageImage, progress, signal);
   }, '노트를 PDF로 저장하지 못했어요.');
   if (file) download(file, filename);
 }
@@ -2099,7 +2260,7 @@ function fromDataUrl(value) {
 }
 function restoredContent(note, title = note.title) {
   const pages = note.pages.map((page) => ({
-    type: page.type, strokes: page.strokes,
+    type: page.type, strokes: page.strokes, bookmark: page.bookmark === true,
     texts: page.texts.map(({ id, ...item }) => item),
     background: page.background ? { kind: page.background.kind, name: page.background.name } : null
   }));
@@ -2197,9 +2358,15 @@ async function planBackupRestore(notes, assets, existing, progress, signal) {
   }
   return { imported, repaired, entries: [...entries.values()] };
 }
-async function exportBackup() {
-  const blob = await runFileWork('전체 노트 백업 중', async (progress, signal) => {
-    const keys = [...assetKeys(state.notes)];
+function snapshotForBackup(scope) {
+  const notes = scope === 'current' ? [currentNote()] : state.notes;
+  return JSON.parse(JSON.stringify({ active: scope === 'current' ? notes[0].id : state.active, inputMode: state.inputMode, notes }));
+}
+async function buildBackup(snapshot, progress, signal) {
+  checkFileCancellation(signal);
+  return withAssetLock(async () => {
+    checkFileCancellation(signal);
+    const keys = [...assetKeys(snapshot.notes)];
     const assets = [];
     if (keys.length) {
       const { assetBlob } = await media();
@@ -2210,13 +2377,22 @@ async function exportBackup() {
       }
     }
     checkFileCancellation(signal);
-    const data = JSON.stringify({ format: 'jeongi-note', version: assets.length ? 2 : 1, ...state,
+    const data = JSON.stringify({ format: 'jeongi-note', version: assets.length ? 2 : 1, ...snapshot,
       ...(assets.length ? { assets } : {}) });
     const result = new Blob([data], { type: 'application/json' });
     if (result.size > maxBackupBytes) throw Error('백업 파일이 160MB를 초과해요.');
     return result;
-  }, '전체 노트를 백업하지 못했어요.');
-  if (blob) download(blob, '종이노트-백업.json');
+  });
+}
+async function exportBackup(scope = 'all') {
+  finishDrawing();
+  resetLasso(true);
+  const snapshot = snapshotForBackup(scope);
+  const single = scope === 'current';
+  const filename = single ? fileBase(snapshot.notes[0]) + '-백업.json' : '종이노트-백업.json';
+  const blob = await runFileWork(single ? '이 노트 백업 중' : '전체 노트 백업 중',
+    (progress, signal) => buildBackup(snapshot, progress, signal), '노트를 백업하지 못했어요.');
+  if (blob) download(blob, filename);
 }
 $('backupFile').addEventListener('change', async (event) => {
   const file = event.target.files[0];
@@ -2273,7 +2449,12 @@ $('confirmDialog').addEventListener('close', () => {
 const actions = {
   png: exportPng,
   print: printPage,
-  'export-pdf': exportNotePdf,
+  'export-pdf': openPdfExportDialog,
+  'backup-note': () => exportBackup('current'),
+  bookmark: () => {
+    const marked = togglePageBookmark(currentNote().id, currentPage().id);
+    toast(marked ? '현재 페이지에 책갈피를 표시했어요.' : '현재 페이지의 책갈피를 해제했어요.');
+  },
   backup: exportBackup,
   import: () => $('backupFile').click(),
   move: () => {
@@ -2357,7 +2538,12 @@ document.addEventListener('keydown', (event) => {
   if (key === 'y' || event.shiftKey) undoRedo('redo','undo');
   else undoRedo('undo','redo');
 });
-$('search').addEventListener('input', renderSidebar);
+$('search').addEventListener('input', () => {
+  expandedSearchNotes.clear();
+  searchTarget = null;
+  for (const node of $('textLayer').children) node.classList.remove('search-match');
+  renderSidebar();
+});
 $('title').addEventListener('input', (event) => {
   currentNote().title = event.target.value;
   updateNote();
@@ -2430,6 +2616,20 @@ for (const button of $('shapeMenu').querySelectorAll('[data-shape]')) {
     toast(`${button.textContent}의 시작점부터 끝점까지 끌어 그리세요.`);
   };
 }
+$('pdfExportScope').onchange = () => {
+  const range = $('pdfExportScope').value === 'range';
+  $('pdfExportRange').disabled = !range;
+  $('pdfExportRange').required = range;
+};
+$('pdfExportDialog').addEventListener('close', () => { pendingPdfExport = null; });
+$('pdfExportForm').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const note = pendingPdfExport;
+  const scope = $('pdfExportScope').value;
+  const range = $('pdfExportRange').value;
+  $('pdfExportDialog').close();
+  if (note) await exportNotePdf(note, scope, range);
+});
 $('copyDestination').onchange = () => {
   const create = !$('copyDestination').value;
   $('copyNewLabel').hidden = $('copyNewTitle').hidden = !create;
