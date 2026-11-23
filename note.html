@@ -466,6 +466,10 @@ async function media() {
 function checkFileCancellation(signal) {
   if (signal.aborted) throw signal.reason || Error('작업을 취소했어요.');
 }
+function withAssetLock(task) {
+  return typeof navigator !== 'undefined' && navigator.locks?.request
+    ? navigator.locks.request('jeongi-note-assets-v1', task) : task();
+}
 const validAssetId = (value) => typeof value === 'string' && /^[a-z0-9-]{8,100}$/i.test(value);
 function validColor(value) { return typeof value === 'string' && /^#[a-f0-9]{6}$/i.test(value); }
 function validShape(shape) {
@@ -1512,15 +1516,17 @@ function retainedAssetKeys() {
 }
 async function clearOrphanedAssets() {
   try {
-    const store = await media();
-    if (protectedStorage || dirty || localStorage.getItem(key) !== lastStored) return;
-    const used = retainedAssetKeys();
-    const remove = [...orphanedAssets].filter((key) => !used.has(key));
-    await store.updateAssets({ remove });
-    for (const key of remove) orphanedAssets.delete(key);
-    const removed = new Set(remove);
-    const queued = new Set([...readCleanupQueue(), ...orphanedAssets]);
-    localStorage.setItem(cleanupKey, JSON.stringify([...queued].filter((key) => !removed.has(key))));
+    await withAssetLock(async () => {
+      const store = await media();
+      if (protectedStorage || dirty || localStorage.getItem(key) !== lastStored) return;
+      const used = retainedAssetKeys();
+      const remove = [...orphanedAssets].filter((key) => !used.has(key));
+      await store.updateAssets({ remove });
+      for (const key of remove) orphanedAssets.delete(key);
+      const removed = new Set(remove);
+      const queued = new Set([...readCleanupQueue(), ...orphanedAssets]);
+      localStorage.setItem(cleanupKey, JSON.stringify([...queued].filter((key) => !removed.has(key))));
+    });
   } catch {
     // Unused data can be removed on the next successful save.
   }
@@ -1614,6 +1620,7 @@ function duplicatePageData(page) {
   return copy;
 }
 async function copyPageToNote(sourceId, pageId, destinationId, title = '') {
+  $('cancelFileWork').disabled = true;
   finishDrawing();
   resetLasso(true);
   const source = state.notes.find((note) => note.id === sourceId);
@@ -1652,6 +1659,7 @@ function finishDeleteUndo() {
   clearOrphanedAssets();
 }
 async function deleteWithUndo(kind, noteId, pageId) {
+  $('cancelFileWork').disabled = true;
   finishDrawing();
   resetLasso(true);
   const note = state.notes.find((note) => note.id === noteId);
@@ -1708,6 +1716,7 @@ async function deleteWithUndo(kind, noteId, pageId) {
 async function undoDeleted() {
   const record = pendingDelete;
   if (!record) return null;
+  $('cancelFileWork').disabled = true;
   clearTimeout(deleteTimer);
   // Other tabs cannot see this screen's undo window. Restore retained images
   // under fresh IDs so a cleanup already queued in another tab cannot erase them.
@@ -1933,33 +1942,35 @@ function importSaveError() {
     : '노트 정보를 저장하지 못했어요. 기존 노트를 백업하고 브라우저 저장 공간을 확인해 주세요.');
 }
 async function commitImport(entries, apply, signal) {
-  checkFileCancellation(signal);
-  // Save existing edits first; failed imports must not discard them.
-  dirty = true;
-  if (!persist()) throw importSaveError();
-  const before = JSON.stringify(state);
-  $('cancelFileWork').disabled = true;
-  const assets = entries.length ? await media() : null;
-  if (assets) await assets.updateAssets({ entries });
-  try {
-    const note = apply();
-    state.active = note.id;
+  return withAssetLock(async () => {
+    checkFileCancellation(signal);
+    // Save existing edits first; failed imports must not discard them.
     dirty = true;
     if (!persist()) throw importSaveError();
-    return note;
-  } catch (error) {
-    clearTimeout(saveTimer);
-    state = parseState(before);
-    dirty = true;
-    renderNote();
-    if (assets) {
-      try { await assets.updateAssets({ remove: entries.map(([key]) => key) }); }
-      catch (cause) {
-        throw new Error(error.message + ' 추가한 임시 자료 일부를 정리하지 못했어요.', { cause });
+    const before = JSON.stringify(state);
+    $('cancelFileWork').disabled = true;
+    const assets = entries.length ? await media() : null;
+    if (assets) await assets.updateAssets({ entries });
+    try {
+      const note = apply();
+      state.active = note.id;
+      dirty = true;
+      if (!persist()) throw importSaveError();
+      return note;
+    } catch (error) {
+      clearTimeout(saveTimer);
+      state = parseState(before);
+      dirty = true;
+      renderNote();
+      if (assets) {
+        try { await assets.updateAssets({ remove: entries.map(([key]) => key) }); }
+        catch (cause) {
+          throw new Error(error.message + ' 추가한 임시 자료 일부를 정리하지 못했어요.', { cause });
+        }
       }
+      throw error;
     }
-    throw error;
-  }
+  });
 }
 function makeMediaPage(kind, name) {
   return { ...makePage('plain'), background: { id: id(), kind, name: name.slice(0, 200) } };
