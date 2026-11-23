@@ -1773,7 +1773,6 @@ function endMove(event) {
 }
 for (const name of ['pointerup','pointercancel','lostpointercapture']) $('moveText').addEventListener(name, endMove);
 $('moveText').addEventListener('keydown', (event) => {
-  if (runToolbarShortcut(event)) return;
   const shift = { ArrowLeft: [-1,0], ArrowRight: [1,0], ArrowUp: [0,-1], ArrowDown: [0,1] }[event.key];
   const item = currentItem();
   if (!shift || !item) return;
@@ -2899,6 +2898,7 @@ document.addEventListener('keydown', (event) => {
     else if (lassoSelection) resetLasso(true);
     else if (focusMode) setFocusMode(false);
   }
+  if (runToolbarShortcut(event)) return;
   const shift = { ArrowLeft: [-8,0], ArrowRight: [8,0], ArrowUp: [0,-8], ArrowDown: [0,8] }[event.key];
   if (shift && tool === 'lasso' && lassoSelection && !lasso && !event.ctrlKey && !event.metaKey && !event.altKey &&
       !event.target.closest('input, textarea, select, dialog')) {
