@@ -178,7 +178,32 @@ export async function photoRaster(file, sheetWidth, sheetHeight) {
   src.close?.();
   return canvasBlob(canvas, 'image/jpeg', .9);
 }
+export function parsePageRange(value, numPages) {
+  const text = String(value ?? '').trim().replace(/[–—−~～－]/g, '-').replace(/，/g, ',');
+  if (!text || text === '전체') {
+    if (numPages > 100) throw Error('PDF는 한 번에 100쪽까지 넣을 수 있어요. 가져올 쪽을 골라 주세요.');
+    return Array.from({ length: numPages }, (_, i) => i + 1);
+  }
+  if (text.length > 2000) throw Error('가져올 쪽 범위를 짧게 입력해 주세요.');
+  const selected = new Set();
+  for (const part of text.split(',')) {
+    const match = part.trim().match(/^(\d+)\s*(?:-\s*(\d+))?$/);
+    if (!match) throw Error('쪽 범위는 1-3, 5처럼 입력해 주세요.');
+    const first = Number(match[1]), last = Number(match[2] ?? match[1]);
+    if (!Number.isSafeInteger(first) || !Number.isSafeInteger(last) || first < 1 || last < first || last > numPages) {
+      throw Error(`이 PDF의 1쪽부터 ${numPages}쪽 사이에서 골라 주세요.`);
+    }
+    for (let page = first; page <= last; page++) {
+      selected.add(page);
+      if (selected.size > 100) throw Error('PDF는 한 번에 100쪽까지 넣을 수 있어요.');
+    }
+  }
+  return [...selected].sort((a, b) => a - b);
+}
 export async function pdfRasters(file, sheetWidth, sheetHeight, progress, signal) {
+  return (await selectedPdfRasters(file, sheetWidth, sheetHeight, progress, signal)).images;
+}
+export async function selectedPdfRasters(file, sheetWidth, sheetHeight, progress, signal, range = '') {
   if (file.size > 60 * 1024 * 1024) throw Error('PDF 한 파일은 60MB까지 넣을 수 있어요.');
   let pdfjs;
   try { pdfjs = await import('./vendor/pdfjs/pdf.min.js'); }
@@ -208,13 +233,13 @@ export async function pdfRasters(file, sheetWidth, sheetHeight, progress, signal
   signal.addEventListener('abort', abort, { once: true });
   try {
     const pdf = await task.promise;
-    if (pdf.numPages > 100) throw Error('PDF는 한 번에 100쪽까지 넣을 수 있어요.');
+    const pageNumbers = parsePageRange(range, pdf.numPages);
     const pages = [];
     const canvas = document.createElement('canvas');
-    for (let index = 1; index <= pdf.numPages; index++) {
+    for (const [index, pageNumber] of pageNumbers.entries()) {
       checkCancellation(signal);
-      progress(index - 1, pdf.numPages, '쪽');
-      const page = await pdf.getPage(index);
+      progress(index, pageNumbers.length, '쪽');
+      const page = await pdf.getPage(pageNumber);
       const size = page.getViewport({ scale: 1 });
       const scale = requireSpace(size.width, size.height, sheetWidth * 2, sheetHeight * 2);
       const viewport = page.getViewport({ scale });
@@ -226,9 +251,9 @@ export async function pdfRasters(file, sheetWidth, sheetHeight, progress, signal
       checkCancellation(signal);
       pages.push(await canvasBlob(canvas, 'image/jpeg', .92));
       page.cleanup();
-      progress(index, pdf.numPages, '쪽');
+      progress(index + 1, pageNumbers.length, '쪽');
     }
-    return pages;
+    return { images: pages, pageNumbers };
   } catch (error) {
     if (error?.name === 'PasswordException') throw Error('암호가 걸린 PDF예요. 잠금을 해제한 파일을 선택해 주세요.');
     if (['InvalidPDFException', 'UnknownErrorException', 'FormatError'].includes(error?.name)) {
@@ -266,3 +291,4 @@ export async function noteAsPdf(title, pages, render, progress, signal) {
   checkCancellation(signal);
   return new Blob([await pdf.save()], { type: 'application/pdf' });
 }
+
