@@ -185,7 +185,7 @@ textarea.dialog-input{min-height:130px;resize:vertical;line-height:1.5}
   .toolbar>label{grid-column:3;grid-row:2;justify-self:end}
   .toolbar .swatch{height:28px}
 }
-@media(max-width:375px){.save-state span{display:none}.save-state.error span{display:inline}.bottom-bar .secondary{gap:2px}.page-add svg{width:13px}.tool-group.colors .swatch{width:24px}}
+@media(max-width:375px){.save-state span{display:none}.save-state.error span{display:inline}.bottom-bar .secondary{gap:2px}.page-add svg{width:13px}.tool-group.colors .swatch{width:24px}.zoom-actions .paper-select{max-width:63px}.zoom-actions .zoom-value{min-width:31px}}
 @media(prefers-reduced-motion:reduce){.sidebar{transition:none}}
 @page{size:A4 portrait;margin:8mm}
 @media print{body{height:auto;overflow:visible;background:white}.app,.toast,dialog{display:none!important}.print-page{display:block;width:194mm;height:auto;margin:0;break-inside:avoid}}
@@ -419,6 +419,7 @@ function icon(name) {
 }
 for (const node of document.querySelectorAll('[data-icon]')) node.innerHTML = icon(node.dataset.icon);
 const key = 'jeongi-note-v1';
+const cleanupKey = key + '-asset-cleanup';
 const width = 760;
 const height = 1010;
 const paperTypes = ['lines', 'plain', 'grid', 'dots'];
@@ -545,7 +546,7 @@ let pageCopyTarget = null;
 let pendingPdfAppend = null;
 let displayedBackground = null;
 let thumbObserver;
-const orphanedAssets = new Set();
+const orphanedAssets = new Set(readCleanupQueue());
 const histories = new Map();
 const currentNote = () => state.notes.find((note) => note.id === state.active);
 const currentPage = () => currentNote().pages.find((page) => page.id === currentNote().active);
@@ -1490,6 +1491,17 @@ function renderBackdrop(page) {
 function assetKeys(notes) {
   return new Set(notes.flatMap((note) => note.pages.flatMap((page) => page.background ? [page.background.id] : [])));
 }
+function readCleanupQueue() {
+  try {
+    const entries = JSON.parse(localStorage.getItem(cleanupKey) || '[]');
+    return Array.isArray(entries) ? entries.filter(validAssetId) : [];
+  } catch { return []; }
+}
+function rememberOrphanedAssets(keys) {
+  for (const key of keys) orphanedAssets.add(key);
+  const queued = new Set([...readCleanupQueue(), ...orphanedAssets]);
+  localStorage.setItem(cleanupKey, JSON.stringify([...queued]));
+}
 function retainedAssetKeys() {
   const used = assetKeys(state.notes);
   if (pendingDelete) {
@@ -1500,11 +1512,15 @@ function retainedAssetKeys() {
 }
 async function clearOrphanedAssets() {
   try {
+    const store = await media();
     if (protectedStorage || dirty || localStorage.getItem(key) !== lastStored) return;
     const used = retainedAssetKeys();
     const remove = [...orphanedAssets].filter((key) => !used.has(key));
-    await (await media()).updateAssets({ remove });
+    await store.updateAssets({ remove });
     for (const key of remove) orphanedAssets.delete(key);
+    const removed = new Set(remove);
+    const queued = new Set([...readCleanupQueue(), ...orphanedAssets]);
+    localStorage.setItem(cleanupKey, JSON.stringify([...queued].filter((key) => !removed.has(key))));
   } catch {
     // Unused data can be removed on the next successful save.
   }
@@ -1647,6 +1663,21 @@ async function deleteWithUndo(kind, noteId, pageId) {
     ...(kind === 'page' ? { page: JSON.parse(JSON.stringify(note.pages[index])) } : {}) };
   pendingDelete = record;
   try {
+    record.blobs = new Map();
+    const pages = kind === 'note' ? record.note.pages : [record.page];
+    const keys = [...assetKeys([{ pages }])];
+    if (keys.length) {
+      const store = await media();
+      for (const key of keys) {
+        try { record.blobs.set(key, await store.assetBlob(key)); }
+        catch (error) {
+          if (error.message !== '이 페이지의 원본 자료를 찾을 수 없어요.') throw error;
+        }
+      }
+      // Persist before deleting metadata, so closing this screen cannot lose
+      // the cleanup work. Live references are always excluded from removal.
+      rememberOrphanedAssets(keys);
+    }
     await commitImport([], () => {
       const removed = kind === 'page' ? note.pages.splice(index, 1) : note.pages;
       if (kind === 'note') state.notes.splice(index, 1);
@@ -1677,41 +1708,57 @@ async function deleteWithUndo(kind, noteId, pageId) {
 async function undoDeleted() {
   const record = pendingDelete;
   if (!record) return null;
-  const restored = await commitImport([], () => {
-    const allIds = new Set(state.notes.flatMap((note) => [note.id, ...note.pages.flatMap((page) => [page.id, ...page.texts.map((item) => item.id)])]));
-    if (record.kind === 'note') {
-      const note = JSON.parse(JSON.stringify(record.note));
-      const ids = [note.id, ...note.pages.flatMap((page) => [page.id, ...page.texts.map((item) => item.id)])];
-      if (ids.some((value) => allIds.has(value))) {
-        note.id = id();
-        note.title = (titleOf(note) + ' (복구)').slice(0, 100);
-        const active = note.pages.findIndex((page) => page.id === note.active);
-        note.pages = note.pages.map(duplicatePageData);
-        note.active = note.pages[Math.max(0, active)].id;
-      }
-      if (record.placeholder) state.notes = state.notes.filter((candidate) => JSON.stringify(candidate) !== record.placeholder);
-      if (state.notes.length >= 1000) throw Error('노트는 1000개까지 보관할 수 있어요.');
-      state.notes.splice(Math.min(record.index, state.notes.length), 0, note);
-      return note;
-    }
-    let note = state.notes.find((note) => note.id === record.note.id);
-    let page = JSON.parse(JSON.stringify(record.page));
-    if ([page.id, ...page.texts.map((item) => item.id)].some((value) => allIds.has(value))) page = duplicatePageData(page);
-    if (!note) {
-      if (state.notes.length >= 1000) throw Error('노트는 1000개까지 보관할 수 있어요.');
-      note = makeNote(record.note.folder, (titleOf(record.note) + ' (복구)').slice(0, 100));
-      note.pages = [];
-      state.notes.push(note);
-    }
-    note.pages.splice(Math.min(record.index, note.pages.length), 0, page);
-    note.active = page.id;
-    note.updated = Date.now();
-    return note;
-  }, new AbortController().signal);
   clearTimeout(deleteTimer);
-  pendingDelete = null;
-  hideDeleteNotice();
-  return restored;
+  // Other tabs cannot see this screen's undo window. Restore retained images
+  // under fresh IDs so a cleanup already queued in another tab cannot erase them.
+  const remap = new Map([...(record.blobs ?? [])].map(([key]) => [key, id()]));
+  const entries = [...(record.blobs ?? [])].map(([key, blob]) => [remap.get(key), blob]);
+  const relink = (page) => {
+    if (page.background && remap.has(page.background.id)) page.background.id = remap.get(page.background.id);
+  };
+  try {
+    const restored = await commitImport(entries, () => {
+      const allIds = new Set(state.notes.flatMap((note) => [note.id, ...note.pages.flatMap((page) => [page.id, ...page.texts.map((item) => item.id)])]));
+      if (record.kind === 'note') {
+        const note = JSON.parse(JSON.stringify(record.note));
+        note.pages.forEach(relink);
+        const ids = [note.id, ...note.pages.flatMap((page) => [page.id, ...page.texts.map((item) => item.id)])];
+        if (ids.some((value) => allIds.has(value))) {
+          note.id = id();
+          note.title = (titleOf(note) + ' (복구)').slice(0, 100);
+          const active = note.pages.findIndex((page) => page.id === note.active);
+          note.pages = note.pages.map(duplicatePageData);
+          note.active = note.pages[Math.max(0, active)].id;
+        }
+        if (record.placeholder) state.notes = state.notes.filter((candidate) => JSON.stringify(candidate) !== record.placeholder);
+        if (state.notes.length >= 1000) throw Error('노트는 1000개까지 보관할 수 있어요.');
+        state.notes.splice(Math.min(record.index, state.notes.length), 0, note);
+        return note;
+      }
+      let note = state.notes.find((note) => note.id === record.note.id);
+      let page = JSON.parse(JSON.stringify(record.page));
+      relink(page);
+      if ([page.id, ...page.texts.map((item) => item.id)].some((value) => allIds.has(value))) page = duplicatePageData(page);
+      if (!note) {
+        if (state.notes.length >= 1000) throw Error('노트는 1000개까지 보관할 수 있어요.');
+        note = makeNote(record.note.folder, (titleOf(record.note) + ' (복구)').slice(0, 100));
+        note.pages = [];
+        state.notes.push(note);
+      }
+      note.pages.splice(Math.min(record.index, note.pages.length), 0, page);
+      note.active = page.id;
+      note.updated = Date.now();
+      return note;
+    }, new AbortController().signal);
+    clearTimeout(deleteTimer);
+    pendingDelete = null;
+    hideDeleteNotice();
+    clearOrphanedAssets();
+    return restored;
+  } catch (error) {
+    if (pendingDelete === record) deleteTimer = setTimeout(() => { if (pendingDelete === record) finishDeleteUndo(); }, 10000);
+    throw error;
+  }
 }
 function renderPageOverview(focusId, step) {
   const note = currentNote();
@@ -2239,14 +2286,14 @@ const actions = {
     const page = currentPage();
     confirmDelete('이 페이지를 삭제할까요?', '이 화면에서 삭제 직후 10초 동안 되돌릴 수 있어요.', async () => {
       const result = await runFileWork('삭제 내용 저장 중', () => deleteWithUndo('page', note.id, page.id), '페이지를 삭제하지 못했어요.');
-      if (result) openImportedNote(result);
+      if (result) { openImportedNote(result); $('undoDelete').focus(); }
     });
   },
   'delete-note': () => {
     const note = currentNote();
     confirmDelete('이 노트를 삭제할까요?', `'${titleOf(note)}'을 삭제해요. 이 화면에서 10초 동안 되돌릴 수 있어요.`, async () => {
       const result = await runFileWork('삭제 내용 저장 중', () => deleteWithUndo('note', note.id), '노트를 삭제하지 못했어요.');
-      if (result) openImportedNote(result);
+      if (result) { openImportedNote(result); $('undoDelete').focus(); }
     });
   }
 };
@@ -2277,6 +2324,7 @@ for (const [toggle, menu] of menus) {
   });
 }
 document.addEventListener('click', (event) => { if (!event.target.closest('.menu-wrap, #shapeMenu, #shapeToggle')) showMenu(); });
+window.addEventListener('resize', () => { if (!$('shapeMenu').hidden) showMenu(); });
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
     const open = menus.find(([,menu]) => !$(menu).hidden);
@@ -2416,6 +2464,7 @@ updateSidebarAccess();
 if (protectedStorage) saveStatus('저장 데이터 오류 · 백업 필요', true);
 else if (lastStored) saveStatus('저장됨');
 else queueSave();
+if (orphanedAssets.size) clearOrphanedAssets();
 </script>
 </body>
 </html>
