@@ -164,19 +164,20 @@ export async function photoRaster(file, sheetWidth, sheetHeight) {
     throw Error(heifOrAvif ? '이 브라우저가 이 사진 형식을 열 수 없어요. JPG나 PNG로 변환한 뒤 넣어 주세요.' :
       '사진을 열 수 없어요. 파일이 정상인지 확인해 주세요.');
   }
-  const sourceWidth = src.naturalWidth ?? src.width;
-  const sourceHeight = src.naturalHeight ?? src.height;
-  const scale = Math.min(1, requireSpace(sourceWidth, sourceHeight, sheetWidth * 2, sheetHeight * 2));
   const canvas = document.createElement('canvas');
-  canvas.width = Math.max(1, Math.round(sourceWidth * scale));
-  canvas.height = Math.max(1, Math.round(sourceHeight * scale));
-  const ctx = canvas.getContext('2d', { alpha: false });
-  ctx.fillStyle = '#fff';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.imageSmoothingQuality = 'high';
-  ctx.drawImage(src, 0, 0, canvas.width, canvas.height);
-  src.close?.();
-  return canvasBlob(canvas, 'image/jpeg', .9);
+  try {
+    const sourceWidth = src.naturalWidth ?? src.width;
+    const sourceHeight = src.naturalHeight ?? src.height;
+    const scale = Math.min(1, requireSpace(sourceWidth, sourceHeight, sheetWidth * 2, sheetHeight * 2));
+    canvas.width = Math.max(1, Math.round(sourceWidth * scale));
+    canvas.height = Math.max(1, Math.round(sourceHeight * scale));
+    const ctx = canvas.getContext('2d', { alpha: false });
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(src, 0, 0, canvas.width, canvas.height);
+    return await canvasBlob(canvas, 'image/jpeg', .9);
+  } finally { src.close?.(); canvas.width = canvas.height = 0; }
 }
 function photoEditValues(edit = {}) {
   const rotation = edit.rotation ?? 0;
