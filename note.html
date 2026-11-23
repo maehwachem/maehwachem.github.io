@@ -381,7 +381,7 @@ body.has-delete-undo .toast{bottom:calc(var(--note-footer-height,48px) + 72px)}
   <p class="photo-hint">남길 영역을 끌어서 정하거나 아래 여백을 조정하세요. 여러 장은 한 장씩 다듬은 뒤 함께 추가해요.</p>
   <p id="photoStatus" class="photo-status" role="status"></p>
   <div class="photo-stage"><canvas id="photoPreview" width="640" height="480" aria-label="사진 자르기 미리보기"></canvas></div>
-  <div class="photo-actions"><button type="button" id="photoLeft" class="secondary" data-photo-control>왼쪽 90°</button><button type="button" id="photoRight" class="secondary" data-photo-control>오른쪽 90°</button><button type="button" id="photoFull" class="secondary" data-photo-control>전체 영역</button><button type="button" id="photoReset" class="secondary" data-photo-control>원래대로</button></div>
+  <div class="photo-actions"><button type="button" id="photoLeft" class="secondary" data-photo-control>왼쪽 90°</button><button type="button" id="photoRight" class="secondary" data-photo-control>오른쪽 90°</button><button type="button" id="photoFull" class="secondary" data-photo-control>전체 영역</button><button type="button" id="photoReset" class="secondary" data-photo-control>원래대로</button><button type="button" id="photoOmit" class="secondary" data-photo-control>이 사진 제외</button></div>
   <div class="photo-margins">
     <label>왼쪽 여백 (%)<input id="photoMarginLeft" class="dialog-input" type="number" min="0" max="99" step="0.1" value="0" data-photo-control></label>
     <label>오른쪽 여백 (%)<input id="photoMarginRight" class="dialog-input" type="number" min="0" max="99" step="0.1" value="0" data-photo-control></label>
@@ -596,6 +596,7 @@ let pendingPdfAppend = null;
 let pendingPdfExport = null;
 let focusMode = false;
 let pendingPhotoImport = null;
+let retryPhotoImport = null;
 let photoPreviewSource = null;
 let photoPreviewLayout = null;
 let photoCropDrag = null;
@@ -2222,6 +2223,20 @@ $('pdfAppendForm').addEventListener('submit', async (event) => {
   }, 'PDF를 추가하지 못했어요.');
   if (added) toast(`PDF ${added}쪽을 현재 노트에 추가했어요.`);
 });
+async function preparePhotos(files, progress, signal) {
+  if (!files.length || files.length > 24) throw Error('사진은 한 번에 1~24장까지 넣을 수 있어요.');
+  const prepared = new Map();
+  const { photoRaster } = await media();
+  for (const [index, file] of files.entries()) {
+    checkFileCancellation(signal);
+    progress(index, files.length, '장');
+    try { prepared.set(index, await photoRaster(file, width, height)); }
+    catch (error) { throw new Error(`${index + 1}번째 사진 '${file.name.slice(0, 100)}': ${error.message}`, { cause: error }); }
+    checkFileCancellation(signal);
+    progress(index + 1, files.length, '장');
+  }
+  return prepared;
+}
 async function addPhotos(request, progress, signal) {
   if (!request.files.length || request.files.length > 24) throw Error('사진은 한 번에 1~24장까지 넣을 수 있어요.');
   checkFileCancellation(signal);
@@ -2230,11 +2245,14 @@ async function addPhotos(request, progress, signal) {
   for (const [index, file] of request.files.entries()) {
     checkFileCancellation(signal);
     progress(index, request.files.length, '장');
-    const source = request.prepared.get(index) ?? await photoRaster(file, width, height);
-    checkFileCancellation(signal);
-    const edit = request.edits[index], crop = edit.crop;
-    const unchanged = edit.rotation === 0 && (!crop || (crop.x === 0 && crop.y === 0 && crop.width === 1 && crop.height === 1));
-    const image = unchanged ? source : await editedPhotoRaster(file, edit, width, height);
+    let image;
+    try {
+      const source = request.prepared.get(index) ?? await photoRaster(file, width, height);
+      checkFileCancellation(signal);
+      const edit = request.edits[index], crop = edit.crop;
+      const unchanged = edit.rotation === 0 && (!crop || (crop.x === 0 && crop.y === 0 && crop.width === 1 && crop.height === 1));
+      image = unchanged ? source : await editedPhotoRaster(file, edit, width, height);
+    } catch (error) { throw new Error(`${index + 1}번째 사진 '${file.name.slice(0, 100)}': ${error.message}`, { cause: error }); }
     checkFileCancellation(signal);
     const page = makeMediaPage('photo', file.name);
     pages.push(page);
@@ -2251,11 +2269,26 @@ async function addPhotos(request, progress, signal) {
     return note;
   }, signal);
 }
-function openPhotoEditor(files, noteId, pageId) {
+function removePhotoAt(request, index) {
+  if (request.files.length <= 1 || index < 0 || index >= request.files.length) throw Error('마지막 사진은 추가 취소로 닫을 수 있어요.');
+  request.files.splice(index, 1);
+  request.edits.splice(index, 1);
+  request.prepared = new Map([...request.prepared].filter(([key]) => key !== index).map(([key, value]) => [key > index ? key - 1 : key, value]));
+  request.index = Math.min(index, request.files.length - 1);
+}
+function resumePhotoEditor(request) {
+  pendingPhotoImport = request;
+  request.focusAfterLoad = 'photoLeft';
+  request.notice = '사진은 아직 추가되지 않았어요.';
+  $('photoApply').textContent = `사진 ${request.files.length}장 추가`;
+  $('photoEditor').showModal();
+  loadPhotoPreview();
+}
+function openPhotoEditor(files, noteId, pageId, prepared = new Map()) {
   if ($('photoEditor').open) return;
   clearPhotoEditor();
   if (files.length > 24) { photoEditorError(Error('사진은 한 번에 24장까지 넣을 수 있어요.')); return; }
-  pendingPhotoImport = { files, noteId, pageId, index: 0, loading: true, focusAfterLoad: 'photoLeft', prepared: new Map(),
+  pendingPhotoImport = { files, noteId, pageId, index: 0, loading: true, focusAfterLoad: 'photoLeft', prepared,
     edits: files.map(() => ({ rotation: 0, crop: { x: 0, y: 0, width: 1, height: 1 } })) };
   $('photoApply').textContent = `사진 ${files.length}장 추가`;
   $('photoEditor').showModal();
@@ -2283,6 +2316,7 @@ function photoBusy(request, value) {
   for (const node of $('photoEditor').querySelectorAll('[data-photo-control]')) node.disabled = value;
   $('photoPrev').disabled = value || request.index === 0;
   $('photoNext').disabled = value || request.index === request.files.length - 1;
+  $('photoOmit').disabled = value || request.files.length <= 1;
 }
 async function loadPhotoPreview() {
   const request = pendingPhotoImport;
@@ -2332,8 +2366,7 @@ function paintPhotoPreview() {
   for (const [px,py] of [[left,top],[left+cw,top],[left,top+ch],[left+cw,top+ch]]) context.fillRect(px - 4, py - 4, 8, 8);
   const margins = { Left: crop.x, Right: Math.max(0, 1 - crop.x - crop.width), Top: crop.y, Bottom: Math.max(0, 1 - crop.y - crop.height) };
   for (const [side, value] of Object.entries(margins)) $('photoMargin' + side).value = Math.round(value * 1000) / 10;
-  const geometry = request.store.photoEditGeometry(source.width, source.height, { crop });
-  $('photoStatus').textContent = `남길 영역 ${geometry.crop.width} × ${geometry.crop.height}px · 회전 ${edit.rotation * 90}°`;
+  $('photoStatus').textContent = (request.notice ? request.notice + ' ' : '') + `남길 영역 가로 ${Math.round(crop.width * 1000) / 10}% · 세로 ${Math.round(crop.height * 1000) / 10}% · 회전 ${edit.rotation * 90}°`;
 }
 function photoPoint(event) {
   if (!photoPreviewLayout) return null;
@@ -2353,7 +2386,7 @@ function movePhotoCrop(event) {
     ? { x: Math.min(point.x, drag.start.x), y: Math.min(point.y, drag.start.y), width: w, height: h } : drag.before;
   paintPhotoPreview();
 }
-$('photoFiles').addEventListener('change', (event) => {
+$('photoFiles').addEventListener('change', async (event) => {
   const files = [...event.target.files];
   event.target.value = '';
   if (!files.length) return;
@@ -2361,7 +2394,9 @@ $('photoFiles').addEventListener('change', (event) => {
   $('mediaToggle').focus();
   finishDrawing();
   resetLasso(true);
-  openPhotoEditor(files, currentNote().id, currentPage().id);
+  const noteId = currentNote().id, pageId = currentPage().id;
+  const prepared = await runFileWork('사진 준비 중', (progress, signal) => preparePhotos(files, progress, signal), '사진을 준비하지 못했어요.');
+  if (prepared) openPhotoEditor(files, noteId, pageId, prepared);
 });
 function pdfExportPages(note, scope, range, parseRange) {
   if (scope === 'all') return note.pages;
@@ -2802,6 +2837,14 @@ $('photoReset').onclick = () => {
   pendingPhotoImport.focusAfterLoad = 'photoReset';
   loadPhotoPreview();
 };
+$('photoOmit').onclick = () => {
+  const request = pendingPhotoImport;
+  if (!request || request.loading || request.files.length <= 1) return;
+  removePhotoAt(request, request.index);
+  $('photoApply').textContent = `사진 ${request.files.length}장 추가`;
+  request.focusAfterLoad = 'photoOmit';
+  loadPhotoPreview();
+};
 for (const side of ['Left','Right','Top','Bottom']) $('photoMargin' + side).onchange = () => {
   const request = pendingPhotoImport;
   if (!request || request.loading) return;
@@ -2813,7 +2856,7 @@ for (const side of ['Left','Right','Top','Bottom']) $('photoMargin' + side).onch
 };
 $('photoPreview').addEventListener('pointerdown', (event) => {
   const request = pendingPhotoImport, point = photoPoint(event);
-  if (!request || request.loading || !point?.inside || photoCropDrag || (event.pointerType === 'mouse' && event.button !== 0)) return;
+  if (!request || request.loading || !point || photoCropDrag || (event.pointerType === 'mouse' && event.button !== 0)) return;
   event.preventDefault();
   photoCropDrag = { request, pointerId: event.pointerId, start: point, before: { ...request.edits[request.index].crop } };
   $('photoPreview').setPointerCapture(event.pointerId);
@@ -2830,16 +2873,24 @@ for (const type of ['pointerup','pointercancel','lostpointercapture']) $('photoP
 });
 $('photoEditor').addEventListener('cancel', clearPhotoEditor);
 $('photoEditor').addEventListener('close', () => { if (!$('photoEditor').open) clearPhotoEditor(); });
+$('fileError').addEventListener('close', () => {
+  const request = retryPhotoImport;
+  retryPhotoImport = null;
+  if (request) resumePhotoEditor(request);
+});
 $('photoApply').onclick = async () => {
   const request = pendingPhotoImport;
   if (!request || request.loading) return;
   pendingPhotoImport = null;
   photoLoadGeneration++;
   $('photoEditor').close();
-  try {
-    const note = await runFileWork('사진 넣는 중', (progress, signal) => addPhotos(request, progress, signal), '사진을 넣지 못했어요.');
-    if (note) { openImportedNote(note); toast(`사진 ${request.files.length}장을 새 페이지로 넣었어요.`); }
-  } finally { request.prepared.clear(); }
+  const note = await runFileWork('사진 넣는 중', (progress, signal) => addPhotos(request, progress, signal), '사진을 넣지 못했어요.');
+  if (note) {
+    request.prepared.clear();
+    openImportedNote(note);
+    toast(`사진 ${request.files.length}장을 새 페이지로 넣었어요.`);
+  } else if ($('fileError').open) retryPhotoImport = request;
+  else resumePhotoEditor(request);
 };
 $('pdfExportScope').onchange = () => {
   const range = $('pdfExportScope').value === 'range';
