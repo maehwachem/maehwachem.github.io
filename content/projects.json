@@ -353,6 +353,27 @@
     ],
     "tool": [
       {
+        "title": "종이노트",
+        "subject": "tools",
+        "date": "2026-11-23",
+        "desc": "손글씨와 텍스트를 함께 적고, 사진·PDF 위에 필기하는 개인 노트. 부분 지우개, 올가미 이동·복제, 페이지 순서 변경, 전체 노트 PDF와 백업 저장을 지원합니다. 기록과 불러온 자료는 현재 브라우저에 저장합니다.",
+        "tag": "필기 · 사진·PDF",
+        "level": "교사·학생 누구나",
+        "poster": "note",
+        "words": "종이노트",
+        "links": [
+          {
+            "label": "노트 열기",
+            "url": "/note.html"
+          },
+          {
+            "label": "저장 안내",
+            "url": "/privacy/#paper-note"
+          }
+        ],
+        "kind": "tool"
+      },
+      {
         "title": "피코 작업실",
         "subject": "tools",
         "date": "2026-11-21",
