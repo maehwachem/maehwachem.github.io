@@ -206,6 +206,15 @@ body.has-delete-undo .toast{bottom:calc(var(--note-footer-height,48px) + 72px)}
 @media(max-width:450px){.photo-editor{padding:12px}.photo-margins{grid-template-columns:repeat(2,minmax(0,1fr))}.photo-footer{justify-content:center}.photo-editor .dialog-actions{flex-wrap:wrap;justify-content:center}}
 @media(max-width:680px){.breadcrumb strong{display:none}}
 @media(max-width:680px){.delete-notice{gap:6px;padding:8px;min-width:min(350px,calc(100vw - 20px))}.delete-notice small{font-size:10px}}
+
+.bar-zone{flex-direction:column;align-items:center;gap:3px}
+.tool.labeled-tool{width:40px;height:46px;align-content:center;gap:2px}.tool-label{font-size:10px;line-height:13px;white-space:nowrap;font-weight:650}
+.tool-settings-toggle{min-height:36px;min-width:80px;padding:3px 7px;border:1px solid #e5deed;border-radius:7px;font-size:12px;white-space:nowrap}.tool-settings-toggle:hover:not(:disabled){background:var(--tint)}
+.tool-status{display:flex;align-items:center;justify-content:space-between;gap:10px;width:min(100%,760px);padding:0 5px;color:var(--muted);font-size:11px;min-height:26px}.current-tool{display:flex;align-items:center;gap:6px;min-width:0}.current-tool span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.current-tool i{width:10px;height:10px;border-radius:50%;box-shadow:0 0 0 1px #33304c22;flex:none}.tool-status button{white-space:nowrap;color:var(--accent);min-height:28px;padding:2px 5px;text-decoration:underline;text-underline-offset:3px}
+.tool-settings{position:fixed;z-index:12;width:310px;max-width:calc(100vw - 16px);max-height:calc(100dvh - 16px);overflow:auto;padding:13px;background:#fffefa;border:1px solid #dfd6ec;border-radius:12px;box-shadow:0 6px 24px #30254c25}.tool-settings header{display:flex;align-items:center;justify-content:space-between;gap:10px}.tool-settings h2{font-size:16px;margin:0}.tool-settings h3{font-size:13px;margin:14px 0 6px}.tool-settings .dialog-label{margin:9px 0 4px}.tool-settings header .secondary{min-height:32px;font-size:12px}.tool-settings #toolPreview{width:100%;height:66px;border-radius:6px;background:#f2efe9;margin-top:7px}.tool-width-row{display:flex;gap:10px;align-items:center}.tool-width-row input[type=range]{width:100%;min-width:0;accent-color:var(--accent)}.tool-width-row input[type=number]{width:62px;padding:5px;border:1px solid #ddd6e6;border-radius:6px;font-size:16px}.quick-widths{display:flex;gap:5px;margin-top:6px}.quick-widths button{flex:1;min-height:34px;border:1px solid #e3dcec;border-radius:6px;font-size:12px}.quick-widths button[aria-pressed=true],.quick-widths button:hover{background:var(--tint);color:var(--deep)}.tool-color-row{display:flex;align-items:center;gap:7px}.tool-color-row input[type=color]{width:42px;height:36px;padding:2px;border:1px solid #ddd6e6;border-radius:6px;background:white;flex:none}.tool-color-row input[type=text]{min-width:0;width:100%;padding:6px;border:1px solid #ddd6e6;border-radius:6px;font-size:16px}.tool-color-row .secondary{white-space:nowrap;font-size:12px;min-height:36px}.tool-favorites{display:grid;gap:5px}.tool-favorites button{display:flex;align-items:center;gap:8px;padding:6px 8px;min-height:34px;text-align:left;border:1px solid #e3dcec;border-radius:6px;font-size:12px}.tool-favorites button::before{content:'';width:13px;height:13px;border-radius:50%;background:var(--favorite-color);box-shadow:0 0 0 1px #33304c44;flex:none}.tool-favorites button:hover{background:var(--tint)}.favorite-save{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:9px}.favorite-save label{font-size:11px}.favorite-save select{min-height:34px;min-width:65px;border:1px solid #ddd6e6;background:#fff;border-radius:6px;font-size:12px}.favorite-save .secondary{font-size:12px;padding-inline:7px}.tool-setting-hint{font-size:11px;color:var(--muted);margin:10px 0 0}.shortcut-table{border-collapse:collapse;width:100%;font-size:12px}.shortcut-table caption{text-align:left;font-weight:700;margin-bottom:5px}.shortcut-table th,.shortcut-table td{padding:7px 6px;text-align:left;border-bottom:1px solid var(--line)}.shortcut-table th{white-space:nowrap}
+@container(max-width:760px){.toolbar{display:grid;grid-template-columns:auto auto auto;column-gap:8px;row-gap:3px}.toolbar .tool-divider{display:none}.toolbar #tools{grid-column:1/3;grid-row:1}.toolbar .history-tools{grid-column:3;grid-row:1;justify-self:end}.toolbar .finger-mode{grid-column:1;grid-row:2;justify-self:start;min-height:36px}.toolbar .colors{grid-column:2;grid-row:2;justify-self:center;gap:4px}.toolbar .tool-settings-toggle{grid-column:3;grid-row:2;justify-self:end}.toolbar .swatch{height:34px}}
+@media(max-width:680px){.tool.labeled-tool{width:36px;height:46px}.tool-status{font-size:10px;gap:4px}.tool-settings-toggle{min-width:76px}}
+@container(max-width:350px){.toolbar{grid-template-columns:auto auto;gap:3px 6px}.toolbar #tools{grid-column:1/3;grid-row:1;justify-self:center}.toolbar .history-tools{grid-column:2;grid-row:2}.toolbar .finger-mode{grid-column:1;grid-row:2}.toolbar .colors{grid-column:1;grid-row:3;justify-self:start}.toolbar .tool-settings-toggle{grid-column:2;grid-row:3}}
 </style>
 </head>
 <body>
@@ -275,29 +284,39 @@ body.has-delete-undo .toast{bottom:calc(var(--note-footer-height,48px) + 72px)}
       <div class="bar-zone">
         <div class="toolbar" role="toolbar" aria-label="필기 도구">
           <div class="tool-group" id="tools">
-            <button class="tool" data-tool="select" data-icon="hand" aria-label="선택·이동" title="선택·이동"></button>
-            <button class="tool" data-tool="pen" data-icon="pen" aria-label="펜" title="펜"></button>
-            <button class="tool" data-tool="marker" data-icon="marker" aria-label="형광펜" title="형광펜"></button>
-            <button class="tool" data-tool="eraser" data-icon="eraser" aria-label="지우개" title="부분 지우개"></button>
-            <button class="tool" data-tool="text" data-icon="text" aria-label="텍스트" title="텍스트"></button>
-            <button class="tool" data-tool="lasso" data-icon="lasso" aria-label="올가미" title="올가미"></button>
-            <button class="tool" id="shapeToggle" data-tool="shape" data-icon="shape" aria-label="도형" title="도형 고르기" aria-expanded="false" aria-controls="shapeMenu"></button>
+            <button class="tool labeled-tool" data-tool="select" aria-label="선택·이동" title="선택·이동 (V)"><span data-icon="hand"></span><span class="tool-label">선택</span></button>
+            <button class="tool labeled-tool" data-tool="pen" aria-label="펜" title="펜 (P)"><span data-icon="pen"></span><span class="tool-label">펜</span></button>
+            <button class="tool labeled-tool" data-tool="marker" aria-label="형광펜" title="형광펜 (H)"><span data-icon="marker"></span><span class="tool-label">형광펜</span></button>
+            <button class="tool labeled-tool" data-tool="eraser" aria-label="지우개" title="지우개 (E)"><span data-icon="eraser"></span><span class="tool-label">지우개</span></button>
+            <button class="tool labeled-tool" data-tool="text" aria-label="텍스트" title="텍스트 (T)"><span data-icon="text"></span><span class="tool-label">텍스트</span></button>
+            <button class="tool labeled-tool" data-tool="lasso" aria-label="올가미" title="올가미 (L)"><span data-icon="lasso"></span><span class="tool-label">올가미</span></button>
+            <button class="tool labeled-tool" id="shapeToggle" data-tool="shape" aria-label="도형" title="도형 (S)" aria-expanded="false" aria-controls="shapeMenu"><span data-icon="shape"></span><span class="tool-label">도형</span></button>
           </div>
           <button class="tool finger-mode" id="fingerMode" aria-pressed="false" title="손가락 필기 켜기"><span data-icon="finger"></span><span id="fingerModeLabel">손가락 꺼짐</span></button>
           <span class="tool-divider" aria-hidden="true"></span>
           <div class="tool-group colors" id="colors"></div>
-          <label><select class="tool-select" id="size" aria-label="펜 굵기"><option value="3">가는 선</option><option value="5">중간 선</option><option value="9">굵은 선</option></select></label>
+          <button class="tool-settings-toggle" id="toolSettingsToggle" aria-label="현재 도구 굵기·색 설정" aria-controls="toolSettings" aria-expanded="false" aria-haspopup="dialog">3px · 설정</button>
           <span class="tool-divider" aria-hidden="true"></span>
           <div class="tool-group history-tools">
             <button id="undo" class="tool" data-icon="undo" aria-label="실행 취소" title="실행 취소"></button>
             <button id="redo" class="tool" data-icon="redo" aria-label="다시 실행" title="다시 실행"></button>
           </div>
         </div>
+        <div class="tool-status"><span class="current-tool"><i id="currentToolColor" aria-hidden="true"></i><span id="currentToolStatus"></span></span><button id="toolHelp" aria-haspopup="dialog">도구 안내</button></div>
       </div>
       <div class="shape-menu" id="shapeMenu" role="group" aria-label="도형 종류" hidden>
         <button type="button" data-shape="line">직선</button><button type="button" data-shape="arrow">화살표</button>
         <button type="button" data-shape="rect">사각형</button><button type="button" data-shape="ellipse">원·타원</button>
       </div>
+      <section class="tool-settings" id="toolSettings" role="dialog" aria-labelledby="toolSettingsHeading" hidden>
+        <header><h2 id="toolSettingsHeading">펜 설정</h2><button class="secondary" id="closeToolSettings" type="button">닫기</button></header>
+        <svg id="toolPreview" viewBox="0 0 260 66" aria-label="실제 굵기 미리보기"><path id="toolPreviewStroke" d="M28 36 Q78 7 130 33 T232 31" stroke="#33304c" stroke-width="3"/><circle id="toolPreviewEraser" cx="130" cy="33" r="0" fill="#fffefa" stroke="#5143a4" stroke-width="1"/></svg>
+        <div id="toolWidthBlock"><label class="dialog-label" for="toolWidth">굵기 (종이 기준 px)</label><div class="tool-width-row"><input id="toolWidth" type="range" min="1" max="20" value="3" aria-label="도구 굵기"><input id="toolWidthNumber" type="number" min="1" max="20" step="1" value="3" aria-label="도구 굵기 숫자"></div><div id="toolQuickWidths" class="quick-widths"><button type="button">가늘게</button><button type="button">보통</button><button type="button">굵게</button></div></div>
+        <div id="toolColorBlock"><label class="dialog-label" for="toolCustomColor">사용자 색</label><div class="tool-color-row"><input id="toolCustomColor" type="color" value="#33304c" aria-label="사용자 색 고르기"><input id="toolColorHex" type="text" maxlength="7" pattern="#?[0-9a-fA-F]{6}" value="#33304c" aria-label="색상 코드" spellcheck="false" autocomplete="off"><button id="applyToolColor" class="secondary" type="button">색 적용</button></div></div>
+        <h3>자주 쓰는 설정</h3><div class="tool-favorites" id="toolFavorites"><button type="button"></button><button type="button"></button><button type="button"></button></div>
+        <div class="favorite-save"><label for="favoriteSlot">저장할 번호</label><select id="favoriteSlot"><option value="0">설정 1</option><option value="1">설정 2</option><option value="2">설정 3</option></select><button type="button" class="secondary" id="saveToolFavorite">현재 설정 저장</button></div>
+        <p class="tool-setting-hint">굵기·색과 자주 쓰는 설정을 이 브라우저에 기억해요.<br>텍스트 색은 펜과 함께 사용해요.</p>
+      </section>
       <div class="scroller" id="scroller" aria-label="종이">
         <div class="paper-deck">
           <div class="paper-frame" id="frame">
@@ -338,6 +357,14 @@ body.has-delete-undo .toast{bottom:calc(var(--note-footer-height,48px) + 72px)}
     </section>
   </main>
 </div>
+<dialog id="toolHelpDialog" aria-labelledby="toolHelpHeading">
+  <h2 class="dialog-title" id="toolHelpHeading">도구 안내</h2>
+  <p>도구를 고른 뒤 <strong>굵기·색 설정</strong>을 열어 조절해요. 각 도구의 굵기와 색을 따로 기억하고, 자주 쓰는 설정은 3개까지 저장할 수 있어요.</p>
+  <label class="dialog-label"><input id="toolShortcuts" type="checkbox" checked> 도구 단축키 사용</label>
+  <table class="shortcut-table"><caption>키보드 단축키</caption><tbody><tr><th scope="row">P / H / E</th><td>펜 / 형광펜 / 부분 지우개</td></tr><tr><th scope="row">T / L / V</th><td>텍스트 / 올가미 / 선택·이동</td></tr><tr><th scope="row">S</th><td>마지막에 쓴 도형</td></tr><tr><th scope="row">1 / 2 / 3</th><td>자주 쓰는 설정 불러오기</td></tr><tr><th scope="row">[ / ]</th><td>굵기 줄이기 / 늘리기</td></tr><tr><th scope="row">Ctrl·⌘ + Z</th><td>실행 취소 (Shift로 다시 실행)</td></tr></tbody></table>
+  <p>입력칸·대화창과 필기 중에는 도구 단축키가 작동하지 않아요. 부분 지우개는 그린 선만 지우며 사진·PDF·텍스트는 지우지 않아요. 손가락으로 쓰려면 ‘손가락 켜짐’을 선택하세요.</p>
+  <div class="dialog-actions"><button type="button" class="primary" data-close="toolHelpDialog" autofocus>닫기</button></div>
+</dialog>
 <dialog id="pageOverview" class="page-overview" aria-labelledby="overviewHeading">
   <header class="overview-head">
     <h2 class="dialog-title" id="overviewHeading">페이지 관리</h2>
@@ -521,6 +548,57 @@ function validShape(shape) {
     Array.isArray(shape.points) && shape.points.length > 0 &&
     shape.points.every((p) => Array.isArray(p) && p.length === 2 && p.every((v) => Number.isFinite(v) && Math.abs(v) <= 8000));
 }
+const toolPreferenceKey = 'jeongi-note-tools-v1';
+const toolLimits = { pen: [1,20,3], marker: [4,48,12], eraser: [6,60,24], shape: [1,20,3] };
+const toolNames = { select: '선택·이동', pen: '펜', marker: '형광펜', eraser: '지우개', text: '텍스트', lasso: '올가미', shape: '도형' };
+const shapeNames = { line: '직선', arrow: '화살표', rect: '사각형', ellipse: '원·타원' };
+function defaultToolPreferences() {
+  return {
+    pen: { color: '#33304c', size: 3 }, marker: { color: '#e7ad35', size: 12 },
+    eraser: { color: '#000000', size: 24 }, shape: { color: '#33304c', size: 3 }, shapeKind: 'line', shortcuts: true,
+    favorites: [{ tool: 'pen', color: '#33304c', size: 3 }, { tool: 'pen', color: '#5143a4', size: 5 }, { tool: 'marker', color: '#e7ad35', size: 16 }]
+  };
+}
+function parseToolPreferences(raw) {
+  const result = defaultToolPreferences();
+  let input;
+  try { input = typeof raw === 'string' ? JSON.parse(raw) : raw; } catch { return result; }
+  if (!input || typeof input !== 'object') return result;
+  if (typeof input.shortcuts === 'boolean') result.shortcuts = input.shortcuts;
+  const style = (name, value, fallback) => ({
+    color: name === 'eraser' ? '#000000' : validColor(value?.color) ? value.color.toLowerCase() : fallback.color,
+    size: Number.isFinite(value?.size) ? clamp(Math.round(value.size), toolLimits[name][0], toolLimits[name][1]) : fallback.size
+  });
+  for (const name of Object.keys(toolLimits)) result[name] = style(name, input[name], result[name]);
+  if (Object.hasOwn(shapeNames, input.shapeKind)) result.shapeKind = input.shapeKind;
+  result.favorites = result.favorites.map((fallback, index) => {
+    const item = input.favorites?.[index];
+    if (!item || !Object.hasOwn(toolLimits, item.tool)) return fallback;
+    return { tool: item.tool, ...style(item.tool, item, result[item.tool]),
+      ...(item.tool === 'shape' ? { shape: Object.hasOwn(shapeNames, item.shape) ? item.shape : 'line' } : {}) };
+  });
+  return result;
+}
+function loadToolPreferences() {
+  try { return parseToolPreferences(localStorage.getItem(toolPreferenceKey)); }
+  catch { return defaultToolPreferences(); }
+}
+let toolPreferences = loadToolPreferences();
+function persistToolPreferences() {
+  try { localStorage.setItem(toolPreferenceKey, JSON.stringify(toolPreferences)); return true; }
+  catch { return false; }
+}
+function captureToolFavorite(preferences, name, shape) {
+  if (!Object.hasOwn(toolLimits, name)) return null;
+  return { tool: name, ...preferences[name], ...(name === 'shape' ? { shape } : {}) };
+}
+function restoreToolFavorite(preferences, favorite) {
+  if (!favorite || !Object.hasOwn(toolLimits, favorite.tool)) return null;
+  const clean = parseToolPreferences({ favorites: [favorite] }).favorites[0];
+  preferences[clean.tool] = { color: clean.color, size: clean.size };
+  if (clean.tool === 'shape') preferences.shapeKind = clean.shape;
+  return clean.tool;
+}
 function parseState(raw) {
   const input = typeof raw === 'string' ? JSON.parse(raw) : raw;
   if (!input || !Array.isArray(input.notes) || !input.notes.length || input.notes.length > 1000) throw Error('invalid notes');
@@ -571,7 +649,7 @@ try {
 }
 let filter = 'all';
 let tool = 'pen';
-let color = colors[0][0];
+let color = toolPreferences.pen.color;
 let selected = null;
 let textTarget = null;
 let scale = 1;
@@ -588,7 +666,7 @@ let dirty = false;
 let saveTimer;
 let toastTimer;
 let fileJob = null;
-let shapeKind = 'line';
+let shapeKind = toolPreferences.shapeKind;
 let pendingDelete = null;
 let deleteTimer;
 let pageCopyTarget = null;
@@ -982,17 +1060,112 @@ function setTool(value) {
   tool = value;
   if (!['select','text'].includes(tool)) selected = null;
   $('paper').dataset.tool = tool;
-  const erasing = tool === 'eraser';
-  const sizeLabels = erasing ? ['작게', '보통', '크게'] : ['가는 선', '중간 선', '굵은 선'];
-  $('size').setAttribute('aria-label', erasing ? '지우개 크기' : '펜 굵기');
-  for (const [index, option] of [...$('size').options].entries()) option.textContent = sizeLabels[index];
+  color = toolPreferences[tool === 'text' ? 'pen' : Object.hasOwn(toolLimits, tool) ? tool : 'pen'].color;
   $('eraserCursor').hidden = true;
-  for (const button of $('tools').children) button.setAttribute('aria-pressed', button.dataset.tool === tool);
+  renderToolState();
   renderTexts();
 }
-function setColor(value) {
-  color = value;
-  for (const button of $('colors').children) button.setAttribute('aria-pressed', button.dataset.color === color);
+function rememberToolPreferences() {
+  if (!persistToolPreferences()) toast('도구 설정은 이번 화면에서만 적용돼요. 저장 공간을 확인해 주세요.');
+}
+function setColor(value, remember = true) {
+  if (!validColor(value) || ['eraser','select','lasso'].includes(tool)) return;
+  finishDrawing();
+  color = value.toLowerCase();
+  toolPreferences[tool === 'text' ? 'pen' : tool].color = color;
+  renderToolState();
+  if (remember) rememberToolPreferences();
+}
+function setToolWidth(value) {
+  if (!Object.hasOwn(toolLimits, tool) || !Number.isFinite(Number(value)) || String(value).trim() === '') return false;
+  finishDrawing();
+  const [min, max] = toolLimits[tool];
+  toolPreferences[tool].size = clamp(Math.round(Number(value)), min, max);
+  renderToolState();
+  rememberToolPreferences();
+  return true;
+}
+function renderToolState() {
+  const drawing = Object.hasOwn(toolLimits, tool);
+  const style = toolPreferences[drawing ? tool : 'pen'];
+  const colored = !['eraser','select','lasso'].includes(tool);
+  $('toolShortcuts').checked = toolPreferences.shortcuts;
+  for (const button of $('tools').children) button.setAttribute('aria-pressed', button.dataset.tool === tool);
+  for (const button of $('colors').children) {
+    button.disabled = !colored;
+    button.setAttribute('aria-pressed', colored && button.dataset.color === color);
+  }
+  for (const button of $('shapeMenu').querySelectorAll('[data-shape]')) button.setAttribute('aria-pressed', button.dataset.shape === shapeKind);
+  $('shapeToggle').title = `도형: ${shapeNames[shapeKind]} (S)`;
+  $('toolSettingsToggle').disabled = !drawing && tool !== 'text';
+  $('toolSettingsToggle').textContent = drawing ? `${style.size}px · 설정` : tool === 'text' ? '색 설정' : '설정';
+  $('toolSettingsHeading').textContent = `${toolNames[tool]} 설정`;
+  $('toolWidthBlock').hidden = !drawing;
+  $('toolColorBlock').hidden = !colored;
+  $('saveToolFavorite').disabled = !drawing;
+  if (drawing) {
+    const [min, max] = toolLimits[tool];
+    for (const name of ['toolWidth','toolWidthNumber']) Object.assign($(name), { min, max, value: style.size });
+    const quick = tool === 'marker' ? [8,16,28] : tool === 'eraser' ? [12,24,44] : [2,5,9];
+    for (const [i,button] of [...$('toolQuickWidths').children].entries()) {
+      button.dataset.width = quick[i];
+      button.textContent = `${['가늘게','보통','굵게'][i]} ${quick[i]}`;
+      button.setAttribute('aria-pressed', style.size === quick[i]);
+    }
+  }
+  $('toolPreviewStroke').setAttribute('stroke', style.color);
+  $('toolPreviewStroke').setAttribute('stroke-width', style.size);
+  $('toolPreviewStroke').toggleAttribute('hidden', !drawing || tool === 'eraser');
+  $('toolPreviewEraser').setAttribute('r', tool === 'eraser' ? style.size / 2 : 0);
+  $('toolPreviewEraser').toggleAttribute('hidden', tool !== 'eraser');
+  $('toolPreview').hidden = !drawing;
+  $('toolCustomColor').value = style.color;
+  $('toolColorHex').value = style.color;
+  $('toolColorHex').setCustomValidity('');
+  const detail = drawing ? `${tool === 'shape' ? shapeNames[shapeKind] + ' · ' : ''}${style.size}px${colored ? ' · ' + style.color.toUpperCase() : ' · 그린 선만 지워요'}`
+    : tool === 'text' ? '종이를 눌러 글 넣기' : tool === 'lasso' ? '둘러 그려 옮기거나 복제' : '종이를 끌어 이동';
+  $('currentToolStatus').textContent = `${toolNames[tool]} · ${detail}`;
+  $('currentToolColor').hidden = !colored;
+  $('currentToolColor').style.background = style.color;
+  for (const [index, button] of [...$('toolFavorites').children].entries()) {
+    const item = toolPreferences.favorites[index];
+    const label = `${index + 1} · ${toolNames[item.tool]}${item.tool === 'shape' ? ' ' + shapeNames[item.shape] : ''} ${item.size}px`;
+    button.textContent = label;
+    button.style.setProperty('--favorite-color', item.tool === 'eraser' ? '#fffefa' : item.color);
+    button.setAttribute('aria-label', `${label}${item.tool === 'eraser' ? '' : ' ' + item.color} 불러오기`);
+  }
+}
+function loadToolFavorite(index) {
+  finishDrawing();
+  const name = restoreToolFavorite(toolPreferences, toolPreferences.favorites[index]);
+  if (!name) return;
+  shapeKind = toolPreferences.shapeKind;
+  setTool(name);
+  rememberToolPreferences();
+  showMenu();
+  $('tools').querySelector(`[data-tool="${name}"]`).focus();
+  toast(`자주 쓰는 설정 ${index + 1}을 불러왔어요.`);
+}
+function toolbarShortcut(event, suspended = false) {
+  if (suspended || event.defaultPrevented || event.isComposing || event.repeat || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey ||
+      event.target?.closest?.('input,textarea,select,dialog,[contenteditable],[role="textbox"],[role="dialog"]')) return '';
+  const code = event.code || ({ '[':'BracketLeft', ']':'BracketRight' }[event.key] || (/^[123]$/.test(event.key) ? 'Digit' + event.key : 'Key' + event.key.toUpperCase()));
+  const selected = { KeyV:'select', KeyP:'pen', KeyH:'marker', KeyE:'eraser', KeyT:'text', KeyL:'lasso', KeyS:'shape' }[code];
+  if (selected) return 'tool:' + selected;
+  if (/^Digit[123]$/.test(code)) return 'favorite:' + (Number(code.slice(-1)) - 1);
+  if (code === 'BracketLeft' || code === 'BracketRight') return 'width:' + (code === 'BracketLeft' ? -1 : 1);
+  return '';
+}
+function runToolbarShortcut(event) {
+  const action = toolbarShortcut(event, !toolPreferences.shortcuts || !!(active || drag || lasso || fileJob || touches.size || document.querySelector('dialog[open]') || menus.some(([,menu]) => !$(menu).hidden)));
+  if (!action) return false;
+  const [kind, value] = action.split(':');
+  if (kind === 'width' && !Object.hasOwn(toolLimits, tool)) return false;
+  event.preventDefault();
+  if (kind === 'tool') { showMenu(); setTool(value); toast(`${toolNames[value]} 도구`); }
+  else if (kind === 'favorite') loadToolFavorite(Number(value));
+  else setToolWidth(toolPreferences[tool].size + Number(value) * (['marker','eraser'].includes(tool) ? 2 : 1));
+  return true;
 }
 function penOnly() {
   return state.inputMode === 'pen' || (state.inputMode === 'auto' && penDetected);
@@ -1299,7 +1472,6 @@ $('duplicateSelection').onclick = () => {
   toast('선택한 필기를 복제했어요.');
 };
 $('clearSelection').onclick = () => resetLasso(true);
-const eraserSizes = { 3: 12, 5: 24, 9: 44 };
 function showEraser(p, size) {
   const cursor = $('eraserCursor');
   cursor.style.left = p[0] + 'px';
@@ -1365,12 +1537,12 @@ function drawOverlay() {
 }
 function beginDrawing(event, drawingTool) {
   const here = point(event);
-  const size = Number($('size').value);
+  const style = toolPreferences[drawingTool];
   const erasing = drawingTool === 'eraser';
   const stroke = {
     tool: drawingTool === 'shape' ? 'pen' : drawingTool,
-    color: erasing ? '#000000' : color,
-    size: erasing ? eraserSizes[size] : drawingTool === 'marker' ? size * 4 : size,
+    color: erasing ? '#000000' : style.color,
+    size: style.size,
     points: drawingTool === 'shape' ? makeShapePoints(shapeKind, here, here) : [here],
     ...(drawingTool === 'shape' ? { shape: true } : {})
   };
@@ -1484,7 +1656,7 @@ scroller.addEventListener('pointermove', (event) => {
   }
   if (event.pointerId !== active?.pointer) {
     if (event.pointerType !== 'touch' && event.target === sheet && tool === 'eraser' && !active) {
-      showEraser(point(event), eraserSizes[$('size').value]);
+      showEraser(point(event), toolPreferences.eraser.size);
     }
     return;
   }
@@ -2682,11 +2854,18 @@ const actions = {
     });
   }
 };
-const menus = [['mediaToggle','mediaMenu'], ['exportToggle','exportMenu'], ['docToggle','docMenu'], ['shapeToggle','shapeMenu']];
+const menus = [['mediaToggle','mediaMenu'], ['exportToggle','exportMenu'], ['docToggle','docMenu'], ['shapeToggle','shapeMenu'], ['toolSettingsToggle','toolSettings']];
 function showMenu(menuId = '') {
   for (const [toggle, menu] of menus) {
     $(menu).hidden = menu !== menuId;
     $(toggle).setAttribute('aria-expanded', menu === menuId);
+  }
+  if (menuId === 'toolSettings') {
+    renderToolState();
+    const rect = $('toolSettingsToggle').getBoundingClientRect();
+    const popup = $('toolSettings');
+    popup.style.left = Math.max(8, Math.min(rect.right - popup.offsetWidth, window.innerWidth - popup.offsetWidth - 8)) + 'px';
+    popup.style.top = Math.max(8, Math.min(rect.bottom + 6, window.innerHeight - popup.offsetHeight - 8)) + 'px';
   }
   if (menuId === 'shapeMenu') {
     const rect = $('shapeToggle').getBoundingClientRect();
@@ -2708,8 +2887,8 @@ for (const [toggle, menu] of menus) {
     actions[action]();
   });
 }
-document.addEventListener('click', (event) => { if (!event.target.closest('.menu-wrap, #shapeMenu, #shapeToggle')) showMenu(); });
-window.addEventListener('resize', () => { if (!$('shapeMenu').hidden) showMenu(); });
+document.addEventListener('click', (event) => { if (!event.target.closest('.menu-wrap, #shapeMenu, #shapeToggle, #toolSettings, #toolSettingsToggle')) showMenu(); });
+window.addEventListener('resize', () => { if (!$('shapeMenu').hidden || !$('toolSettings').hidden) showMenu(); });
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
     if (document.querySelector('dialog[open]')) return;
@@ -2719,6 +2898,7 @@ document.addEventListener('keydown', (event) => {
     else if (lassoSelection) resetLasso(true);
     else if (focusMode) setFocusMode(false);
   }
+  if (runToolbarShortcut(event)) return;
   const shift = { ArrowLeft: [-8,0], ArrowRight: [8,0], ArrowUp: [0,-8], ArrowDown: [0,8] }[event.key];
   if (shift && tool === 'lasso' && lassoSelection && !lasso && !event.ctrlKey && !event.metaKey && !event.altKey &&
       !event.target.closest('input, textarea, select, dialog')) {
@@ -2804,14 +2984,52 @@ for (const button of $('shapeMenu').querySelectorAll('[data-shape]')) {
   button.setAttribute('aria-pressed', button.dataset.shape === shapeKind);
   button.onclick = () => {
     shapeKind = button.dataset.shape;
+    toolPreferences.shapeKind = shapeKind;
+    rememberToolPreferences();
     setTool('shape');
     for (const item of $('shapeMenu').querySelectorAll('[data-shape]')) item.setAttribute('aria-pressed', item === button);
-    $('shapeToggle').title = `도형: ${button.textContent}`;
+    $('shapeToggle').title = `도형: ${button.textContent} (S)`;
     showMenu();
     $('shapeToggle').focus();
     toast(`${button.textContent}의 시작점부터 끝점까지 끌어 그리세요.`);
   };
 }
+$('closeToolSettings').onclick = () => { showMenu(); $('toolSettingsToggle').focus(); };
+$('toolWidth').oninput = () => setToolWidth($('toolWidth').value);
+$('toolWidthNumber').onchange = () => {
+  if (!setToolWidth($('toolWidthNumber').value)) renderToolState();
+};
+$('toolWidthNumber').onkeydown = (event) => {
+  if (event.key === 'Enter') { event.preventDefault(); $('toolWidthNumber').blur(); $('toolWidthNumber').focus(); }
+};
+for (const button of $('toolQuickWidths').children) button.onclick = () => setToolWidth(button.dataset.width);
+$('toolCustomColor').oninput = () => setColor($('toolCustomColor').value);
+function applyToolHex() {
+  const typed = $('toolColorHex').value.trim();
+  const value = typed.startsWith('#') ? typed : '#' + typed;
+  if (!validColor(value)) {
+    $('toolColorHex').setCustomValidity('#과 여섯 자리 색상 코드를 입력하세요. 예: #5143A4');
+    $('toolColorHex').reportValidity();
+    return;
+  }
+  setColor(value);
+}
+$('applyToolColor').onclick = applyToolHex;
+$('toolColorHex').oninput = () => $('toolColorHex').setCustomValidity('');
+$('toolColorHex').onkeydown = (event) => { if (event.key === 'Enter') { event.preventDefault(); applyToolHex(); } };
+for (const [index,button] of [...$('toolFavorites').children].entries()) button.onclick = () => loadToolFavorite(index);
+$('saveToolFavorite').onclick = () => {
+  const favorite = captureToolFavorite(toolPreferences, tool, shapeKind);
+  if (!favorite) return;
+  const index = Number($('favoriteSlot').value);
+  toolPreferences.favorites[index] = favorite;
+  renderToolState();
+  const saved = persistToolPreferences();
+  toast(saved ? `자주 쓰는 설정 ${index + 1}에 저장했어요.` : '도구 설정은 이번 화면에서만 적용돼요. 저장 공간을 확인해 주세요.');
+};
+$('toolShortcuts').onchange = () => { toolPreferences.shortcuts = $('toolShortcuts').checked; rememberToolPreferences(); };
+$('toolHelp').onclick = () => { finishDrawing(); showMenu(); $('toolHelpDialog').showModal(); };
+$('toolHelpDialog').addEventListener('close', () => $('toolHelp').focus());
 for (const [name, direction] of [['photoLeft', -1], ['photoRight', 1]]) $(name).onclick = () => {
   const request = pendingPhotoImport;
   if (!request || request.loading) return;
@@ -2945,7 +3163,7 @@ mobile.addEventListener('change', updateSidebarAccess);
 new ResizeObserver(setZoom).observe($('scroller'));
 renderNote();
 setTool(tool);
-setColor(color);
+setColor(color, false);
 setInputMode();
 updateSidebarAccess();
 if (protectedStorage) saveStatus('저장 데이터 오류 · 백업 필요', true);
