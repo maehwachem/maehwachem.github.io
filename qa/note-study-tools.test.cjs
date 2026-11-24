@@ -104,3 +104,14 @@ test('thin tape grips sit outside the movable body and flip sides near paper edg
  assert.ok(a.x.left>=tape.x+tape.width);assert.ok(a.y.top>=tape.y+tape.height);
  const edge={x:600,y:984,width:160,height:26};const b=c.tapeGripPositions(edge,36,6);assert.ok(b.x.left+36<=edge.x);assert.ok(b.y.top+36<=edge.y);
 });
+test('offscreen selection has no action menu even if expanded toolbar space is available',()=>{
+ const c=setup(),visible={left:0,top:198,right:844,bottom:342},expanded={...visible,top:107};
+ assert.equal(c.tapeMenuPosition({x:50,y:-77,width:105,height:40},{width:300,height:74},expanded,8,[],visible),null);
+});
+test('short-screen action placement avoids the tape and nearby grips or hides if no safe space exists',()=>{
+ const c=setup();const box={x:20,y:215,width:52,height:20},bounds={left:6,top:107,right:634,bottom:266};
+ const grips=[{left:78,top:207,right:114,bottom:243},{left:28,top:241,right:64,bottom:277}];
+ const at=c.tapeMenuPosition(box,{width:300,height:74},bounds,8,grips,{...bounds,top:192});
+ assert.ok(at);assert.ok(at.top+74<=207 || at.left>=118);
+ const full={left:0,top:0,right:320,bottom:80};assert.equal(c.tapeMenuPosition({x:0,y:0,width:320,height:80},{width:300,height:74},full,8),null);
+});
