@@ -228,6 +228,7 @@ body.has-delete-undo .toast{bottom:calc(var(--note-footer-height,48px) + 72px)}
 .study-controls{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;max-width:100%;font-size:11px}.study-controls button{min-height:32px;border:1px solid #dfd7e9;border-radius:6px;padding:3px 7px;background:#fffefa;white-space:nowrap}.study-controls button[aria-pressed=true]{background:var(--deep);color:white}.study-controls output{align-self:center;color:var(--muted);font-variant-numeric:tabular-nums}.practice-actions,.tape-edit-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:4px}.bar-zone.is-vertical .study-controls{flex-direction:column;flex:none}.bar-zone.is-vertical .study-controls button{width:100%;font-size:11px;padding-inline:2px}.bar-zone.is-vertical .practice-actions,.bar-zone.is-vertical .tape-edit-actions{flex-direction:column}.bar-zone.is-vertical .study-controls output{text-align:center}
 .tape-layer{position:absolute;inset:0;z-index:2;pointer-events:none}.tape-cover{position:absolute;display:flex;align-items:center;justify-content:center;background:var(--tape);border:0;border-radius:2px;pointer-events:none;touch-action:none;overflow:visible}.tape-cover::after{content:'';position:absolute;left:50%;top:50%;width:100%;height:100%;min-width:var(--tape-hit,24px);min-height:var(--tape-hit,24px);transform:translate(-50%,-50%)}.tape-cover span{font-size:var(--tape-font,12px);font-weight:700;color:#fff;pointer-events:none;line-height:1}.paper[data-tool=tape] .tape-cover{pointer-events:auto;cursor:grab;opacity:.6;outline:1px dashed #5143a4}.paper[data-tool=tape] .tape-cover.selected{outline:3px solid #5143a4;outline-offset:2px}.paper[data-tool=reveal] .tape-cover{pointer-events:auto;cursor:pointer}.tape-cover.revealed{background:transparent;box-shadow:inset 0 0 0 1px #8975b4}.tape-cover.revealed span{color:var(--deep);background:#fffefa;align-self:flex-start;border:1px solid #d5c9e5;border-radius:3px;padding:1px 2px;transform:translateY(-100%)}.tape-resize{position:absolute;display:grid;place-items:center;pointer-events:auto;touch-action:none;background:#fffefa;border:1px solid #5143a4;border-radius:5px;z-index:2;color:var(--deep)}.recent-colors{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}.recent-colors button{width:36px;height:34px;border:1px solid #ddd6e6;border-radius:6px;display:grid;place-items:center}.recent-colors i{display:block;width:18px;height:18px;border-radius:50%;background:var(--swatch)}.favorite-name-row{display:flex;gap:5px;align-items:center;margin-top:6px}.favorite-name-row input{width:100%;min-width:0;min-height:34px;border:1px solid #ddd6e6;border-radius:6px;padding:4px 6px;font-size:16px}.favorite-name-row button{font-size:11px;white-space:nowrap}.study-hint{font-size:12px;color:var(--muted)}
 @media(max-height:520px){.top-bar{height:45px}.doc-head{height:56px;padding-block:4px}.doc-meta{display:none}.title-input{font-size:22px}.bar-zone:not(.is-floating){max-height:90px;overflow:auto;overscroll-behavior:contain;justify-content:flex-start;align-items:center;padding:4px 6px;gap:4px}.bar-zone:not(.is-floating) .tool-status{order:-1;position:sticky;top:0;z-index:1;background:var(--canvas);flex:none;width:100%;padding:0;min-height:34px}.bar-zone:not(.is-floating) .toolbar,.bar-zone:not(.is-floating) .study-controls{flex:none}}
+.tape-selection-tools{position:absolute;z-index:4;transform-origin:top left;background:#fffefa;border:1px solid #d6c8e9;border-radius:10px;box-shadow:0 3px 14px #30254c26;padding:6px;pointer-events:auto;display:flex;flex-wrap:wrap;justify-content:center;gap:5px}.tape-selection-tools p{flex-basis:100%;font-size:11px;margin:0;color:var(--muted);text-align:center}.tape-selection-tools button{min-height:38px;padding:5px 10px;border:1px solid #ddd3e9;border-radius:7px;font-size:12px;white-space:nowrap}.tape-selection-tools button:hover{background:var(--tint)}.tape-selection-tools button[data-tape-action=delete]{color:#a43443}.tape-selection-tools button[data-tape-action=done]{background:var(--deep);color:white}.tape-resize{box-shadow:0 1px 4px #30254c26;border-width:2px}.tape-appearance-dialog{width:min(440px,calc(100% - 24px))}.tape-appearance-preview{height:116px;border:1px solid #e4ddea;border-radius:10px;background:repeating-linear-gradient(#fffdf8 0 23px,#e8e2ef 23px 24px);margin:12px 0 16px}.tape-appearance-preview svg{width:100%;height:100%}.tape-color-choices{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}.tape-color-choices button{display:flex;align-items:center;gap:6px;min-height:44px;padding:6px 10px;border:1px solid #ded5ea;border-radius:8px;font-size:13px}.tape-color-choices button[aria-pressed=true]{background:var(--tint);border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}.tape-color-choices i{width:18px;height:18px;border-radius:50%;background:var(--swatch)}.tape-appearance-dialog input[type=range]{display:block;width:100%;min-height:38px;margin:0;accent-color:var(--accent)}.tape-range-labels{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin:-2px 0 12px}.tape-appearance-dialog .study-hint{margin-bottom:6px}
 </style>
 </head>
 <body>
@@ -317,7 +318,7 @@ body.has-delete-undo .toast{bottom:calc(var(--note-footer-height,48px) + 72px)}
         </div>
         <div class="study-controls" role="group" aria-label="암기 연습 도구">
           <button id="tapeTool" aria-pressed="false">테이프</button><button id="practiceToggle" aria-pressed="false">연습 시작</button>
-          <span class="tape-edit-actions" id="tapeEditActions" hidden><button id="editTape">테이프 수정</button><button id="deleteTape">테이프 삭제</button></span>
+          <span class="tape-edit-actions" id="tapeEditActions" hidden><button id="editTape">색·크기</button><button id="deleteTape">테이프 삭제</button></span>
           <span class="practice-actions" id="practiceActions" hidden><button id="revealTool" aria-pressed="false">정답 확인</button><button id="nextAnswer">다음 정답</button><button id="hideAnswers">모두 가리기</button><button id="showAnswers">모두 공개</button><button id="practiceCopy">연습용 사본</button><output id="practiceProgress" aria-live="polite"></output></span>
         </div>
         <div class="tool-status"><button id="toolbarMove" class="toolbar-move" aria-label="도구모음 이동" aria-pressed="false" title="끌어서 이동 · 방향키로 이동 · Home으로 원위치"><span aria-hidden="true">⠿</span> 도구 이동</button><span class="current-tool"><i id="currentToolColor" aria-hidden="true"></i><span id="currentToolStatus"></span></span><span class="toolbar-layout-actions"><button id="toolbarOrientation" aria-label="도구모음 세로 배치" aria-pressed="false" title="도구모음을 세로로 배치">세로</button><button id="toolbarReset" aria-label="도구모음 원래 위치" title="도구모음을 위쪽 원래 위치로" hidden>원위치</button></span><span class="tool-status-actions"><button id="textBoxesButton" aria-haspopup="dialog" aria-label="현재 페이지 텍스트 상자 목록">상자 목록</button><button id="toolHelp" aria-haspopup="dialog">도구 안내</button></span></div>
@@ -381,7 +382,15 @@ body.has-delete-undo .toast{bottom:calc(var(--note-footer-height,48px) + 72px)}
     </section>
   </main>
 </div>
-<dialog id="tapeDialog" aria-labelledby="tapeHeading"><form id="tapeForm"><h2 id="tapeHeading" class="dialog-title">암기 테이프 수정</h2><p class="study-hint">손잡이로 옮기거나, 종이 기준 위치와 크기를 입력하세요.</p><div class="dialog-row"><label>X 위치<input id="tapeX" class="dialog-input" type="number" min="0" max="752" step="any" required></label><label>Y 위치<input id="tapeY" class="dialog-input" type="number" min="0" max="1002" step="any" required></label></div><div class="dialog-row"><label>너비<input id="tapeWidth" class="dialog-input" type="number" min="8" max="760" step="any" required></label><label>높이<input id="tapeHeight" class="dialog-input" type="number" min="8" max="1010" step="any" required></label></div><label class="dialog-label" for="tapeColor">테이프 색</label><select id="tapeColor" class="dialog-input"><option value="#5143a4">보라</option><option value="#377058">초록</option><option value="#bd5365">분홍</option></select><div class="dialog-actions"><button type="button" class="secondary" data-close="tapeDialog">취소</button><button type="submit" class="primary">적용</button></div></form></dialog>
+<dialog id="tapeDialog" class="tape-appearance-dialog" aria-labelledby="tapeHeading"><form id="tapeForm">
+  <h2 id="tapeHeading" class="dialog-title">테이프 색·크기</h2>
+  <p class="study-hint">미리 보면서 골라요. 위치는 종이 위에서 테이프를 끌어 옮길 수 있어요.</p>
+  <div class="tape-appearance-preview"><svg id="tapeAppearancePreview" viewBox="0 0 760 160" aria-label="테이프 모양 미리보기"><rect id="tapePreviewRect" x="200" y="60" width="360" height="40" rx="6" stroke="none" fill="#5143a4"/></svg></div>
+  <p class="dialog-label">색상</p><div id="tapeColorChoices" class="tape-color-choices" role="group" aria-label="테이프 색상"></div>
+  <label class="dialog-label" for="tapeLength">길이</label><input id="tapeLength" type="range" min="8" max="760" step="1"><div class="tape-range-labels" aria-hidden="true"><span>짧게</span><span>길게</span></div>
+  <label class="dialog-label" for="tapeThickness">두께</label><input id="tapeThickness" type="range" min="8" max="1010" step="1"><div class="tape-range-labels" aria-hidden="true"><span>얇게</span><span>두껍게</span></div>
+  <div class="dialog-actions"><button type="button" class="secondary" data-close="tapeDialog">취소</button><button type="submit" class="primary">완료</button></div>
+</form></dialog>
 <dialog id="imageExportDialog" aria-labelledby="imageExportHeading"><form id="imageExportForm"><h2 class="dialog-title" id="imageExportHeading">페이지 내보내기</h2><label class="dialog-label" for="imageTapeMode">암기 테이프</label><select id="imageTapeMode" class="dialog-input"><option value="worksheet">가린 학습지</option><option value="answers">정답본</option></select><p class="study-hint">화면에서 공개한 상태와 관계없이 선택한 방식으로 내보내요.</p><div class="dialog-actions"><button type="button" class="secondary" data-close="imageExportDialog">취소</button><button type="submit" class="primary">계속</button></div></form></dialog>
 <dialog id="toolHelpDialog" aria-labelledby="toolHelpHeading">
   <h2 class="dialog-title" id="toolHelpHeading">도구 안내</h2>
@@ -389,7 +398,7 @@ body.has-delete-undo .toast{bottom:calc(var(--note-footer-height,48px) + 72px)}
   <p><strong>텍스트 상자 삭제:</strong> 텍스트 도구로 기존 상자를 누른 뒤 ‘텍스트 상자 삭제’를 누르세요. 선택·이동 도구에서는 상자를 선택해 ‘삭제’를 눌러도 돼요. 삭제한 상자는 실행 취소로 되돌릴 수 있어요.</p>
   <p>상자 오른쪽 ↔ 손잡이를 끌거나, 손잡이에 초점을 두고 좌우 방향키로 너비를 바꿔요(Shift는 1px씩). 편집창에서는 굵게·밑줄·정렬과 너비를 바꿀 수 있어요. 배치 잠금은 위치·너비를 고정하고 올가미에서 제외해요. ‘상자 목록’에서 현재 페이지의 상자를 찾아 수정·잠금·삭제할 수 있어요.</p>
   <p><strong>도구모음 이동:</strong> ‘도구 이동’ 손잡이를 끌면 원하는 곳에 놓을 수 있어요. ‘세로’를 누르면 좁고 긴 도구 상자로 바뀌고, ‘가로’를 누르면 다시 가로로 놓아요. 손잡이를 누른 뒤 방향키로도 옮길 수 있고, Shift를 누르면 1px씩 조절해요. ‘원위치’나 손잡이의 Home 키로 위쪽 가로 배치로 돌려놓아요. 위치와 배치 방향은 이 브라우저에 기억해요. 상자가 화면보다 길면 안쪽을 스크롤해 나머지 도구를 사용할 수 있어요.</p>
-  <p><strong>암기 테이프:</strong> 테이프 도구로 정답 위를 사각형으로 끌어 가려요. 테이프를 끌어 이동하고 ↘ 손잡이로 크기를 바꿔요. 선택·이동 도구에서 텍스트 상자의 ‘가리기’도 사용할 수 있어요. 연습 시작 후에는 정답 확인 도구에서만 테이프를 눌러 공개해요. 펜·지우개는 테이프를 열지 않아요. 쪽을 바꾸거나 다시 시작하면 모두 가려져요. 연습 중 필기도 노트에 저장되므로 원본 보존에는 ‘연습용 사본’을 사용하세요. 정답 확인 도구에서 다음 정답은 버튼이나 Space·오른쪽 방향키로, 선택한 테이프는 Enter로 공개해요.</p>
+  <p><strong>암기 테이프:</strong> 테이프 도구로 정답 위를 사각형으로 끌어 가려요. 테이프를 끌어 이동하고 오른쪽 ↔ 손잡이로 길이를, 아래 ↕ 손잡이로 두께를 바꿔요. 선택한 테이프 옆에서 색·크기와 삭제를 고를 수 있어요. 선택·이동 도구에서 텍스트 상자의 ‘가리기’도 사용할 수 있어요. 연습 시작 후에는 정답 확인 도구에서만 테이프를 눌러 공개해요. 펜·지우개는 테이프를 열지 않아요. 쪽을 바꾸거나 다시 시작하면 모두 가려져요. 연습 중 필기도 노트에 저장되므로 원본 보존에는 ‘연습용 사본’을 사용하세요. 정답 확인 도구에서 다음 정답은 버튼이나 Space·오른쪽 방향키로, 선택한 테이프는 Enter로 공개해요.</p>
   <label class="dialog-label"><input id="toolShortcuts" type="checkbox" checked> 도구 단축키 사용</label>
   <table class="shortcut-table"><caption>키보드 단축키</caption><tbody><tr><th scope="row">P / H / E</th><td>펜 / 형광펜 / 부분 지우개</td></tr><tr><th scope="row">T / L / V</th><td>텍스트 / 올가미 / 선택·이동</td></tr><tr><th scope="row">S</th><td>마지막에 쓴 도형</td></tr><tr><th scope="row">1 / 2 / 3</th><td>자주 쓰는 설정 불러오기</td></tr><tr><th scope="row">[ / ]</th><td>굵기 줄이기 / 늘리기</td></tr><tr><th scope="row">Ctrl·⌘ + Z</th><td>실행 취소 (Shift로 다시 실행)</td></tr></tbody></table>
   <p>입력칸·대화창과 필기 중에는 도구 단축키가 작동하지 않아요. 부분 지우개는 그린 선만 지우며 사진·PDF·텍스트는 지우지 않아요. 손가락으로 쓰려면 ‘손가락 켜짐’을 선택하세요.</p>
@@ -598,8 +607,32 @@ function tapeFromPoints(from, to, color) {
   return w >= 8 && h >= 8 ? { x,y,width:w,height:h,color } : null;
 }
 function transformTape(tape, dx, dy, mode) {
-  return mode === 'resize' ? { ...tape, width:clamp(tape.width+dx,8,width-tape.x), height:clamp(tape.height+dy,8,height-tape.y) }
+  if(mode==='resize-left'){const x=clamp(tape.x+dx,0,tape.x+tape.width-8);return {...tape,x,width:tape.x+tape.width-x};}
+  if(mode==='resize-top'){const y=clamp(tape.y+dy,0,tape.y+tape.height-8);return {...tape,y,height:tape.y+tape.height-y};}
+  return ['resize','resize-x','resize-y'].includes(mode) ? { ...tape, width:mode==='resize-y'?tape.width:clamp(tape.width+dx,8,width-tape.x), height:mode==='resize-x'?tape.height:clamp(tape.height+dy,8,height-tape.y) }
     : { ...tape, x:clamp(tape.x+dx,0,width-tape.width), y:clamp(tape.y+dy,0,height-tape.height) };
+}
+function tapeAppearance(tape, changes = {}) {
+  return {...tape, width:Number.isFinite(changes.width)?clamp(changes.width,8,width-tape.x):tape.width,
+    height:Number.isFinite(changes.height)?clamp(changes.height,8,height-tape.y):tape.height,
+    color:validColor(changes.color)?changes.color:tape.color};
+}
+function tapeMenuPosition(tape, size, view, gap, obstacles = [], visible = view) {
+  if(tape.x+tape.width<=visible.left || tape.x>=visible.right || tape.y+tape.height<=visible.top || tape.y>=visible.bottom || size.width>view.right-view.left || size.height>view.bottom-view.top)return null;
+  const blocked=[{left:tape.x,top:tape.y,right:tape.x+tape.width,bottom:tape.y+tape.height},...obstacles];
+  const candidates=[{left:tape.x,top:tape.y-size.height-gap},{left:tape.x,top:tape.y+tape.height+gap+42},
+    {left:tape.x+tape.width+gap+42,top:tape.y},{left:tape.x-size.width-gap,top:tape.y},
+    {left:tape.x,top:tape.y-size.height-gap-42},{left:tape.x,top:tape.y+tape.height+gap}];
+  for(const point of candidates) {
+    const at={left:clamp(point.left,view.left,view.right-size.width),top:clamp(point.top,view.top,view.bottom-size.height)};
+    if(!blocked.some(box=>at.left<box.right+3 && at.left+size.width>box.left-3 && at.top<box.bottom+3 && at.top+size.height>box.top-3))return at;
+  }
+  return null;
+}
+function tapeGripPositions(tape, size, gap) {
+  const right=tape.x+tape.width+gap,left=tape.x-size-gap,below=tape.y+tape.height+gap,above=tape.y-size-gap;
+  return {x:{left:right+size<=width?right:left>=0?left:width-size,top:clamp(tape.y+tape.height/2-size/2,0,height-size)},
+    y:{left:clamp(tape.x+tape.width/2-size/2,0,width-size),top:below+size<=height?below:above>=0?above:height-size}};
 }
 function orderedTapes(page) { return [...(page.tapes ?? [])].sort((a,b)=>a.y-b.y || a.x-b.x); }
 const toolPreferenceKey = 'jeongi-note-tools-v1';
@@ -753,6 +786,8 @@ let practiceRedo = new Set();
 let selectedTape = null;
 let tapeDrag = null;
 let tapeTarget = null;
+let tapeDraft = null;
+let tapeActionFrame = 0;
 let pendingImageExport = null;
 let color = toolPreferences.pen.color;
 let selected = null;
@@ -1321,7 +1356,7 @@ function renderToolState() {
   $('toolColorHex').value = style.color;
   $('toolColorHex').setCustomValidity('');
   const detail = drawing ? `${tool === 'shape' ? shapeNames[shapeKind] + ' · ' : ''}${style.size}px${colored ? ' · ' + style.color.toUpperCase() : ' · 그린 선만 지워요'}`
-    : tool === 'tape' ? '사각형으로 가리기 · 선택해서 이동·수정' : tool === 'reveal' ? '테이프를 눌러 공개 · 펜으로 쓰면 공개되지 않아요' : tool === 'text' ? '빈 곳은 추가 · 기존 상자는 수정·삭제' : tool === 'lasso' ? '둘러 그려 이동·복제 · 잠금 상자 제외' : '종이를 끌어 이동';
+    : tool === 'tape' ? '사각형으로 가리기 · 선택해서 끌어 이동' : tool === 'reveal' ? '테이프를 눌러 공개 · 펜으로 쓰면 공개되지 않아요' : tool === 'text' ? '빈 곳은 추가 · 기존 상자는 수정·삭제' : tool === 'lasso' ? '둘러 그려 이동·복제 · 잠금 상자 제외' : '종이를 끌어 이동';
   $('currentToolStatus').textContent = `${toolNames[tool]} · ${detail}`;
   $('currentToolColor').hidden = !colored;
   $('currentToolColor').style.background = style.color;
@@ -3293,6 +3328,7 @@ function renderStudyUI() {
   for (const button of $('tools').children) button.disabled = practiceMode && !['pen','marker','eraser'].includes(button.dataset.tool);
 }
 function renderTapes(preview = null) {
+  $('tapeSelectionTools')?.remove();
   const layer = $('tapeLayer');
   const page = currentPage();
   const tapes = orderedTapes(page);
@@ -3310,18 +3346,29 @@ function renderTapes(preview = null) {
     cover.dataset.tape = tape.id;
     cover.style.cssText = `left:${tape.x}px;top:${tape.y}px;width:${tape.width}px;height:${tape.height}px;--tape:${tape.color};--tape-hit:${24/scale}px;--tape-font:${11/scale}px`;
     cover.tabIndex = interactive ? 0 : -1;
-    cover.setAttribute('aria-label',`가림 ${index+1}/${tapes.length}, ${edit ? '선택해서 이동·수정' : revealed ? '정답 공개됨, 누르면 가리기' : '누르면 정답 공개'}`);
+    cover.setAttribute('aria-label',`가림 ${index+1}/${tapes.length}, ${edit ? '선택해서 끌어 이동' : revealed ? '정답 공개됨, 누르면 가리기' : '누르면 정답 공개'}`);
     cover.setAttribute('aria-pressed',revealed);
     const number = document.createElement('span');number.textContent = index+1;number.setAttribute('aria-hidden','true');cover.append(number);
-    cover.onclick = event => { if (event.detail!==0) return; if (edit) { selectedTape=tape.id;renderTapes();renderStudyUI();openTapeEditor(); } else toggleTapeReveal(tape.id); };
+    cover.onclick = event => { if (event.detail!==0) return; if (edit) { selectedTape=tape.id;renderTapes();renderStudyUI();($('tapeSelectionTools')?.querySelector('[data-tape-action=appearance]')??$('editTape')).focus(); } else toggleTapeReveal(tape.id); };
     layer.append(cover);
     if (edit && selectedTape===tape.id) {
-      const grip = document.createElement('button');grip.className='tape-resize';grip.type='button';grip.textContent='↘';grip.dataset.tape=tape.id;grip.dataset.resize='true';
-      grip.setAttribute('aria-label',`가림 ${index+1} 크기 조절`);
-      const size=28/scale;grip.style.cssText=`left:${clamp(tape.x+tape.width-size/2,0,width-size)}px;top:${clamp(tape.y+tape.height-size/2,0,height-size)}px;width:${size}px;height:${size}px;font-size:${16/scale}px`;
-      grip.onclick=event=>{if(event.detail===0)openTapeEditor();};layer.append(grip);
+      for(const [axis,glyph,label] of [['x','↔','길이'],['y','↕','두께']]) {
+        const grip = document.createElement('button');grip.className='tape-resize';grip.type='button';grip.textContent=glyph;grip.dataset.tape=tape.id;grip.dataset.resize=axis;
+        grip.setAttribute('aria-label',`가림 ${index+1} ${label} 조절`);grip.title=`끌어서 ${label} 조절 · 방향키로 미세 조절`;
+        const size=36/scale,at=tapeGripPositions(tape,size,6/scale)[axis];grip.style.cssText=`left:${at.left}px;top:${at.top}px;width:${size}px;height:${size}px;font-size:${18/scale}px`;
+        grip.dataset.edge=axis==='x' && at.left<tape.x?'left':axis==='y' && at.top<tape.y?'top':axis;
+        grip.onclick=event=>{if(event.detail===0)openTapeEditor();};
+        grip.onkeydown=event=>{
+          const delta={ArrowLeft:-1,ArrowRight:1,ArrowUp:-1,ArrowDown:1}[event.key];if(!delta||event.ctrlKey||event.metaKey||event.altKey||event.isComposing)return;
+          event.preventDefault();event.stopPropagation();const old=(currentPage().tapes??[]).find(t=>t.id===tape.id);if(!old||practiceMode)return;
+          const step=delta*(event.shiftKey?1:5);const next=transformTape(old,axis==='x'?step:0,axis==='y'?step:0,'resize-'+grip.dataset.edge);
+          changePage({tapes:currentPage().tapes.map(t=>t.id===old.id?next:t)});
+          [...$('tapeLayer').querySelectorAll('.tape-resize')].find(node=>node.dataset.resize===axis)?.focus({preventScroll:true});
+        };layer.append(grip);
+      }
     }
   }
+  if(edit && selectedTape && !tapeDrag)renderTapeActions(preview??tapes.find(t=>t.id===selectedTape));
   for (const node of $('textLayer').children) {
     const item=page.texts.find(t=>t.id===node.dataset.id);
     const box=item && textBox(item);
@@ -3329,6 +3376,30 @@ function renderTapes(preview = null) {
     node.inert=!!covered;
     if(covered)node.setAttribute('aria-hidden','true');else node.removeAttribute('aria-hidden');
   }
+}
+function renderTapeActions(tape) {
+  if(!tape)return;
+  const controls=document.createElement('div');controls.id='tapeSelectionTools';controls.className='tape-selection-tools';controls.setAttribute('role','group');controls.setAttribute('aria-label','선택한 테이프');
+  const hint=document.createElement('p');hint.textContent='끌어서 이동 · ↔ 길이 · ↕ 두께';controls.append(hint);
+  for(const [action,label,handler] of [['appearance','색·크기',openTapeEditor],['delete','삭제',removeSelectedTape],['done','완료',()=>{selectedTape=null;renderTapes();renderStudyUI();$('tapeTool').focus();}]]) {
+    const button=document.createElement('button');button.type='button';button.dataset.tapeAction=action;button.textContent=label;button.onclick=handler;controls.append(button);
+  }
+  for(const type of ['pointerdown','pointermove','pointerup'])controls.addEventListener(type,event=>event.stopPropagation());
+  controls.style.position='fixed';controls.style.zIndex='9';controls.style.width=Math.max(120,Math.min(300,scroller.clientWidth-16,window.innerWidth-16))+'px';
+  document.querySelector('.workspace').append(controls);
+  const paper=$('paper').getBoundingClientRect(),view=scroller.getBoundingClientRect(),area=document.querySelector('.workspace').getBoundingClientRect();
+  const box={x:paper.left+tape.x*scale,y:paper.top+tape.y*scale,width:tape.width*scale,height:tape.height*scale};
+  const visible={left:Math.max(view.left,0)+6,right:Math.min(view.right,window.innerWidth)-6,top:Math.max(view.top,0)+6,bottom:Math.min(view.bottom,window.innerHeight)-6};
+  const bounds={...visible},size={width:controls.offsetWidth,height:controls.offsetHeight};
+  const grips=Object.values(tapeGripPositions(tape,36/scale,6/scale)).map(at=>({left:paper.left+at.left*scale,top:paper.top+at.top*scale,right:paper.left+at.left*scale+36,bottom:paper.top+at.top*scale+36}));
+  const obstacles=[...grips,...(currentPage().tapes??[]).map(t=>{
+    const w=Math.max(24,t.width*scale),h=Math.max(24,t.height*scale),x=paper.left+(t.x+t.width/2)*scale,y=paper.top+(t.y+t.height/2)*scale;
+    return {left:x-w/2,top:y-h/2,right:x+w/2,bottom:y+h/2};
+  })];
+  let at=tapeMenuPosition(box,size,bounds,8,obstacles,visible);
+  if(!at){bounds.top=Math.max(area.top,0)+6;at=tapeMenuPosition(box,size,bounds,8,obstacles,visible);}
+  if(!at){controls.remove();return;}
+  controls.style.left=at.left+'px';controls.style.top=at.top+'px';
 }
 function toggleTapeReveal(tapeId) {
   if (!practiceMode || tool!=='reveal' || !(currentPage().tapes ?? []).some(t=>t.id===tapeId)) return;
@@ -3367,8 +3438,9 @@ function startTapeGesture(event) {
   finishDrawing();finishTextTransform(false);resetLasso(true);showMenu();
   const saved=(currentPage().tapes??[]).find(t=>t.id===target?.dataset.tape);
   if(saved)selectedTape=saved.id;
+  else if(editing)selectedTape=null;
   tapeDrag={pointer:event.pointerId,source:event.pointerType,context:practicePage,start:point(event),client:[event.clientX,event.clientY],
-    mode:!editing?'reveal':saved?(target.dataset.resize?'resize':'move'):'create',original:saved,preview:saved,id:saved?.id??id(),moved:false};
+    mode:!editing?'reveal':saved?(target.dataset.resize?'resize-'+(target.dataset.edge??target.dataset.resize):'move'):'create',original:saved,preview:saved,id:saved?.id??id(),moved:false};
   event.preventDefault();event.stopImmediatePropagation();scroller.setPointerCapture(event.pointerId);
   renderTapes();renderStudyUI();
 }
@@ -3399,10 +3471,37 @@ function finishTapeGesture(commit=true) {
 function openTapeEditor() {
   if(practiceMode)return;
   const tape=(currentPage().tapes??[]).find(t=>t.id===selectedTape);if(!tape)return;
-  tapeTarget={note:currentNote().id,page:currentPage().id,id:tape.id};
-  for(const [name,value] of Object.entries({tapeX:tape.x,tapeY:tape.y,tapeWidth:tape.width,tapeHeight:tape.height,tapeColor:tape.color}))$(name).value=value;
-  if(!$('tapeColor').value){const option=document.createElement('option');option.value=tape.color;option.textContent=tape.color;$('tapeColor').append(option);$('tapeColor').value=tape.color;}
+  tapeTarget={note:currentNote().id,page:currentPage().id,id:tape.id,original:JSON.stringify(tape)};
+  tapeDraft={...tape};
+  const choices=[['#5143a4','보라'],['#377058','초록'],['#bd5365','분홍']];
+  if(!choices.some(([color])=>color.toLowerCase()===tape.color.toLowerCase()))choices.push([tape.color,'기존 색']);
+  $('tapeColorChoices').replaceChildren();
+  for(const [color,label] of choices) {
+    const button=document.createElement('button');button.type='button';button.dataset.color=color;button.style.setProperty('--swatch',color);button.setAttribute('aria-label',label+' 테이프');
+    const dot=document.createElement('i');dot.setAttribute('aria-hidden','true');button.append(dot,document.createTextNode(label));
+    button.onclick=()=>{if(tapeDraft){tapeDraft=tapeAppearance(tapeDraft,{color});renderTapeAppearance();}};$('tapeColorChoices').append(button);
+  }
+  renderTapeAppearance();
   $('tapeDialog').showModal();
+}
+function renderTapeAppearance() {
+  if(!tapeDraft)return;
+  const totalHeight=Math.max(160,tapeDraft.height+40);
+  $('tapeAppearancePreview').setAttribute('viewBox',`0 0 ${width} ${totalHeight}`);
+  for(const [name,value] of Object.entries({x:(width-tapeDraft.width)/2,y:(totalHeight-tapeDraft.height)/2,width:tapeDraft.width,height:tapeDraft.height,fill:tapeDraft.color}))$('tapePreviewRect').setAttribute(name,value);
+  for(const [name,field,limit,dimension,label] of [['tapeLength','width',width-tapeDraft.x,width,'너비'],['tapeThickness','height',height-tapeDraft.y,height,'높이']]) {
+    $(name).max=Math.floor(limit);$(name).value=Math.round(tapeDraft[field]);$(name).setAttribute('aria-valuetext',`종이 ${label}의 ${Math.round(tapeDraft[field]/dimension*100)}%`);
+  }
+  for(const button of $('tapeColorChoices').children)button.setAttribute('aria-pressed',button.dataset.color.toLowerCase()===tapeDraft.color.toLowerCase());
+}
+function applyTapeAppearance() {
+  const target=tapeTarget;
+  if(practiceMode || !target || !tapeDraft || currentNote().id!==target.note || currentPage().id!==target.page)return false;
+  const old=(currentPage().tapes??[]).find(t=>t.id===target.id);
+  if(!old || JSON.stringify(old)!==target.original){toast('테이프가 바뀌었어요. 다시 선택해 주세요.');return false;}
+  const tape=tapeAppearance(old,tapeDraft);if(!validTape(tape))return false;
+  if(JSON.stringify(old)!==JSON.stringify(tape))changePage({tapes:currentPage().tapes.map(t=>t.id===old.id?tape:t)});
+  return true;
 }
 function removeSelectedTape() {
   if(practiceMode)return;
@@ -3908,6 +4007,10 @@ for(const type of ['pointerup','pointercancel','lostpointercapture'])scroller.ad
 },true);
 window.addEventListener('blur',()=>finishTapeGesture(false));
 window.addEventListener('resize',()=>finishTapeGesture(false));
+scroller.addEventListener('scroll',()=>{
+  if(tapeActionFrame || !selectedTape || tapeDrag || tool!=='tape' || practiceMode)return;
+  tapeActionFrame=requestAnimationFrame(()=>{tapeActionFrame=0;$('tapeSelectionTools')?.remove();if(!tapeDrag && tool==='tape' && !practiceMode)renderTapeActions((currentPage().tapes??[]).find(t=>t.id===selectedTape));});
+});
 $('tapeTool').onclick=()=>{setTool('tape');toast('정답 위를 사각형으로 끌어 가려요. 테이프를 누르면 선택해 옮길 수 있어요.');};
 $('practiceToggle').onclick=togglePractice;
 $('revealTool').onclick=()=>setTool('reveal');
@@ -3922,14 +4025,15 @@ $('tapeText').onclick=()=>{
   const box=textBox(item),tape=tapeFromPoints([box.left,box.top],[box.right,box.bottom],'#5143a4');if(!tape)return;
   tape.id=id();selectedTape=tape.id;changePage({tapes:[...(currentPage().tapes??[]),tape]});setTool('tape');
 };
-$('tapeForm').onsubmit=event=>{
-  event.preventDefault();const target=tapeTarget;if(practiceMode || !target || currentNote().id!==target.note || currentPage().id!==target.page)return;
-  const old=(currentPage().tapes??[]).find(t=>t.id===target.id);if(!old)return;
-  const tape={id:old.id,x:Number($('tapeX').value),y:Number($('tapeY').value),width:Number($('tapeWidth').value),height:Number($('tapeHeight').value),color:$('tapeColor').value};
-  if(!validTape(tape)){toast('테이프가 종이 안에 들어오도록 위치와 크기를 입력하세요.');return;}
-  changePage({tapes:currentPage().tapes.map(t=>t.id===old.id?tape:t)});$('tapeDialog').close();
+for(const [name,field] of [['tapeLength','width'],['tapeThickness','height']])$(name).oninput=()=>{
+  if(!tapeDraft)return;tapeDraft=tapeAppearance(tapeDraft,{[field]:Number($(name).value)});renderTapeAppearance();
 };
-$('tapeDialog').addEventListener('close',()=>{tapeTarget=null;$('tapeTool').focus();});
+$('tapeForm').onsubmit=event=>{event.preventDefault();if(applyTapeAppearance())$('tapeDialog').close();};
+$('tapeDialog').addEventListener('close',()=>{
+  tapeTarget=null;tapeDraft=null;
+  const cover=[...$('tapeLayer').querySelectorAll('.tape-cover')].find(node=>node.dataset.tape===selectedTape);
+  (cover??$('tapeTool')).focus({preventScroll:true});
+});
 $('practiceCopy').onclick=async()=>{
   const note=currentNote(),page=currentPage();
   const copied=await runFileWork('연습용 사본 만들기',()=>copyPageToNote(note.id,page.id,'',(titleOf(note)+' 연습용').slice(0,100)),'연습용 사본을 만들지 못했어요.');

@@ -73,3 +73,51 @@ test('conflicting backup restores regenerate tape IDs and repeating the same res
  assert.equal(first.imported.length,1);assert.notEqual(first.imported[0].pages[0].tapes[0].id,'tape-a');assert.equal(first.imported[0].pages[0].tapes[0].width,160);
  const second=await c.planBackupRestore([incoming],new Map(),[existing,...first.imported],()=>{},new AbortController().signal);assert.equal(second.imported.length,0);
 });
+test('length and thickness handles resize one axis without moving or rounding the original tape',()=>{
+ const c=setup(),old={...tape(),x:7.889471,width:105.12295,height:156.48394};
+ const horizontal=c.transformTape(old,30,100,'resize-x');assert.equal(horizontal.width,old.width+30);assert.equal(horizontal.height,old.height);assert.equal(horizontal.x,old.x);
+ const vertical=c.transformTape(old,100,-20,'resize-y');assert.equal(vertical.width,old.width);assert.equal(vertical.height,old.height-20);
+ assert.equal(old.width,105.12295);
+});
+test('appearance controls preserve exact position and untouched dimensions while clamping slider edits',()=>{
+ const c=setup();assert.equal(typeof c.tapeAppearance,'function');const old={...tape(),x:7.889471,y:543.113,width:105.12295,height:156.48394};
+ const color=c.tapeAppearance(old,{color:'#377058',x:600});assert.equal(color.x,old.x);assert.equal(color.y,old.y);assert.equal(color.width,old.width);assert.equal(color.height,old.height);
+ const large=c.tapeAppearance(old,{width:9999,height:9999});assert.equal(large.width,760-old.x);assert.equal(large.height,1010-old.y);assert.equal(old.color,'#5143a4');
+});
+test('nearby tape actions remain inside the visible paper at edges and after zooming',()=>{
+ const c=setup();assert.equal(typeof c.tapeMenuPosition,'function');
+ for(const view of [{left:0,top:0,right:760,bottom:1010},{left:90,top:350,right:730,bottom:600}]){
+   const size={width:Math.min(320,view.right-view.left),height:68};
+   const at=c.tapeMenuPosition({...tape(),x:700,y:590},size,view,6);assert.ok(at.left>=view.left);assert.ok(at.left+size.width<=view.right);assert.ok(at.top>=view.top);assert.ok(at.top+size.height<=view.bottom);
+ }
+});
+test('visual editor applies a draft once without changing coordinates and rejects stale or canceled edits',()=>{
+ const c=setup(),p=data().notes[0].pages[0];p.tapes[0].x=7.889471;p.tapes[0].width=105.12295;const old=p.tapes[0];let writes=0;
+ Object.assign(c,{practiceMode:false,tapeTarget:{note:'n',page:'p',id:old.id,original:JSON.stringify(old)},tapeDraft:{...old,color:'#377058'},
+ currentNote:()=>({id:'n'}),currentPage:()=>p,changePage(update){writes++;Object.assign(p,update);},toast(){}});
+ vm.runInContext(part('function applyTapeAppearance(','function removeSelectedTape('),c);assert.equal(typeof c.applyTapeAppearance,'function');
+ assert.equal(c.applyTapeAppearance(),true);assert.equal(writes,1);assert.equal(p.tapes[0].x,7.889471);assert.equal(p.tapes[0].width,105.12295);assert.equal(old.color,'#5143a4');
+ assert.equal(c.applyTapeAppearance(),false);assert.equal(writes,1);c.tapeDraft=null;assert.equal(c.applyTapeAppearance(),false);
+});
+test('thin tape grips sit outside the movable body and flip sides near paper edges',()=>{
+ const c=setup();assert.equal(typeof c.tapeGripPositions,'function');const tape={x:100,y:100,width:160,height:26};const a=c.tapeGripPositions(tape,36,6);
+ assert.ok(a.x.left>=tape.x+tape.width);assert.ok(a.y.top>=tape.y+tape.height);
+ const edge={x:600,y:984,width:160,height:26};const b=c.tapeGripPositions(edge,36,6);assert.ok(b.x.left+36<=edge.x);assert.ok(b.y.top+36<=edge.y);
+});
+test('offscreen selection has no action menu even if expanded toolbar space is available',()=>{
+ const c=setup(),visible={left:0,top:198,right:844,bottom:342},expanded={...visible,top:107};
+ assert.equal(c.tapeMenuPosition({x:50,y:-77,width:105,height:40},{width:300,height:74},expanded,8,[],visible),null);
+});
+test('short-screen action placement avoids the tape and nearby grips or hides if no safe space exists',()=>{
+ const c=setup();const box={x:20,y:215,width:52,height:20},bounds={left:6,top:107,right:634,bottom:266};
+ const grips=[{left:78,top:207,right:114,bottom:243},{left:28,top:241,right:64,bottom:277}];
+ const at=c.tapeMenuPosition(box,{width:300,height:74},bounds,8,grips,{...bounds,top:192});
+ assert.ok(at);assert.ok(at.top+74<=207 || at.left>=118);
+ const full={left:0,top:0,right:320,bottom:80};assert.equal(c.tapeMenuPosition({x:0,y:0,width:320,height:80},{width:300,height:74},full,8),null);
+});
+test('flipped left and top grips follow the drag direction while keeping the opposite edge fixed',()=>{
+ const c=setup(),old={...tape(),x:600,y:984,width:160,height:26};
+ const left=c.transformTape(old,-30,90,'resize-left');assert.equal(left.x,570);assert.equal(left.width,190);assert.equal(left.x+left.width,760);assert.equal(left.y,984);
+ const top=c.transformTape(old,90,-20,'resize-top');assert.equal(top.y,964);assert.equal(top.height,46);assert.equal(top.y+top.height,1010);assert.equal(top.x,600);
+ const tiny=c.transformTape(old,900,0,'resize-left');assert.equal(tiny.width,8);assert.equal(tiny.x+tiny.width,760);
+});
