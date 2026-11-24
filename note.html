@@ -933,12 +933,19 @@ function renderSelection(item = currentItem()) {
   $('lockText').setAttribute('aria-pressed', item.locked === true);
   $('lockText').textContent = item.locked ? '해제' : '잠금';
   $('lockText').setAttribute('aria-label', item.locked ? '텍스트 배치 잠금 해제' : '텍스트 배치 잠금');
-  controls.style.left = `${clamp(item.x, 5, width - controls.offsetWidth - 5)}px`;
+  controls.style.transform = `scale(${1 / scale})`;
+  controls.style.transformOrigin = 'top left';
+  controls.style.maxWidth = `${Math.max(120, width * scale - 10)}px`;
+  controls.style.flexWrap = 'wrap';
+  const controlWidth = controls.offsetWidth / scale;
+  const controlHeight = controls.offsetHeight / scale;
+  controls.style.left = `${clamp(item.x, 5 / scale, width - controlWidth - 5 / scale)}px`;
   const label = [...$('textLayer').children].find((node) => node.dataset.id === item.id);
-  controls.style.top = `${item.y < 45 ? Math.min(height - 44, item.y + (label?.offsetHeight ?? 32) + 5) : item.y - 42}px`;
+  controls.style.top = `${item.y >= controlHeight + 5 / scale ? item.y - controlHeight - 5 / scale : Math.min(height - controlHeight, item.y + (label?.offsetHeight ?? 32) + 5 / scale)}px`;
   const handle = $('resizeText');
   handle.style.width = `${24 / scale}px`;
   handle.style.height = `${36 / scale}px`;
+  handle.style.fontSize = `${16 / scale}px`;
   handle.style.left = `${clamp(item.x + annotationWidth(item) - 12 / scale, 0, width - 24 / scale)}px`;
   handle.style.top = `${clamp(item.y + Math.min(label?.offsetHeight ?? item.size * 1.25, 140) / 2 - 18 / scale, 0, height - 36 / scale)}px`;
 }
