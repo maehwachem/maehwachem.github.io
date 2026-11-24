@@ -29,9 +29,9 @@
       if (on) Z.forEach(function (z) { for (var q = 0; q < 12; q += 2) { px(g, z.x + q, z.y, 1, 1, '#fff'); px(g, z.x + q, z.y + 9, 1, 1, '#fff'); } });
     }
     draw(false);
-    var msg = el('div', 'margin:4px 0;min-height:18px', '아연을 끌어 어디에 달지 정하세요.');
+    var msg = el('div', 'margin:4px 0;min-height:18px', '가방에서 꺼낸 아연판을 끌어 어디에 달지 정하세요.');
     var zn = el('div', 'position:absolute;left:12px;top:12px;width:30px;height:18px;background:#c9ccd2;border:3px solid #7d828c;box-shadow:inset -3px -3px #9aa0a8;cursor:grab;box-sizing:border-box');
-    zn.tabIndex = 0; zn.setAttribute('role', 'button'); zn.setAttribute('aria-label', '아연 덩이. 화살표로 옮기고 Enter로 놓기.');
+    zn.tabIndex = 0; zn.setAttribute('role', 'button'); zn.setAttribute('aria-label', '아연판. 화살표로 옮기고 Enter로 놓기.');
     box.appendChild(zn);
     var pos = { x: 12, y: 12 }, drag = null;
     function place() { zn.style.left = pos.x + 'px'; zn.style.top = pos.y + 'px'; }

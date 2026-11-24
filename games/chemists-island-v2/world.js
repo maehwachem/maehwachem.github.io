@@ -2,28 +2,31 @@
 (() => {
   'use strict';
   const scenes = {
-    harbor: {name:'우편선 선착장', spawn:0, nodes:[[100,170],[48,147],[91,151],[126,134],[178,128],[232,126],[258,119],[144,190],[122,148],[117,126]],
-      edges:[[0,2],[2,1],[2,3],[3,4],[4,5],[5,6],[0,7],[0,8],[8,3],[3,9]],
-      spots:{post:['우체국',[40,123],1],bench:['작업대',[179,172],7],boat:['우편정',[323,97],6],board:['항로 게시판',[117,119],9]}},
+    harbor: {name:'우편선 선착장', spawn:0, nodes:[[100,170],[48,147],[91,151],[126,134],[178,128],[232,126],[258,119],[144,190],[122,148],[117,126],[80,163],[205,127]],
+      edges:[[0,2],[2,1],[2,3],[3,4],[4,11],[11,5],[5,6],[0,7],[0,8],[8,3],[3,9],[0,10],[10,1]],
+      spots:{post:['우체국',[40,123],1],bench:['작업대',[179,172],7],boat:['우편정',[323,97],6],board:['항로 게시판',[117,119],9],chain:['사슬 더미',[76,156],10],zinc:['정비 상자',[205,117],11]}},
     mine: {name:'붉은 만 · 옛 광산',spawn:4,nodes:[[98,185],[138,187],[204,195],[261,188],[317,150],[266,174],[237,184]],
       edges:[[0,1],[1,2],[2,6],[6,3],[3,5],[5,4]],spots:{winch:['권양기',[80,150],0],wreck:['난파선',[252,150],6],boat:['우편정',[342,125],4]}},
     salt: {name:'흰 띠 · 옛 염전',spawn:4,nodes:[[67,165],[103,161],[169,151],[243,140],[332,123],[285,132]],
-      edges:[[0,1],[1,2],[2,3],[3,5],[5,4]],spots:{gate:['수문',[77,130],0],shed:['창고',[251,116],3],boat:['우편정',[342,108],4]}}
+      edges:[[0,1],[1,2],[2,3],[3,5],[5,4]],spots:{gate:['수문',[77,130],0],shed:['창고',[251,116],3],boat:['우편정',[342,108],4],rain:['처마 아래 빗물통',[186,129],2],brine:['염전 물웅덩이',[133,133],1]}}
   };
   // Bounds in the same 384 × 216 grid as the paintings. Keep bare walkways outside them.
   const objects = {
-    harbor:{post:[3,64,87,82],bench:[147,164,68,34],boat:[267,68,108,60],board:[106,105,23,20]},
+    harbor:{post:[3,64,87,82],bench:[147,164,68,34],boat:[267,68,108,60],board:[106,105,23,20],chain:[62,144,29,22],zinc:[191,103,29,23]},
     mine:{winch:[10,96,87,72],wreck:[173,113,113,53],boat:[300,100,82,47]},
-    salt:{gate:[1,78,102,71],shed:[185,49,132,83],boat:[321,76,62,46]}
+    salt:{gate:[1,78,102,71],shed:[185,49,132,83],boat:[321,76,62,46],rain:[173,114,27,26],brine:[119,120,30,23]}
   };
   function actionLabel(scene,key,s){
+    if(key==='chain')return '사슬을 챙긴다';
+    if(key==='zinc')return '정비 상자를 뒤진다';
+    if(key==='rain')return '빗물통을 살핀다';
+    if(key==='brine')return '웅덩이를 살핀다';
     if(key==='boat')return scene==='harbor'&&!s.repaired?'우편정을 살핀다':'우편정에 오른다';
     if(key==='post')return s.mail?'국장과 이야기한다':'우체국 문을 연다';
     if(key==='board')return '게시판을 읽는다';
     if(key==='bench'){
       if(s.finished)return '말린 띠를 본다';
-      if(!s.mail)return '작업대를 살핀다';
-      if(!s.repaired)return '정비 기록을 본다';
+      if(!s.repaired)return Supplies.ready(s)?'모은 재료를 펼친다':'부표를 살핀다';
       if(!s.refs)return '작업대를 살핀다';
       if(s.ran)return '분리 결과를 본다';
       return s.line?'실험을 이어 간다':'거름종이를 편다';
@@ -65,16 +68,20 @@
     alignCamera();positionObjects();
   }
   function alignCamera(){camera=Math.round(Math.max(0,Math.min(W-width,px-width/2)));}
+  function present(key){
+    return id!=='harbor'||!Object.hasOwn(Supplies.items,key)||(!s.repaired && !s.pack[key]);
+  }
   function positionObjects(){
     for(const b of controls.children){
       const [x,y,w,h]=objects[id][b.dataset.spot];
       const left=Math.max(0,x-camera),right=Math.min(width,x+w-camera);
-      b.hidden=right<=left;
+      b.hidden=right<=left || !present(b.dataset.spot);
       b.style.left=left*100/width+'%';b.style.width=Math.max(0,right-left)*100/width+'%';
       b.style.top=y*100/H+'%';b.style.height=h*100/H+'%';
     }
   }
   function refreshLabels(){
+    positionObjects();
     for(const b of controls.children){
       const key=b.dataset.spot,label=actionLabel(id,key,s);
       b.setAttribute('aria-label',scene.spots[key][0]+' · '+label);
@@ -98,6 +105,7 @@
     if(!paused&&!route.length){
       let best=23;
       for(const [key,spot] of Object.entries(scene.spots)){
+        if(!present(key))continue;
         const d=dist([px,py],scene.nodes[spot[2]]);
         if(d<best){best=d;nearKey=key;}
       }
@@ -133,7 +141,7 @@
     const list=[];for(let i=b;i!==-1;i=previous[i])list.unshift(nodes[i]);return list;
   }
   function moveToSpot(key){
-    if(paused||!scene.spots[key])return;
+    if(paused||!scene.spots[key]||!present(key))return;
     target=null;held.clear();request=key;route=findRoute(scene.nodes[scene.spots[key][2]]);
     if(overview){overview=false;size();}
     canvas.focus({preventScroll:true});updateNearby();
@@ -178,9 +186,32 @@
     rect(111,112,2,13,'#694a38');rect(122,112,2,13,'#694a38');rect(109,108,17,9,'#503e38');
     rect(110,109,15,7,'#a5754b');rect(112,110,6,4,'#efdeb2');rect(119,111,3,3,'#d8c293');
   }
+  // Small objects share the painting's pixel grid; pale edges catch the sun.
+  function chainPile(){
+    function link(x,y){
+      rect(x+1,y,6,1,'#3a4142');rect(x,y+1,8,3,'#384651');rect(x+1,y+4,6,1,'#3a4142');
+      rect(x+1,y+1,6,1,'#abb8b3');rect(x+2,y+2,4,1,'#685956');rect(x+1,y+3,6,1,'#768b8d');
+    }
+    rect(68,158,16,2,'#684f41');link(67,155);link(72,153);link(77,155);link(71,157);link(77,152);
+  }
+  function toolbox(full){
+    rect(195,119,22,3,'#795a42');rect(195,111,19,8,'#273c36');
+    rect(196,113,17,5,'#4c8274');rect(197,110,17,3,'#548f7e');rect(198,109,15,1,'#add1b5');
+    rect(196,112,17,1,'#203f40');rect(203,112,4,3,'#e9b659');
+    if(full){rect(199,107,9,3,'#626f79');rect(200,107,8,1,'#dbe1d1');rect(202,108,2,1,'#5d6567');}
+    else {rect(196,108,17,3,'#27433e');rect(197,107,16,1,'#7aa48d');}
+  }
+  function waterSpots(){
+    rect(178,124,15,9,'#4f4540');rect(179,121,13,13,'#965d3c');rect(181,123,3,10,'#bb8452');
+    rect(178,122,16,2,'#455659');rect(178,130,16,2,'#506267');rect(180,120,12,2,'#a89477');rect(181,120,10,1,'#a7d9dd');
+    rect(125,131,16,5,'#876b53');rect(123,132,19,2,'#688e94');rect(126,131,13,1,'#c2d4ba');
+    rect(123,134,5,2,'#efe7c6');rect(137,132,4,1,'#dedfc7');
+  }
   function weather(t){
     if(id==='harbor'){
       board();
+      if(present('chain'))chainPile();
+      toolbox(present('zinc'));
       if(!s.repaired){ctx.drawImage(textures.harbor,182,39,22,43,207-camera,39,22,43);}
       if(s.lit){
         ctx.fillStyle='#1c315c55';ctx.fillRect(0,0,width,H);
@@ -190,6 +221,7 @@
         const fx=258+Math.round(((t*3)%52));rect(fx,58,9,2,'#e1bb88');rect(fx+2,56,5,2,'#dcdbbe');rect(fx+2,55,4,1,'#b45741');rect(fx-3,61,9,1,'#c1c5aa');
       }
     }
+    if(id==='salt')waterSpots();
     const patches=id==='harbor'?[[145,65],[267,82],[283,182]]:id==='mine'?[[314,83],[360,163],[201,101]]:[[157,74],[127,77],[329,182]];
     patches.forEach(([x,y],i)=>{for(let j=0;j<7;j++){const a=t*.9+i+j*1.37;const len=Math.round(1+Math.sin(a)*2);if(len>0)rect(x+(j*11)%33,y+(j*5)%8,len,1,'#d2e6cf72');}});
   }
@@ -223,5 +255,5 @@
       const spawn=arriving&&key==='harbor'?scene.spots.boat[2]:scene.spawn;
       [px,py]=scene.nodes[spawn];face=arriving?'left':'up';route=[];request=null;target=null;held.clear();mountObjects();size();
     },
-    stop(){active=false;held.clear();route=[];request=null;cancelAnimationFrame(raf);},pause(value){paused=value;held.clear();if(scene)refreshLabels();},resize:size};
+    refresh(){if(scene)refreshLabels();},stop(){active=false;held.clear();route=[];request=null;cancelAnimationFrame(raf);},pause(value){paused=value;held.clear();if(scene)refreshLabels();},resize:size};
 })();

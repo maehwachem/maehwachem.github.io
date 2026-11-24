@@ -8,14 +8,16 @@
 
   function initial() {
     return { scene: 'harbor', returns: 0, finished: false, log: [], mineClue: false, saltClue: false, repaired: false,
-      mail: false, coupA: false, coupB: false, trip: null, first: null, visited: {}, lit: false,
+      pack: {chain:0, zinc:0}, water: null, mail: false, coupA: false, coupB: false, trip: null, first: null, visited: {}, lit: false,
       plate: false, lifted: false, gate: false, refs: false, line: false, ran: false };
   }
 
   function goal(s) {
     if (s.finished) return '북암 항로가 지도에 올랐다. 섬들을 자유롭게 다시 찾아가자.';
-    if (!s.mail) return '우체국에 들러 오 국장을 만나자.';
-    if (!s.repaired) return (s.coupA && s.coupB) ? '작업대에서 새 사슬에 아연을 달자.' : '작업대에서 옛 시험편 A와 B를 살펴보자.';
+    if (!s.repaired) {
+      if (Supplies.ready(s)) return '작업대에 모은 재료를 펼쳐 부표를 고쳐 보자.';
+      return Supplies.bag(s).length ? '부두 곳곳에 쓸 만한 정비 자재가 더 있을 것 같다.' : '부표 사슬이 끊겼다. 부두에서 쓸 만한 물건을 찾아보자.';
+    }
     if (s.scene === 'mine') return !s.plate ? '권양기 명판을 읽어 보자.' : !s.lifted ? '권양기로 물속 상자를 끌어올리자.' : !s.mineClue ? '난파선 옆 상자를 열자.' : '배로 항구에 돌아가자.';
     if (s.scene === 'salt') return !s.gate ? '굳은 수문을 열자.' : !s.saltClue ? '창고의 우편행낭을 조사하자.' : '배로 항구에 돌아가자.';
     if (s.mineClue && s.saltClue) return s.refs ? '작업대에서 잉크를 분리해 보자.' : '우체국에서 소인 잉크 견본을 받자.';
@@ -24,7 +26,7 @@
   }
 
   function chainMenu() {
-    return D('새 사슬', '새 사슬을 부표에 걸었다.\n아연 덩이를 어떻게 달까?', [
+    return D('새 사슬', '가방에서 꺼낸 예비 사슬을 부표에 걸었다.\n구멍이 뚫린 아연판은 어디에 달면 좋을까?', [
       { label: '금속 사이를 밧줄로만 잇는다', id: 'z_rope' }, { label: '아연에 페인트를 칠해 단다', id: 'z_paint' },
       { label: '물 위 고리에 단다', id: 'z_high' }, { label: '물속 족쇄에 볼트로 조인다', id: 'z_bolt' }], 'samples');
   }
@@ -33,22 +35,43 @@
       [{ label: '등대곶', id: 'r_light' }, { label: '모래섬', id: 'r_sand' }, { label: '북암', id: 'r_north' }], 'ink');
   }
 
+  function salvage(s,id) {
+    if (!Supplies.take(s,id)) return null;
+    return {pickup:id, text:Supplies.items[id].name+'을 가방에 넣었다.'};
+  }
+  function waterSource(s,type) {
+    var fresh=type==='rain', name=fresh?'빗물통':'소금물 웅덩이';
+    if(s.gate) return D(name, fresh?'처마에서 모인 빗물이 남아 있다.':'바닥에 녹지 않은 소금 결정이 보인다.');
+    if(s.water===type) return D(name,'가방 속 물병에 이곳의 물이 들어 있다.');
+    return D(name, (fresh?'처마 홈통에서 흘러온 빗물이다.':'얕은 물 바닥에 소금 결정이 수북하다.') +
+      (s.water?'\n물병을 비우면 이 물로 바꿔 담을 수 있다.':'\n물통 곁에 빈 물병이 있다. 조금 담아 갈 수 있다.'),
+      [{label:s.water?'물병을 비우고 바꿔 담기':'물병에 담기',id:'fill_'+type}]);
+  }
+  function fill(s,type) {
+    if(s.gate || s.scene!=='salt') return null;
+    s.water=type;
+    return {pickup:type,text:(type==='rain'?'빗물':'소금물')+'을 물병에 담았다.'};
+  }
   var SPOT = {
     harbor: {
+      chain: function(s){return salvage(s,'chain');},
+      zinc: function(s){return salvage(s,'zinc');},
       post: function (s) {
-        if (!s.mail) { s.mail = true; L(s, '물새호가 열이틀째 돌아오지 않았다.');
+        if (!s.mail && !(s.mineClue && s.saltClue)) { s.mail = true; L(s, '물새호가 열이틀째 돌아오지 않았다.');
+          if(s.repaired) return D('우체국','오 국장이 낡은 항로도를 편다. “부표를 세워 줬구나. 광산 만이나 옛 염전에 가거든 물새호 소식 좀 알아봐 주겠니?”');
           return D('우체국', '오 국장이 물에 젖은 봉투를 펼친다. 폐쇄된 항로의 소인이다.\n"옛 뱃길을 보러 간 물새호가 열이틀째 안 와.\n부표 사슬이 끊겨 우편정도 묶였지.\n작업대에 옛 정비 기록이 있네."'); }
         if (s.finished) return D('우체국', '"북암행 우편이 모이고 있어.\n주소 쓰는 사람이 늘었네."');
-        if (s.mineClue && s.saltClue && !s.refs) { s.refs = true; L(s, '소인 잉크 견본 셋을 받았다(원본 대장은 그대로).');
+        if (s.mineClue && s.saltClue && !s.refs) { s.mail = true; s.refs = true; L(s, '소인 잉크 견본 셋을 받았다(원본 대장은 그대로).');
           return D('우체국', '"원본 대장엔 손대지 말게."\n국장이 등대곶·모래섬·북암 소인대를\n새 종이에 하나씩 찍어 준다.', [], 'samples'); }
         return D('우체국', '"' + goal(s) + '"\n국장은 그 말만 하고 장부로 돌아간다.');
       },
       bench: function (s) {
-        if (!s.mail) return D('작업대', '공구와 녹슨 쇳조각. 아직 주인이 없다.');
         if (!s.repaired) {
-          var c = [{ label: '시험편 A 관찰', id: 'coupA' }, { label: '시험편 B 관찰', id: 'coupB' }];
-          if (s.coupA && s.coupB) c.push({ label: '새 사슬 작업', id: 'chain' });
-          return D('작업대', '옛 정비 기록과 강철 시험편 두 개.\n둘 다 1년 동안 바닷물에 잠겨 있었다.', c, 'samples');
+          var c = [{label:'정비 기록 A 펼치기', id:'coupA'},{label:'정비 기록 B 펼치기',id:'coupB'}];
+          if (Supplies.ready(s)) c.unshift({label:'가방의 재료로 수리하기',id:'chain'});
+          else c.push({label:'남은 자재의 행방 살피기',id:'stock_note'});
+          var text=Supplies.ready(s)?'끊어진 부표가 작업대에 누워 있다. 모은 사슬과 아연판을 옆에 펼쳤다.':'부표 아래쪽에 끊어진 사슬 한 토막이 매달려 있다. 그 옆에 낡은 정비 기록 두 장이 놓여 있다.';
+          return D('작업대',text,c,'bench');
         }
         if (s.finished) return D('작업대', '말린 거름종이 띠 넷. 분홍 띠가 아직 선명하다.');
         if (!(s.mineClue && s.saltClue)) return D('작업대', '단서가 더 필요하다.');
@@ -61,7 +84,7 @@
       },
       boat: function (s) {
         if (!s.repaired) return D('우편정', '부표가 없으면 암초 사이로 못 나간다.');
-        var t = '간조가 한 번. 섬 하나만 다녀올 수 있다.';
+        var t = s.mail?'물이 빠졌다. 이번 썰물에 다녀올 섬을 고르자.':'배 안에 젖은 쪽지가 있다. 물새호가 열이틀째 돌아오지 않았단다.\n썰물인 지금, 어느 섬에서부터 찾아볼까?';
         if (s.lit) t += '\n등대 불빛이 뱃길을 긋는다.';
         return D('출항', t, [{ label: ISL.mine + (s.visited.mine ? ' ✓' : ''), id: 'go_mine' },
           { label: ISL.salt + (s.visited.salt ? ' ✓' : ''), id: 'go_salt' }], 'route');
@@ -87,10 +110,13 @@
       boat: function (s) { return D('우편정', '물이 들어오기 전에 돌아가야 한다.', [{ label: '항구로 귀항', id: 'home' }]); }
     },
     salt: {
+      rain: function(s){return waterSource(s,'rain');},
+      brine: function(s){return waterSource(s,'brine');},
       gate: function (s) {
         if (s.gate) return D('수문', '열린 수문으로 바람이 지난다.');
-        return D('수문', '경첩이 소금 결정에 굳었다.',
-          [{ label: '포화 소금물을 붓는다', id: 'g_brine' }, { label: '빗물통 민물을 붓는다', id: 'g_rain' }, { label: '쇠지레로 비튼다', id: 'g_bar' }]);
+        var choices=s.water?[{label:'가방의 '+(s.water==='rain'?'빗물':'소금물')+' 붓기',id:s.water==='rain'?'g_rain':'g_brine'}]:[];
+        return D('수문','경첩 사이로 하얀 소금 결정이 빽빽하다. 손잡이를 당겨도 꿈쩍하지 않는다.' +
+          (s.water?'':'\n물레방아 옆 웅덩이와 창고 처마 아래 물통에 물이 고여 있다.'),choices);
       },
       shed: function (s) {
         if (s.finished) return D('창고', '분류표 자리에 새 표가 꽂혔다. "북암."');
@@ -115,16 +141,24 @@
   function retry(t, x, back) { return D(t, x, [{ label: '다시', id: back }]); }
 
   var ACT = {
+    fill_rain: function(s){return fill(s,'rain');},
+    fill_brine: function(s){return fill(s,'brine');},
+    stock_note: function(s){
+      var notes=[];
+      if(!s.pack.chain) notes.push('사슬을 마지막으로 풀어 둔 곳은 부두 입구의 낮은 나무 발판이다.');
+      if(!s.pack.zinc) notes.push('작은 금속 부속은 배로 가는 길목의 초록 정비 상자에 보관한다.');
+      return D('정비 당번의 메모',notes.join('\n')||'필요한 자재가 가방에 있다.');
+    },
     coupA: function (s) { s.coupA = true; if (s.coupB) L(s, '같은 바닷물 속에서 전기적으로 연결된 아연이 먼저 부식되어 강철을 보호했다.');
-      return D('시험편 A', '강철에 아연 덩이를 볼트로 맸다.\n강철은 거의 매끈. 아연은 하얗게 삭아 반쯤 줄었다.\n기록: "볼트 풀린 달엔 A도 녹슴."', (s.coupB ? [{label:'새 사슬 작업',id:'chain'}] : []).concat([{ label: 'B 보기', id: 'coupB' }]), 'samples'); },
+      return D('시험편 A', '강철에 아연 덩이를 볼트로 맸다.\n강철은 거의 매끈. 아연은 하얗게 삭아 반쯤 줄었다.\n기록: "볼트 풀린 달엔 A도 녹슴."', (Supplies.ready(s) ? [{label:'가방의 재료로 수리하기',id:'chain'}] : []).concat([{ label: 'B 보기', id: 'coupB' }]), 'samples'); },
     coupB: function (s) { s.coupB = true; if (s.coupA) L(s, '같은 바닷물 속에서 전기적으로 연결된 아연이 먼저 부식되어 강철을 보호했다.');
-      return D('시험편 B', '같은 강철, 아연 없음.\n붉은 녹이 부풀고 구멍이 깊다.', (s.coupA ? [{label:'새 사슬 작업',id:'chain'}] : []).concat([{ label: 'A 보기', id: 'coupA' }]), 'samples'); },
-    chain: function (s) { return (s.coupA && s.coupB && !s.repaired) ? chainMenu() : null; },
+      return D('시험편 B', '같은 강철, 아연 없음.\n붉은 녹이 부풀고 구멍이 깊다.', (Supplies.ready(s) ? [{label:'가방의 재료로 수리하기',id:'chain'}] : []).concat([{ label: 'A 보기', id: 'coupA' }]), 'samples'); },
+    chain: function (s) { return (s.scene==='harbor' && Supplies.ready(s)) ? chainMenu() : null; },
     z_rope: function () { return retry('실패', '금속끼리 닿지 않는다.\n아연의 전자가 사슬로 건너갈 길이 없다.', 'chain'); },
     z_paint: function () { return retry('실패', '페인트가 아연을 바닷물과 막았다.\n아연이 녹지 못하면 사슬을 지키지 못한다.', 'chain'); },
     z_high: function () { return retry('실패', '물 밖이다. 둘이 같은 바닷물에 잠겨야\n전류가 한 바퀴 돈다.', 'chain'); },
-    z_bolt: function (s) { if (!s.coupA || !s.coupB) return null; s.repaired = true; L(s, '부표 사슬 교체. 아연을 물속 족쇄에 볼트로 맸다.');
-      return D('부표 복구', '금속끼리 맞닿고, 둘 다 바닷물 속.\n부표가 다시 선다. 우편정의 밧줄이 풀린다.'); },
+    z_bolt: function (s) { if (s.scene!=='harbor' || !Supplies.install(s)) return null; L(s, '부표 사슬 교체. 아연을 물속 족쇄에 볼트로 맸다.');
+      return D('부표 복구', '예비 사슬과 아연판이 물속에서 맞닿았다. 아연이 먼저 부식되면서 강철 사슬을 보호한다.\n바다 한가운데 빨간 부표가 다시 섰다. 이제 우편정으로 나갈 수 있다.'); },
     go_mine: function (s) { return go(s, 'mine'); },
     go_salt: function (s) { return go(s, 'salt'); },
     home: function (s) {
@@ -144,10 +178,8 @@
     w_ok: function (s) { if (!s.plate) return null; s.lifted = true; return D('권양기', '덜컥, 덜컥. 물 밑에서 쇠상자가 올라와 전마선 옆에 놓인다.'); },
     box: function (s) { if (!s.lifted) return null; s.mineClue = true; L(s, '광산 만: 물새호 전마선. 압지에 거꾸로 찍힌 소인 잉크.');
       return D('쇠상자', '우편 기록부는 물에 번졌다.\n맞붙은 압지에 소인 잉크가 거꾸로 찍혀 남았다.\n압지의 잉크 자국에서 분석용 소량 시료를 따로 챙긴다.', [], 'samples'); },
-    g_brine: function () { return retry('그대로', '이 통의 소금물은 같은 온도에서 이미 포화 상태다.\n결정이 더 녹지 않는다.', 'g_back'); },
-    g_bar: function () { return retry('그만', '경첩이 삐걱댄다. 부러지면 수문을 못 닫는다.', 'g_back'); },
-    g_back: function (s) { return interact(s, 'gate'); },
-    g_rain: function (s) { s.gate = true; return D('수문', '민물에 결정이 녹아내린다.\n수문이 열리고 창고 앞 물이 빠진다.'); },
+    g_brine: function (s) { if(s.scene!=='salt'||s.water!=='brine'||s.gate)return null; s.water=null; return D('남아 있는 결정','물병을 비웠지만 경첩에 흰 결정이 남았다. 웅덩이 물에는 이미 소금이 녹을 만큼 녹아 있었다.'); },
+    g_rain: function (s) { if(s.scene!=='salt'||s.water!=='rain'||s.gate)return null; s.water=null; s.gate = true; return D('수문', '민물에 결정이 녹아내린다.\n수문이 열리고 창고 앞 물이 빠진다.'); },
     bag: function (s) { if (!s.gate) return null; s.saltClue = true; L(s, '염전 창고: 분류표 "북암 기항 폐지", 뒷면 "임시 1회 기항".');
       return D('분류표', '"정기 항로 등대곶→모래섬.\n북암 기항 폐지(광업소 폐쇄)."\n뒷면 연필: "임시 1회 기항." 지명은 번져 지워졌다.', [], 'samples'); },
     c_pen: function () { return retry('번짐', '수성펜 잉크까지 물에 녹아 올라간다.\n엉뚱한 띠가 섞인다. 새 띠로.', 'c_back'); },
