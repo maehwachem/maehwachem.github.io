@@ -222,6 +222,9 @@ body.has-delete-undo .toast{bottom:calc(var(--note-footer-height,48px) + 72px)}
 
 .tool-status .toolbar-move{display:inline-flex;align-items:center;justify-content:center;gap:3px;flex:none;min-height:32px;padding:2px 6px;border:1px solid #ded5eb;border-radius:7px;text-decoration:none;font-weight:650;color:var(--deep);background:#fffefa;cursor:grab;touch-action:none;user-select:none}.toolbar-move span{font-size:18px;line-height:1}.tool-status .current-tool{flex:1}.bar-zone.is-floating{position:fixed;z-index:7;box-sizing:border-box;padding:7px;border:1px solid #d9cfea;border-radius:13px;background:#fffefa;box-shadow:0 7px 28px #30254c30;overflow:auto;overscroll-behavior:contain;justify-content:flex-start;gap:5px}.bar-zone.is-floating .toolbar{flex:none;box-shadow:none}.bar-zone.is-floating .tool-status{order:-1;position:sticky;top:0;z-index:1;background:#fffefa;flex:none;padding:0;min-height:34px;gap:4px}.bar-zone.is-floating .tool-status-actions{gap:2px}.bar-zone.is-floating .tool-status button:not(.toolbar-move){padding-inline:3px}.bar-zone.is-moving .toolbar-move{cursor:grabbing;background:var(--tint)}.bar-zone.is-moving{user-select:none}.bar-zone.is-floating #toolbarReset{font-weight:700;text-decoration:none;border:1px solid #ded5eb;border-radius:6px;min-height:32px;padding-inline:5px}
 @media(max-width:375px){.tool-status .toolbar-move{font-size:10px;padding-inline:4px}.bar-zone.is-floating .current-tool{font-size:10px}}
+.tool-status{flex-wrap:wrap}.toolbar-layout-actions{display:flex;gap:3px;flex:none}.tool-status #toolbarOrientation{min-height:32px;padding-inline:6px;text-decoration:none;border:1px solid #ded5eb;border-radius:6px;font-weight:700}.tool-status #toolbarOrientation[aria-pressed=true]{background:var(--tint);color:var(--deep)}
+.bar-zone.is-vertical{align-items:stretch;gap:4px}.bar-zone.is-vertical .tool-status{display:contents}.bar-zone.is-vertical .toolbar-move{order:-3;position:sticky;top:0;z-index:2;background:#fffefa;width:100%;min-height:34px}.bar-zone.is-vertical .toolbar-layout-actions{order:-2;justify-content:center;background:#fffefa}.bar-zone.is-vertical .toolbar-layout-actions button{flex:1;min-width:0;font-size:11px;padding-inline:2px}.bar-zone.is-vertical .current-tool{order:1;flex:none;max-width:100%;font-size:10px;min-height:20px}.bar-zone.is-vertical .tool-status-actions{order:2;display:flex;flex-direction:column;gap:2px}.bar-zone.is-vertical .tool-status-actions button{min-height:32px}
+.bar-zone.is-vertical .toolbar{display:flex;flex-direction:column;align-items:stretch;gap:5px;width:100%;max-width:100%;padding:4px;flex-shrink:0}.bar-zone.is-vertical .toolbar #tools{display:flex;flex-direction:column;align-items:stretch;gap:2px}.bar-zone.is-vertical .tool.labeled-tool{display:flex;align-items:center;justify-content:flex-start;gap:7px;width:100%;height:36px;padding:0 6px}.bar-zone.is-vertical .tool-label{font-size:11px;line-height:14px}.bar-zone.is-vertical .toolbar .tool-divider{display:none}.bar-zone.is-vertical .toolbar .finger-mode{width:100%;min-height:36px;padding:0 2px;font-size:10px;gap:2px}.bar-zone.is-vertical .toolbar .colors{display:grid;grid-template-columns:repeat(3,26px);justify-content:center;gap:1px;padding:0}.bar-zone.is-vertical .toolbar .swatch{width:26px;height:28px}.bar-zone.is-vertical .tool-settings-toggle{min-width:0;width:100%;min-height:36px;font-size:11px;padding-inline:2px}.bar-zone.is-vertical .history-tools{justify-content:center;gap:4px}.bar-zone.is-vertical .history-tools .tool{width:36px;min-height:34px}
 </style>
 </head>
 <body>
@@ -289,7 +292,7 @@ body.has-delete-undo .toast{bottom:calc(var(--note-footer-height,48px) + 72px)}
     </section>
     <section class="workspace" aria-label="필기 공간">
       <div class="bar-zone" id="toolbarPanel">
-        <div class="toolbar" role="toolbar" aria-label="필기 도구">
+        <div class="toolbar" role="toolbar" aria-label="필기 도구" aria-orientation="horizontal">
           <div class="tool-group" id="tools">
             <button class="tool labeled-tool" data-tool="select" aria-label="선택·이동" title="선택·이동 (V)"><span data-icon="hand"></span><span class="tool-label">선택</span></button>
             <button class="tool labeled-tool" data-tool="pen" aria-label="펜" title="펜 (P)"><span data-icon="pen"></span><span class="tool-label">펜</span></button>
@@ -309,7 +312,7 @@ body.has-delete-undo .toast{bottom:calc(var(--note-footer-height,48px) + 72px)}
             <button id="redo" class="tool" data-icon="redo" aria-label="다시 실행" title="다시 실행"></button>
           </div>
         </div>
-        <div class="tool-status"><button id="toolbarMove" class="toolbar-move" aria-label="도구모음 이동" aria-pressed="false" title="끌어서 이동 · 방향키로 이동 · Home으로 원위치"><span aria-hidden="true">⠿</span> 도구 이동</button><span class="current-tool"><i id="currentToolColor" aria-hidden="true"></i><span id="currentToolStatus"></span></span><span class="tool-status-actions"><button id="toolbarReset" aria-label="도구모음 원래 위치" title="도구모음을 위쪽 원래 위치로" hidden>원위치</button><button id="textBoxesButton" aria-haspopup="dialog" aria-label="현재 페이지 텍스트 상자 목록">상자 목록</button><button id="toolHelp" aria-haspopup="dialog">도구 안내</button></span></div>
+        <div class="tool-status"><button id="toolbarMove" class="toolbar-move" aria-label="도구모음 이동" aria-pressed="false" title="끌어서 이동 · 방향키로 이동 · Home으로 원위치"><span aria-hidden="true">⠿</span> 도구 이동</button><span class="current-tool"><i id="currentToolColor" aria-hidden="true"></i><span id="currentToolStatus"></span></span><span class="toolbar-layout-actions"><button id="toolbarOrientation" aria-label="도구모음 세로 배치" aria-pressed="false" title="도구모음을 세로로 배치">세로</button><button id="toolbarReset" aria-label="도구모음 원래 위치" title="도구모음을 위쪽 원래 위치로" hidden>원위치</button></span><span class="tool-status-actions"><button id="textBoxesButton" aria-haspopup="dialog" aria-label="현재 페이지 텍스트 상자 목록">상자 목록</button><button id="toolHelp" aria-haspopup="dialog">도구 안내</button></span></div>
       </div>
       <div class="shape-menu" id="shapeMenu" role="group" aria-label="도형 종류" hidden>
         <button type="button" data-shape="line">직선</button><button type="button" data-shape="arrow">화살표</button>
@@ -371,7 +374,7 @@ body.has-delete-undo .toast{bottom:calc(var(--note-footer-height,48px) + 72px)}
   <p>도구를 고른 뒤 <strong>굵기·색 설정</strong>을 열어 조절해요. 각 도구의 굵기와 색을 따로 기억하고, 자주 쓰는 설정은 3개까지 저장할 수 있어요.</p>
   <p><strong>텍스트 상자 삭제:</strong> 텍스트 도구로 기존 상자를 누른 뒤 ‘텍스트 상자 삭제’를 누르세요. 선택·이동 도구에서는 상자를 선택해 ‘삭제’를 눌러도 돼요. 삭제한 상자는 실행 취소로 되돌릴 수 있어요.</p>
   <p>상자 오른쪽 ↔ 손잡이를 끌거나, 손잡이에 초점을 두고 좌우 방향키로 너비를 바꿔요(Shift는 1px씩). 편집창에서는 굵게·밑줄·정렬과 너비를 바꿀 수 있어요. 배치 잠금은 위치·너비를 고정하고 올가미에서 제외해요. ‘상자 목록’에서 현재 페이지의 상자를 찾아 수정·잠금·삭제할 수 있어요.</p>
-  <p><strong>도구모음 이동:</strong> ‘도구 이동’ 손잡이를 끌면 원하는 곳에 놓을 수 있어요. 손잡이를 누른 뒤 방향키로도 옮길 수 있고, Shift를 누르면 1px씩 조절해요. ‘원위치’나 손잡이의 Home 키로 위쪽에 돌려놓아요. 위치는 이 브라우저에 기억해요.</p>
+  <p><strong>도구모음 이동:</strong> ‘도구 이동’ 손잡이를 끌면 원하는 곳에 놓을 수 있어요. ‘세로’를 누르면 좁고 긴 도구 상자로 바뀌고, ‘가로’를 누르면 다시 가로로 놓아요. 손잡이를 누른 뒤 방향키로도 옮길 수 있고, Shift를 누르면 1px씩 조절해요. ‘원위치’나 손잡이의 Home 키로 위쪽 가로 배치로 돌려놓아요. 위치와 배치 방향은 이 브라우저에 기억해요. 상자가 화면보다 길면 안쪽을 스크롤해 나머지 도구를 사용할 수 있어요.</p>
   <label class="dialog-label"><input id="toolShortcuts" type="checkbox" checked> 도구 단축키 사용</label>
   <table class="shortcut-table"><caption>키보드 단축키</caption><tbody><tr><th scope="row">P / H / E</th><td>펜 / 형광펜 / 부분 지우개</td></tr><tr><th scope="row">T / L / V</th><td>텍스트 / 올가미 / 선택·이동</td></tr><tr><th scope="row">S</th><td>마지막에 쓴 도형</td></tr><tr><th scope="row">1 / 2 / 3</th><td>자주 쓰는 설정 불러오기</td></tr><tr><th scope="row">[ / ]</th><td>굵기 줄이기 / 늘리기</td></tr><tr><th scope="row">Ctrl·⌘ + Z</th><td>실행 취소 (Shift로 다시 실행)</td></tr></tbody></table>
   <p>입력칸·대화창과 필기 중에는 도구 단축키가 작동하지 않아요. 부분 지우개는 그린 선만 지우며 사진·PDF·텍스트는 지우지 않아요. 손가락으로 쓰려면 ‘손가락 켜짐’을 선택하세요.</p>
@@ -624,7 +627,8 @@ const toolbarLayoutKey = 'jeongi-note-toolbar-layout-v1';
 function parseToolbarLayout(raw) {
   let input;
   try { input = typeof raw === 'string' ? JSON.parse(raw) : raw; } catch { input = null; }
-  return { floating: input?.floating === true,
+  const orientation = input?.orientation === 'vertical' ? 'vertical' : 'horizontal';
+  return { floating: input?.floating === true || orientation === 'vertical', orientation,
     x: Number.isFinite(input?.x) ? clamp(input.x, 0, 1) : .5,
     y: Number.isFinite(input?.y) ? clamp(input.y, 0, 1) : .12 };
 }
@@ -636,8 +640,8 @@ function clampToolbarPoint(point, size, bounds) {
   return { left: clamp(point.left, bounds.left, bounds.left + Math.max(0, bounds.width - size.width)),
     top: clamp(point.top, bounds.top, bounds.top + Math.max(0, bounds.height - size.height)) };
 }
-function toolbarPreferenceAt(box, bounds) {
-  return { floating: true,
+function toolbarPreferenceAt(box, bounds, orientation = 'horizontal') {
+  return { floating: true, orientation: orientation === 'vertical' ? 'vertical' : 'horizontal',
     x: bounds.width > box.width ? clamp((box.left - bounds.left) / (bounds.width - box.width), 0, 1) : 0,
     y: bounds.height > box.height ? clamp((box.top - bounds.top) / (bounds.height - box.height), 0, 1) : 0 };
 }
@@ -3203,7 +3207,13 @@ function toolbarBounds() {
 }
 function applyToolbarLayout(point = null) {
   const panel = $('toolbarPanel');
+  const vertical = toolbarLayout.floating && toolbarLayout.orientation === 'vertical';
   panel.classList.toggle('is-floating', toolbarLayout.floating);
+  panel.classList.toggle('is-vertical', vertical);
+  panel.querySelector('[role="toolbar"]').setAttribute('aria-orientation', vertical ? 'vertical' : 'horizontal');
+  $('toolbarOrientation').setAttribute('aria-pressed', vertical);
+  $('toolbarOrientation').textContent = vertical ? '가로' : '세로';
+  $('toolbarOrientation').title = vertical ? '도구모음을 가로로 배치' : '도구모음을 세로로 배치';
   $('toolbarMove').setAttribute('aria-pressed', toolbarLayout.floating);
   $('toolbarReset').hidden = !toolbarLayout.floating;
   if (!toolbarLayout.floating) {
@@ -3212,7 +3222,7 @@ function applyToolbarLayout(point = null) {
     return panel.getBoundingClientRect();
   }
   const bounds = toolbarBounds();
-  panel.style.width = Math.min(440, bounds.width) + 'px';
+  panel.style.width = Math.min(vertical ? 124 : 440, bounds.width) + 'px';
   panel.style.maxHeight = bounds.height + 'px';
   const size = panel.getBoundingClientRect();
   const desired = point ?? toolbarPointFromPreference(toolbarLayout, size, bounds);
@@ -3223,11 +3233,21 @@ function applyToolbarLayout(point = null) {
 }
 function saveToolbarLayout() {
   try { localStorage.setItem(toolbarLayoutKey, JSON.stringify(toolbarLayout)); return true; }
-  catch { toast('도구 위치는 이번 화면에서만 기억해요. 저장 공간을 확인해 주세요.'); return false; }
+  catch { toast('도구 위치와 배치는 이번 화면에서만 기억해요. 저장 공간을 확인해 주세요.'); return false; }
+}
+function setToolbarOrientation(orientation) {
+  finishToolbarDrag(false);
+  showMenu();
+  const before = $('toolbarPanel').getBoundingClientRect();
+  toolbarLayout = { ...toolbarLayout, floating: true, orientation: orientation === 'vertical' ? 'vertical' : 'horizontal' };
+  const box = applyToolbarLayout({ left: before.left, top: before.top });
+  toolbarLayout = toolbarPreferenceAt(box, toolbarBounds(), toolbarLayout.orientation);
+  saveToolbarLayout();
+  toast(toolbarLayout.orientation === 'vertical' ? '세로 배치로 바꿨어요. 손잡이를 끌어 옮길 수 있어요.' : '가로 배치로 바꿨어요.');
 }
 function resetToolbarLayout() {
   finishToolbarDrag(false);
-  toolbarLayout = { floating: false, x: .5, y: .12 };
+  toolbarLayout = { floating: false, orientation: 'horizontal', x: .5, y: .12 };
   showMenu();
   applyToolbarLayout();
   saveToolbarLayout();
@@ -3272,7 +3292,7 @@ function finishToolbarDrag(commit = true) {
   $('toolbarPanel').classList.remove('is-moving');
   if (!gesture.moved) return;
   if (commit) {
-    toolbarLayout = toolbarPreferenceAt($('toolbarPanel').getBoundingClientRect(), toolbarBounds());
+    toolbarLayout = toolbarPreferenceAt($('toolbarPanel').getBoundingClientRect(), toolbarBounds(), toolbarLayout.orientation);
     saveToolbarLayout();
   } else {
     toolbarLayout = { ...gesture.before };
@@ -3318,10 +3338,11 @@ $('toolbarMove').addEventListener('keydown', (event) => {
   const box = applyToolbarLayout();
   const step = event.shiftKey ? 1 : 10;
   const at = applyToolbarLayout({ left: box.left + delta[0] * step, top: box.top + delta[1] * step });
-  toolbarLayout = toolbarPreferenceAt(at, toolbarBounds());
+  toolbarLayout = toolbarPreferenceAt(at, toolbarBounds(), toolbarLayout.orientation);
   saveToolbarLayout();
 });
 $('toolbarReset').onclick = resetToolbarLayout;
+$('toolbarOrientation').onclick = () => setToolbarOrientation(toolbarLayout.orientation === 'vertical' ? 'horizontal' : 'vertical');
 window.addEventListener('resize', scheduleToolbarLayout);
 window.addEventListener('blur', () => finishToolbarDrag(false));
 window.visualViewport?.addEventListener('resize', scheduleToolbarLayout);
