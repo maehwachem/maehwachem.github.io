@@ -26,9 +26,8 @@
   }
 
   function chainMenu() {
-    return D('새 사슬', '가방에서 꺼낸 예비 사슬을 부표에 걸었다.\n구멍이 뚫린 아연판은 어디에 달면 좋을까?', [
-      { label: '금속 사이를 밧줄로만 잇는다', id: 'z_rope' }, { label: '아연에 페인트를 칠해 단다', id: 'z_paint' },
-      { label: '물 위 고리에 단다', id: 'z_high' }, { label: '물속 족쇄에 볼트로 조인다', id: 'z_bolt' }], 'samples');
+    return D('부표 사슬 수리', '부표 아래 강철 사슬이 바닷속에 잠겨 있다. 사슬의 부식을 늦추려면 아연판을 어디에 달아야 할까?', [
+      {label:'물 위 금속 고리',id:'z_high'},{label:'섬유 밧줄 끝',id:'z_rope'},{label:'물속 강철 연결쇠',id:'z_bolt'}], 'rig');
   }
   function chromaResult() {
     return D('분리 결과', '등대곶: 파랑 한 줄.\n모래섬: 아래 빨강, 위 파랑.\n북암: 아래 파랑, 멀리 위 분홍.\n압지 시료: 아래 파랑, 멀리 위 분홍.\n\n분류표 뒷면: "임시 1회 기항." 지명은 지워졌다.\n물새호는 어디에 들렀나?',
@@ -150,15 +149,21 @@
       return D('정비 당번의 메모',notes.join('\n')||'필요한 자재가 가방에 있다.');
     },
     coupA: function (s) { s.coupA = true; if (s.coupB) L(s, '같은 바닷물 속에서 전기적으로 연결된 아연이 먼저 부식되어 강철을 보호했다.');
-      return D('시험편 A', '강철에 아연 덩이를 볼트로 맸다.\n강철은 거의 매끈. 아연은 하얗게 삭아 반쯤 줄었다.\n기록: "볼트 풀린 달엔 A도 녹슴."', (Supplies.ready(s) ? [{label:'가방의 재료로 수리하기',id:'chain'}] : []).concat([{ label: 'B 보기', id: 'coupB' }]), 'samples'); },
+      return D('시험편 A', '같은 바닷물에 담가 두었더니, 아연판은 부식되어 얇아졌고 강철 표면에는 붉은 녹이 거의 보이지 않았다.\n\n정비 일지\n“볼트가 풀려 아연판과 강철 사이의 전기적 연결이 끊긴 달에는 강철 표면에도 붉은 녹이 생겼다.”', (Supplies.ready(s) ? [{label:'가방의 재료로 수리하기',id:'chain'}] : []).concat([{ label: 'B 보기', id: 'coupB' }]), 'samples'); },
     coupB: function (s) { s.coupB = true; if (s.coupA) L(s, '같은 바닷물 속에서 전기적으로 연결된 아연이 먼저 부식되어 강철을 보호했다.');
-      return D('시험편 B', '같은 강철, 아연 없음.\n붉은 녹이 부풀고 구멍이 깊다.', (Supplies.ready(s) ? [{label:'가방의 재료로 수리하기',id:'chain'}] : []).concat([{ label: 'A 보기', id: 'coupA' }]), 'samples'); },
+      return D('시험편 B', 'A와 같은 강철을 같은 기간 동안 같은 바닷물에 담가 두었다. 이 강철에는 아연판을 연결하지 않았다.\n\n표면 여러 곳에 붉은 녹이 보이고, 일부가 움푹 패어 있다.', (Supplies.ready(s) ? [{label:'가방의 재료로 수리하기',id:'chain'}] : []).concat([{ label: 'A 보기', id: 'coupA' }]), 'samples'); },
     chain: function (s) { return (s.scene==='harbor' && Supplies.ready(s)) ? chainMenu() : null; },
-    z_rope: function () { return retry('실패', '금속끼리 닿지 않는다.\n아연의 전자가 사슬로 건너갈 길이 없다.', 'chain'); },
-    z_paint: function () { return retry('실패', '페인트가 아연을 바닷물과 막았다.\n아연이 녹지 못하면 사슬을 지키지 못한다.', 'chain'); },
-    z_high: function () { return retry('실패', '물 밖이다. 둘이 같은 바닷물에 잠겨야\n전류가 한 바퀴 돈다.', 'chain'); },
-    z_bolt: function (s) { if (s.scene!=='harbor' || !Supplies.install(s)) return null; L(s, '부표 사슬 교체. 아연을 물속 족쇄에 볼트로 맸다.');
-      return D('부표 복구', '예비 사슬과 아연판이 물속에서 맞닿았다. 아연이 먼저 부식되면서 강철 사슬을 보호한다.\n바다 한가운데 빨간 부표가 다시 섰다. 이제 우편정으로 나갈 수 있다.'); },
+    z_rope: function () {
+      return D('밧줄 끝에 단 아연판','아연판은 바닷물에 잠겼다. 하지만 섬유 밧줄에만 매달려 있어 사슬까지 전자가 흐를 금속 경로가 없다. 이 위치에서는 강철을 보호할 수 없다.',[{label:'다른 곳에 달아 보기',id:'chain'}],'rig-rope');
+    },
+    z_high: function () {
+      return D('물 위 고리에 단 아연판','금속 고리는 사슬과 전기적으로 이어져 있다. 하지만 이 고리는 계속 수면 위에 있어 아연판이 마른 상태다. 이 위치에서는 물속 사슬에 보호 전류를 공급할 수 없다.',[{label:'다른 곳에 달아 보기',id:'chain'}],'rig-high');
+    },
+    z_bolt: function (s) {
+      if(s.scene!=='harbor'||!Supplies.install(s))return null;
+      L(s,'부표 사슬 교체. 물속의 강철 연결쇠에 아연판을 볼트로 고정했다.');
+      return D('부표 복구','아연판과 사슬이 같은 바닷물에 잠기고, 강철 연결쇠를 통해 전기가 통한다. 아연이 먼저 산화되어 전자를 공급하므로 강철의 부식이 느려진다.\n\n빨간 부표가 다시 섰다. 이제 우편정으로 출항할 수 있다.',[],'rig-bolt');
+    },
     go_mine: function (s) { return go(s, 'mine'); },
     go_salt: function (s) { return go(s, 'salt'); },
     home: function (s) {

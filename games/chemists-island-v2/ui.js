@@ -74,18 +74,48 @@
     const alternative=$('diagram').classList.contains('interactive-lab')?document.createElement('details'):null;
     if(alternative){const summary=document.createElement('summary');summary.textContent='선택 버튼으로 조작';alternative.append(summary);buttons.append(alternative);}
     for(const choice of view.choices||[{label:'닫기',id:'close'}]){
+      if(view.kind==='rig'&&choice.id!=='close')continue;
       const b=document.createElement('button');b.type='button';b.textContent=choice.label;b.dataset.action=choice.id;
       if(choice.id==='close')b.className='muted';
       b.onclick=()=>choice.id==='close'?close():select(choice.id);(alternative&&choice.id!=='close'?alternative:buttons).append(b);
     }
   }
-  function specimens(title){
-    const d=$('diagram');
-    for(const [cls,name] of [['metal','A · 아연 연결'],['rust','B · 강철']]){
-      const f=document.createElement('figure'),p=document.createElement('i'),l=document.createElement('figcaption');
-      p.className='coupon '+cls;l.textContent=name;f.append(p,l);d.append(f);
+  function drawCoupon(canvas,connected){
+    canvas.width=512;canvas.height=248;
+    const g=canvas.getContext('2d');g.scale(2,2);
+    let seed=connected?11:7;
+    const rnd=()=> (seed=seed*16807%2147483647)/2147483647;
+    const box=(x,y,w,h,color)=>{g.fillStyle=color;g.fillRect(x,y,w,h);};
+    box(19,41,218,62,'#3c4e56');box(19,40,218,5,'#85989c');box(20,100,216,5,'#283a44');
+    for(let i=0;i<40;i++)box(23+rnd()*186,47+rnd()*48,2+rnd()*18,.7,'#627781');
+    if(connected){
+      box(151,47,64,46,'#8a9698');box(151,46,63,43,'#c8d0cc');box(153,47,59,2,'#edf1dd');
+      for(let i=0;i<22;i++)box(154+rnd()*52,51+rnd()*31,1+rnd()*5,2,'#e7e8dc');
+      g.beginPath();
+      for(let k=0;k<6;k++){const a=k*Math.PI/3;g.lineTo(182+11*Math.cos(a),66+11*Math.sin(a));}
+      g.closePath();g.fillStyle='#79878a';g.fill();g.strokeStyle='#495960';g.lineWidth=2;g.stroke();
+      g.fillStyle='#b3bdb9';g.fillRect(177,63,10,3);
+      g.fillStyle='#394b4d';g.font='bold 18px sans-serif';g.textAlign='center';g.fillText('아연판',182,24);
+      g.beginPath();g.moveTo(183,29);g.lineTo(183,44);g.stroke();
+    }else{
+      g.save();g.beginPath();g.rect(20,43,216,58);g.clip();
+      for(let i=0;i<30;i++){
+        const x=25+rnd()*204,y=45+rnd()*55,r=4+rnd()*14;
+        g.beginPath();for(let k=0;k<9;k++){const a=k*Math.PI*2/9,rr=r*(.52+rnd()*.55);g.lineTo(x+Math.cos(a)*rr,y+Math.sin(a)*rr*.7);}
+        g.closePath();g.fillStyle=['#a95732','#a34427','#87482d','#bc6b37'][i%4];g.fill();
+        g.fillStyle='#532d25';g.fillRect(x-1,y-1,2.5,2.5);
+      }
+      g.restore();
     }
-    if(title==='시험편 A'||title==='시험편 B'){const f=d.children[title.endsWith('A')?0:1];f.style.fontWeight='900';}
+  }
+  function specimens(title){
+    const d=$('diagram');d.className='specimens';
+    for(const [key,name] of [['A','아연이 연결된 강철'],['B','아연을 연결하지 않은 강철']]){
+      const f=document.createElement('figure'),c=document.createElement('canvas'),l=document.createElement('figcaption');
+      c.setAttribute('role','img');c.setAttribute('aria-label',key==='A'?'강철판 일부에 볼트로 고정한 작은 아연판':'강철판 표면 곳곳의 붉은 녹');
+      drawCoupon(c,key==='A');l.textContent=key+' · '+name;
+      f.classList.toggle('selected',title==='시험편 '+key);f.append(c,l);d.append(f);
+    }
     d.hidden=false;
   }
   function drawDialog(view,select,label){
@@ -96,10 +126,14 @@
     World.pause(true);
     $('panel-label').textContent=label||World.scenes[state.scene].name;$('panel-title').textContent=view.title;$('panel-text').textContent=view.text;
     const d=$('diagram');d.replaceChildren();d.hidden=true;d.className='';
-    if(window.VoyageLab?.mount(d,state,view,select)){d.hidden=false;d.className='interactive-lab';}
+    if(view.kind==='rig'||view.kind?.startsWith('rig-')){
+      d.hidden=false;d.className='rig-panel';VoyageLab.rig(d,view,select);
+    }else if(window.VoyageLab?.mount(d,state,view,select)){d.hidden=false;d.className='interactive-lab';}
     else if(view.kind==='samples'&&['작업대','시험편 A','시험편 B'].includes(view.title)) specimens(view.title);
+    if(d.classList.contains('rig-panel'))d.before($('panel-text'));else d.after($('panel-text'));
     standardButtons(view,select);
     if(!opened)panel.showModal();
+    panel.classList.toggle('rig-dialog',d.classList.contains('rig-panel'));
     panel.classList.toggle('story',!label&&!view.kind&&view.choices?.every(item=>item.id==='close'));
     panel.scrollTop=0;$('close-panel').focus({preventScroll:true});
   }
