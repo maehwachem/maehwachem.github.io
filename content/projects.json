@@ -244,6 +244,24 @@
         "kind": "game"
       },
       {
+        "title": "화학자의 섬 v2 · 마지막 우편선",
+        "subject": "chemistry",
+        "desc": "항구의 부표를 수리하고 우편정으로 광산 만과 염전을 탐사합니다. 두 섬에서 찾은 기록과 소인 잉크를 대조해 사라진 우편선의 마지막 기항지를 찾는 픽셀 어드벤처 첫 장입니다.",
+        "tag": "픽셀 어드벤처 · 첫 항해",
+        "level": "중·고등학교 과학, 화학",
+        "cover": "/games/chemists-island-v2/art/cover.webp",
+        "poster": "island",
+        "words": "마지막\n우편선",
+        "links": [
+          {
+            "label": "v2 플레이",
+            "url": "/games/chemists-island-v2/"
+          }
+        ],
+        "kind": "game",
+        "date": "2026-11-24"
+      },
+      {
         "title": "화학자의 항해",
         "subject": "chemistry",
         "desc": "화학자의 섬 뒷이야기. 몰 농도와 희석, 어는점 내림, 삼투압으로 선원과 연구 기지를 구하는 세 장의 이야기 게임. 같은 조 최대 5명이 함께하는 모둠판도 있습니다.",
