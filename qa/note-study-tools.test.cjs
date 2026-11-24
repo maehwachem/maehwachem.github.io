@@ -115,3 +115,9 @@ test('short-screen action placement avoids the tape and nearby grips or hides if
  assert.ok(at);assert.ok(at.top+74<=207 || at.left>=118);
  const full={left:0,top:0,right:320,bottom:80};assert.equal(c.tapeMenuPosition({x:0,y:0,width:320,height:80},{width:300,height:74},full,8),null);
 });
+test('flipped left and top grips follow the drag direction while keeping the opposite edge fixed',()=>{
+ const c=setup(),old={...tape(),x:600,y:984,width:160,height:26};
+ const left=c.transformTape(old,-30,90,'resize-left');assert.equal(left.x,570);assert.equal(left.width,190);assert.equal(left.x+left.width,760);assert.equal(left.y,984);
+ const top=c.transformTape(old,90,-20,'resize-top');assert.equal(top.y,964);assert.equal(top.height,46);assert.equal(top.y+top.height,1010);assert.equal(top.x,600);
+ const tiny=c.transformTape(old,900,0,'resize-left');assert.equal(tiny.width,8);assert.equal(tiny.x+tiny.width,760);
+});
