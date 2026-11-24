@@ -225,6 +225,8 @@ body.has-delete-undo .toast{bottom:calc(var(--note-footer-height,48px) + 72px)}
 .tool-status{flex-wrap:wrap}.toolbar-layout-actions{display:flex;gap:3px;flex:none}.tool-status #toolbarOrientation{min-height:32px;padding-inline:6px;text-decoration:none;border:1px solid #ded5eb;border-radius:6px;font-weight:700}.tool-status #toolbarOrientation[aria-pressed=true]{background:var(--tint);color:var(--deep)}
 .bar-zone.is-vertical{align-items:stretch;gap:4px}.bar-zone.is-vertical .tool-status{display:contents}.bar-zone.is-vertical .toolbar-move{order:-3;position:sticky;top:0;z-index:2;background:#fffefa;width:100%;min-height:34px}.bar-zone.is-vertical .toolbar-layout-actions{order:-2;justify-content:center;background:#fffefa}.bar-zone.is-vertical .toolbar-layout-actions button{flex:1;min-width:0;font-size:11px;padding-inline:2px}.bar-zone.is-vertical .current-tool{order:1;flex:none;max-width:100%;font-size:10px;min-height:20px}.bar-zone.is-vertical .tool-status-actions{order:2;display:flex;flex-direction:column;gap:2px}.bar-zone.is-vertical .tool-status-actions button{min-height:32px}
 .bar-zone.is-vertical .toolbar{display:flex;flex-direction:column;align-items:stretch;gap:5px;width:100%;max-width:100%;padding:4px;flex-shrink:0}.bar-zone.is-vertical .toolbar #tools{display:flex;flex-direction:column;align-items:stretch;gap:2px}.bar-zone.is-vertical .tool.labeled-tool{display:flex;align-items:center;justify-content:flex-start;gap:7px;width:100%;height:36px;padding:0 6px}.bar-zone.is-vertical .tool-label{font-size:11px;line-height:14px}.bar-zone.is-vertical .toolbar .tool-divider{display:none}.bar-zone.is-vertical .toolbar .finger-mode{width:100%;min-height:36px;padding:0 2px;font-size:10px;gap:2px}.bar-zone.is-vertical .toolbar .colors{display:grid;grid-template-columns:repeat(3,26px);justify-content:center;gap:1px;padding:0}.bar-zone.is-vertical .toolbar .swatch{width:26px;height:28px}.bar-zone.is-vertical .tool-settings-toggle{min-width:0;width:100%;min-height:36px;font-size:11px;padding-inline:2px}.bar-zone.is-vertical .history-tools{justify-content:center;gap:4px}.bar-zone.is-vertical .history-tools .tool{width:36px;min-height:34px}
+.study-controls{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;max-width:100%;font-size:11px}.study-controls button{min-height:32px;border:1px solid #dfd7e9;border-radius:6px;padding:3px 7px;background:#fffefa;white-space:nowrap}.study-controls button[aria-pressed=true]{background:var(--deep);color:white}.study-controls output{align-self:center;color:var(--muted);font-variant-numeric:tabular-nums}.practice-actions,.tape-edit-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:4px}.bar-zone.is-vertical .study-controls{flex-direction:column;flex:none}.bar-zone.is-vertical .study-controls button{width:100%;font-size:11px;padding-inline:2px}.bar-zone.is-vertical .practice-actions,.bar-zone.is-vertical .tape-edit-actions{flex-direction:column}.bar-zone.is-vertical .study-controls output{text-align:center}
+.tape-layer{position:absolute;inset:0;z-index:2;pointer-events:none}.tape-cover{position:absolute;display:flex;align-items:center;justify-content:center;background:var(--tape);border:0;border-radius:2px;pointer-events:none;touch-action:none;overflow:visible}.tape-cover::after{content:'';position:absolute;left:50%;top:50%;width:100%;height:100%;min-width:var(--tape-hit,24px);min-height:var(--tape-hit,24px);transform:translate(-50%,-50%)}.tape-cover span{font-size:var(--tape-font,12px);font-weight:700;color:#fff;pointer-events:none;line-height:1}.paper[data-tool=tape] .tape-cover{pointer-events:auto;cursor:grab;opacity:.6;outline:1px dashed #5143a4}.paper[data-tool=tape] .tape-cover.selected{outline:3px solid #5143a4;outline-offset:2px}.paper[data-tool=reveal] .tape-cover{pointer-events:auto;cursor:pointer}.tape-cover.revealed{background:transparent;box-shadow:inset 0 0 0 1px #8975b4}.tape-cover.revealed span{color:var(--deep);background:#fffefa;align-self:flex-start;border:1px solid #d5c9e5;border-radius:3px;padding:1px 2px;transform:translateY(-100%)}.tape-resize{position:absolute;display:grid;place-items:center;pointer-events:auto;touch-action:none;background:#fffefa;border:1px solid #5143a4;border-radius:5px;z-index:2;color:var(--deep)}.recent-colors{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}.recent-colors button{width:36px;height:34px;border:1px solid #ddd6e6;border-radius:6px;display:grid;place-items:center}.recent-colors i{display:block;width:18px;height:18px;border-radius:50%;background:var(--swatch)}.favorite-name-row{display:flex;gap:5px;align-items:center;margin-top:6px}.favorite-name-row input{width:100%;min-width:0;min-height:34px;border:1px solid #ddd6e6;border-radius:6px;padding:4px 6px;font-size:16px}.favorite-name-row button{font-size:11px;white-space:nowrap}.study-hint{font-size:12px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -312,6 +314,11 @@ body.has-delete-undo .toast{bottom:calc(var(--note-footer-height,48px) + 72px)}
             <button id="redo" class="tool" data-icon="redo" aria-label="다시 실행" title="다시 실행"></button>
           </div>
         </div>
+        <div class="study-controls" role="group" aria-label="암기 연습 도구">
+          <button id="tapeTool" aria-pressed="false">테이프</button><button id="practiceToggle" aria-pressed="false">연습 시작</button>
+          <span class="tape-edit-actions" id="tapeEditActions" hidden><button id="editTape">테이프 수정</button><button id="deleteTape">테이프 삭제</button></span>
+          <span class="practice-actions" id="practiceActions" hidden><button id="revealTool" aria-pressed="false">정답 확인</button><button id="nextAnswer">다음 정답</button><button id="hideAnswers">모두 가리기</button><button id="showAnswers">모두 공개</button><button id="practiceCopy">연습용 사본</button><output id="practiceProgress" aria-live="polite"></output></span>
+        </div>
         <div class="tool-status"><button id="toolbarMove" class="toolbar-move" aria-label="도구모음 이동" aria-pressed="false" title="끌어서 이동 · 방향키로 이동 · Home으로 원위치"><span aria-hidden="true">⠿</span> 도구 이동</button><span class="current-tool"><i id="currentToolColor" aria-hidden="true"></i><span id="currentToolStatus"></span></span><span class="toolbar-layout-actions"><button id="toolbarOrientation" aria-label="도구모음 세로 배치" aria-pressed="false" title="도구모음을 세로로 배치">세로</button><button id="toolbarReset" aria-label="도구모음 원래 위치" title="도구모음을 위쪽 원래 위치로" hidden>원위치</button></span><span class="tool-status-actions"><button id="textBoxesButton" aria-haspopup="dialog" aria-label="현재 페이지 텍스트 상자 목록">상자 목록</button><button id="toolHelp" aria-haspopup="dialog">도구 안내</button></span></div>
       </div>
       <div class="shape-menu" id="shapeMenu" role="group" aria-label="도형 종류" hidden>
@@ -323,8 +330,10 @@ body.has-delete-undo .toast{bottom:calc(var(--note-footer-height,48px) + 72px)}
         <svg id="toolPreview" viewBox="0 0 260 66" aria-label="실제 굵기 미리보기"><path id="toolPreviewStroke" d="M28 36 Q78 7 130 33 T232 31" stroke="#33304c" stroke-width="3"/><circle id="toolPreviewEraser" cx="130" cy="33" r="0" fill="#fffefa" stroke="#5143a4" stroke-width="1"/></svg>
         <div id="toolWidthBlock"><label class="dialog-label" for="toolWidth">굵기 (종이 기준 px)</label><div class="tool-width-row"><input id="toolWidth" type="range" min="1" max="20" value="3" aria-label="도구 굵기"><input id="toolWidthNumber" type="number" min="1" max="20" step="1" value="3" aria-label="도구 굵기 숫자"></div><div id="toolQuickWidths" class="quick-widths"><button type="button">가늘게</button><button type="button">보통</button><button type="button">굵게</button></div></div>
         <div id="toolColorBlock"><label class="dialog-label" for="toolCustomColor">사용자 색</label><div class="tool-color-row"><input id="toolCustomColor" type="color" value="#33304c" aria-label="사용자 색 고르기"><input id="toolColorHex" type="text" maxlength="7" pattern="#?[0-9a-fA-F]{6}" value="#33304c" aria-label="색상 코드" spellcheck="false" autocomplete="off"><button id="applyToolColor" class="secondary" type="button">색 적용</button></div></div>
+        <div id="recentColorBlock"><h3>최근 사용 색</h3><div class="recent-colors" id="recentColors"></div></div>
         <h3>자주 쓰는 설정</h3><div class="tool-favorites" id="toolFavorites"><button type="button"></button><button type="button"></button><button type="button"></button></div>
         <div class="favorite-save"><label for="favoriteSlot">저장할 번호</label><select id="favoriteSlot"><option value="0">설정 1</option><option value="1">설정 2</option><option value="2">설정 3</option></select><button type="button" class="secondary" id="saveToolFavorite">현재 설정 저장</button></div>
+        <div class="favorite-name-row"><input id="favoriteName" maxlength="12" aria-label="즐겨찾기 이름" placeholder="예: 풀이용"><button type="button" class="secondary" id="renameFavorite">이름 변경</button></div>
         <p class="tool-setting-hint">굵기·색과 자주 쓰는 설정을 이 브라우저에 기억해요.<br>텍스트 색은 펜과 함께 사용해요.</p>
       </section>
       <div class="scroller" id="scroller" aria-label="종이">
@@ -335,12 +344,14 @@ body.has-delete-undo .toast{bottom:calc(var(--note-footer-height,48px) + 72px)}
               <canvas class="ink-layer" id="ink" aria-hidden="true"></canvas>
               <canvas class="ink-layer" id="activeInk" aria-label="손글씨 영역"></canvas>
               <div class="text-layer" id="textLayer"></div>
+              <div class="tape-layer" id="tapeLayer" aria-label="암기 테이프"></div>
               <div class="eraser-cursor" id="eraserCursor" aria-hidden="true" hidden></div>
               <button id="resizeText" class="text-resize" aria-label="텍스트 상자 너비 조절" title="끌어서 너비 조절 · 방향키로 조절" hidden>↔</button>
               <div class="annotation-tools" id="annotationTools" hidden>
                 <button id="moveText" title="텍스트 상자 끌어서 이동" aria-label="텍스트 상자 끌어서 이동"><span data-icon="hand"></span>이동</button>
                 <button id="editText" title="텍스트 수정" aria-label="텍스트 수정"><span data-icon="pen"></span>수정</button>
                 <button id="lockText" aria-label="텍스트 배치 잠금" aria-pressed="false">잠금</button>
+                <button id="tapeText" aria-label="선택한 텍스트 상자 가리기">가리기</button>
                 <button id="deleteText" title="텍스트 삭제 · 실행 취소로 복원" aria-label="텍스트 삭제"><span data-icon="trash"></span>삭제</button>
               </div>
             </div>
@@ -369,12 +380,15 @@ body.has-delete-undo .toast{bottom:calc(var(--note-footer-height,48px) + 72px)}
     </section>
   </main>
 </div>
+<dialog id="tapeDialog" aria-labelledby="tapeHeading"><form id="tapeForm"><h2 id="tapeHeading" class="dialog-title">암기 테이프 수정</h2><p class="study-hint">손잡이로 옮기거나, 종이 기준 위치와 크기를 입력하세요.</p><div class="dialog-row"><label>X 위치<input id="tapeX" class="dialog-input" type="number" min="0" max="752" step="any" required></label><label>Y 위치<input id="tapeY" class="dialog-input" type="number" min="0" max="1002" step="any" required></label></div><div class="dialog-row"><label>너비<input id="tapeWidth" class="dialog-input" type="number" min="8" max="760" step="any" required></label><label>높이<input id="tapeHeight" class="dialog-input" type="number" min="8" max="1010" step="any" required></label></div><label class="dialog-label" for="tapeColor">테이프 색</label><select id="tapeColor" class="dialog-input"><option value="#5143a4">보라</option><option value="#377058">초록</option><option value="#bd5365">분홍</option></select><div class="dialog-actions"><button type="button" class="secondary" data-close="tapeDialog">취소</button><button type="submit" class="primary">적용</button></div></form></dialog>
+<dialog id="imageExportDialog" aria-labelledby="imageExportHeading"><form id="imageExportForm"><h2 class="dialog-title" id="imageExportHeading">페이지 내보내기</h2><label class="dialog-label" for="imageTapeMode">암기 테이프</label><select id="imageTapeMode" class="dialog-input"><option value="worksheet">가린 학습지</option><option value="answers">정답본</option></select><p class="study-hint">화면에서 공개한 상태와 관계없이 선택한 방식으로 내보내요.</p><div class="dialog-actions"><button type="button" class="secondary" data-close="imageExportDialog">취소</button><button type="submit" class="primary">계속</button></div></form></dialog>
 <dialog id="toolHelpDialog" aria-labelledby="toolHelpHeading">
   <h2 class="dialog-title" id="toolHelpHeading">도구 안내</h2>
   <p>도구를 고른 뒤 <strong>굵기·색 설정</strong>을 열어 조절해요. 각 도구의 굵기와 색을 따로 기억하고, 자주 쓰는 설정은 3개까지 저장할 수 있어요.</p>
   <p><strong>텍스트 상자 삭제:</strong> 텍스트 도구로 기존 상자를 누른 뒤 ‘텍스트 상자 삭제’를 누르세요. 선택·이동 도구에서는 상자를 선택해 ‘삭제’를 눌러도 돼요. 삭제한 상자는 실행 취소로 되돌릴 수 있어요.</p>
   <p>상자 오른쪽 ↔ 손잡이를 끌거나, 손잡이에 초점을 두고 좌우 방향키로 너비를 바꿔요(Shift는 1px씩). 편집창에서는 굵게·밑줄·정렬과 너비를 바꿀 수 있어요. 배치 잠금은 위치·너비를 고정하고 올가미에서 제외해요. ‘상자 목록’에서 현재 페이지의 상자를 찾아 수정·잠금·삭제할 수 있어요.</p>
   <p><strong>도구모음 이동:</strong> ‘도구 이동’ 손잡이를 끌면 원하는 곳에 놓을 수 있어요. ‘세로’를 누르면 좁고 긴 도구 상자로 바뀌고, ‘가로’를 누르면 다시 가로로 놓아요. 손잡이를 누른 뒤 방향키로도 옮길 수 있고, Shift를 누르면 1px씩 조절해요. ‘원위치’나 손잡이의 Home 키로 위쪽 가로 배치로 돌려놓아요. 위치와 배치 방향은 이 브라우저에 기억해요. 상자가 화면보다 길면 안쪽을 스크롤해 나머지 도구를 사용할 수 있어요.</p>
+  <p><strong>암기 테이프:</strong> 테이프 도구로 정답 위를 사각형으로 끌어 가려요. 테이프를 끌어 이동하고 ↘ 손잡이로 크기를 바꿔요. 선택·이동 도구에서 텍스트 상자의 ‘가리기’도 사용할 수 있어요. 연습 시작 후에는 정답 확인 도구에서만 테이프를 눌러 공개해요. 펜·지우개는 테이프를 열지 않아요. 쪽을 바꾸거나 다시 시작하면 모두 가려져요. 연습 중 필기도 노트에 저장되므로 원본 보존에는 ‘연습용 사본’을 사용하세요. 정답 확인 도구에서 다음 정답은 버튼이나 Space·오른쪽 방향키로, 선택한 테이프는 Enter로 공개해요.</p>
   <label class="dialog-label"><input id="toolShortcuts" type="checkbox" checked> 도구 단축키 사용</label>
   <table class="shortcut-table"><caption>키보드 단축키</caption><tbody><tr><th scope="row">P / H / E</th><td>펜 / 형광펜 / 부분 지우개</td></tr><tr><th scope="row">T / L / V</th><td>텍스트 / 올가미 / 선택·이동</td></tr><tr><th scope="row">S</th><td>마지막에 쓴 도형</td></tr><tr><th scope="row">1 / 2 / 3</th><td>자주 쓰는 설정 불러오기</td></tr><tr><th scope="row">[ / ]</th><td>굵기 줄이기 / 늘리기</td></tr><tr><th scope="row">Ctrl·⌘ + Z</th><td>실행 취소 (Shift로 다시 실행)</td></tr></tbody></table>
   <p>입력칸·대화창과 필기 중에는 도구 단축키가 작동하지 않아요. 부분 지우개는 그린 선만 지우며 사진·PDF·텍스트는 지우지 않아요. 손가락으로 쓰려면 ‘손가락 켜짐’을 선택하세요.</p>
@@ -395,6 +409,7 @@ body.has-delete-undo .toast{bottom:calc(var(--note-footer-height,48px) + 72px)}
     <label for="pdfExportScope" class="dialog-label">저장할 페이지</label>
     <select id="pdfExportScope" class="dialog-input pdf-scope"><option value="all">이 노트 전체</option><option value="current">현재 페이지</option><option value="bookmarks">책갈피한 페이지</option><option value="range">범위 선택</option></select>
     <label for="pdfExportRange" class="dialog-label">쪽 범위</label><input id="pdfExportRange" class="dialog-input" maxlength="2000" placeholder="예: 1-3, 5" autocomplete="off" disabled>
+    <label class="dialog-label" for="pdfTapeMode">암기 테이프</label><select id="pdfTapeMode" class="dialog-input"><option value="worksheet">가린 학습지</option><option value="answers">정답본</option></select>
     <p class="dialog-label">쪽 번호는 이 노트의 순서예요. 선택한 쪽을 원래 순서대로 저장해요.</p>
     <div class="dialog-actions"><button type="button" class="secondary" data-close="pdfExportDialog">취소</button><button type="submit" class="primary">PDF 저장</button></div>
   </form>
@@ -572,15 +587,29 @@ function validShape(shape) {
     Array.isArray(shape.points) && shape.points.length > 0 &&
     shape.points.every((p) => Array.isArray(p) && p.length === 2 && p.every((v) => Number.isFinite(v) && Math.abs(v) <= 8000));
 }
+function validTape(tape) {
+  return tape && [tape.x,tape.y,tape.width,tape.height].every(Number.isFinite) && validColor(tape.color) &&
+    tape.x >= 0 && tape.y >= 0 && tape.width >= 8 && tape.height >= 8 && tape.x + tape.width <= width && tape.y + tape.height <= height;
+}
+function tapeFromPoints(from, to, color) {
+  const x = clamp(Math.min(from[0],to[0]),0,width), y = clamp(Math.min(from[1],to[1]),0,height);
+  const w = clamp(Math.max(from[0],to[0]),0,width)-x, h = clamp(Math.max(from[1],to[1]),0,height)-y;
+  return w >= 8 && h >= 8 ? { x,y,width:w,height:h,color } : null;
+}
+function transformTape(tape, dx, dy, mode) {
+  return mode === 'resize' ? { ...tape, width:clamp(tape.width+dx,8,width-tape.x), height:clamp(tape.height+dy,8,height-tape.y) }
+    : { ...tape, x:clamp(tape.x+dx,0,width-tape.width), y:clamp(tape.y+dy,0,height-tape.height) };
+}
+function orderedTapes(page) { return [...(page.tapes ?? [])].sort((a,b)=>a.y-b.y || a.x-b.x); }
 const toolPreferenceKey = 'jeongi-note-tools-v1';
 const toolLimits = { pen: [1,20,3], marker: [4,48,12], eraser: [6,60,24], shape: [1,20,3] };
-const toolNames = { select: '선택·이동', pen: '펜', marker: '형광펜', eraser: '지우개', text: '텍스트', lasso: '올가미', shape: '도형' };
+const toolNames = { select: '선택·이동', pen: '펜', marker: '형광펜', eraser: '지우개', text: '텍스트', lasso: '올가미', shape: '도형', tape:'암기 테이프', reveal:'정답 확인' };
 const shapeNames = { line: '직선', arrow: '화살표', rect: '사각형', ellipse: '원·타원' };
 function defaultToolPreferences() {
   return {
     pen: { color: '#33304c', size: 3 }, marker: { color: '#e7ad35', size: 12 },
     eraser: { color: '#000000', size: 24 }, shape: { color: '#33304c', size: 3 }, shapeKind: 'line', shortcuts: true,
-    favorites: [{ tool: 'pen', color: '#33304c', size: 3 }, { tool: 'pen', color: '#5143a4', size: 5 }, { tool: 'marker', color: '#e7ad35', size: 16 }]
+    recentColors: [], favorites: [{ tool: 'pen', color: '#33304c', size: 3 }, { tool: 'pen', color: '#5143a4', size: 5 }, { tool: 'marker', color: '#e7ad35', size: 16 }]
   };
 }
 function parseToolPreferences(raw) {
@@ -589,6 +618,7 @@ function parseToolPreferences(raw) {
   try { input = typeof raw === 'string' ? JSON.parse(raw) : raw; } catch { return result; }
   if (!input || typeof input !== 'object') return result;
   if (typeof input.shortcuts === 'boolean') result.shortcuts = input.shortcuts;
+  result.recentColors = [...new Set((Array.isArray(input.recentColors) ? input.recentColors : []).filter(validColor).map(value=>value.toLowerCase()))].slice(0,6);
   const style = (name, value, fallback) => ({
     color: name === 'eraser' ? '#000000' : validColor(value?.color) ? value.color.toLowerCase() : fallback.color,
     size: Number.isFinite(value?.size) ? clamp(Math.round(value.size), toolLimits[name][0], toolLimits[name][1]) : fallback.size
@@ -598,7 +628,7 @@ function parseToolPreferences(raw) {
   result.favorites = result.favorites.map((fallback, index) => {
     const item = input.favorites?.[index];
     if (!item || !Object.hasOwn(toolLimits, item.tool)) return fallback;
-    return { tool: item.tool, ...style(item.tool, item, result[item.tool]),
+    return { tool: item.tool, ...style(item.tool, item, result[item.tool]), ...(typeof item.name === 'string' && item.name.trim() ? {name:item.name.trim().slice(0,12)} : {}),
       ...(item.tool === 'shape' ? { shape: Object.hasOwn(shapeNames, item.shape) ? item.shape : 'line' } : {}) };
   });
   return result;
@@ -606,6 +636,11 @@ function parseToolPreferences(raw) {
 function loadToolPreferences() {
   try { return parseToolPreferences(localStorage.getItem(toolPreferenceKey)); }
   catch { return defaultToolPreferences(); }
+}
+function rememberRecentColor(preferences, value) {
+  if (!validColor(value)) return;
+  const color = value.toLowerCase();
+  preferences.recentColors = [color,...(preferences.recentColors ?? []).filter(item=>item!==color)].slice(0,6);
 }
 let toolPreferences = loadToolPreferences();
 function persistToolPreferences() {
@@ -669,6 +704,10 @@ function parseState(raw) {
       keepId(page?.id);
       if (!paperTypes.includes(page.type) || !Array.isArray(page.strokes) || !Array.isArray(page.texts)) throw Error('invalid page');
       if (page.bookmark !== undefined && typeof page.bookmark !== 'boolean') throw Error('invalid bookmark');
+      if (page.tapes !== undefined) {
+        if (!Array.isArray(page.tapes) || page.tapes.length > 300) throw Error('invalid tapes');
+        for (const tape of page.tapes) { keepId(tape?.id); if (!validTape(tape)) throw Error('invalid tape'); }
+      }
       if (page.background !== undefined && (!validAssetId(page.background?.id) ||
           !['pdf', 'photo'].includes(page.background.kind) || typeof page.background.name !== 'string' ||
           page.background.name.length > 200)) throw Error('invalid background');
@@ -705,6 +744,15 @@ try {
 }
 let filter = 'all';
 let tool = 'pen';
+let practiceMode = false;
+let practicePage = '';
+let revealedTapes = new Set();
+let practiceUndo = new Set();
+let practiceRedo = new Set();
+let selectedTape = null;
+let tapeDrag = null;
+let tapeTarget = null;
+let pendingImageExport = null;
 let color = toolPreferences.pen.color;
 let selected = null;
 let textTarget = null;
@@ -823,7 +871,7 @@ function updateNote() {
   queueSave();
   renderSidebar();
 }
-function snapshot(page) { return { type: page.type, strokes: page.strokes, texts: page.texts }; }
+function snapshot(page) { return { type: page.type, strokes: page.strokes, texts: page.texts, tapes: page.tapes ?? [] }; }
 function pageHistory() {
   const pageId = currentPage().id;
   if (!histories.has(pageId)) histories.set(pageId, { undo: [], redo: [] });
@@ -831,12 +879,13 @@ function pageHistory() {
 }
 function updateHistoryButtons() {
   const history = pageHistory();
-  $('undo').disabled = !history.undo.length;
-  $('redo').disabled = !history.redo.length;
+  $('undo').disabled = !history.undo.length || practiceMode && !practiceUndo.has(history.undo.at(-1));
+  $('redo').disabled = !history.redo.length || practiceMode && !practiceRedo.has(history.redo.at(-1));
 }
 function record(before) {
   const history = pageHistory();
   history.undo.push(before);
+  if (practiceMode) { practiceUndo.add(before); practiceRedo.clear(); }
   if (history.undo.length > 55) history.undo.shift();
   history.redo.length = 0;
   updateNote();
@@ -851,11 +900,14 @@ function changePage(changes) {
   renderPage();
 }
 function undoRedo(from, to) {
-  if (active || drag || lasso) return;
+  if (active || drag || lasso || tapeDrag) return;
   const page = currentPage();
   const history = pageHistory();
   if (!history[from].length) return;
-  history[to].push(snapshot(page));
+  if (practiceMode && !(from==='undo'?practiceUndo:practiceRedo).has(history[from].at(-1))) return;
+  const before = snapshot(page);
+  history[to].push(before);
+  if (practiceMode) (to==='undo'?practiceUndo:practiceRedo).add(before);
   Object.assign(page, history[from].pop());
   selected = null;
   updateNote();
@@ -1157,6 +1209,7 @@ function renderSidebar() {
 function renderPage(resetScroll = false) {
   const note = currentNote();
   const page = currentPage();
+  syncStudyPage();
   const index = note.pages.indexOf(page);
   resetLasso();
   $('paper').className = 'paper ' + page.type + (page.type === 'lines' ? ' margin-line' : '');
@@ -1172,6 +1225,8 @@ function renderPage(resetScroll = false) {
   $('docMenu').querySelector('[data-action=bookmark]').setAttribute('aria-pressed', page.bookmark === true);
   redrawInk();
   renderTexts();
+  renderTapes();
+  renderStudyUI();
   $('textBoxesButton').textContent = `상자 목록 ${page.texts.length}`;
   updateHistoryButtons();
   setZoom();
@@ -1188,6 +1243,9 @@ function renderNote() {
   renderPage(true);
 }
 function setTool(value) {
+  if (practiceMode && !['pen','marker','eraser','reveal'].includes(value)) { toast('연습 중에는 펜·형광펜·지우개와 정답 확인을 사용해요.'); return; }
+  if (!practiceMode && value === 'reveal') return;
+  finishTapeGesture(false);
   finishTextTransform(false);
   finishDrawing();
   resetLasso(true);
@@ -1198,12 +1256,14 @@ function setTool(value) {
   $('eraserCursor').hidden = true;
   renderToolState();
   renderTexts();
+  renderTapes();
+  renderStudyUI();
 }
 function rememberToolPreferences() {
   if (!persistToolPreferences()) toast('도구 설정은 이번 화면에서만 적용돼요. 저장 공간을 확인해 주세요.');
 }
 function setColor(value, remember = true) {
-  if (!validColor(value) || ['eraser','select','lasso'].includes(tool)) return;
+  if (!validColor(value) || !['pen','marker','shape','text'].includes(tool)) return;
   finishDrawing();
   color = value.toLowerCase();
   toolPreferences[tool === 'text' ? 'pen' : tool].color = color;
@@ -1222,7 +1282,7 @@ function setToolWidth(value) {
 function renderToolState() {
   const drawing = Object.hasOwn(toolLimits, tool);
   const style = toolPreferences[drawing ? tool : 'pen'];
-  const colored = !['eraser','select','lasso'].includes(tool);
+  const colored = ['pen','marker','shape','text'].includes(tool);
   $('toolShortcuts').checked = toolPreferences.shortcuts;
   for (const button of $('tools').children) button.setAttribute('aria-pressed', button.dataset.tool === tool);
   for (const button of $('colors').children) {
@@ -1236,6 +1296,8 @@ function renderToolState() {
   $('toolSettingsHeading').textContent = `${toolNames[tool]} 설정`;
   $('toolWidthBlock').hidden = !drawing;
   $('toolColorBlock').hidden = !colored;
+  $('recentColorBlock').hidden = !colored;
+  renderRecentColors();
   $('saveToolFavorite').disabled = !drawing;
   if (drawing) {
     const [min, max] = toolLimits[tool];
@@ -1257,13 +1319,13 @@ function renderToolState() {
   $('toolColorHex').value = style.color;
   $('toolColorHex').setCustomValidity('');
   const detail = drawing ? `${tool === 'shape' ? shapeNames[shapeKind] + ' · ' : ''}${style.size}px${colored ? ' · ' + style.color.toUpperCase() : ' · 그린 선만 지워요'}`
-    : tool === 'text' ? '빈 곳은 추가 · 기존 상자는 수정·삭제' : tool === 'lasso' ? '둘러 그려 이동·복제 · 잠금 상자 제외' : '종이를 끌어 이동';
+    : tool === 'tape' ? '사각형으로 가리기 · 선택해서 이동·수정' : tool === 'reveal' ? '테이프를 눌러 공개 · 펜으로 쓰면 공개되지 않아요' : tool === 'text' ? '빈 곳은 추가 · 기존 상자는 수정·삭제' : tool === 'lasso' ? '둘러 그려 이동·복제 · 잠금 상자 제외' : '종이를 끌어 이동';
   $('currentToolStatus').textContent = `${toolNames[tool]} · ${detail}`;
   $('currentToolColor').hidden = !colored;
   $('currentToolColor').style.background = style.color;
   for (const [index, button] of [...$('toolFavorites').children].entries()) {
     const item = toolPreferences.favorites[index];
-    const label = `${index + 1} · ${toolNames[item.tool]}${item.tool === 'shape' ? ' ' + shapeNames[item.shape] : ''} ${item.size}px`;
+    const label = `${index + 1} · ${item.name ? item.name + ' · ' : ''}${toolNames[item.tool]}${item.tool === 'shape' ? ' ' + shapeNames[item.shape] : ''} ${item.size}px`;
     button.textContent = label;
     button.style.setProperty('--favorite-color', item.tool === 'eraser' ? '#fffefa' : item.color);
     button.setAttribute('aria-label', `${label}${item.tool === 'eraser' ? '' : ' ' + item.color} 불러오기`);
@@ -1332,6 +1394,7 @@ function setZoom() {
   $('zoomOut').disabled = scale <= .25;
   $('zoomIn').disabled = scale >= 2;
   renderSelection(drag?.target || currentItem());
+  renderTapes();
 }
 function navigate(direction) {
   const note = currentNote();
@@ -1781,7 +1844,7 @@ scroller.addEventListener('pointerdown', (event) => {
     renderSelection();
     return;
   }
-  if (tool === 'text') return;
+  if (['text','tape','reveal'].includes(tool)) return;
   event.preventDefault();
   scroller.setPointerCapture(event.pointerId);
   if (tool === 'lasso' && event.button !== 5) startLasso(event);
@@ -2206,7 +2269,7 @@ async function clearOrphanedAssets() {
     // Unused data can be removed on the next successful save.
   }
 }
-function compositePage(page = currentPage(), pixels = 2, image = null) {
+function compositePage(page = currentPage(), pixels = 2, image = null, tapeMode = 'worksheet') {
   const result = document.createElement('canvas');
   result.width = Math.round(width * pixels);
   result.height = Math.round(height * pixels);
@@ -2255,10 +2318,14 @@ function compositePage(page = currentPage(), pixels = 2, image = null) {
       if (format.underline && row.width > 0) ctx.fillRect(row.x, row.y + item.size * .12, row.width, item.size * .0625);
     }
   }
+  if (tapeMode !== 'answers') for (const tape of page.tapes ?? []) {
+    ctx.fillStyle = tape.color;
+    ctx.fillRect(tape.x,tape.y,tape.width,tape.height);
+  }
   return result;
 }
-async function pageImage(page, pixels = 2) {
-  return compositePage(page, pixels, await pageBackground(page));
+async function pageImage(page, pixels = 2, tapeMode = 'worksheet') {
+  return compositePage(page, pixels, await pageBackground(page), tapeMode);
 }
 function updateThumbnail(canvas, page) {
   pageImage(page, .16).then((prepared) => {
@@ -2276,6 +2343,7 @@ function duplicatePageData(page) {
   const copy = JSON.parse(JSON.stringify(page));
   copy.id = id();
   for (const item of copy.texts) item.id = id();
+  for (const tape of copy.tapes ?? []) tape.id = id();
   return copy;
 }
 async function copyPageToNote(sourceId, pageId, destinationId, title = '') {
@@ -2386,11 +2454,11 @@ async function undoDeleted() {
   };
   try {
     const restored = await commitImport(entries, () => {
-      const allIds = new Set(state.notes.flatMap((note) => [note.id, ...note.pages.flatMap((page) => [page.id, ...page.texts.map((item) => item.id)])]));
+      const allIds = new Set(state.notes.flatMap((note) => [note.id, ...note.pages.flatMap((page) => [page.id, ...page.texts.map((item) => item.id), ...(page.tapes ?? []).map((tape) => tape.id)])]));
       if (record.kind === 'note') {
         const note = JSON.parse(JSON.stringify(record.note));
         note.pages.forEach(relink);
-        const ids = [note.id, ...note.pages.flatMap((page) => [page.id, ...page.texts.map((item) => item.id)])];
+        const ids = [note.id, ...note.pages.flatMap((page) => [page.id, ...page.texts.map((item) => item.id), ...(page.tapes ?? []).map((tape) => tape.id)])];
         if (ids.some((value) => allIds.has(value))) {
           note.id = id();
           note.title = (titleOf(note) + ' (복구)').slice(0, 100);
@@ -2406,7 +2474,7 @@ async function undoDeleted() {
       let note = state.notes.find((note) => note.id === record.note.id);
       let page = JSON.parse(JSON.stringify(record.page));
       relink(page);
-      if ([page.id, ...page.texts.map((item) => item.id)].some((value) => allIds.has(value))) page = duplicatePageData(page);
+      if ([page.id, ...page.texts.map((item) => item.id), ...(page.tapes ?? []).map((tape) => tape.id)].some((value) => allIds.has(value))) page = duplicatePageData(page);
       if (!note) {
         if (state.notes.length >= 1000) throw Error('노트는 1000개까지 보관할 수 있어요.');
         note = makeNote(record.note.folder, (titleOf(record.note) + ' (복구)').slice(0, 100));
@@ -2573,22 +2641,20 @@ function download(blob, filename) {
   setTimeout(() => URL.revokeObjectURL(url), 30000);
 }
 function fileBase(note = currentNote()) { return titleOf(note).replace(/[\\/:*?"<>|]/g, '_').slice(0, 80); }
-async function exportPng() {
-  const page = currentPage();
-  const index = currentNote().pages.indexOf(page) + 1;
-  const filename = `${fileBase()}_${index}쪽.png`;
+async function exportPng(page = currentPage(), tapeMode = 'worksheet', base = fileBase(), index = currentNote().pages.indexOf(page)+1) {
+  const filename = `${base}_${index}쪽${page.tapes?.length ? '_' + (tapeMode==='answers'?'정답본':'학습지') : ''}.png`;
   try {
-    const canvas = await pageImage(page);
+    const canvas = await pageImage(page,2,tapeMode);
     const blob = await (await media()).canvasBlob(canvas, 'image/png');
     download(blob, filename);
   } catch {
     toast('페이지를 이미지로 만들지 못했어요.');
   }
 }
-async function printPage() {
+async function printPage(page = currentPage(), tapeMode = 'worksheet') {
   try {
     const img = $('printPage');
-    img.src = (await pageImage(currentPage())).toDataURL('image/png');
+    img.src = (await pageImage(page,2,tapeMode)).toDataURL('image/png');
     await img.decode();
     window.print();
   } catch {
@@ -2933,18 +2999,19 @@ function openPdfExportDialog() {
   $('pdfExportScope').value = 'all';
   $('pdfExportScope').querySelector('[value=bookmarks]').disabled = !pendingPdfExport.pages.some((page) => page.bookmark === true);
   $('pdfExportRange').value = '';
+  $('pdfTapeMode').value = 'worksheet';
   $('pdfExportScope').onchange();
   $('pdfExportDialog').showModal();
 }
-async function exportNotePdf(note, scope, range) {
+async function exportNotePdf(note, scope, range, tapeMode = 'worksheet') {
   let filename;
   const file = await runFileWork('노트를 PDF로 만드는 중', async (progress, signal) => {
     const { noteAsPdf, parsePageRange } = await media();
     const pages = pdfExportPages(note, scope, range, parsePageRange);
     const numbers = pages.map((page) => note.pages.indexOf(page) + 1);
     const label = numbers.length <= 8 ? numbers.join(',') : `${numbers[0]}-${numbers.at(-1)}중${numbers.length}`;
-    filename = fileBase(note) + (scope === 'all' ? '' : `-${scope === 'bookmarks' ? '책갈피-' : ''}${label}쪽`) + '.pdf';
-    return noteAsPdf(titleOf(note), pages, pageImage, progress, signal);
+    filename = fileBase(note) + (scope === 'all' ? '' : `-${scope === 'bookmarks' ? '책갈피-' : ''}${label}쪽`) + (pages.some(page=>page.tapes?.length) ? '_' + (tapeMode==='answers'?'정답본':'학습지') : '') + '.pdf';
+    return noteAsPdf(titleOf(note), pages, (page,pixels)=>pageImage(page,pixels,tapeMode), progress, signal);
   }, '노트를 PDF로 저장하지 못했어요.');
   if (file) download(file, filename);
 }
@@ -2965,6 +3032,7 @@ function fromDataUrl(value) {
 function restoredContent(note, title = note.title) {
   const pages = note.pages.map((page) => ({
     type: page.type, strokes: page.strokes, bookmark: page.bookmark === true,
+    tapes: (page.tapes ?? []).map(({id,...tape})=>tape),
     texts: page.texts.map(({ id, ...item }) => ({ ...item, bold: item.bold === true, underline: item.underline === true, align: item.align ?? 'left', locked: item.locked === true })),
     background: page.background ? { kind: page.background.kind, name: page.background.name } : null
   }));
@@ -2986,7 +3054,7 @@ async function planBackupRestore(notes, assets, existing, progress, signal) {
   const imported = [];
   const repaired = new Map();
   const existingIds = new Set(existing.flatMap((note) => [note.id,
-    ...note.pages.flatMap((page) => [page.id, ...page.texts.map((item) => item.id)])]));
+    ...note.pages.flatMap((page) => [page.id, ...page.texts.map((item) => item.id), ...(page.tapes ?? []).map((tape) => tape.id)])]));
   const sourceBlob = async (key) => {
     if (!sourceBlobs.has(key)) {
       const body = fromDataUrl(assets.get(key));
@@ -3040,7 +3108,7 @@ async function planBackupRestore(notes, assets, existing, progress, signal) {
       }
     } else {
       const note = JSON.parse(JSON.stringify(source));
-      const noteIds = [note.id, ...note.pages.flatMap((page) => [page.id, ...page.texts.map((item) => item.id)])];
+      const noteIds = [note.id, ...note.pages.flatMap((page) => [page.id, ...page.texts.map((item) => item.id), ...(page.tapes ?? []).map((tape) => tape.id)])];
       if (noteIds.some((value) => existingIds.has(value))) {
         note.restoredFrom = source.id;
         note.id = id();
@@ -3050,12 +3118,13 @@ async function planBackupRestore(notes, assets, existing, progress, signal) {
           page.id = id();
           if (old === note.active) note.active = page.id;
           for (const item of page.texts) item.id = id();
+          for (const tape of page.tapes ?? []) tape.id = id();
         }
       }
       for (const page of note.pages) {
         if (page.background) page.background.id = await newAsset(page.background.id);
       }
-      for (const value of [note.id, ...note.pages.flatMap((page) => [page.id, ...page.texts.map((item) => item.id)])]) existingIds.add(value);
+      for (const value of [note.id, ...note.pages.flatMap((page) => [page.id, ...page.texts.map((item) => item.id), ...(page.tapes ?? []).map((tape) => tape.id)])]) existingIds.add(value);
       imported.push(note);
     }
     progress(index + 1, notes.length, '개');
@@ -3151,8 +3220,8 @@ $('confirmDialog').addEventListener('close', () => {
   onConfirm = null;
 });
 const actions = {
-  png: exportPng,
-  print: printPage,
+  png: () => openImageExport('png'),
+  print: () => openImageExport('print'),
   'export-pdf': openPdfExportDialog,
   'backup-note': () => exportBackup('current'),
   bookmark: () => {
@@ -3193,6 +3262,171 @@ const actions = {
     });
   }
 };
+function syncStudyPage() {
+  const context = currentNote().id + '/' + currentPage().id;
+  if (context === practicePage) return;
+  finishTapeGesture(false);
+  practicePage = context;
+  revealedTapes.clear();
+  practiceUndo.clear();
+  practiceRedo.clear();
+  selectedTape = null;
+}
+function renderStudyUI() {
+  const tapes = currentPage().tapes ?? [];
+  if (!tapes.some(t=>t.id===selectedTape)) selectedTape = null;
+  $('tapeTool').disabled = practiceMode;
+  $('tapeTool').setAttribute('aria-pressed',tool==='tape');
+  $('practiceToggle').setAttribute('aria-pressed',practiceMode);
+  $('practiceToggle').textContent = practiceMode ? '연습 종료' : '연습 시작';
+  $('practiceActions').hidden = !practiceMode;
+  $('revealTool').setAttribute('aria-pressed',tool==='reveal');
+  $('tapeEditActions').hidden = practiceMode || tool!=='tape' || !selectedTape;
+  $('practiceProgress').textContent = `${tapes.filter(t=>revealedTapes.has(t.id)).length}/${tapes.length} 공개`;
+  $('nextAnswer').disabled = !tapes.some(t=>!revealedTapes.has(t.id));
+  $('textBoxesButton').disabled = practiceMode;
+  $('search').disabled = practiceMode;
+  for (const button of $('tools').children) button.disabled = practiceMode && !['pen','marker','eraser'].includes(button.dataset.tool);
+}
+function renderTapes(preview = null) {
+  const layer = $('tapeLayer');
+  const page = currentPage();
+  const tapes = orderedTapes(page);
+  if (preview && !tapes.some(t=>t.id===preview.id)) tapes.push(preview);
+  layer.replaceChildren();
+  const edit = tool==='tape' && !practiceMode;
+  const interactive = edit || practiceMode && tool==='reveal';
+  const hidden = [];
+  for (const [index,saved] of tapes.entries()) {
+    const tape = preview?.id===saved.id ? preview : saved;
+    const revealed = practiceMode && revealedTapes.has(tape.id);
+    if (!revealed) hidden.push(tape);
+    const cover = document.createElement('button');
+    cover.type = 'button';cover.className = 'tape-cover' + (revealed ? ' revealed' : '') + (selectedTape===tape.id ? ' selected' : '');
+    cover.dataset.tape = tape.id;
+    cover.style.cssText = `left:${tape.x}px;top:${tape.y}px;width:${tape.width}px;height:${tape.height}px;--tape:${tape.color};--tape-hit:${24/scale}px;--tape-font:${11/scale}px`;
+    cover.tabIndex = interactive ? 0 : -1;
+    cover.setAttribute('aria-label',`가림 ${index+1}/${tapes.length}, ${edit ? '선택해서 이동·수정' : revealed ? '정답 공개됨, 누르면 가리기' : '누르면 정답 공개'}`);
+    cover.setAttribute('aria-pressed',revealed);
+    const number = document.createElement('span');number.textContent = index+1;number.setAttribute('aria-hidden','true');cover.append(number);
+    cover.onclick = event => { if (event.detail!==0) return; if (edit) { selectedTape=tape.id;renderTapes();renderStudyUI();openTapeEditor(); } else toggleTapeReveal(tape.id); };
+    layer.append(cover);
+    if (edit && selectedTape===tape.id) {
+      const grip = document.createElement('button');grip.className='tape-resize';grip.type='button';grip.textContent='↘';grip.dataset.tape=tape.id;grip.dataset.resize='true';
+      grip.setAttribute('aria-label',`가림 ${index+1} 크기 조절`);
+      const size=28/scale;grip.style.cssText=`left:${clamp(tape.x+tape.width-size/2,0,width-size)}px;top:${clamp(tape.y+tape.height-size/2,0,height-size)}px;width:${size}px;height:${size}px;font-size:${16/scale}px`;
+      grip.onclick=event=>{if(event.detail===0)openTapeEditor();};layer.append(grip);
+    }
+  }
+  for (const node of $('textLayer').children) {
+    const item=page.texts.find(t=>t.id===node.dataset.id);
+    const box=item && textBox(item);
+    const covered=practiceMode && box && hidden.some(t=>boxesOverlap(box,{left:t.x,top:t.y,right:t.x+t.width,bottom:t.y+t.height}));
+    node.inert=!!covered;
+    if(covered)node.setAttribute('aria-hidden','true');else node.removeAttribute('aria-hidden');
+  }
+}
+function toggleTapeReveal(tapeId) {
+  if (!practiceMode || tool!=='reveal' || !(currentPage().tapes ?? []).some(t=>t.id===tapeId)) return;
+  if (revealedTapes.has(tapeId)) revealedTapes.delete(tapeId);else revealedTapes.add(tapeId);
+  renderTapes();renderStudyUI();
+}
+function nextTapeAnswer() {
+  if (!practiceMode || active || tapeDrag) return;
+  setTool('reveal');
+  const next=orderedTapes(currentPage()).find(t=>!revealedTapes.has(t.id));
+  if(!next)return;
+  toggleTapeReveal(next.id);
+  const node=[...$('tapeLayer').children].find(n=>n.dataset.tape===next.id);
+  node?.scrollIntoView({block:'nearest',inline:'nearest'});node?.focus({preventScroll:true});
+}
+function togglePractice() {
+  finishDrawing();finishTextTransform(false);finishTapeGesture(false);resetLasso(true);showMenu();
+  practiceMode=!practiceMode;revealedTapes.clear();practiceUndo.clear();practiceRedo.clear();selected=null;selectedTape=null;
+  $('search').value='';expandedSearchNotes.clear();searchTarget=null;
+  setTool(practiceMode?'reveal':'pen');renderSidebar();updateHistoryButtons();
+  toast(practiceMode?'정답 확인 도구로 눌러 공개해요. 연습 필기도 저장돼요. 원본 보존에는 연습용 사본을 사용하세요.':'연습을 마쳤어요. 필기는 노트에 저장돼요.');
+}
+function startTapeGesture(event) {
+  if (tapeDrag) {
+    if(event.pointerId!==tapeDrag.pointer && event.pointerType==='touch' && tapeDrag.source==='touch') finishTapeGesture(false);
+    event.preventDefault();event.stopImmediatePropagation();return;
+  }
+  if (!event.isPrimary || event.button!==0 || fileJob || toolbarDrag || document.querySelector('dialog[open]')) return;
+  const target=event.target.closest('[data-tape]');
+  const editing=tool==='tape'&&!practiceMode;
+  if (!editing && !(practiceMode && tool==='reveal' && target)) return;
+  if (!target && event.target!==sheet) return;
+  if(event.pointerType==='touch' && Math.max(event.width,event.height)>=44 && Math.min(event.width,event.height)>=28)return;
+  finishDrawing();finishTextTransform(false);resetLasso(true);showMenu();
+  const saved=(currentPage().tapes??[]).find(t=>t.id===target?.dataset.tape);
+  if(saved)selectedTape=saved.id;
+  tapeDrag={pointer:event.pointerId,source:event.pointerType,context:practicePage,start:point(event),client:[event.clientX,event.clientY],
+    mode:!editing?'reveal':saved?(target.dataset.resize?'resize':'move'):'create',original:saved,preview:saved,id:saved?.id??id(),moved:false};
+  event.preventDefault();event.stopImmediatePropagation();scroller.setPointerCapture(event.pointerId);
+  renderTapes();renderStudyUI();
+}
+function moveTapeGesture(event) {
+  if (!tapeDrag || event.pointerId!==tapeDrag.pointer)return;
+  event.preventDefault();event.stopImmediatePropagation();
+  if(Math.hypot(event.clientX-tapeDrag.client[0],event.clientY-tapeDrag.client[1])>=5)tapeDrag.moved=true;
+  if(tapeDrag.mode==='reveal'||!tapeDrag.moved)return;
+  const at=point(event), dx=at[0]-tapeDrag.start[0],dy=at[1]-tapeDrag.start[1];
+  const value=tapeDrag.mode==='create'?tapeFromPoints(tapeDrag.start,at,'#5143a4'):transformTape(tapeDrag.original,dx,dy,tapeDrag.mode);
+  tapeDrag.preview=value?{...value,id:tapeDrag.id}:null;
+  renderTapes(tapeDrag.preview);
+}
+function finishTapeGesture(commit=true) {
+  if(!tapeDrag)return;
+  const gesture=tapeDrag;tapeDrag=null;
+  if(gesture.context!==practicePage)return;
+  if(commit && gesture.mode==='reveal' && !gesture.moved)toggleTapeReveal(gesture.id);
+  else if(commit && gesture.moved && gesture.preview && !practiceMode) {
+    const tapes=currentPage().tapes??[];
+    if(gesture.mode==='create') {
+      if(tapes.length>=300)toast('한 페이지에는 테이프를 300개까지 붙일 수 있어요.');
+      else {selectedTape=gesture.id;changePage({tapes:[...tapes,gesture.preview]});}
+    }else if(tapes.some(t=>t.id===gesture.id))changePage({tapes:tapes.map(t=>t.id===gesture.id?gesture.preview:t)});
+  }
+  renderTapes();renderStudyUI();
+}
+function openTapeEditor() {
+  if(practiceMode)return;
+  const tape=(currentPage().tapes??[]).find(t=>t.id===selectedTape);if(!tape)return;
+  tapeTarget={note:currentNote().id,page:currentPage().id,id:tape.id};
+  for(const [name,value] of Object.entries({tapeX:tape.x,tapeY:tape.y,tapeWidth:tape.width,tapeHeight:tape.height,tapeColor:tape.color}))$(name).value=value;
+  if(!$('tapeColor').value){const option=document.createElement('option');option.value=tape.color;option.textContent=tape.color;$('tapeColor').append(option);$('tapeColor').value=tape.color;}
+  $('tapeDialog').showModal();
+}
+function removeSelectedTape() {
+  if(practiceMode)return;
+  const tapes=currentPage().tapes??[];if(!tapes.some(t=>t.id===selectedTape))return;
+  changePage({tapes:tapes.filter(t=>t.id!==selectedTape)});selectedTape=null;renderStudyUI();
+}
+function renderRecentColors() {
+  const root=$('recentColors');root.replaceChildren();
+  for(const value of toolPreferences.recentColors??[]) {
+    const button=document.createElement('button');button.type='button';button.title=value;button.setAttribute('aria-label',`최근 색 ${value}`);button.style.setProperty('--swatch',value);
+    button.append(document.createElement('i'));button.onclick=()=>{setColor(value);rememberRecentColor(toolPreferences,value);rememberToolPreferences();renderRecentColors();};root.append(button);
+  }
+  if(!root.children.length){const label=document.createElement('small');label.textContent='사용자 색을 고르면 여기에 표시돼요.';root.append(label);}
+}
+function openImageExport(action) {
+  finishDrawing();finishTapeGesture(false);resetLasso(true);
+  const page=JSON.parse(JSON.stringify(currentPage()));
+  pendingImageExport={action,page,base:fileBase(),index:currentNote().pages.indexOf(currentPage())+1};
+  if(!page.tapes?.length){pendingImageExport=null;return action==='png'?exportPng(page,'worksheet',fileBase(),currentNote().pages.indexOf(currentPage())+1):printPage(page);}
+  $('imageExportHeading').textContent=action==='png'?'페이지를 PNG로 저장':'페이지 인쇄·PDF';$('imageTapeMode').value='worksheet';$('imageExportDialog').showModal();
+}
+function studyShortcut(event) {
+  if(event.isComposing || event.defaultPrevented || event.target?.closest?.('input,textarea,select,dialog,[contenteditable]'))return false;
+  if(event.key==='Escape' && tapeDrag){event.preventDefault();finishTapeGesture(false);return true;}
+  if(active || drag || lasso || toolbarDrag || tapeDrag || fileJob || document.querySelector('dialog[open]'))return false;
+  if(!practiceMode || tool!=='reveal' || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey || event.repeat)return false;
+  if(event.target?.closest?.('button') && !event.target.closest('[data-tape]'))return false;
+  if(!['ArrowRight',' '].includes(event.key))return false;
+  event.preventDefault();nextTapeAnswer();return true;
+}
 function toolbarBounds() {
   const area = document.querySelector('.workspace').getBoundingClientRect();
   const footer = document.querySelector('.bottom-bar').getBoundingClientRect();
@@ -3383,6 +3617,7 @@ for (const [toggle, menu] of menus) {
 document.addEventListener('click', (event) => { if (!event.target.closest('.menu-wrap, #shapeMenu, #shapeToggle, #toolSettings, #toolSettingsToggle')) showMenu(); });
 window.addEventListener('resize', () => { if (!$('shapeMenu').hidden || !$('toolSettings').hidden) showMenu(); });
 document.addEventListener('keydown', (event) => {
+  if (studyShortcut(event)) return;
   if (event.key === 'Escape') {
     if (document.querySelector('dialog[open]')) return;
     if (toolbarDrag) { event.preventDefault(); finishToolbarDrag(false); return; }
@@ -3500,6 +3735,7 @@ $('toolWidthNumber').onkeydown = (event) => {
 };
 for (const button of $('toolQuickWidths').children) button.onclick = () => setToolWidth(button.dataset.width);
 $('toolCustomColor').oninput = () => setColor($('toolCustomColor').value);
+$('toolCustomColor').onchange = () => { rememberRecentColor(toolPreferences,$('toolCustomColor').value);rememberToolPreferences();renderRecentColors(); };
 function applyToolHex() {
   const typed = $('toolColorHex').value.trim();
   const value = typed.startsWith('#') ? typed : '#' + typed;
@@ -3509,6 +3745,7 @@ function applyToolHex() {
     return;
   }
   setColor(value);
+  rememberRecentColor(toolPreferences,value);rememberToolPreferences();renderRecentColors();
 }
 $('applyToolColor').onclick = applyToolHex;
 $('toolColorHex').oninput = () => $('toolColorHex').setCustomValidity('');
@@ -3518,6 +3755,8 @@ $('saveToolFavorite').onclick = () => {
   const favorite = captureToolFavorite(toolPreferences, tool, shapeKind);
   if (!favorite) return;
   const index = Number($('favoriteSlot').value);
+  const name=$('favoriteName').value.trim().slice(0,12) || toolPreferences.favorites[index]?.name;
+  if(name)favorite.name=name;
   toolPreferences.favorites[index] = favorite;
   renderToolState();
   const saved = persistToolPreferences();
@@ -3617,8 +3856,9 @@ $('pdfExportForm').addEventListener('submit', async (event) => {
   const note = pendingPdfExport;
   const scope = $('pdfExportScope').value;
   const range = $('pdfExportRange').value;
+  const tapeMode = $('pdfTapeMode').value==='answers'?'answers':'worksheet';
   $('pdfExportDialog').close();
-  if (note) await exportNotePdf(note, scope, range);
+  if (note) await exportNotePdf(note, scope, range, tapeMode);
 });
 $('copyDestination').onchange = () => {
   const create = !$('copyDestination').value;
@@ -3652,6 +3892,54 @@ for (const [value, name] of colors) {
   $('colors').append(button);
 }
 const mobile = matchMedia('(max-width: 680px)');
+for(const [type,fn] of [['pointerdown',startTapeGesture],['pointermove',moveTapeGesture]])scroller.addEventListener(type,fn,true);
+for(const type of ['pointerup','pointercancel','lostpointercapture'])scroller.addEventListener(type,event=>{
+  if(!tapeDrag || event.pointerId!==tapeDrag.pointer)return;
+  event.preventDefault();event.stopImmediatePropagation();
+  if(type==='pointerup')moveTapeGesture(event);
+  finishTapeGesture(type==='pointerup');
+  if(scroller.hasPointerCapture(event.pointerId))scroller.releasePointerCapture(event.pointerId);
+},true);
+window.addEventListener('blur',()=>finishTapeGesture(false));
+window.addEventListener('resize',()=>finishTapeGesture(false));
+$('tapeTool').onclick=()=>{setTool('tape');toast('정답 위를 사각형으로 끌어 가려요. 테이프를 누르면 선택해 옮길 수 있어요.');};
+$('practiceToggle').onclick=togglePractice;
+$('revealTool').onclick=()=>setTool('reveal');
+$('nextAnswer').onclick=nextTapeAnswer;
+$('hideAnswers').onclick=()=>{revealedTapes.clear();renderTapes();renderStudyUI();};
+$('showAnswers').onclick=()=>{if(!practiceMode)return;revealedTapes=new Set((currentPage().tapes??[]).map(t=>t.id));renderTapes();renderStudyUI();};
+$('editTape').onclick=openTapeEditor;
+$('deleteTape').onclick=removeSelectedTape;
+$('tapeText').onclick=()=>{
+  if(practiceMode)return;const item=currentItem();if(!item)return;
+  if((currentPage().tapes??[]).length>=300){toast('한 페이지에는 테이프를 300개까지 붙일 수 있어요.');return;}
+  const box=textBox(item),tape=tapeFromPoints([box.left,box.top],[box.right,box.bottom],'#5143a4');if(!tape)return;
+  tape.id=id();selectedTape=tape.id;changePage({tapes:[...(currentPage().tapes??[]),tape]});setTool('tape');
+};
+$('tapeForm').onsubmit=event=>{
+  event.preventDefault();const target=tapeTarget;if(practiceMode || !target || currentNote().id!==target.note || currentPage().id!==target.page)return;
+  const old=(currentPage().tapes??[]).find(t=>t.id===target.id);if(!old)return;
+  const tape={id:old.id,x:Number($('tapeX').value),y:Number($('tapeY').value),width:Number($('tapeWidth').value),height:Number($('tapeHeight').value),color:$('tapeColor').value};
+  if(!validTape(tape)){toast('테이프가 종이 안에 들어오도록 위치와 크기를 입력하세요.');return;}
+  changePage({tapes:currentPage().tapes.map(t=>t.id===old.id?tape:t)});$('tapeDialog').close();
+};
+$('tapeDialog').addEventListener('close',()=>{tapeTarget=null;$('tapeTool').focus();});
+$('practiceCopy').onclick=async()=>{
+  const note=currentNote(),page=currentPage();
+  const copied=await runFileWork('연습용 사본 만들기',()=>copyPageToNote(note.id,page.id,'',(titleOf(note)+' 연습용').slice(0,100)),'연습용 사본을 만들지 못했어요.');
+  if(copied){openImportedNote(copied);toast('연습용 노트를 만들었어요. 이 노트에 쓰는 필기도 저장돼요.');}
+};
+$('favoriteSlot').onchange=()=>{$('favoriteName').value=toolPreferences.favorites[Number($('favoriteSlot').value)]?.name??'';};
+$('renameFavorite').onclick=()=>{
+  const favorite=toolPreferences.favorites[Number($('favoriteSlot').value)];if(!favorite)return;
+  const name=$('favoriteName').value.trim().slice(0,12);if(name)favorite.name=name;else delete favorite.name;
+  rememberToolPreferences();renderToolState();toast('즐겨찾기 이름을 바꿨어요.');
+};
+$('imageExportForm').onsubmit=async event=>{
+  event.preventDefault();const target=pendingImageExport;const mode=$('imageTapeMode').value==='answers'?'answers':'worksheet';$('imageExportDialog').close();if(!target)return;
+  if(target.action==='png')await exportPng(target.page,mode,target.base,target.index);else await printPage(target.page,mode);
+};
+$('imageExportDialog').addEventListener('close',()=>{pendingImageExport=null;});
 function updateSidebarAccess() {
   $('sidebar').inert = focusMode || (mobile.matches && !$('app').classList.contains('open'));
 }
