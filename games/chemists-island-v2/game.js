@@ -72,7 +72,7 @@
       },
       chief: function(s){ return SPOT.harbor.post(s); },
       keeper: function(s){
-        if(s.lampReady)return D('등대지기','“저 빛이 보이나? 해 질 때 우편정이 저걸 보고 부두 끝을 찾아.”');
+        if(s.lampReady)return D('등대지기','“저 빛이 보이나? 해 질 때 우편정이 저걸 보고 부두 끝을 찾아. 선착장 반대편에서도 잘 보이는지 가 볼까?”',[{id:'keeper_round',label:'등대지기와 순찰하기'}]);
         if(s.lampWashed)return D('등대지기','유리가 맑아졌다. 등대지기가 가리킨 물길 쪽으로 가림판을 열면 빛이 나간다.',[{label:'물길 쪽 가림판 열기',id:'light_pier'}]);
         return D('등대지기','등대지기가 손등으로 부두 등불의 유리를 문지른다. “바닷물로 닦고 말리면 또 하얘져. 우체국 뒤 작업마당에 민물을 모으던 대야가 있었는데.”',s.flask?[{label:'가방의 증류수로 유리 헹구기',id:'wash_lamp'}]:[]);
       },
@@ -150,7 +150,11 @@
     }
   };
 
-  function interact(s, id) {
+  function interact(s, id, keeperMode) {
+    if(s.scene==='harbor'&&id==='keeper'&&s.lampReady){
+      if(keeperMode==='carry'||keeperMode==='hang')return D('등대지기','“등잔 좀 봐 주게. 저 끝 고리에 걸면 배에서 보일 거야.”');
+      if(keeperMode==='round'||keeperMode==='check')return D('등대지기','“여기서도 빛이 잘 보이는군. 돌아가서 고리만 한 번 살펴보세.”');
+    }
     var f = SPOT[s.scene] && SPOT[s.scene][id];
     var view=f ? f(s) : null;
     if(view && s.scene==='harbor' && (id==='post'||id==='chief')){
@@ -188,7 +192,11 @@
     light_pier: function(s){
       if(s.scene!=='harbor'||!s.lampWashed||s.lampReady)return null;
       s.lampReady=true;L(s,'등대지기와 함께 부두 끝 등불을 밝혔다.');
-      return D('부두 끝 등불','가림판이 열리자 물 위에 금빛 한 줄이 비친다. 등대지기가 우편정을 향해 손을 든다.');
+      return {fieldNotice:'등대지기가 밝힌 등잔을 들고 부두 끝으로 향한다.'};
+    },
+    keeper_round: function(s){
+      if(s.scene==='harbor'&&s.lampReady)return {fieldNotice:'등대지기가 빛이 보이는지 확인하러 나선다.',round:true};
+      return null;
     },
     g_distilled: function(s){
       if(s.scene!=='salt'||!s.flask||s.gate)return null;

@@ -3,7 +3,7 @@
   'use strict';
   const scenes = {
     harbor: {name:'우편선 선착장', spawn:[100,170],
-      spots:{chief:['오 국장',[62,137],[78,145]],keeper:['등대지기',[144,127],[162,131]],post:['우체국',[40,123],[48,147]],bench:['작업대',[179,172],[143,190]],boat:['우편정',[323,97],[258,119]],board:['항로 게시판',[117,119],[117,126]],chain:['사슬 더미',[76,156],[80,163]],zinc:['정비 상자',[205,117],[205,127]]}},
+      spots:{chief:['오 국장',[62,137],[78,145]],get keeper(){const {x,y}=PierYard.keeper;return ['등대지기',[x,y],[x+17,y+4]];},post:['우체국',[40,123],[48,147]],bench:['작업대',[179,172],[143,190]],boat:['우편정',[323,97],[258,119]],board:['항로 게시판',[117,119],[117,126]],chain:['사슬 더미',[76,156],[80,163]],zinc:['정비 상자',[205,117],[205,127]]}},
     yard: {name:'우체국 작업마당',spawn:[55,151],
       spots:{exit:['부두로 난 길',[32,136],[41,147]],frame:['나무틀',[82,121],[83,139]],still:['증류 작업대',[210,90],[210,127]],pane:['유리판',[286,119],[282,138]]}},
     mine: {name:'붉은 만 · 옛 광산',spawn:[317,150],
@@ -13,7 +13,7 @@
   };
   // Bounds in the same 384 × 216 grid as the paintings. Keep bare walkways outside them.
   const objects = {
-    harbor:{post:[15,78,39,57],chief:[55,115,16,27],keeper:[136,105,17,27],bench:[147,164,68,34],boat:[267,68,108,60],board:[106,105,23,20],chain:[62,144,29,22],zinc:[191,103,29,23]},
+    harbor:{post:[15,78,39,57],chief:[55,115,16,27],get keeper(){const {x,y}=PierYard.keeper;return [x-12,y-23,25,28];},bench:[147,164,68,34],boat:[267,68,108,60],board:[106,105,23,20],chain:[62,144,29,22],zinc:[191,103,29,23]},
     yard:{exit:[15,110,31,36],frame:[66,103,29,23],still:[177,78,65,37],pane:[272,99,29,28]},
     mine:{winch:[10,96,87,72],wreck:[173,113,113,53],boat:[300,100,82,47]},
     salt:{gate:[1,78,102,71],shed:[185,49,132,83],boat:[321,76,62,46],rain:[173,114,27,26],brine:[119,120,30,23]}
@@ -83,7 +83,13 @@
     alignCamera(true);positionObjects();
   }
   function alignCamera(reset=false){
-    const desired=reset?px-width/2:Math.min(px-width*.32,Math.max(px-width*.68,camera));
+    let desired=reset?px-width/2:Math.min(px-width*.32,Math.max(px-width*.68,camera));
+    if(id==='harbor'&&!reset&&!held.size&&!padDirection&&!route.length){
+      const keeper=PierYard.keeper;
+      if(keeper.mode!=='waiting'&&keeper.mode!=='post'&&Math.abs(keeper.x-px)<width*.5){
+        desired=Math.max(keeper.x-width*.79,Math.min(keeper.x-width*.21,desired));
+      }
+    }
     camera=snap(Math.max(0,Math.min(W-width,desired)));
   }
   function present(key){
@@ -114,6 +120,7 @@
     for(const key of Object.keys(scene.spots)){
       const b=document.createElement('button');
       b.type='button';b.className='object';b.dataset.spot=key;
+      if(key==='keeper')b.style.zIndex='1';
       const label=document.createElement('span');label.className='caption';label.setAttribute('aria-hidden','true');b.append(label);
       b.onclick=()=>moveToSpot(key);
       controls.append(b);
@@ -237,7 +244,8 @@
   }
   function frame(ts){
     if(!active)return;
-    const dt=Math.max(0,Math.min(.08,(ts-lastFrame)/1000));lastFrame=ts;
+    const elapsed=Math.max(0,(ts-lastFrame)/1000),dt=Math.min(.08,elapsed);lastFrame=ts;
+    const keeperMoved=id==='harbor'&&PierYard.tickKeeper(Math.min(1,elapsed),s.lampReady,document.hidden||paused||request==='keeper',reduced.matches);
     const oldX=px,oldY=py;
     movement(dt);
     const distance=Math.hypot(px-oldX,py-oldY),moving=distance>.015;
@@ -250,18 +258,18 @@
       const key=request,look=scene.spots[key][1];request=null;
       orient(look[0]-px,look[1]-py);onSpot(key);
     }
-    const oldCamera=camera;alignCamera();if(oldCamera!==camera)positionObjects();updateNearby();
+    const oldCamera=camera;alignCamera();if(oldCamera!==camera||keeperMoved)positionObjects();updateNearby();
     const image=textures[id];if(loaded(image)){ctx.drawImage(image,-camera,0,W,H);weather(reduced.matches?0:ts/1000,image);}else{ctx.fillStyle='#164b59';ctx.fillRect(0,0,width,H);}
     if(target&&route.length){
       const [x,y]=target;rect(x-3,y,2,1,'#f2daa5');rect(x+2,y,2,1,'#f2daa5');
       rect(x-1,y+1,3,1,'#ffe9b4');
     }
+    if(id==='harbor')PierYard.beacon(ctx,camera,reduced.matches?0:ts/1000);
     const residents=id==='harbor'?PierYard.residents:[];
     const time=reduced.matches?0:ts/1000;
     for(const person of residents)if(person.y<=py)PierYard.person(ctx,camera,person,time);
     actor(moving);
     for(const person of residents)if(person.y>py)PierYard.person(ctx,camera,person,time);
-    if(id==='harbor'&&s.lampReady)PierYard.beacon(ctx,camera,time);
     raf=requestAnimationFrame(frame);
   }
   canvas.addEventListener('pointerdown',e=>{
@@ -313,9 +321,11 @@
     else if(e.code==='KeyE'||(e.code==='Space'&&e.target.tagName!=='BUTTON')){e.preventDefault();if(!e.repeat&&nearKey)moveToSpot(nearKey);}});
   addEventListener('keyup',e=>held.delete(keys[e.code]));addEventListener('blur',()=>{stopPad();held.clear();});
   addEventListener('resize',size);
+  document.addEventListener('visibilitychange',()=>{lastFrame=performance.now();});
   window.World={scenes,start(state,cb){s=state;onSpot=cb;active=true;paused=false;this.enter(state.scene);cancelAnimationFrame(raf);lastFrame=performance.now();raf=requestAnimationFrame(frame);},
     enter(key,arriving=false){
       s.scene=key;id=key;scene=scenes[key];loadScene(key);overview=false;
+      if(key==='harbor')PierYard.enterHarbor(s.lampReady);
       const spawn=arriving&&key==='harbor'?scene.spots[arriving==='post'?'post':'boat'][2]:scene.spawn;
       [px,py]=Walkways[id].floor(spawn,Infinity);walkPhase=0;wasWalking=false;stopPad();face=arriving?'left':'down';route=[];request=null;target=null;held.clear();mountObjects();size();
     },

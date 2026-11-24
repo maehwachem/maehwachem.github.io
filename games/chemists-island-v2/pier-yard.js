@@ -19,17 +19,103 @@
     '   fhannnraho','   olGGGGGaao','    oddddddo','    oddodddo',
     '    oddodddo','   okkkokkko','   oooo oooo'
   ],{o:outline,n:'#315777',b:'#527898',G:'#dfb05e',l:'#62513e',h:'#9d6c49',f:'#e8b283',e:'#453e44',s:'#bc7e5d',g:'#a5a59b',w:'#eadcbc',a:'#834f37',r:'#b37e4b',d:'#374551',k:'#5f4a3e'});
-  const keeper=sprite([
+  const keeperPalette={o:outline,r:'#9d4c33',t:'#cf7242',l:'#7b624c',f:'#e3b587',s:'#856c4c',h:'#ab7754',e:'#403d43',g:'#c1bd9f',y:'#c49a4c',u:'#e0b968',d:'#465b59',k:'#5d4840',b:'#5a5150'};
+  const keeperFront=sprite([
     '     ooooo','    orrrrrro','   orrtttttro','   otoooootto',
     '    lfffsfho','    lfeffeh','    lggfggg','     oggggo',
     '    oyuuyyo','   oyuyyyuyoo','  otuyytyyyoho','  osuyysyyosfo',
     '  ofoyysyyob o','   oosssssobgbo','    odddddobuf','    oddoddoooo',
     '    oddoddo','   okkkokkk','   oooo oooo'
-  ],{o:outline,r:'#9d4c33',t:'#cf7242',l:'#7b624c',f:'#e3b587',s:'#856c4c',h:'#ab7754',e:'#403d43',g:'#c1bd9f',y:'#c49a4c',u:'#e0b968',d:'#465b59',k:'#5d4840',b:'#5a5150'});
-  const residents=[{x:144,y:127,art:keeper},{x:62,y:139,art:chief}];
+  ],keeperPalette);
+  // The bends skirt the repair chest and keep both feet on the boardwalk.
+  const path=[[144,127],[164,123],[188,129],[210,130],[224,123]];
+  const hook={x:230,y:105};
+  const keeper={x:144,y:127,art:keeperFront,mode:'waiting',direction:1,distance:0,moving:false,reach:0};
+  const residents=[keeper,{x:62,y:139,art:chief}];
+  let stops=[];
+  function enterHarbor(lit){
+    [keeper.x,keeper.y]=lit?path[path.length-1]:path[0];
+    Object.assign(keeper,{mode:lit?'post':'waiting',direction:1,distance:0,moving:false,reach:0});
+    stops=[];
+  }
+  function startRound(){
+    if(keeper.mode!=='post')return;
+    stops=path.slice(0,-1).reverse().concat(path.slice(1));
+    keeper.mode='round';keeper.distance=0;
+  }
+  function tickKeeper(dt,lit,blocked,reduced){
+    keeper.moving=false;
+    if(!lit)return false;
+    if(keeper.mode==='waiting'){
+      stops=path.slice(1);keeper.mode='carry';
+    }
+    if(blocked||keeper.mode==='post')return false;
+    if(reduced){enterHarbor(true);return true;}
+    if(!stops.length){
+      keeper.reach=Math.min(1,keeper.reach+dt/1.1);
+      if(keeper.reach===1)keeper.mode='post';
+      return false;
+    }
+    let budget=22*dt;
+    while(budget>0&&stops.length){
+      const [tx,ty]=stops[0],dx=tx-keeper.x,dy=ty-keeper.y;
+      const gap=Math.hypot(dx,dy),step=Math.min(budget,gap);
+      if(dx)keeper.direction=Math.sign(dx);
+      if(gap){keeper.x+=dx*step/gap;keeper.y+=dy*step/gap;}
+      keeper.distance+=step;budget-=step;
+      if(step===gap){keeper.x=tx;keeper.y=ty;stops.shift();}
+    }
+    keeper.moving=stops.length>0;
+    if(!keeper.moving){
+      keeper.mode=keeper.mode==='carry'?'hang':'check';keeper.reach=0;
+    }
+    return true;
+  }
+  // Two steps per twelve world pixels. The trailing foot lifts at the passing pose.
+  function keeperStep(distance){
+    if(distance<=0)return {near:{dx:0,lift:0},far:{dx:0,lift:0},bob:0,arm:0};
+    const phase=Math.floor(distance/2)%6,k=phase%3,second=phase>=3;
+    const lead={dx:[2,1,-1][k],lift:0},trail={dx:[-2,-1,1][k],lift:k===1?1:0};
+    const arm=[1,0,-1][k];
+    return {near:second?trail:lead,far:second?lead:trail,bob:k===1?-1:0,arm:second?-arm:arm};
+  }
+  const profile=sprite([
+    '   oooo','  orrrro',' orttttro',' otoootttoo',
+    '  lfffee','  lgffeff','   lggfg','   oggg',
+    '  ouyyuo',' ouyytuyo',' ouysyyyo','  oysyyoo','  ossssso'
+  ],keeperPalette);
+  function lamp(ctx,x,y){
+    ctx.fillStyle='#494246';ctx.fillRect(x-2,y-4,4,1);ctx.fillRect(x-3,y-3,6,6);
+    ctx.fillStyle='#ffa953';ctx.fillRect(x-2,y-2,4,4);ctx.fillStyle='#fff1a1';ctx.fillRect(x-1,y-2,2,3);
+  }
+  function keeperProfile(ctx,camera){
+    const pose=keeperStep(keeper.moving?keeper.distance:0);
+    const reach=keeper.mode==='hang'?keeper.reach:keeper.mode==='check'?Math.sin(Math.PI*keeper.reach):0;
+    ctx.save();ctx.translate(Math.round(keeper.x)-camera,Math.round(keeper.y));ctx.scale(keeper.direction*1.12,1.12);
+    function leg(pose,x,cloth,boot){
+      const dx=x+pose.dx,foot=-pose.lift;
+      ctx.fillStyle=cloth;ctx.fillRect(x,-7,3,3);ctx.fillRect(dx,-5,3,5+foot);
+      ctx.fillStyle=boot;ctx.fillRect(dx,foot-2,4,2);
+    }
+    leg(pose.far,-2,'#354846','#483f39');leg(pose.near,0,'#526763','#634b3c');
+    ctx.drawImage(profile,-6,-19+pose.bob);
+    ctx.fillStyle='#a97e3e';ctx.fillRect(-3-pose.arm,-10+pose.bob,3,4);
+    ctx.fillStyle='#dcaf7f';ctx.fillRect(-3-pose.arm,-7+pose.bob,2,2);
+    const handY=-9-Math.round(reach*8);
+    ctx.fillStyle='#bb924c';ctx.fillRect(2,-11+pose.bob,3,3);ctx.fillRect(4,Math.min(-10,handY),2,Math.abs(handY+10)+2);
+    ctx.fillStyle='#e2b985';ctx.fillRect(5,handY,2,2);
+    ctx.restore();
+    if(keeper.mode==='carry'||keeper.mode==='hang'){
+      const lift=keeper.mode==='hang'?keeper.reach:0;
+      lamp(ctx,Math.round(keeper.x+7-lift)-camera,Math.round(keeper.y-8-10*lift));
+    }
+  }
   function person(ctx,camera,p,time){
     const x=p.x-camera, art=p.art;
     ctx.save();ctx.fillStyle='#382f3c55';ctx.beginPath();ctx.ellipse(x,p.y,5.9,1.65,0,0,2*Math.PI);ctx.fill();
+    if(p===keeper&&p.mode!=='waiting'){
+      ctx.restore();keeperProfile(ctx,camera);return;
+    }
     const scale=1.12;
     // A brief shift of the upper body leaves both feet planted.
     const cut=14,shift=time&&Math.sin(time*1.65+p.x)>.86?.55:0;
@@ -39,11 +125,13 @@
     ctx.restore();
   }
   function beacon(ctx,camera,t){
-    ctx.save();ctx.translate(230-camera,113);
-    ctx.fillStyle='#f9c45a30';ctx.beginPath();ctx.moveTo(1,-9);ctx.lineTo(34,-4);ctx.lineTo(42,0);ctx.closePath();ctx.fill();
-    ctx.fillStyle='#594535';ctx.fillRect(-1,-8,2,11);ctx.fillRect(-3,-13,6,6);
-    ctx.fillStyle='#ffdc82';ctx.fillRect(-2,-12,4,4);ctx.fillStyle='#fff4c5';ctx.fillRect(-1,-12,2,3);
-    ctx.fillStyle='#ead98c75';ctx.fillRect(16+Math.round(Math.sin(t)),4,8,1);ctx.restore();
+    const x=hook.x-camera,y=hook.y;
+    ctx.fillStyle='#513f32';ctx.fillRect(x-5,y-4,2,17);ctx.fillRect(x-5,y-5,6,2);ctx.fillRect(x,y-4,1,2);
+    if(!['post','round','check'].includes(keeper.mode))return;
+    ctx.save();ctx.translate(x,y);
+    ctx.fillStyle='#f9c45a30';ctx.beginPath();ctx.moveTo(1,1);ctx.lineTo(34,7);ctx.lineTo(42,11);ctx.closePath();ctx.fill();
+    lamp(ctx,0,0);
+    ctx.fillStyle='#ead98c75';ctx.fillRect(16+Math.round(Math.sin(t)),15,8,1);ctx.restore();
   }
   function paint(ctx,camera,state){
     ctx.save();ctx.translate(-camera,0);
@@ -78,5 +166,5 @@
     rect(26,150,2,10,'#71553b');polygon([[18,148],[22,145],[34,145],[34,150],[22,151]],'#e1bc83','#6d503a');
     ctx.restore();ctx.restore();
   }
-  window.PierYard={residents,person,paint,beacon};
+  window.PierYard={residents,keeper,enterHarbor,startRound,tickKeeper,person,paint,beacon};
 })();

@@ -143,6 +143,10 @@
   }
   function navigate(old,view){
     save();hud();
+    if(view?.fieldNotice){
+      if(view.round)PierYard.startRound();
+      pickup({text:view.fieldNotice});$('world').focus({preventScroll:true});return;
+    }
     if(old===state.scene){if(view?.pickup)pickup(view);else drawDialog(view,choose);return;}
     clearNotice();
     if(old==='yard'||state.scene==='yard'){
@@ -159,7 +163,7 @@
       drawDialog({title:'부표가 다시 섰다',text:'이제 원래 항해로 돌아갈 수 있어요.',choices:[{id:'resume',label:'원래 항해로'},{id:'close',label:'부두 더 둘러보기'}]},resume);
       return;
     }
-    const view=Voyage.interact(state,key);save();hud();
+    const view=Voyage.interact(state,key,PierYard.keeper.mode);save();hud();
     if(view?.pickup)pickup(view);else drawDialog(view,choose);
   }
   function start(asTrial=false){
