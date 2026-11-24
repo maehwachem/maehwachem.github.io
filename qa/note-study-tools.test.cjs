@@ -99,3 +99,8 @@ test('visual editor applies a draft once without changing coordinates and reject
  assert.equal(c.applyTapeAppearance(),true);assert.equal(writes,1);assert.equal(p.tapes[0].x,7.889471);assert.equal(p.tapes[0].width,105.12295);assert.equal(old.color,'#5143a4');
  assert.equal(c.applyTapeAppearance(),false);assert.equal(writes,1);c.tapeDraft=null;assert.equal(c.applyTapeAppearance(),false);
 });
+test('thin tape grips sit outside the movable body and flip sides near paper edges',()=>{
+ const c=setup();assert.equal(typeof c.tapeGripPositions,'function');const tape={x:100,y:100,width:160,height:26};const a=c.tapeGripPositions(tape,36,6);
+ assert.ok(a.x.left>=tape.x+tape.width);assert.ok(a.y.top>=tape.y+tape.height);
+ const edge={x:600,y:984,width:160,height:26};const b=c.tapeGripPositions(edge,36,6);assert.ok(b.x.left+36<=edge.x);assert.ok(b.y.top+36<=edge.y);
+});
