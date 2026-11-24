@@ -219,6 +219,9 @@ body.has-delete-undo .toast{bottom:calc(var(--note-footer-height,48px) + 72px)}
 
 .annotation .text-line{display:block;min-height:1.25em;line-height:1.25;white-space:pre}.annotation .text-run{white-space:pre;text-underline-offset:.12em;text-decoration-thickness:.0625em}.annotation[data-locked=true].selected{outline-style:solid;outline-color:#8a7899}.text-resize{position:absolute;z-index:2;display:grid;place-items:center;border:1px solid #8974bd;border-radius:7px;background:#fffdf8;color:var(--deep);cursor:ew-resize;touch-action:none;pointer-events:auto;font-size:16px;line-height:1}.paper:not(:is([data-tool=select],[data-tool=text])) .text-resize{display:none}.tool-status-actions{display:flex;gap:7px;flex:none}.text-editor{width:min(520px,calc(100% - 24px));overflow:auto}.text-format-controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap;border:1px solid #e5deec;border-radius:8px;padding:8px 10px;margin:12px 0}.text-format-controls legend{font-size:12px;font-weight:700}.text-format-controls label{display:flex;gap:5px;align-items:center;min-height:36px;white-space:nowrap}.text-format-controls select{font-size:16px;min-height:36px;border:1px solid #ddd6e6;border-radius:6px;background:white}.text-lock-option{display:flex;align-items:center;gap:6px;min-height:36px;margin-top:8px;font-weight:650}.text-box-list{width:min(620px,calc(100% - 24px));padding:16px;overflow:auto}.text-box-list #textBoxList{display:grid;gap:8px;margin-top:12px}.text-list-row{display:grid;grid-template-columns:minmax(0,1fr);gap:6px;padding:10px;border:1px solid #e3dcec;border-radius:8px;background:#fcfbf8}.text-list-row strong{overflow-wrap:anywhere;white-space:pre-wrap;font-size:13px}.text-list-row small{color:var(--muted);font-size:11px}.text-list-actions{display:flex;gap:6px;flex-wrap:wrap}.text-list-actions button{min-height:36px;padding:4px 10px;font-size:12px;border:1px solid #ded7e8;border-radius:6px}.text-list-actions button:hover{background:var(--tint)}.text-list-actions button[data-list-action=delete]{color:#a43443}.text-list-actions button[aria-pressed=true]{background:var(--tint);color:var(--deep)}
 @media(max-width:450px){.text-format-controls{gap:7px}.text-editor{padding:14px}.text-box-list{padding:12px}.tool-status-actions{gap:2px}.tool-status{gap:3px}}
+
+.tool-status .toolbar-move{display:inline-flex;align-items:center;justify-content:center;gap:3px;flex:none;min-height:32px;padding:2px 6px;border:1px solid #ded5eb;border-radius:7px;text-decoration:none;font-weight:650;color:var(--deep);background:#fffefa;cursor:grab;touch-action:none;user-select:none}.toolbar-move span{font-size:18px;line-height:1}.tool-status .current-tool{flex:1}.bar-zone.is-floating{position:fixed;z-index:7;box-sizing:border-box;padding:7px;border:1px solid #d9cfea;border-radius:13px;background:#fffefa;box-shadow:0 7px 28px #30254c30;overflow:auto;overscroll-behavior:contain;justify-content:flex-start;gap:5px}.bar-zone.is-floating .toolbar{flex:none;box-shadow:none}.bar-zone.is-floating .tool-status{order:-1;position:sticky;top:0;z-index:1;background:#fffefa;flex:none;padding:0;min-height:34px;gap:4px}.bar-zone.is-floating .tool-status-actions{gap:2px}.bar-zone.is-floating .tool-status button:not(.toolbar-move){padding-inline:3px}.bar-zone.is-moving .toolbar-move{cursor:grabbing;background:var(--tint)}.bar-zone.is-moving{user-select:none}.bar-zone.is-floating #toolbarReset{font-weight:700;text-decoration:none;border:1px solid #ded5eb;border-radius:6px;min-height:32px;padding-inline:5px}
+@media(max-width:375px){.tool-status .toolbar-move{font-size:10px;padding-inline:4px}.bar-zone.is-floating .current-tool{font-size:10px}}
 </style>
 </head>
 <body>
@@ -285,7 +288,7 @@ body.has-delete-undo .toast{bottom:calc(var(--note-footer-height,48px) + 72px)}
       </div>
     </section>
     <section class="workspace" aria-label="필기 공간">
-      <div class="bar-zone">
+      <div class="bar-zone" id="toolbarPanel">
         <div class="toolbar" role="toolbar" aria-label="필기 도구">
           <div class="tool-group" id="tools">
             <button class="tool labeled-tool" data-tool="select" aria-label="선택·이동" title="선택·이동 (V)"><span data-icon="hand"></span><span class="tool-label">선택</span></button>
@@ -306,7 +309,7 @@ body.has-delete-undo .toast{bottom:calc(var(--note-footer-height,48px) + 72px)}
             <button id="redo" class="tool" data-icon="redo" aria-label="다시 실행" title="다시 실행"></button>
           </div>
         </div>
-        <div class="tool-status"><span class="current-tool"><i id="currentToolColor" aria-hidden="true"></i><span id="currentToolStatus"></span></span><span class="tool-status-actions"><button id="textBoxesButton" aria-haspopup="dialog" aria-label="현재 페이지 텍스트 상자 목록">상자 목록</button><button id="toolHelp" aria-haspopup="dialog">도구 안내</button></span></div>
+        <div class="tool-status"><button id="toolbarMove" class="toolbar-move" aria-label="도구모음 이동" aria-pressed="false" title="끌어서 이동 · 방향키로 이동 · Home으로 원위치"><span aria-hidden="true">⠿</span> 도구 이동</button><span class="current-tool"><i id="currentToolColor" aria-hidden="true"></i><span id="currentToolStatus"></span></span><span class="tool-status-actions"><button id="toolbarReset" aria-label="도구모음 원래 위치" title="도구모음을 위쪽 원래 위치로" hidden>원위치</button><button id="textBoxesButton" aria-haspopup="dialog" aria-label="현재 페이지 텍스트 상자 목록">상자 목록</button><button id="toolHelp" aria-haspopup="dialog">도구 안내</button></span></div>
       </div>
       <div class="shape-menu" id="shapeMenu" role="group" aria-label="도형 종류" hidden>
         <button type="button" data-shape="line">직선</button><button type="button" data-shape="arrow">화살표</button>
@@ -368,6 +371,7 @@ body.has-delete-undo .toast{bottom:calc(var(--note-footer-height,48px) + 72px)}
   <p>도구를 고른 뒤 <strong>굵기·색 설정</strong>을 열어 조절해요. 각 도구의 굵기와 색을 따로 기억하고, 자주 쓰는 설정은 3개까지 저장할 수 있어요.</p>
   <p><strong>텍스트 상자 삭제:</strong> 텍스트 도구로 기존 상자를 누른 뒤 ‘텍스트 상자 삭제’를 누르세요. 선택·이동 도구에서는 상자를 선택해 ‘삭제’를 눌러도 돼요. 삭제한 상자는 실행 취소로 되돌릴 수 있어요.</p>
   <p>상자 오른쪽 ↔ 손잡이를 끌거나, 손잡이에 초점을 두고 좌우 방향키로 너비를 바꿔요(Shift는 1px씩). 편집창에서는 굵게·밑줄·정렬과 너비를 바꿀 수 있어요. 배치 잠금은 위치·너비를 고정하고 올가미에서 제외해요. ‘상자 목록’에서 현재 페이지의 상자를 찾아 수정·잠금·삭제할 수 있어요.</p>
+  <p><strong>도구모음 이동:</strong> ‘도구 이동’ 손잡이를 끌면 원하는 곳에 놓을 수 있어요. 손잡이를 누른 뒤 방향키로도 옮길 수 있고, Shift를 누르면 1px씩 조절해요. ‘원위치’나 손잡이의 Home 키로 위쪽에 돌려놓아요. 위치는 이 브라우저에 기억해요.</p>
   <label class="dialog-label"><input id="toolShortcuts" type="checkbox" checked> 도구 단축키 사용</label>
   <table class="shortcut-table"><caption>키보드 단축키</caption><tbody><tr><th scope="row">P / H / E</th><td>펜 / 형광펜 / 부분 지우개</td></tr><tr><th scope="row">T / L / V</th><td>텍스트 / 올가미 / 선택·이동</td></tr><tr><th scope="row">S</th><td>마지막에 쓴 도형</td></tr><tr><th scope="row">1 / 2 / 3</th><td>자주 쓰는 설정 불러오기</td></tr><tr><th scope="row">[ / ]</th><td>굵기 줄이기 / 늘리기</td></tr><tr><th scope="row">Ctrl·⌘ + Z</th><td>실행 취소 (Shift로 다시 실행)</td></tr></tbody></table>
   <p>입력칸·대화창과 필기 중에는 도구 단축키가 작동하지 않아요. 부분 지우개는 그린 선만 지우며 사진·PDF·텍스트는 지우지 않아요. 손가락으로 쓰려면 ‘손가락 켜짐’을 선택하세요.</p>
@@ -616,6 +620,35 @@ function restoreToolFavorite(preferences, favorite) {
   if (clean.tool === 'shape') preferences.shapeKind = clean.shape;
   return clean.tool;
 }
+const toolbarLayoutKey = 'jeongi-note-toolbar-layout-v1';
+function parseToolbarLayout(raw) {
+  let input;
+  try { input = typeof raw === 'string' ? JSON.parse(raw) : raw; } catch { input = null; }
+  return { floating: input?.floating === true,
+    x: Number.isFinite(input?.x) ? clamp(input.x, 0, 1) : .5,
+    y: Number.isFinite(input?.y) ? clamp(input.y, 0, 1) : .12 };
+}
+function loadToolbarLayout() {
+  try { return parseToolbarLayout(localStorage.getItem(toolbarLayoutKey)); }
+  catch { return parseToolbarLayout(null); }
+}
+function clampToolbarPoint(point, size, bounds) {
+  return { left: clamp(point.left, bounds.left, bounds.left + Math.max(0, bounds.width - size.width)),
+    top: clamp(point.top, bounds.top, bounds.top + Math.max(0, bounds.height - size.height)) };
+}
+function toolbarPreferenceAt(box, bounds) {
+  return { floating: true,
+    x: bounds.width > box.width ? clamp((box.left - bounds.left) / (bounds.width - box.width), 0, 1) : 0,
+    y: bounds.height > box.height ? clamp((box.top - bounds.top) / (bounds.height - box.height), 0, 1) : 0 };
+}
+function toolbarPointFromPreference(preference, size, bounds) {
+  return { left: bounds.left + Math.max(0, bounds.width - size.width) * preference.x,
+    top: bounds.top + Math.max(0, bounds.height - size.height) * preference.y };
+}
+let toolbarLayout = loadToolbarLayout();
+let toolbarDrag = null;
+let toolbarClickSuppressed = false;
+let toolbarLayoutFrame = 0;
 function parseState(raw) {
   const input = typeof raw === 'string' ? JSON.parse(raw) : raw;
   if (!input || !Array.isArray(input.notes) || !input.notes.length || input.notes.length > 1000) throw Error('invalid notes');
@@ -766,7 +799,7 @@ window.addEventListener('pagehide', persist);
 document.addEventListener('visibilitychange', () => { if (document.hidden) persist(); });
 window.addEventListener('storage', (event) => {
   if (event.key !== key || event.newValue === lastStored) return;
-  if (dirty || active || drag || lasso || touches.size || textTarget || textListTarget || fileJob || protectedStorage || !event.newValue) {
+  if (dirty || active || drag || toolbarDrag || lasso || touches.size || textTarget || textListTarget || fileJob || protectedStorage || !event.newValue) {
     saveStatus('다른 탭에서 변경됨 · 백업 필요', true);
     return;
   }
@@ -1254,7 +1287,7 @@ function toolbarShortcut(event, suspended = false) {
   return '';
 }
 function runToolbarShortcut(event) {
-  const action = toolbarShortcut(event, !toolPreferences.shortcuts || !!(active || drag || lasso || fileJob || touches.size || document.querySelector('dialog[open]') || menus.some(([,menu]) => !$(menu).hidden)));
+  const action = toolbarShortcut(event, !toolPreferences.shortcuts || !!(active || drag || toolbarDrag || lasso || fileJob || touches.size || document.querySelector('dialog[open]') || menus.some(([,menu]) => !$(menu).hidden)));
   if (!action) return false;
   const [kind, value] = action.split(':');
   if (kind === 'width' && !Object.hasOwn(toolLimits, tool)) return false;
@@ -1313,6 +1346,7 @@ function setSidebar(open) {
   if (open) $('addNote').focus();
 }
 function setFocusMode(value) {
+  finishToolbarDrag(false);
   finishDrawing();
   resetLasso(true);
   showMenu();
@@ -1325,6 +1359,7 @@ function setFocusMode(value) {
   $('focusToggle').title = label + (focusMode ? ' · Esc로 종료' : '');
   updateSidebarAccess();
   $('focusToggle').focus();
+  scheduleToolbarLayout();
 }
 function point(event) {
   const rect = sheet.getBoundingClientRect();
@@ -1719,6 +1754,11 @@ function startTouch(event) {
   }
 }
 scroller.addEventListener('pointerdown', (event) => {
+  if (toolbarDrag) {
+    if (event.pointerType === 'touch' && toolbarDrag.source === 'touch') finishToolbarDrag(false);
+    event.preventDefault();
+    return;
+  }
   if (event.pointerType === 'touch') { startTouch(event); return; }
   if (event.target !== sheet || (event.button !== 0 && !(event.pointerType === 'pen' && event.button === 5))) return;
   if (event.pointerType === 'pen') {
@@ -1899,7 +1939,7 @@ function isTextDeleteKey(event) {
     !event.target?.closest?.('input,textarea,select,dialog,[contenteditable],[role="textbox"],[role="dialog"]');
 }
 function deleteTextShortcut(event) {
-  if (!isTextDeleteKey(event) || !['select','text'].includes(tool) || active || drag || lasso || fileJob || touches.size ||
+  if (!isTextDeleteKey(event) || !['select','text'].includes(tool) || active || drag || toolbarDrag || lasso || fileJob || touches.size ||
       document.querySelector('dialog[open]') || menus.some(([,menu]) => !$(menu).hidden)) return false;
   const itemId = event.target.closest('.annotation')?.dataset.id ?? selected;
   if (!currentPage().texts.some((item) => item.id === itemId)) return false;
@@ -2033,7 +2073,7 @@ function resizeCurrentText(requested) {
 }
 function startTextTransform(event, mode) {
   const item = currentItem();
-  if (!event.isPrimary || event.button !== 0 || !item || item.locked || active || drag || lasso || fileJob || touches.size) return;
+  if (!event.isPrimary || event.button !== 0 || !item || item.locked || active || drag || toolbarDrag || lasso || fileJob || touches.size) return;
   event.preventDefault();
   event.stopPropagation();
   drag = { mode, source: event.pointerType, pointer: event.pointerId, start: point(event), item, page: currentPage(), handle: event.currentTarget, target: null };
@@ -3149,6 +3189,143 @@ const actions = {
     });
   }
 };
+function toolbarBounds() {
+  const area = document.querySelector('.workspace').getBoundingClientRect();
+  const footer = document.querySelector('.bottom-bar').getBoundingClientRect();
+  const view = window.visualViewport;
+  const visible = { left: view?.offsetLeft ?? 0, top: view?.offsetTop ?? 0,
+    right: (view?.offsetLeft ?? 0) + (view?.width ?? window.innerWidth),
+    bottom: (view?.offsetTop ?? 0) + (view?.height ?? window.innerHeight) };
+  const left = Math.max(area.left, visible.left) + 8;
+  const top = Math.max(area.top, visible.top) + 6;
+  return { left, top, width: Math.max(1, Math.min(area.right, visible.right) - left - 8),
+    height: Math.max(1, Math.min(footer.top, visible.bottom) - top - 6) };
+}
+function applyToolbarLayout(point = null) {
+  const panel = $('toolbarPanel');
+  panel.classList.toggle('is-floating', toolbarLayout.floating);
+  $('toolbarMove').setAttribute('aria-pressed', toolbarLayout.floating);
+  $('toolbarReset').hidden = !toolbarLayout.floating;
+  if (!toolbarLayout.floating) {
+    for (const key of ['left','top','width','max-height']) panel.style.removeProperty(key);
+    panel.scrollTop = 0;
+    return panel.getBoundingClientRect();
+  }
+  const bounds = toolbarBounds();
+  panel.style.width = Math.min(440, bounds.width) + 'px';
+  panel.style.maxHeight = bounds.height + 'px';
+  const size = panel.getBoundingClientRect();
+  const desired = point ?? toolbarPointFromPreference(toolbarLayout, size, bounds);
+  const at = clampToolbarPoint(desired, size, bounds);
+  panel.style.left = at.left + 'px';
+  panel.style.top = at.top + 'px';
+  return panel.getBoundingClientRect();
+}
+function saveToolbarLayout() {
+  try { localStorage.setItem(toolbarLayoutKey, JSON.stringify(toolbarLayout)); return true; }
+  catch { toast('도구 위치는 이번 화면에서만 기억해요. 저장 공간을 확인해 주세요.'); return false; }
+}
+function resetToolbarLayout() {
+  finishToolbarDrag(false);
+  toolbarLayout = { floating: false, x: .5, y: .12 };
+  showMenu();
+  applyToolbarLayout();
+  saveToolbarLayout();
+  $('toolbarMove').focus();
+  toast('도구모음을 위쪽 원래 위치로 돌렸어요.');
+}
+function startToolbarDrag(event) {
+  if (!event.isPrimary || event.button !== 0 || toolbarDrag || fileJob || document.querySelector('dialog[open]')) return;
+  finishDrawing();
+  finishTextTransform(false);
+  finishLasso(false);
+  showMenu();
+  event.preventDefault();
+  event.stopPropagation();
+  const handle = $('toolbarMove').getBoundingClientRect();
+  toolbarClickSuppressed = false;
+  toolbarDrag = { pointer: event.pointerId, source: event.pointerType, startX: event.clientX, startY: event.clientY,
+    grabX: event.clientX - handle.left, grabY: event.clientY - handle.top, before: { ...toolbarLayout }, moved: false };
+  $('toolbarMove').setPointerCapture(event.pointerId);
+}
+function moveToolbarDrag(event) {
+  if (!toolbarDrag || toolbarDrag.pointer !== event.pointerId) return;
+  const gesture = toolbarDrag;
+  if (!gesture.moved) {
+    if (Math.hypot(event.clientX - gesture.startX, event.clientY - gesture.startY) < 5) return;
+    gesture.moved = true;
+    toolbarLayout = { ...toolbarLayout, floating: true };
+    const panel = applyToolbarLayout();
+    const handle = $('toolbarMove').getBoundingClientRect();
+    gesture.origin = applyToolbarLayout({ left: gesture.startX - (handle.left - panel.left + gesture.grabX),
+      top: gesture.startY - (handle.top - panel.top + gesture.grabY) });
+    $('toolbarPanel').classList.add('is-moving');
+  }
+  applyToolbarLayout({ left: gesture.origin.left + event.clientX - gesture.startX,
+    top: gesture.origin.top + event.clientY - gesture.startY });
+}
+function finishToolbarDrag(commit = true) {
+  if (!toolbarDrag) return;
+  const gesture = toolbarDrag;
+  toolbarDrag = null;
+  toolbarClickSuppressed = gesture.moved;
+  $('toolbarPanel').classList.remove('is-moving');
+  if (!gesture.moved) return;
+  if (commit) {
+    toolbarLayout = toolbarPreferenceAt($('toolbarPanel').getBoundingClientRect(), toolbarBounds());
+    saveToolbarLayout();
+  } else {
+    toolbarLayout = { ...gesture.before };
+    applyToolbarLayout();
+  }
+}
+function endToolbarDrag(event) {
+  if (!toolbarDrag || toolbarDrag.pointer !== event.pointerId) return;
+  if (event.type === 'pointerup') moveToolbarDrag(event);
+  finishToolbarDrag(event.type === 'pointerup');
+  if ($('toolbarMove').hasPointerCapture(event.pointerId)) $('toolbarMove').releasePointerCapture(event.pointerId);
+}
+function scheduleToolbarLayout() {
+  if (toolbarLayoutFrame) return;
+  toolbarLayoutFrame = requestAnimationFrame(() => {
+    toolbarLayoutFrame = 0;
+    finishToolbarDrag(false);
+    applyToolbarLayout();
+  });
+}
+$('toolbarMove').addEventListener('pointerdown', startToolbarDrag);
+$('toolbarMove').addEventListener('pointermove', moveToolbarDrag);
+for (const name of ['pointerup','pointercancel','lostpointercapture']) $('toolbarMove').addEventListener(name, endToolbarDrag);
+$('toolbarMove').onclick = () => {
+  if (toolbarClickSuppressed) { toolbarClickSuppressed = false; return; }
+  if (!toolbarLayout.floating) {
+    toolbarLayout.floating = true;
+    showMenu();
+    applyToolbarLayout();
+    saveToolbarLayout();
+    toast('손잡이를 끌거나 방향키로 옮기세요. 원위치로 되돌릴 수 있어요.');
+  }
+};
+$('toolbarMove').addEventListener('keydown', (event) => {
+  if (event.isComposing || event.ctrlKey || event.metaKey || event.altKey || toolbarDrag) return;
+  if (event.key === 'Home') { event.preventDefault(); event.stopPropagation(); resetToolbarLayout(); return; }
+  const delta = { ArrowLeft: [-1,0], ArrowRight: [1,0], ArrowUp: [0,-1], ArrowDown: [0,1] }[event.key];
+  if (!delta) return;
+  event.preventDefault();
+  event.stopPropagation();
+  toolbarLayout.floating = true;
+  showMenu();
+  const box = applyToolbarLayout();
+  const step = event.shiftKey ? 1 : 10;
+  const at = applyToolbarLayout({ left: box.left + delta[0] * step, top: box.top + delta[1] * step });
+  toolbarLayout = toolbarPreferenceAt(at, toolbarBounds());
+  saveToolbarLayout();
+});
+$('toolbarReset').onclick = resetToolbarLayout;
+window.addEventListener('resize', scheduleToolbarLayout);
+window.addEventListener('blur', () => finishToolbarDrag(false));
+window.visualViewport?.addEventListener('resize', scheduleToolbarLayout);
+window.visualViewport?.addEventListener('scroll', scheduleToolbarLayout);
 const menus = [['mediaToggle','mediaMenu'], ['exportToggle','exportMenu'], ['docToggle','docMenu'], ['shapeToggle','shapeMenu'], ['toolSettingsToggle','toolSettings']];
 function showMenu(menuId = '') {
   for (const [toggle, menu] of menus) {
@@ -3187,6 +3364,7 @@ window.addEventListener('resize', () => { if (!$('shapeMenu').hidden || !$('tool
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
     if (document.querySelector('dialog[open]')) return;
+    if (toolbarDrag) { event.preventDefault(); finishToolbarDrag(false); return; }
     if (drag) { event.preventDefault(); finishTextTransform(false); return; }
     const open = menus.find(([,menu]) => !$(menu).hidden);
     if (open) { showMenu(); $(open[0]).focus(); }
@@ -3463,6 +3641,7 @@ setTool(tool);
 setColor(color, false);
 setInputMode();
 updateSidebarAccess();
+applyToolbarLayout();
 if (protectedStorage) saveStatus('저장 데이터 오류 · 백업 필요', true);
 else if (lastStored) saveStatus('저장됨');
 else queueSave();
