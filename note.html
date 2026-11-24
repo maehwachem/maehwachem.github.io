@@ -619,6 +619,11 @@ function tapeMenuPosition(tape, size, view, gap) {
   const desired=tape.y-size.height-gap>=view.top?tape.y-size.height-gap:tape.y+tape.height+gap;
   return {left:clamp(tape.x,view.left,Math.max(view.left,view.right-size.width)),top:clamp(desired,view.top,Math.max(view.top,view.bottom-size.height))};
 }
+function tapeGripPositions(tape, size, gap) {
+  const right=tape.x+tape.width+gap,left=tape.x-size-gap,below=tape.y+tape.height+gap,above=tape.y-size-gap;
+  return {x:{left:right+size<=width?right:left>=0?left:width-size,top:clamp(tape.y+tape.height/2-size/2,0,height-size)},
+    y:{left:clamp(tape.x+tape.width/2-size/2,0,width-size),top:below+size<=height?below:above>=0?above:height-size}};
+}
 function orderedTapes(page) { return [...(page.tapes ?? [])].sort((a,b)=>a.y-b.y || a.x-b.x); }
 const toolPreferenceKey = 'jeongi-note-tools-v1';
 const toolLimits = { pen: [1,20,3], marker: [4,48,12], eraser: [6,60,24], shape: [1,20,3] };
@@ -772,6 +777,7 @@ let selectedTape = null;
 let tapeDrag = null;
 let tapeTarget = null;
 let tapeDraft = null;
+let tapeActionFrame = 0;
 let pendingImageExport = null;
 let color = toolPreferences.pen.color;
 let selected = null;
@@ -3312,6 +3318,7 @@ function renderStudyUI() {
   for (const button of $('tools').children) button.disabled = practiceMode && !['pen','marker','eraser'].includes(button.dataset.tool);
 }
 function renderTapes(preview = null) {
+  $('tapeSelectionTools')?.remove();
   const layer = $('tapeLayer');
   const page = currentPage();
   const tapes = orderedTapes(page);
@@ -3332,13 +3339,13 @@ function renderTapes(preview = null) {
     cover.setAttribute('aria-label',`가림 ${index+1}/${tapes.length}, ${edit ? '선택해서 끌어 이동' : revealed ? '정답 공개됨, 누르면 가리기' : '누르면 정답 공개'}`);
     cover.setAttribute('aria-pressed',revealed);
     const number = document.createElement('span');number.textContent = index+1;number.setAttribute('aria-hidden','true');cover.append(number);
-    cover.onclick = event => { if (event.detail!==0) return; if (edit) { selectedTape=tape.id;renderTapes();renderStudyUI();$('tapeLayer').querySelector('[data-tape-action=appearance]')?.focus(); } else toggleTapeReveal(tape.id); };
+    cover.onclick = event => { if (event.detail!==0) return; if (edit) { selectedTape=tape.id;renderTapes();renderStudyUI();$('tapeSelectionTools')?.querySelector('[data-tape-action=appearance]')?.focus(); } else toggleTapeReveal(tape.id); };
     layer.append(cover);
     if (edit && selectedTape===tape.id) {
       for(const [axis,glyph,label] of [['x','↔','길이'],['y','↕','두께']]) {
         const grip = document.createElement('button');grip.className='tape-resize';grip.type='button';grip.textContent=glyph;grip.dataset.tape=tape.id;grip.dataset.resize=axis;
         grip.setAttribute('aria-label',`가림 ${index+1} ${label} 조절`);grip.title=`끌어서 ${label} 조절 · 방향키로 미세 조절`;
-        const size=36/scale;grip.style.cssText=`left:${clamp(tape.x+(axis==='x'?tape.width:tape.width/2)-size/2,0,width-size)}px;top:${clamp(tape.y+(axis==='x'?tape.height/2:tape.height)-size/2,0,height-size)}px;width:${size}px;height:${size}px;font-size:${18/scale}px`;
+        const size=36/scale,at=tapeGripPositions(tape,size,6/scale)[axis];grip.style.cssText=`left:${at.left}px;top:${at.top}px;width:${size}px;height:${size}px;font-size:${18/scale}px`;
         grip.onclick=event=>{if(event.detail===0)openTapeEditor();};
         grip.onkeydown=event=>{
           const delta={ArrowLeft:-1,ArrowRight:1,ArrowUp:-1,ArrowDown:1}[event.key];if(!delta||event.ctrlKey||event.metaKey||event.altKey||event.isComposing)return;
@@ -3361,18 +3368,20 @@ function renderTapes(preview = null) {
 }
 function renderTapeActions(tape) {
   if(!tape)return;
-  const controls=document.createElement('div');controls.className='tape-selection-tools';controls.setAttribute('role','group');controls.setAttribute('aria-label','선택한 테이프');
+  const controls=document.createElement('div');controls.id='tapeSelectionTools';controls.className='tape-selection-tools';controls.setAttribute('role','group');controls.setAttribute('aria-label','선택한 테이프');
   const hint=document.createElement('p');hint.textContent='끌어서 이동 · ↔ 길이 · ↕ 두께';controls.append(hint);
   for(const [action,label,handler] of [['appearance','색·크기',openTapeEditor],['delete','삭제',removeSelectedTape],['done','완료',()=>{selectedTape=null;renderTapes();renderStudyUI();$('tapeTool').focus();}]]) {
     const button=document.createElement('button');button.type='button';button.dataset.tapeAction=action;button.textContent=label;button.onclick=handler;controls.append(button);
   }
   for(const type of ['pointerdown','pointermove','pointerup'])controls.addEventListener(type,event=>event.stopPropagation());
-  controls.style.width=Math.max(120,Math.min(300,scroller.clientWidth-16,width*scale-12))+'px';controls.style.transform=`scale(${1/scale})`;
-  $('tapeLayer').append(controls);
-  const paper=$('paper').getBoundingClientRect(),view=scroller.getBoundingClientRect();
-  const bounds={left:Math.max(0,(view.left-paper.left+6)/scale),right:Math.min(width,(view.right-paper.left-6)/scale),
-    top:Math.max(0,(view.top-paper.top+6)/scale),bottom:Math.min(height,(view.bottom-paper.top-6)/scale)};
-  const at=tapeMenuPosition(tape,{width:controls.offsetWidth/scale,height:controls.offsetHeight/scale},bounds,8/scale);
+  controls.style.position='fixed';controls.style.zIndex='9';controls.style.width=Math.max(120,Math.min(300,scroller.clientWidth-16,window.innerWidth-16))+'px';
+  document.querySelector('.workspace').append(controls);
+  const paper=$('paper').getBoundingClientRect(),view=scroller.getBoundingClientRect(),area=document.querySelector('.workspace').getBoundingClientRect();
+  const box={x:paper.left+tape.x*scale,y:paper.top+tape.y*scale,width:tape.width*scale,height:tape.height*scale};
+  const bounds={left:Math.max(view.left,0)+6,right:Math.min(view.right,window.innerWidth)-6,top:view.top+6,bottom:Math.min(view.bottom,window.innerHeight)-6};
+  const size={width:controls.offsetWidth,height:controls.offsetHeight},gap=50;
+  if(box.y-size.height-gap<bounds.top && box.y+box.height+gap+size.height>bounds.bottom)bounds.top=Math.max(area.top,0)+6;
+  const at=tapeMenuPosition(box,size,bounds,gap);
   controls.style.left=at.left+'px';controls.style.top=at.top+'px';
 }
 function toggleTapeReveal(tapeId) {
@@ -3412,6 +3421,7 @@ function startTapeGesture(event) {
   finishDrawing();finishTextTransform(false);resetLasso(true);showMenu();
   const saved=(currentPage().tapes??[]).find(t=>t.id===target?.dataset.tape);
   if(saved)selectedTape=saved.id;
+  else if(editing)selectedTape=null;
   tapeDrag={pointer:event.pointerId,source:event.pointerType,context:practicePage,start:point(event),client:[event.clientX,event.clientY],
     mode:!editing?'reveal':saved?(target.dataset.resize?'resize-'+target.dataset.resize:'move'):'create',original:saved,preview:saved,id:saved?.id??id(),moved:false};
   event.preventDefault();event.stopImmediatePropagation();scroller.setPointerCapture(event.pointerId);
@@ -3980,6 +3990,10 @@ for(const type of ['pointerup','pointercancel','lostpointercapture'])scroller.ad
 },true);
 window.addEventListener('blur',()=>finishTapeGesture(false));
 window.addEventListener('resize',()=>finishTapeGesture(false));
+scroller.addEventListener('scroll',()=>{
+  if(tapeActionFrame || !selectedTape || tapeDrag || tool!=='tape' || practiceMode)return;
+  tapeActionFrame=requestAnimationFrame(()=>{tapeActionFrame=0;$('tapeSelectionTools')?.remove();if(!tapeDrag && tool==='tape' && !practiceMode)renderTapeActions((currentPage().tapes??[]).find(t=>t.id===selectedTape));});
+});
 $('tapeTool').onclick=()=>{setTool('tape');toast('정답 위를 사각형으로 끌어 가려요. 테이프를 누르면 선택해 옮길 수 있어요.');};
 $('practiceToggle').onclick=togglePractice;
 $('revealTool').onclick=()=>setTool('reveal');
