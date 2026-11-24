@@ -888,6 +888,7 @@ function renderTexts() {
     button.tabIndex = ['select','text'].includes(tool) ? 0 : -1;
     button.title = tool === 'text' ? '텍스트 수정' : '텍스트 선택';
     button.style.cssText = `left:${item.x}px;top:${item.y}px;width:${annotationWidth(item)}px;font-size:${item.size}px;color:${item.color}`;
+    button.addEventListener('focus', () => { if (['select','text'].includes(tool)) selectItem(item.id); });
     button.addEventListener('click', () => selectItem(item.id, tool === 'text'));
     button.addEventListener('dblclick', () => selectItem(item.id, true));
     fragment.append(button);
@@ -1731,10 +1732,12 @@ function isTextDeleteKey(event) {
     !event.target?.closest?.('input,textarea,select,dialog,[contenteditable],[role="textbox"],[role="dialog"]');
 }
 function deleteTextShortcut(event) {
-  if (!isTextDeleteKey(event) || !['select','text'].includes(tool) || !currentItem() || active || drag || lasso || fileJob || touches.size ||
+  if (!isTextDeleteKey(event) || !['select','text'].includes(tool) || active || drag || lasso || fileJob || touches.size ||
       document.querySelector('dialog[open]') || menus.some(([,menu]) => !$(menu).hidden)) return false;
+  const itemId = event.target.closest('.annotation')?.dataset.id ?? selected;
+  if (!currentPage().texts.some((item) => item.id === itemId)) return false;
   event.preventDefault();
-  removeTextBox(selected);
+  removeTextBox(itemId);
   $('tools').querySelector(`[data-tool="${tool}"]`).focus();
   return true;
 }
