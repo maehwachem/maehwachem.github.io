@@ -134,10 +134,11 @@ svg{display:block;width:19px;height:19px;flex:none;stroke:currentColor;fill:none
 .paper:is([data-tool=select],[data-tool=text]) .annotation,.paper:is([data-tool=select],[data-tool=text]) .annotation-tools{pointer-events:auto;cursor:pointer}
 .paper:is([data-tool=select],[data-tool=text]) .annotation:hover,.annotation.selected{outline:1px dashed #a99bce;outline-offset:5px}
 .annotation-tools{position:absolute;display:flex;gap:2px;padding:2px;border:1px solid #e5ddee;background:#fefdfa;border-radius:7px;box-shadow:0 2px 6px #2b244016}
-.annotation-tools button{width:36px;height:32px;display:grid;place-items:center;border-radius:5px}
+.annotation-tools button{min-width:36px;min-height:36px;padding:0 8px;display:flex;align-items:center;justify-content:center;gap:5px;border-radius:5px;font-size:12px;white-space:nowrap}
 .annotation-tools button:hover{background:var(--tint)}
 .annotation-tools svg{width:20px;height:20px}
 .annotation-tools #moveText{cursor:grab;touch-action:none}
+.annotation-tools #deleteText,.text-delete{color:#a43443}.text-editor-footer{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-top:16px}.text-editor-footer .dialog-actions{margin:0;margin-left:auto}.text-editor-footer .secondary{min-height:40px}.text-edit-hint{font-size:12px;color:var(--muted);margin:8px 0 0}
 .bottom-bar{border-top:1px solid #e5e1da;background:#f9f7f2;min-height:48px;padding:4px 24px;flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px}
 .page-actions,.zoom-actions{display:flex;align-items:center;gap:4px;white-space:nowrap}
 .bottom-bar .icon-button{width:31px;min-height:32px}
@@ -327,9 +328,9 @@ body.has-delete-undo .toast{bottom:calc(var(--note-footer-height,48px) + 72px)}
               <div class="text-layer" id="textLayer"></div>
               <div class="eraser-cursor" id="eraserCursor" aria-hidden="true" hidden></div>
               <div class="annotation-tools" id="annotationTools" hidden>
-                <button id="moveText" data-icon="hand" title="텍스트 상자 끌어서 이동" aria-label="텍스트 상자 끌어서 이동"></button>
-                <button id="editText" data-icon="pen" title="텍스트 수정" aria-label="텍스트 수정"></button>
-                <button id="deleteText" data-icon="trash" title="텍스트 삭제" aria-label="텍스트 삭제"></button>
+                <button id="moveText" title="텍스트 상자 끌어서 이동" aria-label="텍스트 상자 끌어서 이동"><span data-icon="hand"></span>이동</button>
+                <button id="editText" title="텍스트 수정" aria-label="텍스트 수정"><span data-icon="pen"></span>수정</button>
+                <button id="deleteText" title="텍스트 삭제 · 실행 취소로 복원" aria-label="텍스트 삭제"><span data-icon="trash"></span>삭제</button>
               </div>
             </div>
           </div>
@@ -360,6 +361,7 @@ body.has-delete-undo .toast{bottom:calc(var(--note-footer-height,48px) + 72px)}
 <dialog id="toolHelpDialog" aria-labelledby="toolHelpHeading">
   <h2 class="dialog-title" id="toolHelpHeading">도구 안내</h2>
   <p>도구를 고른 뒤 <strong>굵기·색 설정</strong>을 열어 조절해요. 각 도구의 굵기와 색을 따로 기억하고, 자주 쓰는 설정은 3개까지 저장할 수 있어요.</p>
+  <p><strong>텍스트 상자 삭제:</strong> 텍스트 도구로 기존 상자를 누른 뒤 ‘텍스트 상자 삭제’를 누르세요. 선택·이동 도구에서는 상자를 선택해 ‘삭제’를 눌러도 돼요. 삭제한 상자는 실행 취소로 되돌릴 수 있어요.</p>
   <label class="dialog-label"><input id="toolShortcuts" type="checkbox" checked> 도구 단축키 사용</label>
   <table class="shortcut-table"><caption>키보드 단축키</caption><tbody><tr><th scope="row">P / H / E</th><td>펜 / 형광펜 / 부분 지우개</td></tr><tr><th scope="row">T / L / V</th><td>텍스트 / 올가미 / 선택·이동</td></tr><tr><th scope="row">S</th><td>마지막에 쓴 도형</td></tr><tr><th scope="row">1 / 2 / 3</th><td>자주 쓰는 설정 불러오기</td></tr><tr><th scope="row">[ / ]</th><td>굵기 줄이기 / 늘리기</td></tr><tr><th scope="row">Ctrl·⌘ + Z</th><td>실행 취소 (Shift로 다시 실행)</td></tr></tbody></table>
   <p>입력칸·대화창과 필기 중에는 도구 단축키가 작동하지 않아요. 부분 지우개는 그린 선만 지우며 사진·PDF·텍스트는 지우지 않아요. 손가락으로 쓰려면 ‘손가락 켜짐’을 선택하세요.</p>
@@ -426,7 +428,8 @@ body.has-delete-undo .toast{bottom:calc(var(--note-footer-height,48px) + 72px)}
       <label><span class="dialog-label">글자 크기</span><select class="dialog-input" id="textSize"><option value="18">18</option><option value="22">22</option><option value="28">28</option><option value="36">36</option><option value="46">46</option></select></label>
       <label><span class="dialog-label">색상</span><select class="dialog-input" id="textColor"></select></label>
     </div>
-    <div class="dialog-actions"><button class="secondary" type="button" data-close="textDialog">취소</button><button class="primary" type="submit">적용</button></div>
+    <p class="text-edit-hint" id="textDeleteHint" hidden>상자를 삭제해도 ‘실행 취소’로 되돌릴 수 있어요.</p>
+    <div class="text-editor-footer"><button class="secondary text-delete" type="button" id="deleteTextInDialog" hidden>텍스트 상자 삭제</button><div class="dialog-actions"><button class="secondary" type="button" data-close="textDialog">취소</button><button class="primary" type="submit">적용</button></div></div>
   </form>
 </dialog>
 <dialog id="confirmDialog" aria-labelledby="confirmTitle">
@@ -869,7 +872,7 @@ function renderSelection() {
   const controls = $('annotationTools');
   controls.hidden = !item || !['select','text'].includes(tool);
   if (controls.hidden) return;
-  controls.style.left = `${Math.min(item.x, width - 125)}px`;
+  controls.style.left = `${clamp(item.x, 5, width - controls.offsetWidth - 5)}px`;
   const label = [...$('textLayer').children].find((node) => node.dataset.id === item.id);
   controls.style.top = `${item.y < 45 ? Math.min(height - 44, item.y + (label?.offsetHeight ?? 32) + 5) : item.y - 42}px`;
 }
@@ -885,6 +888,7 @@ function renderTexts() {
     button.tabIndex = ['select','text'].includes(tool) ? 0 : -1;
     button.title = tool === 'text' ? '텍스트 수정' : '텍스트 선택';
     button.style.cssText = `left:${item.x}px;top:${item.y}px;width:${annotationWidth(item)}px;font-size:${item.size}px;color:${item.color}`;
+    button.addEventListener('focus', () => { if (['select','text'].includes(tool)) selectItem(item.id); });
     button.addEventListener('click', () => selectItem(item.id, tool === 'text'));
     button.addEventListener('dblclick', () => selectItem(item.id, true));
     fragment.append(button);
@@ -1123,7 +1127,7 @@ function renderToolState() {
   $('toolColorHex').value = style.color;
   $('toolColorHex').setCustomValidity('');
   const detail = drawing ? `${tool === 'shape' ? shapeNames[shapeKind] + ' · ' : ''}${style.size}px${colored ? ' · ' + style.color.toUpperCase() : ' · 그린 선만 지워요'}`
-    : tool === 'text' ? '종이를 눌러 글 넣기' : tool === 'lasso' ? '둘러 그려 옮기거나 복제' : '종이를 끌어 이동';
+    : tool === 'text' ? '빈 곳은 추가 · 기존 상자는 수정·삭제' : tool === 'lasso' ? '둘러 그려 옮기거나 복제' : '종이를 끌어 이동';
   $('currentToolStatus').textContent = `${toolNames[tool]} · ${detail}`;
   $('currentToolColor').hidden = !colored;
   $('currentToolColor').style.background = style.color;
@@ -1702,9 +1706,46 @@ document.addEventListener('pointerdown', (event) => {
     finishLasso(false);
   }
 }, true);
+function textColorChoices(value) {
+  const result = colors.map(([color, name]) => [color, name]);
+  const normalized = validColor(value) ? value.toLowerCase() : null;
+  if (normalized && !result.some(([color]) => color === normalized)) result.push([normalized, '사용자 색']);
+  return result;
+}
+function textTargetIsCurrent(target) {
+  return !!target && target.noteId === currentNote().id && target.pageId === currentPage().id &&
+    (!target.id || currentPage().texts.some((item) => item.id === target.id));
+}
+function removeTextBox(itemId) {
+  const page = currentPage();
+  if (!page.texts.some((item) => item.id === itemId)) return false;
+  finishDrawing();
+  selected = null;
+  changePage({ texts: page.texts.filter((item) => item.id !== itemId) });
+  toast('텍스트 상자를 삭제했어요. 실행 취소로 되돌릴 수 있어요.');
+  return true;
+}
+function isTextDeleteKey(event) {
+  return ['Delete','Backspace'].includes(event.key) && !event.defaultPrevented && !event.isComposing && !event.repeat &&
+    !event.ctrlKey && !event.metaKey && !event.altKey && !event.shiftKey &&
+    !!event.target?.closest?.('.annotation, .annotation-tools') &&
+    !event.target?.closest?.('input,textarea,select,dialog,[contenteditable],[role="textbox"],[role="dialog"]');
+}
+function deleteTextShortcut(event) {
+  if (!isTextDeleteKey(event) || !['select','text'].includes(tool) || active || drag || lasso || fileJob || touches.size ||
+      document.querySelector('dialog[open]') || menus.some(([,menu]) => !$(menu).hidden)) return false;
+  const itemId = event.target.closest('.annotation')?.dataset.id ?? selected;
+  if (!currentPage().texts.some((item) => item.id === itemId)) return false;
+  event.preventDefault();
+  removeTextBox(itemId);
+  $('tools').querySelector(`[data-tool="${tool}"]`).focus();
+  return true;
+}
 function openText(item, location = [76, 76]) {
-  textTarget = { id: item?.id, location };
+  textTarget = { id: item?.id, location, noteId: currentNote().id, pageId: currentPage().id };
   $('textHeading').textContent = item ? '텍스트 수정' : '텍스트 상자 추가';
+  $('deleteTextInDialog').hidden = !item;
+  $('textDeleteHint').hidden = !item;
   $('textValue').value = item?.body ?? '';
   $('textValue').setCustomValidity('');
   const size = String(item?.size ?? 22);
@@ -1715,22 +1756,33 @@ function openText(item, location = [76, 76]) {
     $('textSize').add(option);
   }
   $('textSize').value = size;
-  const values = [...colors];
-  if (item?.color && !colors.some(([value]) => value === item.color)) values.push([item.color, '기존 색상']);
+  const chosenColor = validColor(item?.color ?? color) ? (item?.color ?? color).toLowerCase() : colors[0][0];
+  const values = textColorChoices(chosenColor);
   $('textColor').replaceChildren(...values.map(([value, name]) => new Option(name, value)));
-  $('textColor').value = item?.color ?? color;
+  $('textColor').value = chosenColor;
   $('textDialog').showModal();
   $('textValue').focus();
 }
-$('textDialog').addEventListener('close', () => { textTarget = null; });
+$('textDialog').addEventListener('close', () => {
+  textTarget = null;
+  const annotation = [...$('textLayer').children].find((node) => node.dataset.id === selected);
+  if (annotation && ['select','text'].includes(tool)) annotation.focus({ preventScroll: true });
+  else $('tools').querySelector(`[data-tool="${tool}"]`)?.focus();
+});
 $('textForm').addEventListener('submit', (event) => {
   event.preventDefault();
+  if (!textTargetIsCurrent(textTarget)) {
+    toast('편집하던 텍스트 상자를 찾을 수 없어요. 페이지를 확인해 주세요.');
+    $('textDialog').close();
+    return;
+  }
   const body = $('textValue').value.trim();
   if (!body) {
     $('textValue').setCustomValidity('내용을 입력해 주세요.');
     $('textValue').reportValidity();
     return;
   }
+  if (!validColor($('textColor').value)) { toast('텍스트 색상을 다시 골라 주세요.'); $('textColor').focus(); return; }
   const page = currentPage();
   const existing = page.texts.find((item) => item.id === textTarget.id);
   const [x, y] = textTarget.location;
@@ -1746,9 +1798,12 @@ $('textValue').addEventListener('input', () => $('textValue').setCustomValidity(
 for (const button of document.querySelectorAll('[data-close]')) button.onclick = () => $(button.dataset.close).close();
 $('editText').onclick = () => openText(currentItem());
 $('deleteText').onclick = () => {
-  const texts = currentPage().texts.filter((item) => item.id !== selected);
-  selected = null;
-  changePage({ texts });
+  if (removeTextBox(selected)) $('tools').querySelector(`[data-tool="${tool}"]`).focus();
+};
+$('deleteTextInDialog').onclick = () => {
+  if (textTargetIsCurrent(textTarget) && textTarget.id) removeTextBox(textTarget.id);
+  else toast('삭제할 텍스트 상자를 찾을 수 없어요.');
+  $('textDialog').close();
 };
 $('moveText').addEventListener('pointerdown', (event) => {
   if (!event.isPrimary || event.button !== 0 || !currentItem()) return;
@@ -2899,6 +2954,7 @@ document.addEventListener('keydown', (event) => {
     else if (focusMode) setFocusMode(false);
   }
   if (runToolbarShortcut(event)) return;
+  if (deleteTextShortcut(event)) return;
   const shift = { ArrowLeft: [-8,0], ArrowRight: [8,0], ArrowUp: [0,-8], ArrowDown: [0,8] }[event.key];
   if (shift && tool === 'lasso' && lassoSelection && !lasso && !event.ctrlKey && !event.metaKey && !event.altKey &&
       !event.target.closest('input, textarea, select, dialog')) {
@@ -2976,7 +3032,7 @@ for (const button of $('tools').children) {
       const top = $('scroller').scrollTop / scale;
       openText(null, [76, clamp(top + 65, 10, height - 95)]);
     } else {
-      toast('글을 넣을 곳을 누르세요.');
+      toast('빈 곳을 누르면 글 추가, 기존 상자를 누르면 수정·삭제해요.');
     }
   };
 }
