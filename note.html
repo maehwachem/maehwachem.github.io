@@ -227,6 +227,7 @@ body.has-delete-undo .toast{bottom:calc(var(--note-footer-height,48px) + 72px)}
 .bar-zone.is-vertical .toolbar{display:flex;flex-direction:column;align-items:stretch;gap:5px;width:100%;max-width:100%;padding:4px;flex-shrink:0}.bar-zone.is-vertical .toolbar #tools{display:flex;flex-direction:column;align-items:stretch;gap:2px}.bar-zone.is-vertical .tool.labeled-tool{display:flex;align-items:center;justify-content:flex-start;gap:7px;width:100%;height:36px;padding:0 6px}.bar-zone.is-vertical .tool-label{font-size:11px;line-height:14px}.bar-zone.is-vertical .toolbar .tool-divider{display:none}.bar-zone.is-vertical .toolbar .finger-mode{width:100%;min-height:36px;padding:0 2px;font-size:10px;gap:2px}.bar-zone.is-vertical .toolbar .colors{display:grid;grid-template-columns:repeat(3,26px);justify-content:center;gap:1px;padding:0}.bar-zone.is-vertical .toolbar .swatch{width:26px;height:28px}.bar-zone.is-vertical .tool-settings-toggle{min-width:0;width:100%;min-height:36px;font-size:11px;padding-inline:2px}.bar-zone.is-vertical .history-tools{justify-content:center;gap:4px}.bar-zone.is-vertical .history-tools .tool{width:36px;min-height:34px}
 .study-controls{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;max-width:100%;font-size:11px}.study-controls button{min-height:32px;border:1px solid #dfd7e9;border-radius:6px;padding:3px 7px;background:#fffefa;white-space:nowrap}.study-controls button[aria-pressed=true]{background:var(--deep);color:white}.study-controls output{align-self:center;color:var(--muted);font-variant-numeric:tabular-nums}.practice-actions,.tape-edit-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:4px}.bar-zone.is-vertical .study-controls{flex-direction:column;flex:none}.bar-zone.is-vertical .study-controls button{width:100%;font-size:11px;padding-inline:2px}.bar-zone.is-vertical .practice-actions,.bar-zone.is-vertical .tape-edit-actions{flex-direction:column}.bar-zone.is-vertical .study-controls output{text-align:center}
 .tape-layer{position:absolute;inset:0;z-index:2;pointer-events:none}.tape-cover{position:absolute;display:flex;align-items:center;justify-content:center;background:var(--tape);border:0;border-radius:2px;pointer-events:none;touch-action:none;overflow:visible}.tape-cover::after{content:'';position:absolute;left:50%;top:50%;width:100%;height:100%;min-width:var(--tape-hit,24px);min-height:var(--tape-hit,24px);transform:translate(-50%,-50%)}.tape-cover span{font-size:var(--tape-font,12px);font-weight:700;color:#fff;pointer-events:none;line-height:1}.paper[data-tool=tape] .tape-cover{pointer-events:auto;cursor:grab;opacity:.6;outline:1px dashed #5143a4}.paper[data-tool=tape] .tape-cover.selected{outline:3px solid #5143a4;outline-offset:2px}.paper[data-tool=reveal] .tape-cover{pointer-events:auto;cursor:pointer}.tape-cover.revealed{background:transparent;box-shadow:inset 0 0 0 1px #8975b4}.tape-cover.revealed span{color:var(--deep);background:#fffefa;align-self:flex-start;border:1px solid #d5c9e5;border-radius:3px;padding:1px 2px;transform:translateY(-100%)}.tape-resize{position:absolute;display:grid;place-items:center;pointer-events:auto;touch-action:none;background:#fffefa;border:1px solid #5143a4;border-radius:5px;z-index:2;color:var(--deep)}.recent-colors{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}.recent-colors button{width:36px;height:34px;border:1px solid #ddd6e6;border-radius:6px;display:grid;place-items:center}.recent-colors i{display:block;width:18px;height:18px;border-radius:50%;background:var(--swatch)}.favorite-name-row{display:flex;gap:5px;align-items:center;margin-top:6px}.favorite-name-row input{width:100%;min-width:0;min-height:34px;border:1px solid #ddd6e6;border-radius:6px;padding:4px 6px;font-size:16px}.favorite-name-row button{font-size:11px;white-space:nowrap}.study-hint{font-size:12px;color:var(--muted)}
+@media(max-height:520px){.top-bar{height:45px}.doc-head{height:56px;padding-block:4px}.doc-meta{display:none}.title-input{font-size:22px}.bar-zone:not(.is-floating){max-height:90px;overflow:auto;overscroll-behavior:contain;justify-content:flex-start;align-items:center;padding:4px 6px;gap:4px}.bar-zone:not(.is-floating) .tool-status{order:-1;position:sticky;top:0;z-index:1;background:var(--canvas);flex:none;width:100%;padding:0;min-height:34px}.bar-zone:not(.is-floating) .toolbar,.bar-zone:not(.is-floating) .study-controls{flex:none}}
 </style>
 </head>
 <body>
@@ -1243,8 +1244,8 @@ function renderNote() {
   renderPage(true);
 }
 function setTool(value) {
-  if (practiceMode && !['pen','marker','eraser','reveal'].includes(value)) { toast('연습 중에는 펜·형광펜·지우개와 정답 확인을 사용해요.'); return; }
-  if (!practiceMode && value === 'reveal') return;
+  if (practiceMode && !['pen','marker','eraser','reveal'].includes(value)) { toast('연습 중에는 펜·형광펜·지우개와 정답 확인을 사용해요.'); return false; }
+  if (!practiceMode && value === 'reveal') return false;
   finishTapeGesture(false);
   finishTextTransform(false);
   finishDrawing();
@@ -1258,6 +1259,7 @@ function setTool(value) {
   renderTexts();
   renderTapes();
   renderStudyUI();
+  return true;
 }
 function rememberToolPreferences() {
   if (!persistToolPreferences()) toast('도구 설정은 이번 화면에서만 적용돼요. 저장 공간을 확인해 주세요.');
@@ -1327,11 +1329,13 @@ function renderToolState() {
     const item = toolPreferences.favorites[index];
     const label = `${index + 1} · ${item.name ? item.name + ' · ' : ''}${toolNames[item.tool]}${item.tool === 'shape' ? ' ' + shapeNames[item.shape] : ''} ${item.size}px`;
     button.textContent = label;
+    button.disabled = practiceMode && !['pen','marker','eraser'].includes(item.tool);
     button.style.setProperty('--favorite-color', item.tool === 'eraser' ? '#fffefa' : item.color);
     button.setAttribute('aria-label', `${label}${item.tool === 'eraser' ? '' : ' ' + item.color} 불러오기`);
   }
 }
 function loadToolFavorite(index) {
+  if(practiceMode && !['pen','marker','eraser'].includes(toolPreferences.favorites[index]?.tool))return;
   finishDrawing();
   const name = restoreToolFavorite(toolPreferences, toolPreferences.favorites[index]);
   if (!name) return;
@@ -1353,12 +1357,12 @@ function toolbarShortcut(event, suspended = false) {
   return '';
 }
 function runToolbarShortcut(event) {
-  const action = toolbarShortcut(event, !toolPreferences.shortcuts || !!(active || drag || toolbarDrag || lasso || fileJob || touches.size || document.querySelector('dialog[open]') || menus.some(([,menu]) => !$(menu).hidden)));
+  const action = toolbarShortcut(event, !toolPreferences.shortcuts || !!(active || drag || tapeDrag || toolbarDrag || lasso || fileJob || touches.size || document.querySelector('dialog[open]') || menus.some(([,menu]) => !$(menu).hidden)));
   if (!action) return false;
   const [kind, value] = action.split(':');
   if (kind === 'width' && !Object.hasOwn(toolLimits, tool)) return false;
   event.preventDefault();
-  if (kind === 'tool') { showMenu(); setTool(value); toast(`${toolNames[value]} 도구`); }
+  if (kind === 'tool') { showMenu(); if(setTool(value)!==false)toast(`${toolNames[value]} 도구`); }
   else if (kind === 'favorite') loadToolFavorite(Number(value));
   else setToolWidth(toolPreferences[tool].size + Number(value) * (['marker','eraser'].includes(tool) ? 2 : 1));
   return true;
@@ -3328,8 +3332,10 @@ function renderTapes(preview = null) {
 }
 function toggleTapeReveal(tapeId) {
   if (!practiceMode || tool!=='reveal' || !(currentPage().tapes ?? []).some(t=>t.id===tapeId)) return;
+  const refocus=document.activeElement?.dataset?.tape===tapeId;
   if (revealedTapes.has(tapeId)) revealedTapes.delete(tapeId);else revealedTapes.add(tapeId);
   renderTapes();renderStudyUI();
+  if(refocus)[...$('tapeLayer').children].find(node=>node.dataset.tape===tapeId)?.focus({preventScroll:true});
 }
 function nextTapeAnswer() {
   if (!practiceMode || active || tapeDrag) return;
