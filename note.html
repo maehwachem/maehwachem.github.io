@@ -216,6 +216,9 @@ body.has-delete-undo .toast{bottom:calc(var(--note-footer-height,48px) + 72px)}
 @container(max-width:760px){.toolbar{display:grid;grid-template-columns:auto auto auto;column-gap:8px;row-gap:3px}.toolbar .tool-divider{display:none}.toolbar #tools{grid-column:1/3;grid-row:1}.toolbar .history-tools{grid-column:3;grid-row:1;justify-self:end}.toolbar .finger-mode{grid-column:1;grid-row:2;justify-self:start;min-height:36px}.toolbar .colors{grid-column:2;grid-row:2;justify-self:center;gap:4px}.toolbar .tool-settings-toggle{grid-column:3;grid-row:2;justify-self:end}.toolbar .swatch{height:34px}}
 @media(max-width:680px){.tool.labeled-tool{width:36px;height:46px}.tool-status{font-size:10px;gap:4px}.tool-settings-toggle{min-width:76px}}
 @container(max-width:350px){.toolbar{grid-template-columns:auto auto;gap:3px 6px}.toolbar #tools{grid-column:1/3;grid-row:1;justify-self:center}.toolbar .history-tools{grid-column:2;grid-row:2}.toolbar .finger-mode{grid-column:1;grid-row:2}.toolbar .colors{grid-column:1;grid-row:3;justify-self:start}.toolbar .tool-settings-toggle{grid-column:2;grid-row:3}}
+
+.annotation .text-line{display:block;min-height:1.25em;line-height:1.25;white-space:pre}.annotation .text-run{white-space:pre;text-underline-offset:.12em;text-decoration-thickness:.0625em}.annotation[data-locked=true].selected{outline-style:solid;outline-color:#8a7899}.text-resize{position:absolute;z-index:2;display:grid;place-items:center;border:1px solid #8974bd;border-radius:7px;background:#fffdf8;color:var(--deep);cursor:ew-resize;touch-action:none;pointer-events:auto;font-size:16px;line-height:1}.paper:not(:is([data-tool=select],[data-tool=text])) .text-resize{display:none}.tool-status-actions{display:flex;gap:7px;flex:none}.text-editor{width:min(520px,calc(100% - 24px));overflow:auto}.text-format-controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap;border:1px solid #e5deec;border-radius:8px;padding:8px 10px;margin:12px 0}.text-format-controls legend{font-size:12px;font-weight:700}.text-format-controls label{display:flex;gap:5px;align-items:center;min-height:36px;white-space:nowrap}.text-format-controls select{font-size:16px;min-height:36px;border:1px solid #ddd6e6;border-radius:6px;background:white}.text-lock-option{display:flex;align-items:center;gap:6px;min-height:36px;margin-top:8px;font-weight:650}.text-box-list{width:min(620px,calc(100% - 24px));padding:16px;overflow:auto}.text-box-list #textBoxList{display:grid;gap:8px;margin-top:12px}.text-list-row{display:grid;grid-template-columns:minmax(0,1fr);gap:6px;padding:10px;border:1px solid #e3dcec;border-radius:8px;background:#fcfbf8}.text-list-row strong{overflow-wrap:anywhere;white-space:pre-wrap;font-size:13px}.text-list-row small{color:var(--muted);font-size:11px}.text-list-actions{display:flex;gap:6px;flex-wrap:wrap}.text-list-actions button{min-height:36px;padding:4px 10px;font-size:12px;border:1px solid #ded7e8;border-radius:6px}.text-list-actions button:hover{background:var(--tint)}.text-list-actions button[data-list-action=delete]{color:#a43443}.text-list-actions button[aria-pressed=true]{background:var(--tint);color:var(--deep)}
+@media(max-width:450px){.text-format-controls{gap:7px}.text-editor{padding:14px}.text-box-list{padding:12px}.tool-status-actions{gap:2px}.tool-status{gap:3px}}
 </style>
 </head>
 <body>
@@ -303,7 +306,7 @@ body.has-delete-undo .toast{bottom:calc(var(--note-footer-height,48px) + 72px)}
             <button id="redo" class="tool" data-icon="redo" aria-label="다시 실행" title="다시 실행"></button>
           </div>
         </div>
-        <div class="tool-status"><span class="current-tool"><i id="currentToolColor" aria-hidden="true"></i><span id="currentToolStatus"></span></span><button id="toolHelp" aria-haspopup="dialog">도구 안내</button></div>
+        <div class="tool-status"><span class="current-tool"><i id="currentToolColor" aria-hidden="true"></i><span id="currentToolStatus"></span></span><span class="tool-status-actions"><button id="textBoxesButton" aria-haspopup="dialog" aria-label="현재 페이지 텍스트 상자 목록">상자 목록</button><button id="toolHelp" aria-haspopup="dialog">도구 안내</button></span></div>
       </div>
       <div class="shape-menu" id="shapeMenu" role="group" aria-label="도형 종류" hidden>
         <button type="button" data-shape="line">직선</button><button type="button" data-shape="arrow">화살표</button>
@@ -327,9 +330,11 @@ body.has-delete-undo .toast{bottom:calc(var(--note-footer-height,48px) + 72px)}
               <canvas class="ink-layer" id="activeInk" aria-label="손글씨 영역"></canvas>
               <div class="text-layer" id="textLayer"></div>
               <div class="eraser-cursor" id="eraserCursor" aria-hidden="true" hidden></div>
+              <button id="resizeText" class="text-resize" aria-label="텍스트 상자 너비 조절" title="끌어서 너비 조절 · 방향키로 조절" hidden>↔</button>
               <div class="annotation-tools" id="annotationTools" hidden>
                 <button id="moveText" title="텍스트 상자 끌어서 이동" aria-label="텍스트 상자 끌어서 이동"><span data-icon="hand"></span>이동</button>
                 <button id="editText" title="텍스트 수정" aria-label="텍스트 수정"><span data-icon="pen"></span>수정</button>
+                <button id="lockText" aria-label="텍스트 배치 잠금" aria-pressed="false">잠금</button>
                 <button id="deleteText" title="텍스트 삭제 · 실행 취소로 복원" aria-label="텍스트 삭제"><span data-icon="trash"></span>삭제</button>
               </div>
             </div>
@@ -362,6 +367,7 @@ body.has-delete-undo .toast{bottom:calc(var(--note-footer-height,48px) + 72px)}
   <h2 class="dialog-title" id="toolHelpHeading">도구 안내</h2>
   <p>도구를 고른 뒤 <strong>굵기·색 설정</strong>을 열어 조절해요. 각 도구의 굵기와 색을 따로 기억하고, 자주 쓰는 설정은 3개까지 저장할 수 있어요.</p>
   <p><strong>텍스트 상자 삭제:</strong> 텍스트 도구로 기존 상자를 누른 뒤 ‘텍스트 상자 삭제’를 누르세요. 선택·이동 도구에서는 상자를 선택해 ‘삭제’를 눌러도 돼요. 삭제한 상자는 실행 취소로 되돌릴 수 있어요.</p>
+  <p>상자 오른쪽 ↔ 손잡이를 끌거나, 손잡이에 초점을 두고 좌우 방향키로 너비를 바꿔요(Shift는 1px씩). 편집창에서는 굵게·밑줄·정렬과 너비를 바꿀 수 있어요. 배치 잠금은 위치·너비를 고정하고 올가미에서 제외해요. ‘상자 목록’에서 현재 페이지의 상자를 찾아 수정·잠금·삭제할 수 있어요.</p>
   <label class="dialog-label"><input id="toolShortcuts" type="checkbox" checked> 도구 단축키 사용</label>
   <table class="shortcut-table"><caption>키보드 단축키</caption><tbody><tr><th scope="row">P / H / E</th><td>펜 / 형광펜 / 부분 지우개</td></tr><tr><th scope="row">T / L / V</th><td>텍스트 / 올가미 / 선택·이동</td></tr><tr><th scope="row">S</th><td>마지막에 쓴 도형</td></tr><tr><th scope="row">1 / 2 / 3</th><td>자주 쓰는 설정 불러오기</td></tr><tr><th scope="row">[ / ]</th><td>굵기 줄이기 / 늘리기</td></tr><tr><th scope="row">Ctrl·⌘ + Z</th><td>실행 취소 (Shift로 다시 실행)</td></tr></tbody></table>
   <p>입력칸·대화창과 필기 중에는 도구 단축키가 작동하지 않아요. 부분 지우개는 그린 선만 지우며 사진·PDF·텍스트는 지우지 않아요. 손가락으로 쓰려면 ‘손가락 켜짐’을 선택하세요.</p>
@@ -419,7 +425,7 @@ body.has-delete-undo .toast{bottom:calc(var(--note-footer-height,48px) + 72px)}
   </div>
   <div class="photo-footer"><div class="photo-nav"><button type="button" id="photoPrev" class="secondary" data-photo-control>이전 사진</button><button type="button" id="photoNext" class="secondary" data-photo-control>다음 사진</button></div><div class="dialog-actions"><button type="button" class="secondary" data-close="photoEditor">취소</button><button type="button" id="photoApply" class="primary" data-photo-control>사진 추가</button></div></div>
 </dialog>
-<dialog id="textDialog" aria-labelledby="textHeading">
+<dialog id="textDialog" class="text-editor" aria-labelledby="textHeading">
   <form id="textForm">
     <h2 id="textHeading" class="dialog-title">텍스트 상자</h2>
     <label for="textValue" class="dialog-label">내용</label>
@@ -428,9 +434,17 @@ body.has-delete-undo .toast{bottom:calc(var(--note-footer-height,48px) + 72px)}
       <label><span class="dialog-label">글자 크기</span><select class="dialog-input" id="textSize"><option value="18">18</option><option value="22">22</option><option value="28">28</option><option value="36">36</option><option value="46">46</option></select></label>
       <label><span class="dialog-label">색상</span><select class="dialog-input" id="textColor"></select></label>
     </div>
+    <fieldset class="text-format-controls"><legend>글자 서식</legend><label><input type="checkbox" id="textBold"> 굵게</label><label><input type="checkbox" id="textUnderline"> 밑줄</label><label>정렬<select id="textAlign" aria-label="텍스트 정렬"><option value="left">왼쪽</option><option value="center">가운데</option><option value="right">오른쪽</option></select></label></fieldset>
+    <div class="text-width-controls"><label for="textWidth" class="dialog-label">상자 너비 (px)</label><div class="tool-width-row"><input type="range" id="textWidthRange" min="30" max="760" value="420" aria-label="텍스트 상자 너비 슬라이더"><input type="number" id="textWidth" min="30" max="760" step="1" value="420" required aria-label="텍스트 상자 너비 숫자"></div></div>
+    <label class="text-lock-option"><input type="checkbox" id="textLocked"> 배치 잠금</label><p class="text-edit-hint">잠그면 위치와 너비가 고정되고 올가미에서 제외돼요. 내용·서식 수정과 삭제는 가능해요.</p>
     <p class="text-edit-hint" id="textDeleteHint" hidden>상자를 삭제해도 ‘실행 취소’로 되돌릴 수 있어요.</p>
     <div class="text-editor-footer"><button class="secondary text-delete" type="button" id="deleteTextInDialog" hidden>텍스트 상자 삭제</button><div class="dialog-actions"><button class="secondary" type="button" data-close="textDialog">취소</button><button class="primary" type="submit">적용</button></div></div>
   </form>
+</dialog>
+<dialog id="textBoxListDialog" class="text-box-list" aria-labelledby="textBoxListHeading">
+  <header class="overview-head"><h2 class="dialog-title" id="textBoxListHeading">현재 페이지 텍스트 상자</h2><button type="button" class="secondary" data-close="textBoxListDialog" autofocus>닫기</button></header>
+  <p class="text-edit-hint" id="textBoxListCount" role="status"></p><p class="text-edit-hint">‘찾기’로 종이 위 위치를 확인하고, 겹친 상자도 여기에서 수정·관리할 수 있어요.</p>
+  <div id="textBoxList" role="list"></div>
 </dialog>
 <dialog id="confirmDialog" aria-labelledby="confirmTitle">
   <h2 id="confirmTitle" class="dialog-title"></h2>
@@ -631,7 +645,9 @@ function parseState(raw) {
         if (typeof item.body !== 'string' || item.body.length > 5000 || !['normal','heading','label'].includes(item.style) ||
             !validColor(item.color) || !Number.isFinite(item.size) || item.size < 10 || item.size > 90 ||
             !Number.isFinite(item.x) || item.x < 0 || item.x > width || !Number.isFinite(item.y) || item.y < 0 || item.y > height ||
-            !Number.isFinite(item.width) || item.width < 30 || item.width > width) throw Error('invalid text');
+            !Number.isFinite(item.width) || item.width < 30 || item.width > width ||
+            ['bold','underline','locked'].some((key) => item[key] !== undefined && typeof item[key] !== 'boolean') ||
+            (item.align !== undefined && !['left','center','right'].includes(item.align))) throw Error('invalid text');
       }
     }
     if (!note.pages.some((page) => page.id === note.active)) note.active = note.pages[0].id;
@@ -655,6 +671,8 @@ let tool = 'pen';
 let color = toolPreferences.pen.color;
 let selected = null;
 let textTarget = null;
+let textListTarget = null;
+let textListAction = null;
 let scale = 1;
 let manualScale = null;
 let active = null;
@@ -697,6 +715,7 @@ const ink = $('ink').getContext('2d', { willReadFrequently: true });
 const overlay = sheet.getContext('2d');
 const backdrop = $('paperBackdrop').getContext('2d');
 const density = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+const textMetrics = document.createElement('canvas').getContext('2d');
 for (const context of [backdrop, ink, overlay]) {
   context.canvas.width = width * density;
   context.canvas.height = height * density;
@@ -747,7 +766,7 @@ window.addEventListener('pagehide', persist);
 document.addEventListener('visibilitychange', () => { if (document.hidden) persist(); });
 window.addEventListener('storage', (event) => {
   if (event.key !== key || event.newValue === lastStored) return;
-  if (dirty || active || drag || lasso || touches.size || textTarget || fileJob || protectedStorage || !event.newValue) {
+  if (dirty || active || drag || lasso || touches.size || textTarget || textListTarget || fileJob || protectedStorage || !event.newValue) {
     saveStatus('다른 탭에서 변경됨 · 백업 필요', true);
     return;
   }
@@ -860,21 +879,92 @@ function redrawInk(strokes = currentPage().strokes) {
   ink.clearRect(0, 0, width, height);
   paintInk(ink, strokes);
 }
+function textFormat(item) {
+  const weight = { normal: 500, heading: 700, label: 750 }[item.style] ?? 500;
+  return { weight: item.bold ? Math.max(700, weight) : weight, family: fontFamilies[item.style] ?? fontFamilies.normal,
+    spacing: ({ normal: 0, heading: -.045, label: .01 }[item.style] ?? 0) * item.size,
+    underline: item.underline === true, align: item.align ?? 'left' };
+}
+function configureTextContext(context, item) {
+  const format = textFormat(item);
+  context.font = `${format.weight} ${item.size}px ${format.family}`;
+  if ('letterSpacing' in context) context.letterSpacing = format.spacing + 'px';
+  return format;
+}
+function resizedText(item, requested) {
+  if (item.locked || !Number.isFinite(requested)) return null;
+  return { ...item, width: clamp(Math.round(requested), 30, Math.max(30, width - item.x - 10)) };
+}
+function movableTexts(items) { return items.filter((item) => !item.locked); }
+function textLineLayout(item, measure, baseline = item.size) {
+  const segmenter = typeof Intl.Segmenter === 'function' ? new Intl.Segmenter('ko') : null;
+  const limit = annotationWidth(item);
+  const factor = { left: 0, center: .5, right: 1 }[item.align ?? 'left'] ?? 0;
+  const result = [];
+  const write = (text) => {
+    const lineWidth = measure(text).width;
+    result.push({ text, width: lineWidth, x: item.x + Math.max(0, limit - lineWidth) * factor,
+      y: item.y + baseline + result.length * item.size * 1.25 });
+  };
+  for (const paragraph of item.body.split('\n')) {
+    let row = '';
+    const units = segmenter ? [...segmenter.segment(paragraph)].map((entry) => entry.segment) : [...paragraph];
+    for (const unit of units) {
+      if (row && measure(row + unit).width > limit) { write(row); row = ''; }
+      row += unit;
+    }
+    write(row);
+  }
+  return result;
+}
 function annotationWidth(item) { return Math.min(item.width, Math.max(30, width - item.x - 10)); }
 function selectItem(itemId, open = false) {
   selected = itemId;
   renderSelection();
   if (open) openText(currentItem());
 }
-function renderSelection() {
-  const item = currentItem();
+function renderSelection(item = currentItem()) {
   for (const node of $('textLayer').children) node.classList.toggle('selected', node.dataset.id === selected);
   const controls = $('annotationTools');
   controls.hidden = !item || !['select','text'].includes(tool);
+  $('resizeText').hidden = controls.hidden || item?.locked === true;
   if (controls.hidden) return;
-  controls.style.left = `${clamp(item.x, 5, width - controls.offsetWidth - 5)}px`;
+  $('moveText').disabled = item.locked === true;
+  $('lockText').setAttribute('aria-pressed', item.locked === true);
+  $('lockText').textContent = item.locked ? '해제' : '잠금';
+  $('lockText').setAttribute('aria-label', item.locked ? '텍스트 배치 잠금 해제' : '텍스트 배치 잠금');
+  controls.style.transform = `scale(${1 / scale})`;
+  controls.style.transformOrigin = 'top left';
+  controls.style.width = 'max-content';
+  controls.style.maxWidth = `${Math.max(120, width * scale - 10)}px`;
+  controls.style.flexWrap = 'wrap';
+  const controlWidth = controls.offsetWidth / scale;
+  const controlHeight = controls.offsetHeight / scale;
+  controls.style.left = `${clamp(item.x, 5 / scale, width - controlWidth - 5 / scale)}px`;
   const label = [...$('textLayer').children].find((node) => node.dataset.id === item.id);
-  controls.style.top = `${item.y < 45 ? Math.min(height - 44, item.y + (label?.offsetHeight ?? 32) + 5) : item.y - 42}px`;
+  controls.style.top = `${item.y >= controlHeight + 5 / scale ? item.y - controlHeight - 5 / scale : Math.min(height - controlHeight, item.y + (label?.offsetHeight ?? 32) + 5 / scale)}px`;
+  const handle = $('resizeText');
+  handle.style.width = `${24 / scale}px`;
+  handle.style.height = `${36 / scale}px`;
+  handle.style.fontSize = `${16 / scale}px`;
+  handle.style.left = `${clamp(item.x + annotationWidth(item) - 12 / scale, 0, width - 24 / scale)}px`;
+  handle.style.top = `${clamp(item.y + Math.min(label?.offsetHeight ?? item.size * 1.25, 140) / 2 - 18 / scale, 0, height - 36 / scale)}px`;
+}
+function paintTextNode(button, item) {
+  const format = configureTextContext(textMetrics, item);
+  button.style.cssText = `left:${item.x}px;top:${item.y}px;width:${annotationWidth(item)}px;font-size:${item.size}px;color:${item.color};font-weight:${format.weight};font-family:${format.family};letter-spacing:${format.spacing}px;text-align:${format.align}`;
+  const lines = document.createDocumentFragment();
+  for (const row of textLineLayout(item, (text) => textMetrics.measureText(text))) {
+    const line = document.createElement('span');
+    line.className = 'text-line';
+    const run = document.createElement('span');
+    run.className = 'text-run';
+    run.textContent = row.text || '\u200b';
+    run.style.textDecorationLine = format.underline ? 'underline' : 'none';
+    line.append(run);
+    lines.append(line);
+  }
+  button.replaceChildren(lines);
 }
 function renderTexts() {
   const fragment = document.createDocumentFragment();
@@ -884,10 +974,11 @@ function renderTexts() {
     button.classList.toggle('search-match', searchTarget?.pageId === currentPage().id && searchTarget.itemId === item.id);
     button.dataset.id = item.id;
     button.dataset.style = item.style;
-    button.textContent = item.body;
+    button.dataset.locked = item.locked === true;
+    button.setAttribute('aria-label', item.body);
     button.tabIndex = ['select','text'].includes(tool) ? 0 : -1;
     button.title = tool === 'text' ? '텍스트 수정' : '텍스트 선택';
-    button.style.cssText = `left:${item.x}px;top:${item.y}px;width:${annotationWidth(item)}px;font-size:${item.size}px;color:${item.color}`;
+    paintTextNode(button, item);
     button.addEventListener('focus', () => { if (['select','text'].includes(tool)) selectItem(item.id); });
     button.addEventListener('click', () => selectItem(item.id, tool === 'text'));
     button.addEventListener('dblclick', () => selectItem(item.id, true));
@@ -1044,6 +1135,7 @@ function renderPage(resetScroll = false) {
   $('docMenu').querySelector('[data-action=bookmark]').setAttribute('aria-pressed', page.bookmark === true);
   redrawInk();
   renderTexts();
+  $('textBoxesButton').textContent = `상자 목록 ${page.texts.length}`;
   updateHistoryButtons();
   setZoom();
   if (resetScroll) $('scroller').scrollTo(0, 0);
@@ -1059,6 +1151,7 @@ function renderNote() {
   renderPage(true);
 }
 function setTool(value) {
+  finishTextTransform(false);
   finishDrawing();
   resetLasso(true);
   tool = value;
@@ -1127,7 +1220,7 @@ function renderToolState() {
   $('toolColorHex').value = style.color;
   $('toolColorHex').setCustomValidity('');
   const detail = drawing ? `${tool === 'shape' ? shapeNames[shapeKind] + ' · ' : ''}${style.size}px${colored ? ' · ' + style.color.toUpperCase() : ' · 그린 선만 지워요'}`
-    : tool === 'text' ? '빈 곳은 추가 · 기존 상자는 수정·삭제' : tool === 'lasso' ? '둘러 그려 옮기거나 복제' : '종이를 끌어 이동';
+    : tool === 'text' ? '빈 곳은 추가 · 기존 상자는 수정·삭제' : tool === 'lasso' ? '둘러 그려 이동·복제 · 잠금 상자 제외' : '종이를 끌어 이동';
   $('currentToolStatus').textContent = `${toolNames[tool]} · ${detail}`;
   $('currentToolColor').hidden = !colored;
   $('currentToolColor').style.background = style.color;
@@ -1201,6 +1294,7 @@ function setZoom() {
   $('zoomFit').textContent = Math.round(scale * 100) + '%';
   $('zoomOut').disabled = scale <= .25;
   $('zoomIn').disabled = scale >= 2;
+  renderSelection(drag?.target || currentItem());
 }
 function navigate(direction) {
   const note = currentNote();
@@ -1299,16 +1393,18 @@ function containsVisibleInk(stroke, polygon, cuts) {
 }
 function textBox(item) {
   const label = [...$('textLayer').children].find((node) => node.dataset.id === item.id);
+  let left = item.x;
   let right = item.x + annotationWidth(item);
   if (label?.textContent) {
     const edge = label.getBoundingClientRect().left;
-    const range = document.createRange();
-    range.selectNodeContents(label);
-    const measured = [...range.getClientRects()].reduce((end, rect) => Math.max(end, rect.right), edge);
-    if (measured > edge) right = item.x + (measured - edge) / scale;
+    const rects = [...label.querySelectorAll('.text-run')].flatMap((run) => [...run.getClientRects()]).filter((rect) => rect.width > 0);
+    if (rects.length) {
+      left = item.x + (Math.min(...rects.map((rect) => rect.left)) - edge) / scale;
+      right = item.x + (Math.max(...rects.map((rect) => rect.right)) - edge) / scale;
+    }
   }
   return clipToPaper({
-    left: item.x, top: item.y, right,
+    left, top: item.y, right,
     bottom: item.y + (label?.offsetHeight ?? item.size * 1.25)
   });
 }
@@ -1329,7 +1425,7 @@ function selectEnclosed(polygon) {
     const paint = affected.length ? { ...original, cuts: affected.map(({size, points}) => ({size, points})) } : original;
     strokes.push({ original, paint });
   }
-  const texts = currentPage().texts.filter((item) => {
+  const texts = movableTexts(currentPage().texts).filter((item) => {
     const bounds = textBox(item);
     if (!boxesOverlap(box, bounds)) return false;
     const corners = [[bounds.left,bounds.top], [bounds.right,bounds.top], [bounds.right,bounds.bottom], [bounds.left,bounds.bottom]];
@@ -1338,6 +1434,7 @@ function selectEnclosed(polygon) {
   setLassoSelection(strokes, texts);
 }
 function setLassoSelection(strokes, texts) {
+  texts = movableTexts(texts);
   const boxes = [
     ...strokes.map(({ original }) => clipToPaper(strokeBounds(original))),
     ...texts.map(textBox)
@@ -1380,7 +1477,9 @@ function translateStroke(stroke, dx, dy) {
 function placeLasso(dx, dy, duplicate = false) {
   if (!lassoSelection || (!duplicate && !dx && !dy)) return;
   const page = currentPage();
-  const { strokes, texts } = lassoSelection;
+  const { strokes } = lassoSelection;
+  const texts = movableTexts(lassoSelection.texts).filter((item) => page.texts.includes(item));
+  if (!strokes.length && !texts.length) return;
   const movedStrokes = strokes.map(({ paint }) => translateStroke(paint, dx, dy));
   const movedTexts = texts.map((item) => ({
     ...item, id: duplicate ? id() : item.id, width: annotationWidth(item),
@@ -1413,7 +1512,7 @@ function extendLasso(event) {
   if (lasso.mode === 'move') {
     lasso.delta = limitLassoDelta(p[0] - lasso.from[0], p[1] - lasso.from[1]);
     const [dx,dy] = lasso.delta;
-    const selectedIds = new Set(lassoSelection.texts.map((item) => item.id));
+    const selectedIds = new Set(movableTexts(lassoSelection.texts).map((item) => item.id));
     for (const node of $('textLayer').children) {
       if (selectedIds.has(node.dataset.id)) node.style.transform = `translate(${dx}px,${dy}px)`;
     }
@@ -1595,9 +1694,17 @@ function moveViewport(before, after) {
   scroller.scrollBy(updated.left + paperX * scale - after.x, updated.top + paperY * scale - after.y);
 }
 function startTouch(event) {
+  if (drag) {
+    if (drag.source === 'touch') {
+      finishTextTransform(false);
+      ignoreTouchUntil = performance.now() + 250;
+    }
+    event.preventDefault();
+    return;
+  }
   if (active?.source === 'pen' || lasso?.source === 'pen' || performance.now() < ignoreTouchUntil ||
       (state.inputMode !== 'touch' && Math.max(event.width, event.height) >= 44 && Math.min(event.width, event.height) >= 28) ||
-      event.target.closest('.annotation, .annotation-tools')) return;
+      event.target.closest('.annotation, .annotation-tools, .text-resize')) return;
   if (touches.size >= 2) return;
   event.preventDefault();
   touches.set(event.pointerId, { x: event.clientX, y: event.clientY, canvas: event.target === sheet });
@@ -1712,6 +1819,66 @@ function textColorChoices(value) {
   if (normalized && !result.some(([color]) => color === normalized)) result.push([normalized, '사용자 색']);
   return result;
 }
+function syncTextWidthControls() {
+  for (const name of ['textWidth','textWidthRange']) $(name).disabled = $('textLocked').checked;
+}
+function setTextLayoutLock(itemId, value) {
+  const item = currentPage().texts.find((text) => text.id === itemId);
+  if (!item || typeof value !== 'boolean' || (item.locked === true) === value) return false;
+  finishTextTransform(false);
+  selected = itemId;
+  changePage({ texts: currentPage().texts.map((text) => text.id === itemId ? { ...text, locked: value } : text) });
+  toast(value ? '텍스트 위치와 너비를 잠갔어요.' : '텍스트 배치 잠금을 해제했어요.');
+  return true;
+}
+function currentTextListPage() {
+  return textListTarget?.noteId === currentNote().id && textListTarget.pageId === currentPage().id ? currentPage() : null;
+}
+function renderTextBoxList() {
+  const page = currentTextListPage();
+  const fragment = document.createDocumentFragment();
+  $('textBoxListCount').textContent = page ? `${page.texts.length}개 상자 · ${page.texts.filter((item) => item.locked).length}개 배치 잠금` : '페이지를 다시 확인해 주세요.';
+  for (const [index,item] of (page?.texts ?? []).entries()) {
+    const row = document.createElement('div');
+    row.className = 'text-list-row';
+    row.setAttribute('role', 'listitem');
+    row.dataset.textId = item.id;
+    const title = document.createElement('strong');
+    title.textContent = `${index + 1}. ${item.body.slice(0,110)}${item.body.length > 110 ? '…' : ''}`;
+    const detail = document.createElement('small');
+    detail.textContent = `${item.size}px · 너비 ${Math.round(annotationWidth(item))}px · ${item.locked ? '배치 잠금' : '이동 가능'}${item.bold ? ' · 굵게' : ''}${item.underline ? ' · 밑줄' : ''}`;
+    const actions = document.createElement('div');
+    actions.className = 'text-list-actions';
+    for (const [name,label] of [['find','찾기'],['edit','수정'],['lock',item.locked ? '잠금 해제' : '배치 잠금'],['delete','삭제']]) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.dataset.listAction = name;
+      button.textContent = label;
+      button.setAttribute('aria-label', `${index + 1}번 상자 ${label}`);
+      if (name === 'lock') button.setAttribute('aria-pressed', item.locked === true);
+      actions.append(button);
+    }
+    row.append(title,detail,actions);
+    fragment.append(row);
+  }
+  if (!page?.texts.length) {
+    const empty = document.createElement('p');
+    empty.className = 'empty-list';
+    empty.textContent = '이 페이지에는 텍스트 상자가 없어요. 텍스트 도구로 추가해 보세요.';
+    fragment.append(empty);
+  }
+  $('textBoxList').replaceChildren(fragment);
+}
+function openTextBoxList() {
+  finishTextTransform(false);
+  finishDrawing();
+  finishLasso(false);
+  showMenu();
+  textListTarget = { noteId: currentNote().id, pageId: currentPage().id };
+  textListAction = null;
+  renderTextBoxList();
+  $('textBoxListDialog').showModal();
+}
 function textTargetIsCurrent(target) {
   return !!target && target.noteId === currentNote().id && target.pageId === currentPage().id &&
     (!target.id || currentPage().texts.some((item) => item.id === target.id));
@@ -1728,7 +1895,7 @@ function removeTextBox(itemId) {
 function isTextDeleteKey(event) {
   return ['Delete','Backspace'].includes(event.key) && !event.defaultPrevented && !event.isComposing && !event.repeat &&
     !event.ctrlKey && !event.metaKey && !event.altKey && !event.shiftKey &&
-    !!event.target?.closest?.('.annotation, .annotation-tools') &&
+    !!event.target?.closest?.('.annotation, .annotation-tools, .text-resize') &&
     !event.target?.closest?.('input,textarea,select,dialog,[contenteditable],[role="textbox"],[role="dialog"]');
 }
 function deleteTextShortcut(event) {
@@ -1746,6 +1913,14 @@ function openText(item, location = [76, 76]) {
   $('textHeading').textContent = item ? '텍스트 수정' : '텍스트 상자 추가';
   $('deleteTextInDialog').hidden = !item;
   $('textDeleteHint').hidden = !item;
+  $('textBold').checked = item?.bold === true;
+  $('textUnderline').checked = item?.underline === true;
+  $('textAlign').value = item?.align ?? 'left';
+  $('textLocked').checked = item?.locked === true;
+  const x = item?.x ?? Math.round(clamp(location[0], 10, width - 125));
+  const max = Math.max(30, width - x - 10);
+  for (const name of ['textWidth','textWidthRange']) { $(name).max = max; $(name).value = clamp(item?.width ?? 420, 30, max); }
+  syncTextWidthControls();
   $('textValue').value = item?.body ?? '';
   $('textValue').setCustomValidity('');
   const size = String(item?.size ?? 22);
@@ -1786,9 +1961,13 @@ $('textForm').addEventListener('submit', (event) => {
   const page = currentPage();
   const existing = page.texts.find((item) => item.id === textTarget.id);
   const [x, y] = textTarget.location;
+  const requested = Number($('textWidth').value);
+  if (!Number.isFinite(requested) || !$('textWidth').value.trim() || !['left','center','right'].includes($('textAlign').value)) { toast('너비와 정렬을 확인해 주세요.'); return; }
   const item = {
     ...(existing ?? { id: id(), x: Math.round(clamp(x, 10, width - 125)), y: Math.round(clamp(y, 10, height - 48)), width: 420, style: 'normal' }),
-    body, size: Number($('textSize').value), color: $('textColor').value
+    body, size: Number($('textSize').value), color: $('textColor').value,
+    bold: $('textBold').checked, underline: $('textUnderline').checked, align: $('textAlign').value, locked: $('textLocked').checked,
+    width: existing?.locked && $('textLocked').checked ? existing.width : clamp(Math.round(requested), 30, Number($('textWidth').max))
   };
   selected = item.id;
   changePage({ texts: existing ? page.texts.map((text) => text.id === item.id ? item : text) : [...page.texts, item] });
@@ -1805,37 +1984,114 @@ $('deleteTextInDialog').onclick = () => {
   else toast('삭제할 텍스트 상자를 찾을 수 없어요.');
   $('textDialog').close();
 };
-$('moveText').addEventListener('pointerdown', (event) => {
-  if (!event.isPrimary || event.button !== 0 || !currentItem()) return;
-  event.preventDefault();
-  drag = { pointer: event.pointerId, start: point(event), item: currentItem(), target: null };
-  $('moveText').setPointerCapture(event.pointerId);
+$('textLocked').onchange = syncTextWidthControls;
+$('textWidthRange').oninput = () => { $('textWidth').value = $('textWidthRange').value; };
+$('textWidth').oninput = () => { if (Number.isFinite($('textWidth').valueAsNumber)) $('textWidthRange').value = $('textWidth').value; };
+$('lockText').onclick = () => { const item = currentItem(); if (item) setTextLayoutLock(item.id, !item.locked); };
+$('textBoxesButton').onclick = openTextBoxList;
+$('textBoxList').addEventListener('click', (event) => {
+  const button = event.target.closest('[data-list-action]');
+  const row = button?.closest('[data-text-id]');
+  if (!row) return;
+  const page = currentTextListPage();
+  const item = page?.texts.find((entry) => entry.id === row.dataset.textId);
+  if (!item) { toast('상자를 찾을 수 없어요. 목록을 다시 열어 주세요.'); $('textBoxListDialog').close(); return; }
+  const action = button.dataset.listAction;
+  if (action === 'find' || action === 'edit') {
+    textListAction = { ...textListTarget, itemId: item.id, action };
+    $('textBoxListDialog').close();
+    return;
+  }
+  const index = page.texts.indexOf(item);
+  if (action === 'lock') setTextLayoutLock(item.id, !item.locked);
+  else if (action === 'delete') removeTextBox(item.id);
+  else return;
+  renderTextBoxList();
+  const rows = [...$('textBoxList').children];
+  const next = rows[Math.min(index, rows.length - 1)];
+  (next?.querySelector(`[data-list-action="${action === 'delete' ? 'find' : 'lock'}"]`) || $('textBoxListDialog').querySelector('[data-close]'))?.focus();
 });
-$('moveText').addEventListener('pointermove', (event) => {
-  if (drag?.pointer !== event.pointerId) return;
-  const [x, y] = point(event);
-  const item = drag.item;
-  const node = [...$('textLayer').children].find((button) => button.dataset.id === item.id);
-  drag.target = { ...item, x: Math.round(clamp(item.x + x - drag.start[0], 0, width - 90)), y: Math.round(clamp(item.y + y - drag.start[1], 0, height - 35)) };
-  node.style.left = drag.target.x + 'px';
-  node.style.top = drag.target.y + 'px';
+$('textBoxListDialog').addEventListener('close', () => {
+  const action = textListAction;
+  textListTarget = null;
+  textListAction = null;
+  const item = action?.noteId === currentNote().id && action.pageId === currentPage().id && currentPage().texts.find((text) => text.id === action.itemId);
+  if (!item) { $('textBoxesButton').focus(); return; }
+  setTool(action.action === 'edit' ? 'text' : 'select');
+  selectItem(item.id);
+  scroller.scrollTo(Math.max(0, item.x * scale - 25), Math.max(0, item.y * scale - 55));
+  const node = [...$('textLayer').children].find((entry) => entry.dataset.id === item.id);
+  node?.focus({ preventScroll: true });
+  if (action.action === 'edit') openText(item);
 });
-function endMove(event) {
-  if (drag?.pointer !== event.pointerId) return;
-  const item = drag.target;
-  drag = null;
-  if (item) changePage({ texts: currentPage().texts.map((text) => text.id === item.id ? item : text) });
+function resizeCurrentText(requested) {
+  const item = currentItem();
+  const next = item && resizedText(item, requested);
+  if (!next || next.width === item.width) return false;
+  changePage({ texts: currentPage().texts.map((text) => text.id === item.id ? next : text) });
+  return true;
 }
-for (const name of ['pointerup','pointercancel','lostpointercapture']) $('moveText').addEventListener(name, endMove);
+function startTextTransform(event, mode) {
+  const item = currentItem();
+  if (!event.isPrimary || event.button !== 0 || !item || item.locked || active || drag || lasso || fileJob || touches.size) return;
+  event.preventDefault();
+  event.stopPropagation();
+  drag = { mode, source: event.pointerType, pointer: event.pointerId, start: point(event), item, page: currentPage(), handle: event.currentTarget, target: null };
+  event.currentTarget.setPointerCapture(event.pointerId);
+}
+function updateTextTransform(event) {
+  if (!drag || drag.pointer !== event.pointerId) return;
+  const [x, y] = point(event);
+  const { item, start, mode } = drag;
+  drag.target = mode === 'resize' ? resizedText(item, annotationWidth(item) + x - start[0]) : {
+    ...item, x: Math.round(clamp(item.x + x - start[0], 0, width - 90)), y: Math.round(clamp(item.y + y - start[1], 0, height - 35))
+  };
+  if (!drag.target) return;
+  const node = [...$('textLayer').children].find((button) => button.dataset.id === item.id);
+  if (node) paintTextNode(node, drag.target);
+  renderSelection(drag.target);
+}
+function finishTextTransform(commit = true) {
+  if (!drag) return;
+  const gesture = drag;
+  drag = null;
+  const next = gesture.target;
+  const live = currentPage().texts.find((item) => item.id === gesture.item.id);
+  if (gesture.page === currentPage() && live && !live.locked && commit && next &&
+      ['x','y','width'].some((key) => next[key] !== gesture.item[key])) {
+    selected = gesture.item.id;
+    changePage({ texts: currentPage().texts.map((text) => text.id === next.id ? next : text) });
+  } else renderTexts();
+}
+function endTextTransform(event) {
+  if (!drag || drag.pointer !== event.pointerId) return;
+  const handle = drag.handle;
+  if (event.type === 'pointerup') updateTextTransform(event);
+  finishTextTransform(event.type === 'pointerup');
+  if (handle.hasPointerCapture(event.pointerId)) handle.releasePointerCapture(event.pointerId);
+}
+for (const [name,mode] of [['moveText','move'], ['resizeText','resize']]) {
+  $(name).addEventListener('pointerdown', (event) => startTextTransform(event, mode));
+  $(name).addEventListener('pointermove', updateTextTransform);
+  for (const type of ['pointerup','pointercancel','lostpointercapture']) $(name).addEventListener(type, endTextTransform);
+}
 $('moveText').addEventListener('keydown', (event) => {
   const shift = { ArrowLeft: [-1,0], ArrowRight: [1,0], ArrowUp: [0,-1], ArrowDown: [0,1] }[event.key];
   const item = currentItem();
-  if (!shift || !item) return;
+  if (!shift || !item || item.locked || drag || active || event.ctrlKey || event.metaKey || event.altKey || event.isComposing) return;
   event.preventDefault();
-  const [dx, dy] = shift;
+  const [dx,dy] = shift;
   const moved = { ...item, x: clamp(item.x + 10 * dx, 0, width - 90), y: clamp(item.y + 10 * dy, 0, height - 35) };
   changePage({ texts: currentPage().texts.map((text) => text.id === item.id ? moved : text) });
 });
+$('resizeText').addEventListener('keydown', (event) => {
+  if (!['ArrowLeft','ArrowRight'].includes(event.key) || drag || active || event.ctrlKey || event.metaKey || event.altKey || event.isComposing) return;
+  event.preventDefault();
+  event.stopPropagation();
+  const item = currentItem();
+  if (item) resizeCurrentText(annotationWidth(item) + (event.key === 'ArrowLeft' ? -1 : 1) * (event.shiftKey ? 1 : 10));
+});
+window.addEventListener('blur', () => finishTextTransform(false));
 function drawBackdrop(context, image) {
   const sourceWidth = image.naturalWidth ?? image.width;
   const sourceHeight = image.naturalHeight ?? image.height;
@@ -1941,34 +2197,18 @@ function compositePage(page = currentPage(), pixels = 2, image = null) {
   exportContext.scale(pixels, pixels);
   paintInk(exportContext, page.strokes);
   ctx.drawImage(exportInk, 0, 0, width, height);
-  const segmenter = typeof Intl.Segmenter === 'function' ? new Intl.Segmenter('ko') : null;
   ctx.textBaseline = 'alphabetic';
+  ctx.textAlign = 'left';
   for (const item of page.texts) {
-    const weight = { heading: 700, label: 750, normal: 500 }[item.style];
-    const spacing = { heading: -.045, label: .01, normal: 0 }[item.style] * item.size;
-    ctx.font = `${weight} ${item.size}px ${fontFamilies[item.style]}`;
-    if ('letterSpacing' in ctx) ctx.letterSpacing = spacing + 'px';
+    const format = configureTextContext(ctx, item);
     ctx.fillStyle = item.color;
     const lineHeight = item.size * 1.25;
     const metrics = ctx.measureText('가A');
     const baseline = metrics.fontBoundingBoxAscent && metrics.fontBoundingBoxDescent ?
       (lineHeight + metrics.fontBoundingBoxAscent - metrics.fontBoundingBoxDescent) / 2 : item.size;
-    let y = item.y + baseline;
-    function write(text) {
-      ctx.fillText(text, item.x, y);
-      y += lineHeight;
-    }
-    for (const paragraph of item.body.split('\n')) {
-      let row = '';
-      const units = segmenter ? [...segmenter.segment(paragraph)].map((entry) => entry.segment) : [...paragraph];
-      for (const unit of units) {
-        if (row && ctx.measureText(row + unit).width > annotationWidth(item)) {
-          write(row);
-          row = '';
-        }
-        row += unit;
-      }
-      write(row);
+    for (const row of textLineLayout(item, (text) => ctx.measureText(text), baseline)) {
+      ctx.fillText(row.text, row.x, row.y);
+      if (format.underline && row.width > 0) ctx.fillRect(row.x, row.y + item.size * .12, row.width, item.size * .0625);
     }
   }
   return result;
@@ -2681,7 +2921,7 @@ function fromDataUrl(value) {
 function restoredContent(note, title = note.title) {
   const pages = note.pages.map((page) => ({
     type: page.type, strokes: page.strokes, bookmark: page.bookmark === true,
-    texts: page.texts.map(({ id, ...item }) => item),
+    texts: page.texts.map(({ id, ...item }) => ({ ...item, bold: item.bold === true, underline: item.underline === true, align: item.align ?? 'left', locked: item.locked === true })),
     background: page.background ? { kind: page.background.kind, name: page.background.name } : null
   }));
   // Navigation and regenerated IDs are not edits; image bytes are checked separately.
@@ -2947,6 +3187,7 @@ window.addEventListener('resize', () => { if (!$('shapeMenu').hidden || !$('tool
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
     if (document.querySelector('dialog[open]')) return;
+    if (drag) { event.preventDefault(); finishTextTransform(false); return; }
     const open = menus.find(([,menu]) => !$(menu).hidden);
     if (open) { showMenu(); $(open[0]).focus(); }
     else if ($('app').classList.contains('open')) { setSidebar(false); $('openSidebar').focus(); }
