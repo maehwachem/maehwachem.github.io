@@ -607,6 +607,8 @@ function tapeFromPoints(from, to, color) {
   return w >= 8 && h >= 8 ? { x,y,width:w,height:h,color } : null;
 }
 function transformTape(tape, dx, dy, mode) {
+  if(mode==='resize-left'){const x=clamp(tape.x+dx,0,tape.x+tape.width-8);return {...tape,x,width:tape.x+tape.width-x};}
+  if(mode==='resize-top'){const y=clamp(tape.y+dy,0,tape.y+tape.height-8);return {...tape,y,height:tape.y+tape.height-y};}
   return ['resize','resize-x','resize-y'].includes(mode) ? { ...tape, width:mode==='resize-y'?tape.width:clamp(tape.width+dx,8,width-tape.x), height:mode==='resize-x'?tape.height:clamp(tape.height+dy,8,height-tape.y) }
     : { ...tape, x:clamp(tape.x+dx,0,width-tape.width), y:clamp(tape.y+dy,0,height-tape.height) };
 }
@@ -3354,11 +3356,12 @@ function renderTapes(preview = null) {
         const grip = document.createElement('button');grip.className='tape-resize';grip.type='button';grip.textContent=glyph;grip.dataset.tape=tape.id;grip.dataset.resize=axis;
         grip.setAttribute('aria-label',`가림 ${index+1} ${label} 조절`);grip.title=`끌어서 ${label} 조절 · 방향키로 미세 조절`;
         const size=36/scale,at=tapeGripPositions(tape,size,6/scale)[axis];grip.style.cssText=`left:${at.left}px;top:${at.top}px;width:${size}px;height:${size}px;font-size:${18/scale}px`;
+        grip.dataset.edge=axis==='x' && at.left<tape.x?'left':axis==='y' && at.top<tape.y?'top':axis;
         grip.onclick=event=>{if(event.detail===0)openTapeEditor();};
         grip.onkeydown=event=>{
           const delta={ArrowLeft:-1,ArrowRight:1,ArrowUp:-1,ArrowDown:1}[event.key];if(!delta||event.ctrlKey||event.metaKey||event.altKey||event.isComposing)return;
           event.preventDefault();event.stopPropagation();const old=(currentPage().tapes??[]).find(t=>t.id===tape.id);if(!old||practiceMode)return;
-          const step=delta*(event.shiftKey?1:5);const next=transformTape(old,axis==='x'?step:0,axis==='y'?step:0,'resize-'+axis);
+          const step=delta*(event.shiftKey?1:5);const next=transformTape(old,axis==='x'?step:0,axis==='y'?step:0,'resize-'+grip.dataset.edge);
           changePage({tapes:currentPage().tapes.map(t=>t.id===old.id?next:t)});
           [...$('tapeLayer').querySelectorAll('.tape-resize')].find(node=>node.dataset.resize===axis)?.focus({preventScroll:true});
         };layer.append(grip);
@@ -3437,7 +3440,7 @@ function startTapeGesture(event) {
   if(saved)selectedTape=saved.id;
   else if(editing)selectedTape=null;
   tapeDrag={pointer:event.pointerId,source:event.pointerType,context:practicePage,start:point(event),client:[event.clientX,event.clientY],
-    mode:!editing?'reveal':saved?(target.dataset.resize?'resize-'+target.dataset.resize:'move'):'create',original:saved,preview:saved,id:saved?.id??id(),moved:false};
+    mode:!editing?'reveal':saved?(target.dataset.resize?'resize-'+(target.dataset.edge??target.dataset.resize):'move'):'create',original:saved,preview:saved,id:saved?.id??id(),moved:false};
   event.preventDefault();event.stopImmediatePropagation();scroller.setPointerCapture(event.pointerId);
   renderTapes();renderStudyUI();
 }
