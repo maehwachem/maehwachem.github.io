@@ -30,7 +30,7 @@
   function hud(){
     $('place').textContent=World.scenes[state.scene].name;
     $('tide').textContent=state.scene==='harbor'?(state.returns?'귀항 '+state.returns+'회 · 등대 점등':'첫 출항 전'):'간조 · 연안 탐사';
-    $('goal').textContent=Voyage.goal(state);
+    $('goal').textContent=trial&&state.repaired?'다시 뜬 빨간 부표가 보인다. 원래 항해로 돌아가자.':Voyage.goal(state);
   }
   const waterItems={
     rain:{name:'빗물 한 병',detail:'창고 처마 아래에서 받은 빗물. 바닥에 소금 결정이 없다.'},
