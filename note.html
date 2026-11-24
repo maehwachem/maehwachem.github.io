@@ -1694,8 +1694,10 @@ function moveViewport(before, after) {
 }
 function startTouch(event) {
   if (drag) {
-    finishTextTransform(false);
-    ignoreTouchUntil = performance.now() + 250;
+    if (drag.source === 'touch') {
+      finishTextTransform(false);
+      ignoreTouchUntil = performance.now() + 250;
+    }
     event.preventDefault();
     return;
   }
@@ -2033,7 +2035,7 @@ function startTextTransform(event, mode) {
   if (!event.isPrimary || event.button !== 0 || !item || item.locked || active || drag || lasso || fileJob || touches.size) return;
   event.preventDefault();
   event.stopPropagation();
-  drag = { mode, pointer: event.pointerId, start: point(event), item, page: currentPage(), handle: event.currentTarget, target: null };
+  drag = { mode, source: event.pointerType, pointer: event.pointerId, start: point(event), item, page: currentPage(), handle: event.currentTarget, target: null };
   event.currentTarget.setPointerCapture(event.pointerId);
 }
 function updateTextTransform(event) {
