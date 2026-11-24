@@ -2,7 +2,7 @@
 (() => {
   'use strict';
   const scenes = {
-    harbor: {name:'우편선 선착장', spawn:0, nodes:[[100,170],[66,148],[91,151],[126,134],[178,128],[232,126],[258,119],[144,190],[122,148],[117,126]],
+    harbor: {name:'우편선 선착장', spawn:0, nodes:[[100,170],[48,147],[91,151],[126,134],[178,128],[232,126],[258,119],[144,190],[122,148],[117,126]],
       edges:[[0,2],[2,1],[2,3],[3,4],[4,5],[5,6],[0,7],[0,8],[8,3],[3,9]],
       spots:{post:['우체국',[40,123],1],bench:['작업대',[179,172],7],boat:['우편정',[323,97],6],board:['항로 게시판',[117,119],9]}},
     mine: {name:'붉은 만 · 옛 광산',spawn:4,nodes:[[98,185],[138,187],[204,195],[261,188],[317,150],[266,174],[237,184]],
@@ -10,6 +10,29 @@
     salt: {name:'흰 띠 · 옛 염전',spawn:4,nodes:[[67,165],[103,161],[169,151],[243,140],[332,123],[285,132]],
       edges:[[0,1],[1,2],[2,3],[3,5],[5,4]],spots:{gate:['수문',[77,130],0],shed:['창고',[251,116],3],boat:['우편정',[342,108],4]}}
   };
+  // Bounds in the same 384 × 216 grid as the paintings. Keep bare walkways outside them.
+  const objects = {
+    harbor:{post:[3,64,87,82],bench:[147,164,68,34],boat:[267,68,108,60],board:[106,105,23,20]},
+    mine:{winch:[10,96,87,72],wreck:[173,113,113,53],boat:[300,100,82,47]},
+    salt:{gate:[1,78,102,71],shed:[185,49,132,83],boat:[321,76,62,46]}
+  };
+  function actionLabel(scene,key,s){
+    if(key==='boat')return scene==='harbor'&&!s.repaired?'우편정을 살핀다':'우편정에 오른다';
+    if(key==='post')return s.mail?'국장과 이야기한다':'우체국 문을 연다';
+    if(key==='board')return '게시판을 읽는다';
+    if(key==='bench'){
+      if(s.finished)return '말린 띠를 본다';
+      if(!s.mail)return '작업대를 살핀다';
+      if(!s.repaired)return '정비 기록을 본다';
+      if(!s.refs)return '작업대를 살핀다';
+      if(s.ran)return '분리 결과를 본다';
+      return s.line?'실험을 이어 간다':'거름종이를 편다';
+    }
+    if(key==='winch')return s.plate?'권양기를 살핀다':'명판을 살핀다';
+    if(key==='wreck')return s.lifted&&!s.finished?(s.mineClue?'빈 상자를 본다':'건진 상자를 본다'):'난파선을 살핀다';
+    if(key==='gate')return '수문을 살핀다';
+    return s.gate?'창고 안을 본다':'창고 쪽을 본다';
+  }
   const canvas=document.getElementById('world'), ctx=canvas.getContext('2d'), box=document.getElementById('worldbox'), viewport=document.getElementById('viewport');
   ctx.imageSmoothingEnabled=false;
   const textures={};const W=384,H=216;
@@ -24,33 +47,66 @@
   let s, scene, id, px=0,py=0,face='down',route=[],request=null,walkTime=0,lastFrame=0,raf=0,active=false,paused=false,onSpot=()=>{},width=W,camera=0;
   const dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
   function rect(x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(Math.round(x)-camera,Math.round(y),w,h);}
+  const controls=document.getElementById('objects'), nearby=document.getElementById('nearby'), viewMode=document.getElementById('view-mode');
+  let overview=false, nearKey=null, target=null;
   function size(){
-    if(!active)return;
-    const full=box.clientWidth;if(!full)return;
-    width=Math.min(W,Math.max(180,Math.floor(full)));
-    const usable=Math.max(H,window.innerHeight-(window.innerHeight<520?125:204));
-    const scale=Math.max(1,Math.floor(Math.min(full/width,usable/H)));
-    canvas.style.width=viewport.style.width=(width*scale)+'px';canvas.style.height=viewport.style.height=(H*scale)+'px';
+    if(!active||!box.clientWidth)return;
+    const full=box.clientWidth;
+    const closeUp=full<640&&window.innerHeight>full&&window.innerHeight>=560;
+    viewMode.hidden=!closeUp;
+    const wideScale=Math.max(1,Math.floor(Math.min(full/W,Math.max(H,window.innerHeight-165)/H)));
+    const scale=closeUp&&!overview?2:wideScale;
+    width=Math.min(W,Math.max(1,Math.floor(full/scale)));
+    canvas.style.width=viewport.style.width=(width*scale)+'px';
+    canvas.style.height=viewport.style.height=(H*scale)+'px';
     if(canvas.width!==width){canvas.width=width;ctx.imageSmoothingEnabled=false;}
-    alignCamera();updatePins();
+    viewMode.textContent=overview?'가까이 보기':'전경 보기';
+    viewMode.setAttribute('aria-pressed',String(overview));
+    alignCamera();positionObjects();
   }
   function alignCamera(){camera=Math.round(Math.max(0,Math.min(W-width,px-width/2)));}
-  function updatePins(){
-    if(!scene)return;
-    for(const b of document.getElementById('pins').children){
-      const spot=scene.spots[b.dataset.spot];if(!spot)continue;
-      const [x,y]=spot[1];
-      b.style.left=(100*(x-camera)/width)+'%';b.style.top=(100*y/H)+'%';b.hidden=x-camera<5||x-camera>width-5;
+  function positionObjects(){
+    for(const b of controls.children){
+      const [x,y,w,h]=objects[id][b.dataset.spot];
+      const left=Math.max(0,x-camera),right=Math.min(width,x+w-camera);
+      b.hidden=right<=left;
+      b.style.left=left*100/width+'%';b.style.width=Math.max(0,right-left)*100/width+'%';
+      b.style.top=y*100/H+'%';b.style.height=h*100/H+'%';
     }
   }
-  function markers(){
-    const pins=document.getElementById('pins'), nav=document.getElementById('destinations');pins.replaceChildren();nav.replaceChildren();
-    Object.entries(scene.spots).forEach(([key,[name]],i)=>{
-      const marker=document.createElement('button');marker.type='button';marker.className='pin';marker.dataset.spot=key;marker.title=name;marker.setAttribute('aria-label',name+' 살펴보기');marker.textContent=i+1;marker.onclick=()=>moveToSpot(key);pins.append(marker);
-      const button=document.createElement('button');button.type='button';button.dataset.spot=key;
-      const number=document.createElement('b');number.textContent=i+1;button.append(number,document.createTextNode(name));button.onclick=()=>moveToSpot(key);nav.append(button);
-    });updatePins();
+  function refreshLabels(){
+    for(const b of controls.children){
+      const key=b.dataset.spot,label=actionLabel(id,key,s);
+      b.setAttribute('aria-label',scene.spots[key][0]+' · '+label);
+      b.firstChild.textContent=label;
+    }
+    updateNearby();
   }
+  function mountObjects(){
+    controls.replaceChildren();
+    for(const key of Object.keys(scene.spots)){
+      const b=document.createElement('button');
+      b.type='button';b.className='object';b.dataset.spot=key;
+      const label=document.createElement('span');label.className='caption';label.setAttribute('aria-hidden','true');b.append(label);
+      b.onclick=()=>moveToSpot(key);
+      controls.append(b);
+    }
+    refreshLabels();
+  }
+  function updateNearby(){
+    nearKey=null;
+    if(!paused&&!route.length){
+      let best=23;
+      for(const [key,spot] of Object.entries(scene.spots)){
+        const d=dist([px,py],scene.nodes[spot[2]]);
+        if(d<best){best=d;nearKey=key;}
+      }
+    }
+    nearby.hidden=!nearKey;
+    if(nearKey){const text=actionLabel(id,nearKey,s);if(nearby.textContent!==text)nearby.textContent=text;}
+  }
+  nearby.onclick=()=>{if(nearKey)moveToSpot(nearKey);};
+  viewMode.onclick=()=>{overview=!overview;size();};
   function nearestOnSegment(pos,a,b){
     const dx=b[0]-a[0],dy=b[1]-a[1],t=Math.max(0,Math.min(1,((pos[0]-a[0])*dx+(pos[1]-a[1])*dy)/(dx*dx+dy*dy)));
     return [a[0]+dx*t,a[1]+dy*t];
@@ -76,10 +132,11 @@
     }
     const list=[];for(let i=b;i!==-1;i=previous[i])list.unshift(nodes[i]);return list;
   }
-  function moveToSpot(key){if(paused||!scene.spots[key])return;held.clear();request=key;route=findRoute(scene.nodes[scene.spots[key][2]]);}
-  function nearestSpot(){
-    const spots=Object.keys(scene.spots).sort((a,b)=>dist([px,py],scene.nodes[scene.spots[a][2]])-dist([px,py],scene.nodes[scene.spots[b][2]]));
-    moveToSpot(spots[0]);
+  function moveToSpot(key){
+    if(paused||!scene.spots[key])return;
+    target=null;held.clear();request=key;route=findRoute(scene.nodes[scene.spots[key][2]]);
+    if(overview){overview=false;size();}
+    canvas.focus({preventScroll:true});updateNearby();
   }
   function orient(dx,dy){if(Math.abs(dx)>Math.abs(dy)*1.4)face=dx<0?'left':'right';else if(dy!==0)face=dy<0?'up':'down';}
   function movement(dt){
@@ -97,7 +154,10 @@
       if(length>.15)orient(dx,dy);
       if(length<=left){[px,py]=p;left-=length;route.shift();}else{px+=dx*left/length;py+=dy*left/length;left=0;}
     }
-    if(!route.length&&request){const key=request;request=null;face='up';onSpot(key);}
+    if(!route.length&&request){
+      const key=request, look=scene.spots[key][1];request=null;
+      orient(look[0]-px,look[1]-py);onSpot(key);
+    }
     return route.length>0;
   }
   function actor(moving){
@@ -136,25 +196,32 @@
   function frame(ts){
     if(!active)return;
     const dt=Math.min(.22,(ts-lastFrame)/1000||0);lastFrame=ts;const moving=movement(dt);if(moving)walkTime+=dt;
-    const oldCamera=camera;alignCamera();if(oldCamera!==camera)updatePins();
+    const oldCamera=camera;alignCamera();if(oldCamera!==camera)positionObjects();updateNearby();
     const image=textures[id];if(image.complete&&image.naturalWidth){ctx.drawImage(image,-camera,0);weather(reduced.matches?0:ts/1000);}else{ctx.fillStyle='#164b59';ctx.fillRect(0,0,width,H);}
+    if(target&&route.length){
+      const [x,y]=target;rect(x-3,y,2,1,'#f2daa5');rect(x+2,y,2,1,'#f2daa5');
+      rect(x-1,y+1,3,1,'#ffe9b4');
+    }
     actor(moving);raf=requestAnimationFrame(frame);
   }
   canvas.addEventListener('pointerdown',e=>{
     if(!active||paused)return;
     const b=canvas.getBoundingClientRect(),pos=[camera+(e.clientX-b.left)*width/b.width,(e.clientY-b.top)*H/b.height];
-    for(const [k,[,p]] of Object.entries(scene.spots))if(dist(pos,p)<12){moveToSpot(k);return;}
     const foot=projection(pos);
-    if(foot.d>16)return;
-    request=null;held.clear();route=findRoute(foot.point);
+    if(foot.d>20)return;
+    request=null;target=foot.point;held.clear();route=findRoute(foot.point);
   });
   const keys={ArrowUp:'up',KeyW:'up',ArrowDown:'down',KeyS:'down',ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right'};
   addEventListener('keydown',e=>{if(!active||paused||e.altKey||e.metaKey||e.ctrlKey)return;
     if(keys[e.code]){e.preventDefault();route=[];request=null;held.add(keys[e.code]);}
-    else if(e.code==='KeyE'||(e.code==='Space'&&e.target.tagName!=='BUTTON')){e.preventDefault();if(!e.repeat)nearestSpot();}});
+    else if(e.code==='KeyE'||(e.code==='Space'&&e.target.tagName!=='BUTTON')){e.preventDefault();if(!e.repeat&&nearKey)moveToSpot(nearKey);}});
   addEventListener('keyup',e=>held.delete(keys[e.code]));addEventListener('blur',()=>held.clear());
   addEventListener('resize',size);
   window.World={scenes,start(state,cb){s=state;onSpot=cb;active=true;paused=false;this.enter(state.scene);cancelAnimationFrame(raf);lastFrame=performance.now();raf=requestAnimationFrame(frame);},
-    enter(key){s.scene=key;id=key;scene=scenes[id];[px,py]=scene.nodes[scene.spawn];face='up';route=[];request=null;held.clear();markers();size();},
-    stop(){active=false;held.clear();route=[];request=null;cancelAnimationFrame(raf);},pause(value){paused=value;held.clear();},resize:size};
+    enter(key,arriving=false){
+      s.scene=key;id=key;scene=scenes[key];overview=false;
+      const spawn=arriving&&key==='harbor'?scene.spots.boat[2]:scene.spawn;
+      [px,py]=scene.nodes[spawn];face=arriving?'left':'up';route=[];request=null;target=null;held.clear();mountObjects();size();
+    },
+    stop(){active=false;held.clear();route=[];request=null;cancelAnimationFrame(raf);},pause(value){paused=value;held.clear();if(scene)refreshLabels();},resize:size};
 })();
