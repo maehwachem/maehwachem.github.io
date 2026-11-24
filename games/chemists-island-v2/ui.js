@@ -29,10 +29,13 @@
   }
   function hud(){
     $('place').textContent=World.scenes[state.scene].name;
-    $('tide').textContent=state.scene==='harbor'?(state.returns?'귀항 '+state.returns+'회 · 등대 점등':'첫 출항 전'):'간조 · 연안 탐사';
-    $('goal').textContent=trial&&state.repaired?'다시 뜬 빨간 부표가 보인다. 원래 항해로 돌아가자.':Voyage.goal(state);
+    $('tide').textContent=state.scene==='harbor'?(state.returns?'귀항 '+state.returns+'회 · 등대 점등':'첫 출항 전'):(state.scene==='yard'?'우체국 뒤뜰':'간조 · 연안 탐사');
+    $('goal').textContent=trial&&state.repaired&&state.scene==='harbor'?'다시 뜬 빨간 부표가 보인다. 원래 항해로 돌아가자.':Voyage.goal(state);
   }
   const waterItems={
+    woodFrame:{name:'나무틀',detail:'유리판을 비스듬히 받칠 수 있다.'},
+    glassPane:{name:'유리판',detail:'작업마당에서 찾은 투명한 창유리.'},
+    flask:{name:'증류수 한 병',detail:'태양열 증류기의 물받이에서 받았다.'},
     rain:{name:'빗물 한 병',detail:'창고 처마 아래에서 받은 빗물. 바닥에 소금 결정이 없다.'},
     brine:{name:'소금물 한 병',detail:'염전 웅덩이의 포화 소금물. 바닥에 소금 결정이 쌓여 있었다.'},
     ink:{name:'압지 시료',detail:'광산 만에서 건진 종이. 번진 소인의 색이 희미하게 남았다.'},
@@ -41,6 +44,7 @@
   function packContents(){
     const ids=Supplies.bag(state);
     if(state.water)ids.push(state.water);
+    for(const part of ['woodFrame','glassPane','flask'])if(state[part])ids.push(part);
     if(state.mineClue)ids.push('ink');
     if(state.saltClue)ids.push('ledger');
     return ids;
@@ -141,6 +145,9 @@
     save();hud();
     if(old===state.scene){if(view?.pickup)pickup(view);else drawDialog(view,choose);return;}
     clearNotice();
+    if(old==='yard'||state.scene==='yard'){
+      close();World.enter(state.scene,old==='yard'?'post':false);$('world').focus({preventScroll:true});return;
+    }
     movingScene=true;close();World.enter(state.scene,true);World.pause(true);
     const sail=$('sailing');sail.querySelector('b').textContent=World.scenes[state.scene].name+' 방면';sail.hidden=false;
     clearTimeout(travelTimer);travelTimer=setTimeout(()=>{movingScene=false;sail.hidden=true;World.pause(false);drawDialog(view,choose);},matchMedia('(prefers-reduced-motion: reduce)').matches?40:1050);

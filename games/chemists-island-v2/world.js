@@ -3,7 +3,9 @@
   'use strict';
   const scenes = {
     harbor: {name:'우편선 선착장', spawn:[100,170],
-      spots:{post:['우체국',[40,123],[48,147]],bench:['작업대',[179,172],[143,190]],boat:['우편정',[323,97],[258,119]],board:['항로 게시판',[117,119],[117,126]],chain:['사슬 더미',[76,156],[80,163]],zinc:['정비 상자',[205,117],[205,127]]}},
+      spots:{chief:['오 국장',[62,137],[78,145]],keeper:['등대지기',[144,127],[162,131]],post:['우체국',[40,123],[48,147]],bench:['작업대',[179,172],[143,190]],boat:['우편정',[323,97],[258,119]],board:['항로 게시판',[117,119],[117,126]],chain:['사슬 더미',[76,156],[80,163]],zinc:['정비 상자',[205,117],[205,127]]}},
+    yard: {name:'우체국 작업마당',spawn:[55,151],
+      spots:{exit:['부두로 난 길',[32,136],[41,147]],frame:['나무틀',[82,121],[83,139]],still:['증류 작업대',[210,90],[210,127]],pane:['유리판',[286,119],[282,138]]}},
     mine: {name:'붉은 만 · 옛 광산',spawn:[317,150],
       spots:{winch:['권양기',[80,150],[98,185]],wreck:['난파선',[252,150],[237,184]],boat:['우편정',[342,125],[317,150]]}},
     salt: {name:'흰 띠 · 옛 염전',spawn:[332,123],
@@ -11,7 +13,8 @@
   };
   // Bounds in the same 384 × 216 grid as the paintings. Keep bare walkways outside them.
   const objects = {
-    harbor:{post:[4,67,80,70],bench:[147,164,68,34],boat:[267,68,108,60],board:[106,105,23,20],chain:[62,144,29,22],zinc:[191,103,29,23]},
+    harbor:{post:[15,78,39,57],chief:[55,115,16,27],keeper:[136,105,17,27],bench:[147,164,68,34],boat:[267,68,108,60],board:[106,105,23,20],chain:[62,144,29,22],zinc:[191,103,29,23]},
+    yard:{exit:[15,110,31,36],frame:[66,103,29,23],still:[177,78,65,37],pane:[272,99,29,28]},
     mine:{winch:[10,96,87,72],wreck:[173,113,113,53],boat:[300,100,82,47]},
     salt:{gate:[1,78,102,71],shed:[185,49,132,83],boat:[321,76,62,46],rain:[173,114,27,26],brine:[119,120,30,23]}
   };
@@ -21,7 +24,13 @@
     if(key==='rain')return '빗물통을 살핀다';
     if(key==='brine')return '웅덩이를 살핀다';
     if(key==='boat')return scene==='harbor'&&!s.repaired?'우편정을 살핀다':'우편정에 오른다';
-    if(key==='post')return s.mail?'국장과 이야기한다':'우체국 문을 연다';
+    if(key==='post')return '우체국 문을 연다';
+    if(key==='chief')return '오 국장과 대화';
+    if(key==='keeper')return '등대지기와 대화';
+    if(key==='exit')return '선착장으로';
+    if(key==='frame')return '나무틀 챙기기';
+    if(key==='pane')return '유리판 챙기기';
+    if(key==='still')return s.still?'증류기 살피기':'작업대 살피기';
     if(key==='board')return '게시판을 읽는다';
     if(key==='bench'){
       if(s.finished)return '말린 띠를 본다';
@@ -61,7 +70,8 @@
     const closeUp=full<640&&window.innerHeight>full&&window.innerHeight>=560;
     viewMode.hidden=!closeUp;
     const wideScale=Math.max(1,Math.floor(Math.min(full/W,Math.max(H,window.innerHeight-165)/H)));
-    const scale=closeUp&&!overview?2:wideScale;
+    const portraitScale=Math.min(1.75,Math.max(1,Math.floor((window.innerHeight-292)/H*4)/4));
+    const scale=closeUp&&!overview?portraitScale:wideScale;
     width=Math.min(W,Math.max(1,Math.floor(full/scale)));
     canvas.style.width=viewport.style.width=(width*scale)+'px';
     canvas.style.height=viewport.style.height=(H*scale)+'px';
@@ -77,6 +87,8 @@
     camera=snap(Math.max(0,Math.min(W-width,desired)));
   }
   function present(key){
+    if(id==='yard'&&key==='frame')return !s.still&&!s.woodFrame;
+    if(id==='yard'&&key==='pane')return !s.still&&!s.glassPane;
     return id!=='harbor'||!Object.hasOwn(Supplies.items,key)||(!s.repaired && !s.pack[key]);
   }
   function positionObjects(){
@@ -157,7 +169,7 @@
   }
   function actor(moving){
     const x=snap(px)-camera,y=snap(py);
-    ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.ellipse(x,y-1,9,2.8,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.ellipse(x,y-.7,5.8,1.7,0,0,Math.PI*2);ctx.fill();
     IslandChemist.draw(ctx,x,y,face,moving?Math.floor(walkPhase*8/28):-1);
   }
   function prop(column,x,y){
@@ -218,6 +230,7 @@
         const fx=258+Math.round(((t*3)%52));rect(fx,58,9,2,'#e1bb88');rect(fx+2,56,5,2,'#dcdbbe');rect(fx+2,55,4,1,'#b45741');rect(fx-3,61,9,1,'#c1c5aa');
       }
     }
+    if(id==='yard'){PierYard.paint(ctx,camera,s);return;}
     if(id==='salt')waterSpots();
     const patches=id==='harbor'?[[145,65],[267,82],[283,182]]:id==='mine'?[[314,83],[360,163],[201,101]]:[[157,74],[127,77],[329,182]];
     patches.forEach(([x,y],i)=>{for(let j=0;j<7;j++){const a=t*.9+i+j*1.37;const len=Math.round(1+Math.sin(a)*2);if(len>0)rect(x+(j*11)%33,y+(j*5)%8,len,1,'#d2e6cf72');}});
@@ -243,7 +256,13 @@
       const [x,y]=target;rect(x-3,y,2,1,'#f2daa5');rect(x+2,y,2,1,'#f2daa5');
       rect(x-1,y+1,3,1,'#ffe9b4');
     }
-    actor(moving);raf=requestAnimationFrame(frame);
+    const residents=id==='harbor'?PierYard.residents:[];
+    const time=reduced.matches?0:ts/1000;
+    for(const person of residents)if(person.y<=py)PierYard.person(ctx,camera,person,time);
+    actor(moving);
+    for(const person of residents)if(person.y>py)PierYard.person(ctx,camera,person,time);
+    if(id==='harbor'&&s.lampReady)PierYard.beacon(ctx,camera,time);
+    raf=requestAnimationFrame(frame);
   }
   canvas.addEventListener('pointerdown',e=>{
     if(!active||paused)return;
@@ -297,7 +316,7 @@
   window.World={scenes,start(state,cb){s=state;onSpot=cb;active=true;paused=false;this.enter(state.scene);cancelAnimationFrame(raf);lastFrame=performance.now();raf=requestAnimationFrame(frame);},
     enter(key,arriving=false){
       s.scene=key;id=key;scene=scenes[key];loadScene(key);overview=false;
-      const spawn=arriving&&key==='harbor'?scene.spots.boat[2]:scene.spawn;
+      const spawn=arriving&&key==='harbor'?scene.spots[arriving==='post'?'post':'boat'][2]:scene.spawn;
       [px,py]=Walkways[id].floor(spawn,Infinity);walkPhase=0;wasWalking=false;stopPad();face=arriving?'left':'down';route=[];request=null;target=null;held.clear();mountObjects();size();
     },
     refresh(){if(scene)refreshLabels();},stop(){active=false;stopPad();held.clear();route=[];request=null;cancelAnimationFrame(raf);},pause(value){paused=value;stopPad();held.clear();walkPhase=0;wasWalking=false;if(value){target=request=null;route=[];}if(scene)refreshLabels();},resize:size};

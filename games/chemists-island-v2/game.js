@@ -8,11 +8,17 @@
 
   function initial() {
     return { scene: 'harbor', returns: 0, finished: false, log: [], mineClue: false, saltClue: false, repaired: false,
-      pack: {chain:0, zinc:0}, water: null, mail: false, coupA: false, coupB: false, trip: null, first: null, visited: {}, lit: false,
+      pack: {chain:0, zinc:0}, water: null, woodFrame:false, glassPane:false, still:false, flask:false, lampWashed:false, lampReady:false, mail: false, coupA: false, coupB: false, trip: null, first: null, visited: {}, lit: false,
       plate: false, lifted: false, gate: false, refs: false, line: false, ran: false };
   }
 
   function goal(s) {
+    if(s.scene==='yard'){
+      if(s.flask)return '증류수를 담았다. 등대지기에게 돌아가거나 다음 항해를 준비하자.';
+      if(s.still)return '증류기 안쪽 물받이에 모인 물을 작은 병에 받자.';
+      if(s.woodFrame && s.glassPane)return '작업대의 바닷물 대야에 모은 재료로 증류기를 만들자.';
+      return '마당에서 나무틀과 유리판을 찾아보자.';
+    }
     if (s.finished) return '북암 항로가 지도에 올랐다. 섬들을 자유롭게 다시 찾아가자.';
     if (!s.repaired) {
       if (Supplies.ready(s)) return '작업대에 모은 재료를 펼쳐 부표를 고쳐 보자.';
@@ -64,6 +70,12 @@
           return D('우체국', '"원본 대장엔 손대지 말게."\n국장이 등대곶·모래섬·북암 소인대를\n새 종이에 하나씩 찍어 준다.', [], 'samples'); }
         return D('우체국', '"' + goal(s) + '"\n국장은 그 말만 하고 장부로 돌아간다.');
       },
+      chief: function(s){ return SPOT.harbor.post(s); },
+      keeper: function(s){
+        if(s.lampReady)return D('등대지기','“저 빛이 보이나? 해 질 때 우편정이 저걸 보고 부두 끝을 찾아.”');
+        if(s.lampWashed)return D('등대지기','유리가 맑아졌다. 등대지기가 가리킨 물길 쪽으로 가림판을 열면 빛이 나간다.',[{label:'물길 쪽 가림판 열기',id:'light_pier'}]);
+        return D('등대지기','등대지기가 손등으로 부두 등불의 유리를 문지른다. “바닷물로 닦고 말리면 또 하얘져. 우체국 뒤 작업마당에 민물을 모으던 대야가 있었는데.”',s.flask?[{label:'가방의 증류수로 유리 헹구기',id:'wash_lamp'}]:[]);
+      },
       bench: function (s) {
         if (!s.repaired) {
           var c = [{label:'정비 기록 A 펼치기', id:'coupA'},{label:'정비 기록 B 펼치기',id:'coupB'}];
@@ -92,6 +104,16 @@
         return D('게시판', '목표: ' + goal(s) + '\n\n' + (s.log.length ? s.log.join('\n') : '아직 기록 없음.'), [], s.finished ? 'map' : 'log');
       }
     },
+    yard: {
+      frame: function(s){ if(s.still||s.woodFrame)return null; s.woodFrame=true; return {pickup:'woodFrame',text:'나무틀을 가방에 넣었다.'}; },
+      pane: function(s){ if(s.still||s.glassPane)return null; s.glassPane=true; return {pickup:'glassPane',text:'유리판을 가방에 넣었다.'}; },
+      still: function(s){
+        if(s.flask)return D('작업마당의 증류기','가방의 작은 병은 가득 찼다. 물받이 아래엔 새 물방울이 맺힌다.');
+        if(s.still)return D('작업마당의 증류기','햇살에 데워진 바닷물에서 물이 증발한다. 기울인 유리 안쪽의 물방울이 가장자리를 타고 별도의 물받이에 떨어진다.',[{label:'시간을 보내고 증류수 받기',id:'decant'}]);
+        return D('볕 드는 작업대','검은 대야에는 바닷물이, 옆에는 빈 물받이가 있다. 대야 위에 비스듬히 세울 나무틀과 유리판이 필요하다.',s.woodFrame&&s.glassPane?[{label:'나무틀에 유리판을 끼워 덮기',id:'build_still'}]:[]);
+      },
+      exit: function(){return D('부두로 난 길','나무 발판을 따라가면 우체국 앞이다.',[{label:'선착장으로 걷기',id:'leave_yard'}]);}
+    },
     mine: {
       winch: function (s) {
         if (!s.plate) return D('권양기', '녹청이 명판을 덮었다. 글자가 안 보인다.',
@@ -114,6 +136,7 @@
       gate: function (s) {
         if (s.gate) return D('수문', '열린 수문으로 바람이 지난다.');
         var choices=s.water?[{label:'가방의 '+(s.water==='rain'?'빗물':'소금물')+' 붓기',id:s.water==='rain'?'g_rain':'g_brine'}]:[];
+        if(s.flask) choices.push({label:'가방의 증류수 붓기',id:'g_distilled'});
         return D('수문','경첩 사이로 하얀 소금 결정이 빽빽하다. 손잡이를 당겨도 꿈쩍하지 않는다.' +
           (s.water?'':'\n물레방아 옆 웅덩이와 창고 처마 아래 물통에 물이 고여 있다.'),choices);
       },
@@ -129,7 +152,13 @@
 
   function interact(s, id) {
     var f = SPOT[s.scene] && SPOT[s.scene][id];
-    return f ? f(s) : null;
+    var view=f ? f(s) : null;
+    if(view && s.scene==='harbor' && (id==='post'||id==='chief')){
+      if(id==='chief')view.title='오 국장';
+      if(!s.still)view.text+='\n“우체국 뒤에 쓰던 유리판이 있네. 필요하면 가져가게.”';
+      view.choices.splice(view.choices.length-1,0,{label:'뒤쪽 작업마당으로 걷기',id:'enter_yard'});
+    }
+    return view;
   }
 
   function go(s, isl) {
@@ -140,6 +169,31 @@
   function retry(t, x, back) { return D(t, x, [{ label: '다시', id: back }]); }
 
   var ACT = {
+    enter_yard: function(s){if(s.scene!=='harbor')return null;s.scene='yard';return null;},
+    leave_yard: function(s){if(s.scene!=='yard')return null;s.scene='harbor';return null;},
+    build_still: function(s){
+      if(s.scene!=='yard'||s.still||!s.woodFrame||!s.glassPane)return null;
+      s.woodFrame=s.glassPane=false;s.still=true;
+      L(s,'우체국 뒤에 태양열 증류기를 세웠다.');
+      return SPOT.yard.still(s);
+    },
+    decant: function(s){
+      if(s.scene!=='yard'||!s.still||s.flask)return null;
+      s.flask=true;return {pickup:'flask',text:'볕이 기울 무렵, 증류수 한 병을 받았다.'};
+    },
+    wash_lamp: function(s){
+      if(s.scene!=='harbor'||!s.flask||s.lampWashed)return null;
+      s.flask=false;s.lampWashed=true;return SPOT.harbor.keeper(s);
+    },
+    light_pier: function(s){
+      if(s.scene!=='harbor'||!s.lampWashed||s.lampReady)return null;
+      s.lampReady=true;L(s,'등대지기와 함께 부두 끝 등불을 밝혔다.');
+      return D('부두 끝 등불','가림판이 열리자 물 위에 금빛 한 줄이 비친다. 등대지기가 우편정을 향해 손을 든다.');
+    },
+    g_distilled: function(s){
+      if(s.scene!=='salt'||!s.flask||s.gate)return null;
+      s.flask=false;s.gate=true;return D('수문','마당에서 모아 둔 물에 경첩의 소금 결정이 녹는다. 손잡이가 돌아가고 창고 앞 물이 빠진다.');
+    },
     fill_rain: function(s){return fill(s,'rain');},
     fill_brine: function(s){return fill(s,'brine');},
     stock_note: function(s){
@@ -167,7 +221,7 @@
     go_mine: function (s) { return go(s, 'mine'); },
     go_salt: function (s) { return go(s, 'salt'); },
     home: function (s) {
-      if (s.scene === 'harbor') return null;
+      if (!Object.hasOwn(ISL,s.scene)) return null;
       s.scene = 'harbor'; s.trip = null; s.returns++;
       var t = '우편정이 부두에 닿았다.';
       if (s.returns === 1) { s.lit = true; L(s, '등대에 불이 켜졌다. 정기선 운항 재개.');

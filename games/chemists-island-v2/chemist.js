@@ -63,10 +63,10 @@
       atlas.putImageData(paint(dir,frame),(frame+1)*width,row*height);
     }
   });
-  function draw(ctx,x,y,dir,frame=-1,scale=2){
+  function draw(ctx,x,y,dir,frame=-1,scale=1.25){
     ctx.drawImage(sheet,(frame+1)*width,rows.indexOf(dir)*height,width,height,x-9*scale,y-17*scale,width*scale,height*scale);
   }
   window.IslandChemist={draw};
   const cover=document.getElementById('cover-hero'),cg=cover.getContext('2d');
-  cg.imageSmoothingEnabled=false;draw(cg,116*4,182*4,'down',-1,8);
+  cg.imageSmoothingEnabled=false;draw(cg,116*4,182*4,'down',-1,5);
 })();
