@@ -935,6 +935,7 @@ function renderSelection(item = currentItem()) {
   $('lockText').setAttribute('aria-label', item.locked ? '텍스트 배치 잠금 해제' : '텍스트 배치 잠금');
   controls.style.transform = `scale(${1 / scale})`;
   controls.style.transformOrigin = 'top left';
+  controls.style.width = 'max-content';
   controls.style.maxWidth = `${Math.max(120, width * scale - 10)}px`;
   controls.style.flexWrap = 'wrap';
   const controlWidth = controls.offsetWidth / scale;
