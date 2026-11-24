@@ -1,18 +1,17 @@
-/* Fixed pixel grid, walking corridors follow the jetties in the painted backgrounds. */
+/* A shared foot position drives touch, keyboard, camera and the walking cycle. */
 (() => {
   'use strict';
   const scenes = {
-    harbor: {name:'우편선 선착장', spawn:0, nodes:[[100,170],[48,147],[91,151],[126,134],[178,128],[232,126],[258,119],[144,190],[122,148],[117,126],[80,163],[205,127]],
-      edges:[[0,2],[2,1],[2,3],[3,4],[4,11],[11,5],[5,6],[0,7],[0,8],[8,3],[3,9],[0,10],[10,1]],
-      spots:{post:['우체국',[40,123],1],bench:['작업대',[179,172],7],boat:['우편정',[323,97],6],board:['항로 게시판',[117,119],9],chain:['사슬 더미',[76,156],10],zinc:['정비 상자',[205,117],11]}},
-    mine: {name:'붉은 만 · 옛 광산',spawn:4,nodes:[[98,185],[138,187],[204,195],[261,188],[317,150],[266,174],[237,184]],
-      edges:[[0,1],[1,2],[2,6],[6,3],[3,5],[5,4]],spots:{winch:['권양기',[80,150],0],wreck:['난파선',[252,150],6],boat:['우편정',[342,125],4]}},
-    salt: {name:'흰 띠 · 옛 염전',spawn:4,nodes:[[67,165],[103,161],[169,151],[243,140],[332,123],[285,132]],
-      edges:[[0,1],[1,2],[2,3],[3,5],[5,4]],spots:{gate:['수문',[77,130],0],shed:['창고',[251,116],3],boat:['우편정',[342,108],4],rain:['처마 아래 빗물통',[186,129],2],brine:['염전 물웅덩이',[133,133],1]}}
+    harbor: {name:'우편선 선착장', spawn:[100,170],
+      spots:{post:['우체국',[40,123],[48,147]],bench:['작업대',[179,172],[143,190]],boat:['우편정',[323,97],[258,119]],board:['항로 게시판',[117,119],[117,126]],chain:['사슬 더미',[76,156],[80,163]],zinc:['정비 상자',[205,117],[205,127]]}},
+    mine: {name:'붉은 만 · 옛 광산',spawn:[317,150],
+      spots:{winch:['권양기',[80,150],[98,185]],wreck:['난파선',[252,150],[237,184]],boat:['우편정',[342,125],[317,150]]}},
+    salt: {name:'흰 띠 · 옛 염전',spawn:[332,123],
+      spots:{gate:['수문',[77,130],[67,165]],shed:['창고',[251,116],[243,140]],boat:['우편정',[342,108],[332,123]],rain:['처마 아래 빗물통',[186,129],[169,151]],brine:['염전 물웅덩이',[133,133],[103,161]]}}
   };
   // Bounds in the same 384 × 216 grid as the paintings. Keep bare walkways outside them.
   const objects = {
-    harbor:{post:[3,64,87,82],bench:[147,164,68,34],boat:[267,68,108,60],board:[106,105,23,20],chain:[62,144,29,22],zinc:[191,103,29,23]},
+    harbor:{post:[4,67,80,70],bench:[147,164,68,34],boat:[267,68,108,60],board:[106,105,23,20],chain:[62,144,29,22],zinc:[191,103,29,23]},
     mine:{winch:[10,96,87,72],wreck:[173,113,113,53],boat:[300,100,82,47]},
     salt:{gate:[1,78,102,71],shed:[185,49,132,83],boat:[321,76,62,46],rain:[173,114,27,26],brine:[119,120,30,23]}
   };
@@ -49,18 +48,13 @@
   }
   let density=1;
   function snap(v){return Math.round(v*density)/density;}
-  const colors={o:'#20303a',h:'#372c2b',a:'#60433a',s:'#e4a076',u:'#fac197',t:'#207071',j:'#318a88',l:'#57a6a1',b:'#805134',g:'#cb9652',c:'#f1d7a5',p:'#c5b18c',k:'#443937'};
-  const sprites={
-    down:['....ohhhho....','...ohhaahho...','..ohhhhhhhho..','..ohhsuushu o.'.replace(/ /g,''),'...osusuuso...','....ouuuuo....','...ottoo tto...'.replace(/ /g,''),'..ojjjbgjjjo..','..ojjjgbjtjo..','..osjtbgjtso..','...otgbbbo....','...ogggbcco...','....oppcco....'],
-    up:['....ohhhho....','...ohhaaaho...','..ohhaahhhho..','..ohhhhhhhho..','...ohhhhhho...','....ohhhho....','...otttttto...','..ojjtgbtjjo..','..ojtgbtttjo..','..osgbbbjtso..','...obggbbo....','...obggbcco...','....oppcco....'],
-    side:['....ohhhho....','...ohhaahho...','...ohhhhhho...','...ohhhusuo...','....ohsuuuo...','.....osuuo....','....otttto....','...obgtjjto...','...oggjjjto...','...obgjssto...','....obbbbo....','....oppcco....','....opccco....']
-  };
   const held=new Set(); const reduced=matchMedia('(prefers-reduced-motion: reduce)');
-  let s, scene, id, px=0,py=0,face='down',route=[],request=null,walkTime=0,lastFrame=0,raf=0,active=false,paused=false,onSpot=()=>{},width=W,camera=0;
+  let s, scene, id, px=0,py=0,face='down',route=[],request=null,walkPhase=0,wasWalking=false,lastFrame=0,raf=0,active=false,paused=false,onSpot=()=>{},width=W,camera=0;
   const dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
   function rect(x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(Math.round(x)-camera,Math.round(y),w,h);}
   const controls=document.getElementById('objects'), nearby=document.getElementById('nearby'), viewMode=document.getElementById('view-mode');
-  let overview=false, nearKey=null, target=null;
+  let overview=false, nearKey=null, target=null, padPointer=null, padDirection=null, padStart=null;
+  const pad=document.getElementById('walk-pad');
   function size(){
     if(!active||!box.clientWidth)return;
     const full=box.clientWidth;
@@ -76,9 +70,12 @@
     ctx.setTransform(density,0,0,density,0,0);ctx.imageSmoothingEnabled=false;
     viewMode.textContent=overview?'가까이 보기':'전경 보기';
     viewMode.setAttribute('aria-pressed',String(overview));
-    alignCamera();positionObjects();
+    alignCamera(true);positionObjects();
   }
-  function alignCamera(){camera=snap(Math.max(0,Math.min(W-width,px-width/2)));}
+  function alignCamera(reset=false){
+    const desired=reset?px-width/2:Math.min(px-width*.32,Math.max(px-width*.68,camera));
+    camera=snap(Math.max(0,Math.min(W-width,desired)));
+  }
   function present(key){
     return id!=='harbor'||!Object.hasOwn(Supplies.items,key)||(!s.repaired && !s.pack[key]);
   }
@@ -117,7 +114,7 @@
       let best=23;
       for(const [key,spot] of Object.entries(scene.spots)){
         if(!present(key))continue;
-        const d=dist([px,py],scene.nodes[spot[2]]);
+        const d=dist([px,py],spot[2]);
         if(d<best){best=d;nearKey=key;}
       }
     }
@@ -126,87 +123,42 @@
   }
   nearby.onclick=()=>{if(nearKey)moveToSpot(nearKey);};
   viewMode.onclick=()=>{overview=!overview;size();};
-  function nearestOnSegment(pos,a,b){
-    const dx=b[0]-a[0],dy=b[1]-a[1],t=Math.max(0,Math.min(1,((pos[0]-a[0])*dx+(pos[1]-a[1])*dy)/(dx*dx+dy*dy)));
-    return [a[0]+dx*t,a[1]+dy*t];
-  }
-  function projection(pos){
-    let best;
-    for(const [a,b] of scene.edges){
-      const point=nearestOnSegment(pos,scene.nodes[a],scene.nodes[b]),d=dist(pos,point);
-      if(!best||d<best.d)best={a,b,point,d};
-    }return best;
-  }
-  function findRoute(target){
-    const start=projection([px,py]),end=projection(target);
-    const nodes=[...scene.nodes,start.point,end.point],a=nodes.length-2,b=a+1;
-    const edges=[...scene.edges,[a,start.a],[a,start.b],[b,end.a],[b,end.b]];
-    if(start.a===end.a&&start.b===end.b)edges.push([a,b]);
-    const costs=nodes.map(()=>Infinity),previous=nodes.map(()=>-1),visited=new Set();costs[a]=0;
-    while(visited.size<nodes.length){
-      let u=-1; for(let i=0;i<nodes.length;i++)if(!visited.has(i)&&(u<0||costs[i]<costs[u]))u=i;
-      if(u===b||u<0||costs[u]===Infinity)break;visited.add(u);
-      for(const [x,y] of edges){const v=x===u?y:y===u?x:-1;if(v<0)continue;
-        const c=costs[u]+dist(nodes[u],nodes[v]);if(c<costs[v]){costs[v]=c;previous[v]=u;}}
-    }
-    const list=[];for(let i=b;i!==-1;i=previous[i])list.unshift(nodes[i]);return list;
-  }
   function moveToSpot(key){
     if(paused||!scene.spots[key]||!present(key))return;
-    target=null;held.clear();request=key;route=findRoute(scene.nodes[scene.spots[key][2]]);
+    stopPad();held.clear();
+    target=Walkways[id].floor(scene.spots[key][2],Infinity);
+    route=Walkways[id].route([px,py],target);request=route.length?key:null;
     if(overview){overview=false;size();}
     canvas.focus({preventScroll:true});updateNearby();
   }
-  function orient(dx,dy){if(Math.abs(dx)>Math.abs(dy)*1.4)face=dx<0?'left':'right';else if(dy!==0)face=dy<0?'up':'down';}
+  function orient(dx,dy){
+    const ax=Math.abs(dx),ay=Math.abs(dy);
+    if(ax+ay<.001)return;
+    const same=(face==='left'&&dx<0)||(face==='right'&&dx>0)||(face==='up'&&dy<0)||(face==='down'&&dy>0);
+    if(same&&Math.max(ax,ay)<Math.min(ax,ay)*1.25)return;
+    face=ax>=ay?(dx<0?'left':'right'):(dy<0?'up':'down');
+  }
   function movement(dt){
-    if(paused)return false;
-    let dx=Number(held.has('right'))-Number(held.has('left')),dy=Number(held.has('down'))-Number(held.has('up'));
-    const step=85*dt;
+    if(paused)return;
+    const down=key=>held.has(key)||padDirection===key;
+    let dx=Number(down('right'))-Number(down('left')),dy=Number(down('down'))-Number(down('up'));
+    const step=57*dt;
     if(dx||dy){
-      const len=Math.hypot(dx,dy);dx/=len;dy/=len;const desired=[px+dx*step,py+dy*step],near=projection(desired);
-      if(near.d>6){const k=6/near.d;px=near.point[0]+(desired[0]-near.point[0])*k;py=near.point[1]+(desired[1]-near.point[1])*k;}else [px,py]=desired;
-      orient(dx,dy);return true;
+      const length=Math.hypot(dx,dy);
+      const next=Walkways[id].slide([px,py],[px+dx*step/length,py+dy*step/length]);
+      [px,py]=next;return;
     }
     let left=step;
     while(route.length&&left>0){
       const p=route[0];dx=p[0]-px;dy=p[1]-py;const length=Math.hypot(dx,dy);
-      if(length>.15)orient(dx,dy);
-      if(length<=left){[px,py]=p;left-=length;route.shift();}else{px+=dx*left/length;py+=dy*left/length;left=0;}
+      if(length<=left){[px,py]=p;left-=length;route.shift();}
+      else{px+=dx*left/length;py+=dy*left/length;left=0;}
     }
-    if(!route.length&&request){
-      const key=request, look=scene.spots[key][1];request=null;
-      orient(look[0]-px,look[1]-py);onSpot(key);
-    }
-    return route.length>0;
   }
   function actor(moving){
-    if(loaded(props)){
-      const left=face==='left', col=face==='up'?1:face==='down'?0:2;
-      const step=moving?Math.sin(walkTime*12):0;
-      // Split at the knees so each boot can lift while the satchel follows the torso.
-      ctx.save();ctx.translate(snap(px)-camera,snap(py));
-      ctx.fillStyle='#393c435c';ctx.beginPath();ctx.ellipse(0,-.6,6.6,1.35,0,0,2*Math.PI);ctx.fill();
-      if(left)ctx.scale(-1,1);
-      const top=-40-snap(Math.abs(step)*.42);
-      ctx.drawImage(props,col*144,0,144,119,-18,top,36,29.75);
-      for(let leg=0;leg<2;leg++){
-        const stride=step*(leg?1:-1),lift=snap(Math.max(0,stride)*1.3);
-        ctx.drawImage(props,col*144+72*leg,119,72,41,-18+18*leg,top+29.75,18,10.25-lift);
-      }
-      ctx.restore();return;
-    }
-    const x=Math.round(px),y=Math.round(py),beat=moving?Math.floor(walkTime*8)%2:0;
-    rect(x-8,y-1,17,2,'#4b453f88');rect(x-5,y-2,12,3,'#3a3e4788');
-    const rows=sprites[face==='left'||face==='right'?'side':face];
-    const xx=[0,1,2,4,5,7,8,10,11,13,14,16,17,18,19], yy=[0,2,3,5,7,8,10,12,14,16,18,20,22,24];
-    rows.forEach((row,iy)=>[...row].forEach((c,ix)=>{
-      if(colors[c])rect(x+(face==='left'?9-xx[ix+1]:xx[ix]-9),y-31+yy[iy]-beat,xx[ix+1]-xx[ix],yy[iy+1]-yy[iy],colors[c]);
-    }));
-    const offset=moving?(beat?1:-1):0;
-    rect(x-4,y-9-offset,5,6,colors.p);rect(x+1,y-9+offset,5,6,colors.c);
-    rect(x-4,y-9-offset,1,6,'#947d67');rect(x+5,y-9+offset,1,6,'#947d67');
-    rect(x-5,y-4-offset,6,4,colors.k);rect(x+1,y-4+offset,6,4,colors.k);
-    rect(x-4,y-4-offset,3,1,'#806048');rect(x+2,y-4+offset,3,1,'#806048');
+    const x=snap(px)-camera,y=snap(py);
+    ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.ellipse(x,y-1,9,2.8,0,0,Math.PI*2);ctx.fill();
+    IslandChemist.draw(ctx,x,y,face,moving?Math.floor(walkPhase*8/28):-1);
   }
   function prop(column,x,y){
     if(!loaded(props))return false;
@@ -272,7 +224,19 @@
   }
   function frame(ts){
     if(!active)return;
-    const dt=Math.min(.22,(ts-lastFrame)/1000||0);lastFrame=ts;const moving=movement(dt);if(moving)walkTime+=dt;
+    const dt=Math.max(0,Math.min(.08,(ts-lastFrame)/1000));lastFrame=ts;
+    const oldX=px,oldY=py;
+    movement(dt);
+    const distance=Math.hypot(px-oldX,py-oldY),moving=distance>.015;
+    if(moving){
+      orient(px-oldX,py-oldY);
+      walkPhase=((wasWalking?walkPhase:28/8)+distance)%28;
+    }else walkPhase=0;
+    wasWalking=moving;
+    if(!paused&&!route.length&&request){
+      const key=request,look=scene.spots[key][1];request=null;
+      orient(look[0]-px,look[1]-py);onSpot(key);
+    }
     const oldCamera=camera;alignCamera();if(oldCamera!==camera)positionObjects();updateNearby();
     const image=textures[id];if(loaded(image)){ctx.drawImage(image,-camera,0,W,H);weather(reduced.matches?0:ts/1000,image);}else{ctx.fillStyle='#164b59';ctx.fillRect(0,0,width,H);}
     if(target&&route.length){
@@ -284,21 +248,57 @@
   canvas.addEventListener('pointerdown',e=>{
     if(!active||paused)return;
     const b=canvas.getBoundingClientRect(),pos=[camera+(e.clientX-b.left)*width/b.width,(e.clientY-b.top)*H/b.height];
-    const foot=projection(pos);
-    if(foot.d>20)return;
-    request=null;target=foot.point;held.clear();route=findRoute(foot.point);
+    const foot=Walkways[id].floor(pos,3);
+    if(!foot)return;
+    stopPad();request=null;target=foot;held.clear();route=Walkways[id].route([px,py],foot);
+    canvas.focus({preventScroll:true});
   });
+  function stopPad(){
+    if(padPointer!==null&&pad.hasPointerCapture(padPointer))pad.releasePointerCapture(padPointer);
+    padPointer=null;padDirection=null;padStart=null;
+    for(const b of pad.children)b.classList.remove('pressed');
+  }
+  function steer(e){
+    const button=document.elementFromPoint(e.clientX,e.clientY)?.closest('#walk-pad button');
+    padDirection=button?.dataset.dir||null;
+    for(const b of pad.children)b.classList.toggle('pressed',b===button);
+  }
+  pad.addEventListener('pointerdown',e=>{
+    if(!active||paused||padPointer!==null||!e.target.closest('button'))return;
+    e.preventDefault();padPointer=e.pointerId;pad.setPointerCapture(e.pointerId);
+    route=[];target=request=null;held.clear();steer(e);padStart=[px,py];
+  });
+  pad.addEventListener('pointermove',e=>{if(e.pointerId===padPointer)steer(e);});
+  for(const type of ['pointerup','pointercancel','lostpointercapture']){
+    pad.addEventListener(type,e=>{
+      if(e.pointerId!==padPointer)return;
+      const tap=type==='pointerup'&&padDirection&&padStart&&dist(padStart,[px,py])<.05;
+      const dir=padDirection;stopPad();
+      if(tap)nudge(dir);
+    });
+  }
+  pad.addEventListener('click',e=>{
+    if(e.detail||!active||paused)return;
+    const dir=e.target.closest('button')?.dataset.dir;
+    if(!dir)return;
+    nudge(dir);
+  });
+  function nudge(dir){
+    const dx=Number(dir==='right')-Number(dir==='left'),dy=Number(dir==='down')-Number(dir==='up');
+    const end=Walkways[id].slide([px,py],[px+dx*6,py+dy*6]);
+    request=null;target=end;route=Walkways[id].route([px,py],end);
+  }
   const keys={ArrowUp:'up',KeyW:'up',ArrowDown:'down',KeyS:'down',ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right'};
   addEventListener('keydown',e=>{if(!active||paused||e.altKey||e.metaKey||e.ctrlKey)return;
-    if(keys[e.code]){e.preventDefault();route=[];request=null;held.add(keys[e.code]);}
+    if(keys[e.code]){e.preventDefault();stopPad();route=[];request=target=null;held.add(keys[e.code]);}
     else if(e.code==='KeyE'||(e.code==='Space'&&e.target.tagName!=='BUTTON')){e.preventDefault();if(!e.repeat&&nearKey)moveToSpot(nearKey);}});
-  addEventListener('keyup',e=>held.delete(keys[e.code]));addEventListener('blur',()=>held.clear());
+  addEventListener('keyup',e=>held.delete(keys[e.code]));addEventListener('blur',()=>{stopPad();held.clear();});
   addEventListener('resize',size);
   window.World={scenes,start(state,cb){s=state;onSpot=cb;active=true;paused=false;this.enter(state.scene);cancelAnimationFrame(raf);lastFrame=performance.now();raf=requestAnimationFrame(frame);},
     enter(key,arriving=false){
       s.scene=key;id=key;scene=scenes[key];loadScene(key);overview=false;
       const spawn=arriving&&key==='harbor'?scene.spots.boat[2]:scene.spawn;
-      [px,py]=scene.nodes[spawn];face=arriving?'left':'up';route=[];request=null;target=null;held.clear();mountObjects();size();
+      [px,py]=Walkways[id].floor(spawn,Infinity);walkPhase=0;wasWalking=false;stopPad();face=arriving?'left':'down';route=[];request=null;target=null;held.clear();mountObjects();size();
     },
-    refresh(){if(scene)refreshLabels();},stop(){active=false;held.clear();route=[];request=null;cancelAnimationFrame(raf);},pause(value){paused=value;held.clear();if(scene)refreshLabels();},resize:size};
+    refresh(){if(scene)refreshLabels();},stop(){active=false;stopPad();held.clear();route=[];request=null;cancelAnimationFrame(raf);},pause(value){paused=value;stopPad();held.clear();walkPhase=0;wasWalking=false;if(value){target=request=null;route=[];}if(scene)refreshLabels();},resize:size};
 })();
