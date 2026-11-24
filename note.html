@@ -615,9 +615,17 @@ function tapeAppearance(tape, changes = {}) {
     height:Number.isFinite(changes.height)?clamp(changes.height,8,height-tape.y):tape.height,
     color:validColor(changes.color)?changes.color:tape.color};
 }
-function tapeMenuPosition(tape, size, view, gap) {
-  const desired=tape.y-size.height-gap>=view.top?tape.y-size.height-gap:tape.y+tape.height+gap;
-  return {left:clamp(tape.x,view.left,Math.max(view.left,view.right-size.width)),top:clamp(desired,view.top,Math.max(view.top,view.bottom-size.height))};
+function tapeMenuPosition(tape, size, view, gap, obstacles = [], visible = view) {
+  if(tape.x+tape.width<=visible.left || tape.x>=visible.right || tape.y+tape.height<=visible.top || tape.y>=visible.bottom || size.width>view.right-view.left || size.height>view.bottom-view.top)return null;
+  const blocked=[{left:tape.x,top:tape.y,right:tape.x+tape.width,bottom:tape.y+tape.height},...obstacles];
+  const candidates=[{left:tape.x,top:tape.y-size.height-gap},{left:tape.x,top:tape.y+tape.height+gap+42},
+    {left:tape.x+tape.width+gap+42,top:tape.y},{left:tape.x-size.width-gap,top:tape.y},
+    {left:tape.x,top:tape.y-size.height-gap-42},{left:tape.x,top:tape.y+tape.height+gap}];
+  for(const point of candidates) {
+    const at={left:clamp(point.left,view.left,view.right-size.width),top:clamp(point.top,view.top,view.bottom-size.height)};
+    if(!blocked.some(box=>at.left<box.right+3 && at.left+size.width>box.left-3 && at.top<box.bottom+3 && at.top+size.height>box.top-3))return at;
+  }
+  return null;
 }
 function tapeGripPositions(tape, size, gap) {
   const right=tape.x+tape.width+gap,left=tape.x-size-gap,below=tape.y+tape.height+gap,above=tape.y-size-gap;
@@ -3339,7 +3347,7 @@ function renderTapes(preview = null) {
     cover.setAttribute('aria-label',`가림 ${index+1}/${tapes.length}, ${edit ? '선택해서 끌어 이동' : revealed ? '정답 공개됨, 누르면 가리기' : '누르면 정답 공개'}`);
     cover.setAttribute('aria-pressed',revealed);
     const number = document.createElement('span');number.textContent = index+1;number.setAttribute('aria-hidden','true');cover.append(number);
-    cover.onclick = event => { if (event.detail!==0) return; if (edit) { selectedTape=tape.id;renderTapes();renderStudyUI();$('tapeSelectionTools')?.querySelector('[data-tape-action=appearance]')?.focus(); } else toggleTapeReveal(tape.id); };
+    cover.onclick = event => { if (event.detail!==0) return; if (edit) { selectedTape=tape.id;renderTapes();renderStudyUI();($('tapeSelectionTools')?.querySelector('[data-tape-action=appearance]')??$('editTape')).focus(); } else toggleTapeReveal(tape.id); };
     layer.append(cover);
     if (edit && selectedTape===tape.id) {
       for(const [axis,glyph,label] of [['x','↔','길이'],['y','↕','두께']]) {
@@ -3378,10 +3386,16 @@ function renderTapeActions(tape) {
   document.querySelector('.workspace').append(controls);
   const paper=$('paper').getBoundingClientRect(),view=scroller.getBoundingClientRect(),area=document.querySelector('.workspace').getBoundingClientRect();
   const box={x:paper.left+tape.x*scale,y:paper.top+tape.y*scale,width:tape.width*scale,height:tape.height*scale};
-  const bounds={left:Math.max(view.left,0)+6,right:Math.min(view.right,window.innerWidth)-6,top:view.top+6,bottom:Math.min(view.bottom,window.innerHeight)-6};
-  const size={width:controls.offsetWidth,height:controls.offsetHeight},gap=50;
-  if(box.y-size.height-gap<bounds.top && box.y+box.height+gap+size.height>bounds.bottom)bounds.top=Math.max(area.top,0)+6;
-  const at=tapeMenuPosition(box,size,bounds,gap);
+  const visible={left:Math.max(view.left,0)+6,right:Math.min(view.right,window.innerWidth)-6,top:Math.max(view.top,0)+6,bottom:Math.min(view.bottom,window.innerHeight)-6};
+  const bounds={...visible},size={width:controls.offsetWidth,height:controls.offsetHeight};
+  const grips=Object.values(tapeGripPositions(tape,36/scale,6/scale)).map(at=>({left:paper.left+at.left*scale,top:paper.top+at.top*scale,right:paper.left+at.left*scale+36,bottom:paper.top+at.top*scale+36}));
+  const obstacles=[...grips,...(currentPage().tapes??[]).map(t=>{
+    const w=Math.max(24,t.width*scale),h=Math.max(24,t.height*scale),x=paper.left+(t.x+t.width/2)*scale,y=paper.top+(t.y+t.height/2)*scale;
+    return {left:x-w/2,top:y-h/2,right:x+w/2,bottom:y+h/2};
+  })];
+  let at=tapeMenuPosition(box,size,bounds,8,obstacles,visible);
+  if(!at){bounds.top=Math.max(area.top,0)+6;at=tapeMenuPosition(box,size,bounds,8,obstacles,visible);}
+  if(!at){controls.remove();return;}
   controls.style.left=at.left+'px';controls.style.top=at.top+'px';
 }
 function toggleTapeReveal(tapeId) {
