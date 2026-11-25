@@ -116,3 +116,22 @@ button.rig-label:hover,button.rig-label:focus-visible{background:#ffebbc;border-
   #goal{font-size:.94rem;margin:0}
   .field-note{padding:.35rem 0}
 }
+
+#chapter-route{display:inline-flex;align-items:center;min-height:44px;color:#ffdfa8;text-underline-offset:.24em;font-weight:650}
+body.north-entry #cover{background-image:url('art/north-hd.webp');background-position:center}
+body.north-entry #cover-hero{display:none}
+body.north-entry .intro{max-width:25em;word-break:keep-all}
+#diagram.north-lab{display:block;padding:.45rem;background:#243c44;color:#f4ebd4;border:1px solid #698285;text-align:center}
+.north-lab canvas{display:block;width:100%;height:auto}
+.north-lab button{background:#f4cb92;color:#263d43;border-color:#d5ac76;min-height:44px;margin:.15rem;font-weight:700}
+.north-lab button:disabled{opacity:.62}.north-lab input[type=range]{display:block;width:88%;margin:0 auto;min-height:44px;accent-color:#ffcf85}
+.north-lab p{margin:.2rem .4rem .45rem;font-size:.88rem;line-height:1.45;color:#f4ebd4}
+.stamp-cord::before{width:21px;height:13px;border:3px double #986c3e;border-radius:50%}
+.stamp-magnet::before,.stamp-retriever::before{width:12px;height:14px;border:4px solid #ad5d4b;border-top:0;border-radius:0 0 9px 9px}
+.stamp-retriever::after{width:9px;height:5px;border-top:2px solid #946844;transform:translate(8px,-8px) rotate(-34deg)}
+.stamp-crankPin::before,.stamp-copper::before{width:19px;height:4px;background:#798e95;border-left:4px solid #526b75;transform:rotate(-20deg)}
+.stamp-copper::before{background:#8ab8a9;border-left:4px solid #c47e4a;border-right:4px solid #c47e4a}
+.stamp-reply::before,.stamp-survey::before{width:21px;height:14px;border:1px solid #9c7958;background:#f5e4b6}
+.stamp-reply::after{width:8px;height:8px;border:solid #a68869;border-width:0 1px 1px 0;transform:translateY(-3px) rotate(45deg)}
+.stamp-survey::after{width:17px;height:6px;border-bottom:2px dashed #a87755;transform:rotate(-18deg)}
+@media(max-width:640px){#pickup{width:max-content;max-width:92%;white-space:normal;text-align:center;line-height:1.4}}

@@ -2,6 +2,7 @@
 (() => {
   'use strict';
   const scenes = {
+    north:NorthDock.scene,
     harbor: {name:'우편선 선착장', spawn:[100,170],
       spots:{chief:['오 국장',[62,137],[78,145]],get keeper(){const {x,y}=PierYard.keeper;return ['등대지기',[x,y],[x+17,y+4]];},post:['우체국',[40,123],[48,147]],bench:['작업대',[179,172],[143,190]],boat:['우편정',[323,97],[258,119]],board:['항로 게시판',[117,119],[117,126]],chain:['사슬 더미',[76,156],[80,163]],zinc:['정비 상자',[205,117],[205,127]]}},
     yard: {name:'우체국 작업마당',spawn:[55,151],
@@ -13,12 +14,14 @@
   };
   // Bounds in the same 384 × 216 grid as the paintings. Keep bare walkways outside them.
   const objects = {
+    north:NorthDock.bounds,
     harbor:{post:[15,78,39,57],chief:[55,115,16,27],get keeper(){const {x,y}=PierYard.keeper;return [x-12,y-23,25,28];},bench:[147,164,68,34],boat:[267,68,108,60],board:[106,105,23,20],chain:[62,144,29,22],zinc:[191,103,29,23]},
     yard:{exit:[15,110,31,36],frame:[66,103,29,23],still:[177,78,65,37],pane:[272,99,29,28]},
     mine:{winch:[10,96,87,72],wreck:[173,113,113,53],boat:[300,100,82,47]},
     salt:{gate:[1,78,102,71],shed:[185,49,132,83],boat:[321,76,62,46],rain:[173,114,27,26],brine:[119,120,30,23]}
   };
   function actionLabel(scene,key,s){
+    if(scene==='north')return NorthDock.labels[key];
     if(key==='chain')return '사슬을 챙긴다';
     if(key==='zinc')return '정비 상자를 뒤진다';
     if(key==='rain')return '빗물통을 살핀다';
@@ -92,7 +95,9 @@
     }
     camera=snap(Math.max(0,Math.min(W-width,desired)));
   }
+  function walkway(){return id==='north'&&NorthDock.crossable()?Walkways.northOpen:Walkways[id];}
   function present(key){
+    if(id==='north'&&(key==='cord'||key==='magnet'))return !s[key]&&!s.retriever&&!s.bridgeDown;
     if(id==='yard'&&key==='frame')return !s.still&&!s.woodFrame;
     if(id==='yard'&&key==='pane')return !s.still&&!s.glassPane;
     return id!=='harbor'||!Object.hasOwn(Supplies.items,key)||(!s.repaired && !s.pack[key]);
@@ -144,9 +149,10 @@
   viewMode.onclick=()=>{overview=!overview;size();};
   function moveToSpot(key){
     if(paused||!scene.spots[key]||!present(key))return;
+    if(id==='north'&&!NorthDock.crossable()&&['haeun','radio'].includes(key))key='crank';
     stopPad();held.clear();
-    target=Walkways[id].floor(scene.spots[key][2],Infinity);
-    route=Walkways[id].route([px,py],target);request=route.length?key:null;
+    target=walkway().floor(scene.spots[key][2],Infinity);
+    route=walkway().route([px,py],target);request=route.length?key:null;
     if(overview){overview=false;size();}
     canvas.focus({preventScroll:true});updateNearby();
   }
@@ -164,7 +170,7 @@
     const step=57*dt;
     if(dx||dy){
       const length=Math.hypot(dx,dy);
-      const next=Walkways[id].slide([px,py],[px+dx*step/length,py+dy*step/length]);
+      const next=walkway().slide([px,py],[px+dx*step/length,py+dy*step/length]);
       [px,py]=next;return;
     }
     let left=step;
@@ -221,8 +227,13 @@
     rect(123,134,5,2,'#efe7c6');rect(137,132,4,1,'#dedfc7');
   }
   function weather(t,image){
+    if(id==='north'){NorthDock.paint(ctx,camera,s,t);return;}
     if(id==='harbor'){
       board();
+      if(s.northDelivered){
+        rect(45,119,2,7,'#6b5340');rect(42,125,7,8,'#b67c4e');rect(41,128,9,4,'#a66f47');
+        rect(44,124,4,2,'#6b5140');rect(45,127,4,3,'#f1ddac');rect(46,128,2,1,'#547779');
+      }
       if(present('chain'))chainPile();
       toolbox(present('zinc'));
       if(!s.repaired){
@@ -245,6 +256,7 @@
   function frame(ts){
     if(!active)return;
     const elapsed=Math.max(0,(ts-lastFrame)/1000),dt=Math.min(.08,elapsed);lastFrame=ts;
+    if(id==='north')NorthDock.tick(Math.min(.5,elapsed),s.bridgeDown,reduced.matches);
     const keeperMoved=id==='harbor'&&PierYard.tickKeeper(Math.min(1,elapsed),s.lampReady,document.hidden||paused||request==='keeper',reduced.matches);
     const oldX=px,oldY=py;
     movement(dt);
@@ -268,16 +280,18 @@
     const residents=id==='harbor'?PierYard.residents:[];
     const time=reduced.matches?0:ts/1000;
     for(const person of residents)if(person.y<=py)PierYard.person(ctx,camera,person,time);
+    if(id==='north'&&107<=py)NorthDock.person(ctx,camera,s,time);
     actor(moving);
+    if(id==='north'&&107>py)NorthDock.person(ctx,camera,s,time);
     for(const person of residents)if(person.y>py)PierYard.person(ctx,camera,person,time);
     raf=requestAnimationFrame(frame);
   }
   canvas.addEventListener('pointerdown',e=>{
     if(!active||paused)return;
     const b=canvas.getBoundingClientRect(),pos=[camera+(e.clientX-b.left)*width/b.width,(e.clientY-b.top)*H/b.height];
-    const foot=Walkways[id].floor(pos,3);
+    const foot=walkway().floor(pos,3);
     if(!foot)return;
-    stopPad();request=null;target=foot;held.clear();route=Walkways[id].route([px,py],foot);
+    stopPad();request=null;target=foot;held.clear();route=walkway().route([px,py],foot);
     canvas.focus({preventScroll:true});
   });
   function stopPad(){
@@ -312,8 +326,8 @@
   });
   function nudge(dir){
     const dx=Number(dir==='right')-Number(dir==='left'),dy=Number(dir==='down')-Number(dir==='up');
-    const end=Walkways[id].slide([px,py],[px+dx*6,py+dy*6]);
-    request=null;target=end;route=Walkways[id].route([px,py],end);
+    const end=walkway().slide([px,py],[px+dx*6,py+dy*6]);
+    request=null;target=end;route=walkway().route([px,py],end);
   }
   const keys={ArrowUp:'up',KeyW:'up',ArrowDown:'down',KeyS:'down',ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right'};
   addEventListener('keydown',e=>{if(!active||paused||e.altKey||e.metaKey||e.ctrlKey)return;
@@ -325,9 +339,10 @@
   window.World={scenes,start(state,cb){s=state;onSpot=cb;active=true;paused=false;this.enter(state.scene);cancelAnimationFrame(raf);lastFrame=performance.now();raf=requestAnimationFrame(frame);},
     enter(key,arriving=false){
       s.scene=key;id=key;scene=scenes[key];loadScene(key);overview=false;
+      if(key==='north')NorthDock.enter(s);
       if(key==='harbor')PierYard.enterHarbor(s.lampReady);
       const spawn=arriving&&key==='harbor'?scene.spots[arriving==='post'?'post':'boat'][2]:scene.spawn;
-      [px,py]=Walkways[id].floor(spawn,Infinity);walkPhase=0;wasWalking=false;stopPad();face=arriving?'left':'down';route=[];request=null;target=null;held.clear();mountObjects();size();
+      [px,py]=walkway().floor(spawn,Infinity);walkPhase=0;wasWalking=false;stopPad();face=arriving?'left':'down';route=[];request=null;target=null;held.clear();mountObjects();size();
     },
     refresh(){if(scene)refreshLabels();},stop(){active=false;stopPad();held.clear();route=[];request=null;cancelAnimationFrame(raf);},pause(value){paused=value;stopPad();held.clear();walkPhase=0;wasWalking=false;if(value){target=request=null;route=[];}if(scene)refreshLabels();},resize:size};
 })();

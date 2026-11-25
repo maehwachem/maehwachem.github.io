@@ -1,6 +1,8 @@
 (() => {
   'use strict';
-  const $=id=>document.getElementById(id), panel=$('panel'), SAVE='kje.chemists-island.v2.last-mailboat.1';
+  const northEntry=new URLSearchParams(location.search).get('chapter')==='north';
+  const newVoyage=northEntry?Voyage.northStart:Voyage.initial;
+  const $=id=>document.getElementById(id), panel=$('panel'), SAVE='kje.chemists-island.v2.last-mailboat.1'+(northEntry?'.north':'');
   let state=null, trial=false, movingScene=false, previousFocus=null, travelTimer, pickupTimer, storageError=false;
   function read(){
     try{
@@ -23,16 +25,27 @@
   }
   function cover(){
     const stored=read();
-    $('try-repair').hidden=!stored?.repaired;
-    $('start').textContent=stored?'항해 이어하기':'첫 항해 시작';
-    $('resume-info').textContent=stored?(stored.finished?'첫 장 완료 · 자유 항해':World.scenes[stored.scene].name+' · 귀항 '+stored.returns+'회'):'';
+    $('try-repair').hidden=northEntry||!stored?.repaired;
+    if(northEntry){
+      document.body.classList.add('north-entry');
+      document.querySelector('.chapter').textContent='둘째 장 · 북암의 답장';
+      document.querySelector('.intro').textContent='실종된 물새호의 굴뚝이 보인다. 건너편 사람이 왜 다리를 내려 달라고 손짓할까?';
+      $('chapter-route').href='?v=north1';$('chapter-route').textContent='첫 장 항해로';
+    }
+    $('start').textContent=stored?'항해 이어하기':northEntry?'북암에 상륙':'첫 항해 시작';
+    $('resume-info').textContent=stored?(stored.northDelivered?'북암의 답장 배달 완료':stored.finished?'둘째 장 · 북암의 답장':World.scenes[stored.scene].name+' · 귀항 '+stored.returns+'회'):northEntry?'북암부터 시작하는 별도 저장 항해':'';
+
   }
   function hud(){
     $('place').textContent=World.scenes[state.scene].name;
-    $('tide').textContent=state.scene==='harbor'?(state.returns?'귀항 '+state.returns+'회 · 등대 점등':'첫 출항 전'):(state.scene==='yard'?'우체국 뒤뜰':'간조 · 연안 탐사');
+    $('tide').textContent=state.scene==='north'?'둘째 장 · 북암의 답장':state.scene==='harbor'?(state.returns?'귀항 '+state.returns+'회 · 등대 점등':'첫 출항 전'):(state.scene==='yard'?'우체국 뒤뜰':'간조 · 연안 탐사');
     $('goal').textContent=trial&&state.repaired&&state.scene==='harbor'?'다시 뜬 빨간 부표가 보인다. 원래 항해로 돌아가자.':Voyage.goal(state);
   }
   const waterItems={
+    cord:{name:'삼줄 타래',detail:'창고 앞에서 주운 마른 줄.'},magnet:{name:'고리 달린 자석',detail:'고리에 줄을 단단히 묶을 수 있다.'},
+    retriever:{name:'자석줄',detail:'점검홈 아래까지 닿는 손수 만든 도구.'},crankPin:{name:'강철 고정핀',detail:'도개교 손잡이 축에 맞는다.'},
+    copper:{name:'피복 구리선',detail:'양 끝을 벗기면 구리 심선이 드러난다.'},reply:{name:'북암의 답장',detail:'석 어르신이 오 국장 앞으로 보낸 봉투.'},
+    survey:{name:'옛 광업소 측량도',detail:'석 어르신이 그린 북암 서쪽 해안의 길.'},
     woodFrame:{name:'나무틀',detail:'유리판을 비스듬히 받칠 수 있다.'},
     glassPane:{name:'유리판',detail:'작업마당에서 찾은 투명한 창유리.'},
     flask:{name:'증류수 한 병',detail:'태양열 증류기의 물받이에서 받았다.'},
@@ -44,6 +57,8 @@
   function packContents(){
     const ids=Supplies.bag(state);
     if(state.water)ids.push(state.water);
+    for(const id of ['cord','magnet','retriever','crankPin','copper','reply'])if(state[id])ids.push(id);
+    if(state.reply||state.northDelivered)ids.push('survey');
     for(const part of ['woodFrame','glassPane','flask'])if(state[part])ids.push(part);
     if(state.mineClue)ids.push('ink');
     if(state.saltClue)ids.push('ledger');
@@ -63,6 +78,9 @@
     const ids=packContents();
     drawDialog({title:'내 가방',text:ids.length?'':(state.repaired?'부표에 쓴 재료 자리가 비었다.':'아직 가방이 비어 있다. 부두를 걸으며 쓸 만한 물건을 챙겨 보자.')},choose,'소지품');
     drawPack(ids);
+    if(ids.includes('survey')){
+      const b=document.createElement('button');b.textContent='측량도 펼치기';b.onclick=()=>drawDialog({title:'옛 북암 광업소 측량도',text:'석 어르신이 연필로 남긴 길이 서쪽 해안까지 이어진다.',kind:'survey'},choose,'가방');$('choices').prepend(b);
+    }
   }
   $('pack').onclick=showPack;
   function pickup(view){
@@ -132,7 +150,8 @@
     const d=$('diagram');d.replaceChildren();d.hidden=true;d.className='';
     if(view.kind==='rig'||view.kind?.startsWith('rig-')){
       d.hidden=false;d.className='rig-panel';VoyageLab.rig(d,view,select);
-    }else if(window.VoyageLab?.mount(d,state,view,select)){d.hidden=false;d.className='interactive-lab';}
+    }else if(NorthLab.mount(d,view,select)){d.hidden=false;}
+    else if(window.VoyageLab?.mount(d,state,view,select)){d.hidden=false;d.className='interactive-lab';}
     else if(view.kind==='samples'&&['작업대','시험편 A','시험편 B'].includes(view.title)) specimens(view.title);
     if(d.classList.contains('rig-panel'))d.before($('panel-text'));else d.after($('panel-text'));
     standardButtons(view,select);
@@ -168,7 +187,7 @@
   }
   function start(asTrial=false){
     trial=asTrial;$('exit-trial').hidden=!trial;
-    clearNotice();state=trial?Voyage.initial():(read()||Voyage.initial());$('cover').hidden=true;$('play').hidden=false;
+    clearNotice();state=trial?Voyage.initial():(read()||newVoyage());$('cover').hidden=true;$('play').hidden=false;
     World.start(state,inspect);save();hud();$('world').focus({preventScroll:true});
   }
   function resume(){close();start();}
@@ -185,8 +204,8 @@
     }
     drawDialog({title:'조작과 저장',text:'화면 속 길을 누르면 걷습니다. 우체국 문이나 작업대, 배를 누르면 그 앞으로 걸어가 살펴봅니다. 부두에 놓인 사슬이나 정비 상자를 누르면 재료를 챙깁니다. 가방에서 주운 물건을 살펴보고, 작업대에서 사용하세요. 세로 화면에서는 ‘전경 보기’로 시야를 넓힐 수 있습니다.\n\n키보드로는 방향키 또는 WASD로 걷고, E로 가까운 곳을 조사합니다. 대화는 Tab과 Enter로 선택하고 Esc로 닫습니다.\n\n조사와 항해는 이 브라우저에 자동 저장됩니다. 표지로 돌아가도 이어서 플레이할 수 있어요.',choices:[{label:'표지로 돌아가기',id:'title'},{label:'처음부터 다시 시작',id:'reset'},{label:'닫기',id:'close'}]},action=>{
       if(action==='title'){close();returnToCover();return;}
-      if(action==='reset')drawDialog({title:'새 항해를 시작할까요?',text:'이 기기에 저장한 v2의 현재 항해 기록을 새 기록으로 교체합니다.',choices:[{label:'새 항해 시작',id:'confirmed'},{label:'취소',id:'close'}]},action=>{
-        if(action==='confirmed'){state=Voyage.initial();clearNotice();close();World.start(state,inspect);save();hud();}
+      if(action==='reset')drawDialog({title:'새 항해를 시작할까요?',text:northEntry?'북암부터 시작한 별도 항해를 처음으로 되돌립니다.':'이 기기에 저장한 v2의 현재 항해 기록을 새 기록으로 교체합니다.',choices:[{label:'새 항해 시작',id:'confirmed'},{label:'취소',id:'close'}]},action=>{
+        if(action==='confirmed'){state=newVoyage();clearNotice();close();World.start(state,inspect);save();hud();}
       },'항해일지');
     },'선실 · 안내');
   }

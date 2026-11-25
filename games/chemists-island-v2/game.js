@@ -4,11 +4,12 @@
   var X = { label: '닫기', id: 'close' };
   function D(t, x, c, k) { var r = { title: t, text: x, choices: (c || []).concat([X]) }; if (k) r.kind = k; return r; }
   function L(s, m) { if (s.log.indexOf(m) < 0) s.log.push(m); }
-  var ISL = { mine: '붉은 만(옛 광산)', salt: '흰 띠(폐염전)' };
+  var ISL = { mine: '붉은 만(옛 광산)', salt: '흰 띠(폐염전)', north:'북암 · 바람우체소' };
 
   function initial() {
     return { scene: 'harbor', returns: 0, finished: false, log: [], mineClue: false, saltClue: false, repaired: false,
       pack: {chain:0, zinc:0}, water: null, woodFrame:false, glassPane:false, still:false, flask:false, lampWashed:false, lampReady:false, mail: false, coupA: false, coupB: false, trip: null, first: null, visited: {}, lit: false,
+      cord:false, magnet:false, retriever:false, crankPin:false, bridgeDown:false, metHaeun:false, copper:false, radioFixed:false, reply:false, northDelivered:false,
       plate: false, lifted: false, gate: false, refs: false, line: false, ran: false };
   }
 
@@ -19,7 +20,22 @@
       if(s.woodFrame && s.glassPane)return '작업대의 바닷물 대야에 모은 재료로 증류기를 만들자.';
       return '마당에서 나무틀과 유리판을 찾아보자.';
     }
-    if (s.finished) return '북암 항로가 지도에 올랐다. 섬들을 자유롭게 다시 찾아가자.';
+    if(s.finished){
+      if(s.northDelivered)return s.scene==='harbor'?'북암의 답장이 도착했다. 가방에서 석 어르신의 측량도를 펼쳐 보자.':'다시 열린 길을 자유롭게 둘러보자.';
+      if(s.reply)return s.scene==='harbor'?'오 국장에게 북암의 답장을 직접 전하자.':'답장을 배에 싣고 선착장의 오 국장에게 돌아가자.';
+      if(s.scene!=='north')return s.scene==='harbor'?'우편정에 올라 새로 열린 북암 항로로 출항하자.':'북암으로 가려면 우편정을 타고 선착장으로 돌아가자.';
+      if(!s.bridgeDown){
+        if(s.crankPin)return '다리 손잡이에 고정핀을 끼워 다리를 내리자.';
+        if(s.retriever)return '점검홈에서 자석줄로 빠진 고정핀을 건지자.';
+        if(s.cord&&s.magnet)return '창고 옆 작업대에서 가방의 줄과 자석을 묶자.';
+        if(s.cord)return '줄 끝에 매달 만한 공구가 있을까? 창고 문가의 공구걸이를 살펴보자.';
+        if(s.magnet)return '자석 고리에 묶을 줄이 필요하다. 창고 앞 돌바닥을 살펴보자.';
+        return '건너편에서 누군가 손을 흔든다. 들린 다리와 서쪽 창고를 살펴보자.';
+      }
+      if(!s.metHaeun)return '내려온 다리를 건너 우체소 앞 사람에게 말을 걸자.';
+      if(!s.radioFixed)return s.copper?'우체소 무전기를 열어 끊어진 전원선을 이어 보자.':'서쪽 작업대의 부품함에서 여분의 구리선을 챙기자.';
+      return '무전 응답이 왔다. 하은에게 돌아가 북암의 답장을 받자.';
+    }
     if (!s.repaired) {
       if (Supplies.ready(s)) return '작업대에 모은 재료를 펼쳐 부표를 고쳐 보자.';
       return Supplies.bag(s).length ? '부두 곳곳에 쓸 만한 정비 자재가 더 있을 것 같다.' : '부표 사슬이 끊겼다. 부두에서 쓸 만한 물건을 찾아보자.';
@@ -65,6 +81,8 @@
         if (!s.mail && !(s.mineClue && s.saltClue)) { s.mail = true; L(s, '물새호가 열이틀째 돌아오지 않았다.');
           if(s.repaired) return D('우체국','오 국장이 낡은 항로도를 편다. “부표를 세워 줬구나. 광산 만이나 옛 염전에 가거든 물새호 소식 좀 알아봐 주겠니?”');
           return D('우체국', '오 국장이 물에 젖은 봉투를 펼친다. 폐쇄된 항로의 소인이다.\n"옛 뱃길을 보러 간 물새호가 열이틀째 안 와.\n부표 사슬이 끊겨 우편정도 묶였지.\n작업대에 옛 정비 기록이 있네."'); }
+        if(s.reply&&!s.northDelivered)return D('북암에서 온 편지','오 국장이 봉투의 발신인을 읽다가 안경을 벗는다. “석 선생님 글씨야. 내가 여기 처음 왔을 때 길을 그려 주신 분이지.”',[{label:'북암의 답장 전하기',id:'deliver_north'}]);
+        if(s.northDelivered)return D('우체국','오늘 우편 자루에는 북암 꼬리표도 달려 있다. 오 국장이 다음 배편에 실을 새 봉투들을 묶는다.');
         if (s.finished) return D('우체국', '"북암행 우편이 모이고 있어.\n주소 쓰는 사람이 늘었네."');
         if (s.mineClue && s.saltClue && !s.refs) { s.mail = true; s.refs = true; L(s, '소인 잉크 견본 셋을 받았다(원본 대장은 그대로).');
           return D('우체국', '"원본 대장엔 손대지 말게."\n국장이 등대곶·모래섬·북암 소인대를\n새 종이에 하나씩 찍어 준다.', [], 'samples'); }
@@ -97,8 +115,10 @@
         if (!s.repaired) return D('우편정', '부표가 없으면 암초 사이로 못 나간다.');
         var t = s.mail?'물이 빠졌다. 이번 썰물에 다녀올 섬을 고르자.':'배 안에 젖은 쪽지가 있다. 물새호가 열이틀째 돌아오지 않았단다.\n썰물인 지금, 어느 섬에서부터 찾아볼까?';
         if (s.lit) t += '\n등대 불빛이 뱃길을 긋는다.';
-        return D('출항', t, [{ label: ISL.mine + (s.visited.mine ? ' ✓' : ''), id: 'go_mine' },
-          { label: ISL.salt + (s.visited.salt ? ' ✓' : ''), id: 'go_salt' }], 'route');
+        if(s.finished)t=s.reply&&!s.northDelivered?'북암의 답장이 가방에 있다. 오 국장은 우체국 앞에 서 있다.':'수평선 너머로 북암의 깎아지른 돌기둥이 보인다. 뱃머리를 어디로 돌릴까?';
+        var destinations=s.finished?[{label:ISL.north,id:'go_north'}]:[];
+        return D('출항', t, destinations.concat([{ label: ISL.mine + (s.visited.mine ? ' ✓' : ''), id: 'go_mine' },
+          { label: ISL.salt + (s.visited.salt ? ' ✓' : ''), id: 'go_salt' }]), 'route');
       },
       board: function (s) {
         return D('게시판', '목표: ' + goal(s) + '\n\n' + (s.log.length ? s.log.join('\n') : '아직 기록 없음.'), [], s.finished ? 'map' : 'log');
@@ -113,6 +133,46 @@
         return D('볕 드는 작업대','검은 대야에는 바닷물이, 옆에는 빈 물받이가 있다. 대야 위에 비스듬히 세울 나무틀과 유리판이 필요하다.',s.woodFrame&&s.glassPane?[{label:'나무틀에 유리판을 끼워 덮기',id:'build_still'}]:[]);
       },
       exit: function(){return D('부두로 난 길','나무 발판을 따라가면 우체국 앞이다.',[{label:'선착장으로 걷기',id:'leave_yard'}]);}
+    },
+    north: {
+      cord:function(s){
+        if(s.cord||s.retriever||s.bridgeDown)return null;
+        s.cord=true;return {pickup:'cord',text:'마른 삼줄을 한 타래 챙겼다.'};
+      },
+      magnet:function(s){
+        if(s.magnet||s.retriever||s.bridgeDown)return null;
+        s.magnet=true;return {pickup:'magnet',text:'공구걸이에서 고리 달린 자석을 챙겼다.'};
+      },
+      tools:function(s){
+        var choices=[];
+        if(s.cord&&s.magnet&&!s.retriever&&!s.bridgeDown)choices.push({id:'tie_magnet',label:'삼줄을 자석 고리에 묶기'});
+        if(!s.copper&&!s.radioFixed)choices.push({id:'take_copper',label:'부품함의 구리선 챙기기'});
+        return D('창고 옆 작업대','붉은 부품함 뚜껑에는 전선 조각이 견본으로 붙어 있다. 작업대 모서리에 줄을 묶기 좋은 쇠고리가 있다.'+(s.retriever?' 가방의 자석줄은 단단히 묶여 있다.':''),choices);
+      },
+      drain:function(s){
+        if(s.crankPin||s.bridgeDown)return D('빈 점검홈','바닥에 황동 고리와 나무 조각이 남아 있다.');
+        return s.retriever?D('점검홈','들여다보니 바닥에 물건이 셋 보인다. 자석줄을 옮겨 원하는 자리로 내려 보자.',[], 'magnet-well'):
+          D('다리 아래 점검홈','가느다란 회색 핀이 홈 바닥에 누워 있다. 팔이 닿지 않는다. 가까운 창고에는 줄과 공구가 걸려 있다.');
+      },
+      crank:function(s){
+        if(s.bridgeDown)return D('내려온 도개교','널빤지가 건너편 돌턱에 걸렸다. 바다 위로 발소리가 울린다.');
+        return D('들린 도개교','손잡이가 헛돈다. 축 옆 고정핀 구멍은 비었고, 바로 옆 점검홈 아래에서 금속이 반짝인다.',s.crankPin?[{label:'핀을 끼우고 손잡이 돌리기',id:'lower_bridge'}]:[]);
+      },
+      haeun:function(s){
+        if(!s.bridgeDown)return null;
+        if(s.reply||s.northDelivered)return D('기관사 하은','하은이 파란 배의 밧줄을 살핀다. “견인선이 오면 물새호도 집에 가겠네요.”');
+        if(s.radioFixed)return D('기관사 하은','“구조선이 온대요. 석 어르신은 이 답장을 먼저 보내고 싶으시대요.” 하은이 봉투 한 장과 납작하게 접은 측량도를 건넨다.',[{label:'답장과 측량도 받아 들기',id:'take_reply'}]);
+        s.metHaeun=true;L(s,'물새호는 북암에 남은 석 어르신에게 약 꾸러미를 전하러 왔다.');
+        return D('물새호 기관사 하은','“다리가 올라간 뒤로 열이틀이에요. 그래도 석 어르신 약은 제때 전했어요.”\n하은이 앞바다를 가리킨다. 폭풍에 물새호가 암초에 걸리고 작은 배는 떠내려갔다.\n“무전기 전원선도 끊겼어요. 건너편 창고엔 분명 여분이 있을 텐데.”');
+      },
+      radio:function(s){
+        if(!s.bridgeDown)return null;
+        if(s.radioFixed)return D('북암 우체소 무전기','“북암, 들린다. 견인선 출발.” 스피커에서 오 국장 목소리가 들린다.');
+        if(!s.metHaeun)return D('북암 우체소','창가에 뚜껑을 열어 놓은 무전기가 있다. 바로 옆에 물새호 제복을 입은 사람이 서 있다.');
+        return s.copper?D('끊어진 전원선','전원을 껐다. 같은 전원선의 끊어진 두 끝을 가방의 피복 구리선으로 이어 보자.',[],'splice'):
+          D('무전기 전원선','전지함에서 무전기로 가는 선 한 가닥이 중간에서 끊겼다. 서쪽 창고의 붉은 부품함에 같은 선이 있다.');
+      },
+      boat:function(){return D('우편정','온 길을 따라 선착장으로 돌아갈 수 있다.',[{label:'선착장으로 귀항',id:'home'}]);}
     },
     mine: {
       winch: function (s) {
@@ -166,8 +226,9 @@
   }
 
   function go(s, isl) {
-    if (!s.repaired || s.scene !== 'harbor') return null;
+    if (!s.repaired || s.scene !== 'harbor' || (isl==='north'&&!s.finished)) return null;
     s.scene = isl; s.trip = isl; s.visited[isl] = true; if (!s.first) s.first = isl;
+    if(isl==='north')return D('둘째 장 · 북암의 답장',s.bridgeDown?'우체소까지 도개교가 이어져 있다.':'파란 배 굴뚝에 빛바랜 물새 무늬가 보인다. 물길 건너 우체소 앞에서 누군가 손을 흔든다. 그런데 도개교가 들려 있다.');
     return D('출항', isl === 'mine' ? '물이 녹슨 주황빛. 바위마다 갈색 앙금.\n멀리 권양기 하나가 서 있다.' : '갯벌 끝 흰 결정 띠. 바람이 짜다.\n수문 너머 낮은 창고.');
   }
   function retry(t, x, back) { return D(t, x, [{ label: '다시', id: back }]); }
@@ -226,6 +287,39 @@
       L(s,'부표 사슬 교체. 물속의 강철 연결쇠에 아연판을 볼트로 고정했다.');
       return D('부표 복구','아연판과 사슬이 같은 바닷물에 잠기고, 강철 연결쇠를 통해 전기가 통한다. 아연이 먼저 산화되어 전자를 공급하므로 강철의 부식이 느려진다.\n\n빨간 부표가 다시 섰다. 이제 우편정으로 출항할 수 있다.',[],'rig-bolt');
     },
+    go_north:function(s){return go(s,'north');},
+    tie_magnet:function(s){
+      if(s.scene!=='north'||!s.cord||!s.magnet||s.retriever||s.bridgeDown)return null;
+      s.cord=s.magnet=false;s.retriever=true;return {pickup:'retriever',text:'삼줄 끝에 자석을 묶었다.'};
+    },
+    take_copper:function(s){
+      if(s.scene!=='north'||s.copper||s.radioFixed)return null;
+      s.copper=true;return {pickup:'copper',text:'피복 구리선을 가방에 넣었다.'};
+    },
+    recover_pin:function(s){
+      if(s.scene!=='north'||!s.retriever||s.crankPin||s.bridgeDown)return null;
+      s.crankPin=true;L(s,'자석줄로 점검홈에서 강철 고정핀을 건졌다.');
+      return {pickup:'crankPin',text:'자석 끝에 강철 고정핀이 붙어 올라왔다.'};
+    },
+    lower_bridge:function(s){
+      if(s.scene!=='north'||!s.crankPin||s.bridgeDown)return null;
+      s.crankPin=false;s.bridgeDown=true;L(s,'손잡이에 핀을 끼워 북암 도개교를 내렸다.');
+      return {fieldNotice:'널빤지가 맞은편 돌턱에 내려앉았다.'};
+    },
+    fix_radio:function(s){
+      if(s.scene!=='north'||!s.metHaeun||!s.copper||s.radioFixed)return null;
+      s.copper=false;s.radioFixed=true;L(s,'구리선의 피복을 벗겨 전원선을 잇고 물새호의 위치를 알렸다.');
+      return D('열이틀 만의 응답','초록불이 켜진다. 하은이 송신 단추를 누른다. “여기는 북암. 물새호와 주민 모두 무사합니다.”\n잠시 뒤 잡음 사이로 답이 돌아온다. “잘 들린다, 하은아. 견인선을 보낼게.”');
+    },
+    take_reply:function(s){
+      if(s.scene!=='north'||!s.radioFixed||s.reply||s.northDelivered)return null;
+      s.reply=true;return {pickup:'reply',text:'북암의 답장과 옛 광업소 측량도를 받았다.'};
+    },
+    deliver_north:function(s){
+      if(s.scene!=='harbor'||!s.reply||s.northDelivered)return null;
+      s.reply=false;s.northDelivered=true;L(s,'석 어르신의 답장을 배달했다. 북암행 우편 자루가 다시 걸렸다.');
+      return D('둘째 장 끝 · 다시 걸린 우편 자루','“답장이군. 북암에도 아직 받는 사람이 있었어.” 오 국장이 빈 고리에 북암행 자루를 건다.\n석 어르신이 동봉한 측량도에는 폐쇄된 갱도에서 서쪽 해안으로 난 길이 그려져 있다. 측량도는 가방에서 다시 펼칠 수 있다.',[],'survey');
+    },
     go_mine: function (s) { return go(s, 'mine'); },
     go_salt: function (s) { return go(s, 'salt'); },
     home: function (s) {
@@ -258,7 +352,7 @@
     r_sand: function () { return retry('아니다', '눈으로는 둘 다 보랏빛.\n하지만 모래섬은 빨강이 아래에 남는다.', 'r_back'); },
     r_back: function (s) { return s.ran ? chromaResult() : null; },
     r_north: function (s) { if (!s.ran) return null; s.finished = true; L(s, '물새호는 폐쇄된 북암에 들렀다.');
-      return D('첫 장 끝', '물새호는 끊긴 항로, 북암에 들렀다.\n오 국장이 지도에 북쪽 선을 다시 긋는다.\n"거기 아직 편지 받을 사람이 있었나 보군."\n다음 정기선이 키를 북으로 돌린다.\n\n섬들은 언제든 다시 찾아갈 수 있다.', [], 'map'); }
+      return D('첫 장 끝', '물새호는 끊긴 항로, 북암에 들렀다.\n오 국장이 지도에 북쪽 선을 다시 긋는다.\n"거기 아직 편지 받을 사람이 있었나 보군."\n다음 정기선이 키를 북으로 돌린다.\n\n우편정으로 북암에 상륙할 수 있다.', [{id:'go_north',label:'북암으로 출항'}], 'map'); }
   };
 
   function act(s, action) {
@@ -267,5 +361,11 @@
     return f ? f(s) : null;
   }
 
-  window.Voyage = { initial: initial, goal: goal, interact: interact, act: act };
+  function northStart(){
+    var s=initial();
+    Object.assign(s,{scene:'north',finished:true,repaired:true,mail:true,coupA:true,coupB:true,returns:2,first:'mine',trip:'north',lit:true,plate:true,lifted:true,mineClue:true,gate:true,saltClue:true,refs:true,line:true,ran:true,visited:{mine:true,salt:true,north:true}});
+    L(s,'첫 장의 단서 · 광산과 염전의 기록, 소인 잉크의 띠가 모두 북암을 가리켰다.');
+    return s;
+  }
+  window.Voyage = { initial: initial, northStart:northStart, goal: goal, interact: interact, act: act };
 })();
