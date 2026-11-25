@@ -7,7 +7,7 @@
   var ISL = { mine: '붉은 만(옛 광산)', salt: '흰 띠(폐염전)', north:'북암 · 바람우체소' };
 
   function initial() {
-    return { scene: 'harbor', returns: 0, finished: false, log: [], mineClue: false, saltClue: false, repaired: false,
+    return { ...WestStory.defaults, scene: 'harbor', returns: 0, finished: false, log: [], mineClue: false, saltClue: false, repaired: false,
       pack: {chain:0, zinc:0}, water: null, woodFrame:false, glassPane:false, still:false, flask:false, lampWashed:false, lampReady:false, mail: false, coupA: false, coupB: false, trip: null, first: null, visited: {}, lit: false,
       cord:false, magnet:false, retriever:false, crankPin:false, bridgeDown:false, metHaeun:false, copper:false, radioFixed:false, reply:false, northDelivered:false,
       plate: false, lifted: false, gate: false, refs: false, line: false, ran: false };
@@ -21,7 +21,7 @@
       return '마당에서 나무틀과 유리판을 찾아보자.';
     }
     if(s.finished){
-      if(s.northDelivered)return s.scene==='harbor'?'북암의 답장이 도착했다. 가방에서 석 어르신의 측량도를 펼쳐 보자.':'다시 열린 길을 자유롭게 둘러보자.';
+      if(s.northDelivered)return WestStory.goal(s);
       if(s.reply)return s.scene==='harbor'?'오 국장에게 북암의 답장을 직접 전하자.':'답장을 배에 싣고 선착장의 오 국장에게 돌아가자.';
       if(s.scene!=='north')return s.scene==='harbor'?'우편정에 올라 새로 열린 북암 항로로 출항하자.':'북암으로 가려면 우편정을 타고 선착장으로 돌아가자.';
       if(!s.bridgeDown){
@@ -215,6 +215,7 @@
       if(keeperMode==='carry'||keeperMode==='hang')return D('등대지기','“등잔 좀 봐 주게. 저 끝 고리에 걸면 배에서 보일 거야.”');
       if(keeperMode==='round'||keeperMode==='check')return D('등대지기','“여기서도 빛이 잘 보이는군. 돌아가서 고리만 한 번 살펴보세.”');
     }
+    if(WestStory.isField(s.scene)||(s.scene==='north'&&id==='westTrail'&&s.northDelivered))return WestStory.spot(s,id);
     var f = SPOT[s.scene] && SPOT[s.scene][id];
     var view=f ? f(s) : null;
     if(view && s.scene==='harbor' && (id==='post'||id==='chief')){
@@ -318,7 +319,7 @@
     deliver_north:function(s){
       if(s.scene!=='harbor'||!s.reply||s.northDelivered)return null;
       s.reply=false;s.northDelivered=true;L(s,'석 어르신의 답장을 배달했다. 북암행 우편 자루가 다시 걸렸다.');
-      return D('둘째 장 끝 · 다시 걸린 우편 자루','“답장이군. 북암에도 아직 받는 사람이 있었어.” 오 국장이 빈 고리에 북암행 자루를 건다.\n석 어르신이 동봉한 측량도에는 폐쇄된 갱도에서 서쪽 해안으로 난 길이 그려져 있다. 측량도는 가방에서 다시 펼칠 수 있다.',[],'survey');
+      return D('둘째 장 끝 · 다시 걸린 우편 자루','“답장이군. 북암에도 아직 받는 사람이 있었어.” 오 국장이 빈 고리에 북암행 자루를 건다.\n석 어르신이 동봉한 측량도에는 폐쇄된 갱도에서 서쪽 해안으로 난 길이 그려져 있다. 북암 우체소 옆 오르막으로 가면 광업소가 나온다.',[{id:'go_north',label:'측량도를 들고 북암으로 출항'}],'survey');
     },
     go_mine: function (s) { return go(s, 'mine'); },
     go_salt: function (s) { return go(s, 'salt'); },
@@ -357,15 +358,20 @@
 
   function act(s, action) {
     if (action === 'close') return null;
+    if(action.startsWith('west_'))return WestStory.act(s,action);
     var f = ACT[action];
     return f ? f(s) : null;
   }
 
+  function westStart(){
+    const s=northStart();Object.assign(s,{scene:'quarry',trip:'north',northDelivered:true,bridgeDown:true,metHaeun:true,radioFixed:true,retriever:true,returns:3});
+    L(s,'북암의 답장을 배달하고 석 어르신의 측량도를 받았다.');return s;
+  }
   function northStart(){
     var s=initial();
     Object.assign(s,{scene:'north',finished:true,repaired:true,mail:true,coupA:true,coupB:true,returns:2,first:'mine',trip:'north',lit:true,plate:true,lifted:true,mineClue:true,gate:true,saltClue:true,refs:true,line:true,ran:true,visited:{mine:true,salt:true,north:true}});
     L(s,'첫 장의 단서 · 광산과 염전의 기록, 소인 잉크의 띠가 모두 북암을 가리켰다.');
     return s;
   }
-  window.Voyage = { initial: initial, northStart:northStart, goal: goal, interact: interact, act: act };
+  window.Voyage = { initial: initial, northStart:northStart, westStart:westStart, goal: goal, interact: interact, act: act };
 })();

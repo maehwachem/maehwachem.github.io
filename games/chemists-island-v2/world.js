@@ -2,7 +2,7 @@
 (() => {
   'use strict';
   const scenes = {
-    north:NorthDock.scene,
+    ...WestField.scenes,north:NorthDock.scene,
     harbor: {name:'우편선 선착장', spawn:[100,170],
       spots:{chief:['오 국장',[62,137],[78,145]],get keeper(){const {x,y}=PierYard.keeper;return ['등대지기',[x,y],[x+17,y+4]];},post:['우체국',[40,123],[48,147]],bench:['작업대',[179,172],[143,190]],boat:['우편정',[323,97],[258,119]],board:['항로 게시판',[117,119],[117,126]],chain:['사슬 더미',[76,156],[80,163]],zinc:['정비 상자',[205,117],[205,127]]}},
     yard: {name:'우체국 작업마당',spawn:[55,151],
@@ -14,13 +14,14 @@
   };
   // Bounds in the same 384 × 216 grid as the paintings. Keep bare walkways outside them.
   const objects = {
-    north:NorthDock.bounds,
+    ...WestField.bounds,north:NorthDock.bounds,
     harbor:{post:[15,78,39,57],chief:[55,115,16,27],get keeper(){const {x,y}=PierYard.keeper;return [x-12,y-23,25,28];},bench:[147,164,68,34],boat:[267,68,108,60],board:[106,105,23,20],chain:[62,144,29,22],zinc:[191,103,29,23]},
     yard:{exit:[15,110,31,36],frame:[66,103,29,23],still:[177,78,65,37],pane:[272,99,29,28]},
     mine:{winch:[10,96,87,72],wreck:[173,113,113,53],boat:[300,100,82,47]},
     salt:{gate:[1,78,102,71],shed:[185,49,132,83],boat:[321,76,62,46],rain:[173,114,27,26],brine:[119,120,30,23]}
   };
   function actionLabel(scene,key,s){
+    if(WestStory.isField(scene))return WestField.labels[key];
     if(scene==='north')return NorthDock.labels[key];
     if(key==='chain')return '사슬을 챙긴다';
     if(key==='zinc')return '정비 상자를 뒤진다';
@@ -97,6 +98,8 @@
   }
   function walkway(){return id==='north'&&NorthDock.crossable()?Walkways.northOpen:Walkways[id];}
   function present(key){
+    if(id==='north'&&key==='westTrail')return s.northDelivered;
+    if(id==='mailcave'&&key==='delivery')return s.cartSent&&WestField.arrived();
     if(id==='north'&&(key==='cord'||key==='magnet'))return !s[key]&&!s.retriever&&!s.bridgeDown;
     if(id==='yard'&&key==='frame')return !s.still&&!s.woodFrame;
     if(id==='yard'&&key==='pane')return !s.still&&!s.glassPane;
@@ -227,7 +230,8 @@
     rect(123,134,5,2,'#efe7c6');rect(137,132,4,1,'#dedfc7');
   }
   function weather(t,image){
-    if(id==='north'){NorthDock.paint(ctx,camera,s,t);return;}
+    if(WestStory.isField(id)){WestField.paint(ctx,camera,id,s,t);return;}
+    if(id==='north'){NorthDock.paint(ctx,camera,s,t);if(s.northDelivered)WestField.paint(ctx,camera,id,s,t);return;}
     if(id==='harbor'){
       board();
       if(s.northDelivered){
@@ -257,6 +261,7 @@
     if(!active)return;
     const elapsed=Math.max(0,(ts-lastFrame)/1000),dt=Math.min(.08,elapsed);lastFrame=ts;
     if(id==='north')NorthDock.tick(Math.min(.5,elapsed),s.bridgeDown,reduced.matches);
+    if(id==='mailcave'&&WestField.tick(Math.min(.4,elapsed),s,reduced.matches))positionObjects();
     const keeperMoved=id==='harbor'&&PierYard.tickKeeper(Math.min(1,elapsed),s.lampReady,document.hidden||paused||request==='keeper',reduced.matches);
     const oldX=px,oldY=py;
     movement(dt);
@@ -281,7 +286,9 @@
     const time=reduced.matches?0:ts/1000;
     for(const person of residents)if(person.y<=py)PierYard.person(ctx,camera,person,time);
     if(id==='north'&&107<=py)NorthDock.person(ctx,camera,s,time);
+    if(id==='quarry'&&120<=py)WestField.elder(ctx,camera,time);
     actor(moving);
+    if(id==='quarry'&&120>py)WestField.elder(ctx,camera,time);
     if(id==='north'&&107>py)NorthDock.person(ctx,camera,s,time);
     for(const person of residents)if(person.y>py)PierYard.person(ctx,camera,person,time);
     raf=requestAnimationFrame(frame);
@@ -340,8 +347,10 @@
     enter(key,arriving=false){
       s.scene=key;id=key;scene=scenes[key];loadScene(key);overview=false;
       if(key==='north')NorthDock.enter(s);
+      if(key==='mailcave')WestField.enter(s);
       if(key==='harbor')PierYard.enterHarbor(s.lampReady);
-      const spawn=arriving&&key==='harbor'?scene.spots[arriving==='post'?'post':'boat'][2]:scene.spawn;
+      const fromFoot=typeof arriving==='string'&&scene.spots[arriving]?.[2];
+      const spawn=fromFoot||(arriving&&key==='harbor'?scene.spots.boat[2]:scene.spawn);
       [px,py]=walkway().floor(spawn,Infinity);walkPhase=0;wasWalking=false;stopPad();face=arriving?'left':'down';route=[];request=null;target=null;held.clear();mountObjects();size();
     },
     refresh(){if(scene)refreshLabels();},stop(){active=false;stopPad();held.clear();route=[];request=null;cancelAnimationFrame(raf);},pause(value){paused=value;stopPad();held.clear();walkPhase=0;wasWalking=false;if(value){target=request=null;route=[];}if(scene)refreshLabels();},resize:size};
