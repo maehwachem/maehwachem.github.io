@@ -230,7 +230,7 @@
     if (!s.repaired || s.scene !== 'harbor' || (isl==='north'&&!s.finished)) return null;
     s.scene = isl; s.trip = isl; s.visited[isl] = true; if (!s.first) s.first = isl;
     if(isl==='north')return D('둘째 장 · 북암의 답장',s.bridgeDown?'우체소까지 도개교가 이어져 있다.':'파란 배 굴뚝에 빛바랜 물새 무늬가 보인다. 물길 건너 우체소 앞에서 누군가 손을 흔든다. 그런데 도개교가 들려 있다.');
-    return D('출항', isl === 'mine' ? '물이 녹슨 주황빛. 바위마다 갈색 앙금.\n멀리 권양기 하나가 서 있다.' : '갯벌 끝 흰 결정 띠. 바람이 짜다.\n수문 너머 낮은 창고.');
+    return D(isl === 'mine' ? '붉은 만에 도착' : '옛 염전에 도착', isl === 'mine' ? '물이 녹슨 주황빛. 바위마다 갈색 앙금.\n멀리 권양기 하나가 서 있다.' : '갯벌 끝 흰 결정 띠. 바람이 짜다.\n수문 너머 낮은 창고.');
   }
   function retry(t, x, back) { return D(t, x, [{ label: '다시', id: back }]); }
 

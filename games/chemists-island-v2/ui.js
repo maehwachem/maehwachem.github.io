@@ -4,7 +4,7 @@
   const northEntry=chapter==='north',westEntry=chapter==='west';
   const newVoyage=westEntry?Voyage.westStart:northEntry?Voyage.northStart:Voyage.initial;
   const $=id=>document.getElementById(id), panel=$('panel'), SAVE='kje.chemists-island.v2.last-mailboat.1'+(westEntry?'.west':northEntry?'.north':'');
-  let state=null, trial=false, movingScene=false, previousFocus=null, travelTimer, pickupTimer, storageError=false;
+  let state=null, trial=false, movingScene=false, previousFocus=null, pickupTimer, storageError=false;
   function read(){
     try{
       const data=JSON.parse(localStorage.getItem(SAVE));
@@ -174,23 +174,27 @@
     panel.scrollTop=0;$('close-panel').focus({preventScroll:true});
   }
   function navigate(old,view){
-    save();hud();
+    save();if(old===state.scene)hud();
     if(view?.fieldNotice){
       if(view.round)PierYard.startRound();
       pickup({text:view.fieldNotice});$('world').focus({preventScroll:true});return;
     }
     if(old===state.scene){if(view?.pickup)pickup(view);else drawDialog(view,choose);return;}
     clearNotice();
-    if(WestStory.isField(old)||WestStory.isField(state.scene)){
-      const foot=state.scene==='north'?'westTrail':old==='mailcave'&&state.scene==='quarry'?'rightDoor':old==='north'&&state.scene==='mailcave'?'coast':false;
-      close();World.enter(state.scene,foot);if(view)drawDialog(view,choose);else $('world').focus({preventScroll:true});return;
+    const dest=state.scene;
+    let landing=true;
+    if(old==='yard')landing='post';
+    else if(dest==='yard')landing='exit';
+    else if(WestStory.isField(old)||WestStory.isField(dest)){
+      if(dest==='north')landing='westTrail';
+      else if(dest==='quarry')landing=old==='mailcave'?'rightDoor':'downhill';
+      else landing=old==='north'?'coast':'exit';
     }
-    if(old==='yard'||state.scene==='yard'){
-      close();World.enter(state.scene,old==='yard'?'post':false);$('world').focus({preventScroll:true});return;
-    }
-    movingScene=true;close();World.enter(state.scene,true);World.pause(true);
-    const sail=$('sailing');sail.querySelector('b').textContent=World.scenes[state.scene].name+' 방면';sail.hidden=false;
-    clearTimeout(travelTimer);travelTimer=setTimeout(()=>{movingScene=false;sail.hidden=true;World.pause(false);drawDialog(view,choose);},matchMedia('(prefers-reduced-motion: reduce)').matches?40:1050);
+    movingScene=true;close();
+    Passage.play(old,dest,state,()=>{
+      World.enter(dest,landing);movingScene=false;World.pause(false);hud();
+      if(view)drawDialog(view,choose);else $('world').focus({preventScroll:true});
+    });
   }
   function choose(action){const old=state.scene;const result=Voyage.act(state,action);navigate(old,result);}
   function inspect(key){
@@ -205,8 +209,15 @@
   function fieldStopped(){WestStory.finishMotion(state);save();hud();World.refresh();}
   function start(asTrial=false){
     trial=asTrial;$('exit-trial').hidden=!trial;
-    clearNotice();state=trial?Voyage.initial():(read()||newVoyage());$('cover').hidden=true;$('play').hidden=false;
+    const stored=trial?null:read();
+    clearNotice();state=trial?Voyage.initial():(stored||newVoyage());$('cover').hidden=true;$('play').hidden=false;
     World.start(state,inspect,fieldStopped);save();hud();$('world').focus({preventScroll:true});
+    if(!stored&&!trial&&(northEntry||westEntry)){
+      movingScene=true;World.pause(true);
+      Passage.play(westEntry?'north':'harbor',state.scene,state,()=>{
+        movingScene=false;World.pause(false);$('world').focus({preventScroll:true});
+      });
+    }
   }
   function resume(){close();start();}
   $('start').onclick=()=>start();
@@ -229,5 +240,16 @@
   }
   $('help').onclick=()=>{if(!movingScene)helpView();};
   function returnToCover(){if(movingScene)return;save();World.stop();$('cover').hidden=false;$('play').hidden=true;cover();$('start').focus({preventScroll:true});}
+  function preview(kind){
+    const coastal=kind==='coast';
+    const sample=coastal?Voyage.westStart():Voyage.northStart();
+    if(coastal)Object.assign(sample,{coastOpen:true,cartPhase:'docked',westStamp:true});
+    Passage.play(coastal?'mailcave':'harbor','north',sample,()=>{});
+  }
+  for(const b of document.querySelectorAll('[data-preview]'))b.onclick=()=>preview(b.dataset.preview);
   cover();
+  const reel=new URLSearchParams(location.search).get('preview');
+  if(reel==='sail'||reel==='coast'){
+    $('preview-scenes').open=true;preview(reel);
+  }
 })();
