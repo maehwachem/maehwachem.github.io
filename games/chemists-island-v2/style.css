@@ -156,3 +156,6 @@ body.west-entry .intro{max-width:25em;word-break:keep-all}
 .stamp-acidKit::before{width:11px;height:16px;border:2px solid #7a8c80;background:linear-gradient(#dfd9bc 35%,#bea76b 35%);border-top:4px solid #956e47}
 .stamp-westStamp::after,.stamp-mailCard::after{width:9px;height:8px;border:2px solid #5e8c7c;border-radius:50%}
 @media(max-width:500px){.chapter-links{display:grid;gap:0}.chapter-links a{font-size:.88rem}}
+.stamp-missingMail::before{width:20px;height:16px;background:repeating-linear-gradient(#efddb3 0 4px,#aa9676 4px 5px);border:1px solid #89795d;transform:rotate(-6deg)}
+.stamp-coastKey::before{width:8px;height:8px;border:3px solid #d1aa66;border-radius:50%;transform:translate(-6px,-3px)}
+.stamp-coastKey::after{width:15px;height:4px;background:#be9958;box-shadow:5px 3px 0 -1px #be9958;transform:translate(4px,2px) rotate(28deg)}

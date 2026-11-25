@@ -67,18 +67,19 @@
     parent.append(strip,join,msg);draw();
   }
   function chart(parent){
-    const {g}=canvas(parent,'북암 옛 측량도. 옛 선착장에서 광업소를 거쳐 서쪽 갱구로 이어지는 점선.',320,139);
-    box(g,0,0,320,139,'#e7d4a8');box(g,6,6,308,127,'#edddb9');g.save();
-    g.strokeStyle='#bad1bd';g.lineWidth=.7;for(let x=12;x<320;x+=16){path(g,[[x,6],[x,133]],'#bbbea1',.6);}
-    for(let y=14;y<133;y+=16)path(g,[[6,y],[313,y]],'#bbbea1',.6);
-    const shore=[[8,35],[31,44],[49,35],[68,43],[87,62],[64,74],[70,88],[103,94],[118,125],[130,133]];
-    path(g,shore,'#608e88',3);path(g,shore.map(([x,y])=>[x-5,y+4]),'#8fae9d',1);
-    words(g,'北岩',33,111,'#758f82',12);words(g,'북암 광업소 측량도',209,29,'#564e3e',17);
-    g.setLineDash([4,4]);path(g,[[79,78],[108,75],[141,69],[173,83],[200,76],[232,87],[263,63]],'#9a6045',2);g.setLineDash([]);
-    for(const [x,y,name] of [[79,78,'옛 선착장'],[173,83,'광업소'],[263,63,'서쪽 갱구']]){
-      ring(g,x,y,4,4,'#795b48',2);words(g,name,x,y+20,'#564f40',12);
-    }
-    g.restore();
+    const {g}=canvas(parent,'모서리가 뜯긴 측량도. 광업소에서 갈라진 두 선은 찢긴 곳에서 끊긴다. 메모에는 우편길 표지는 방해석이라고 적혔다.',320,150);
+    box(g,0,0,320,150,'#51463b');g.save();g.beginPath();
+    const edge=[[7,7],[248,7],[245,16],[251,19],[247,25],[255,28],[250,36],[262,40],[258,47],[268,52],[265,58],[281,64],[278,71],[285,75],[282,82],[296,87],[292,95],[311,103],[311,142],[7,142]];
+    edge.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.closePath();g.fillStyle='#edddb9';g.fill();g.clip();
+    for(let x=12;x<320;x+=16)path(g,[[x,5],[x,144]],'#c7c7a8',.6);
+    for(let y=14;y<145;y+=16)path(g,[[6,y],[313,y]],'#c7c7a8',.6);
+    const shore=[[8,28],[31,38],[46,42],[54,55],[40,69],[59,86],[70,109]];
+    path(g,shore,'#71978b',3);words(g,'북암 광업소 측량도',115,30,'#564e3e',17);
+    g.setLineDash([4,3]);path(g,[[53,66],[88,61],[112,69],[142,69],[175,58],[209,59]],'#895d46',2);
+    path(g,[[209,59],[231,48],[267,42]],'#895d46',2);path(g,[[209,59],[245,69],[292,76]],'#895d46',2);g.setLineDash([]);
+    for(const [x,y,label] of [[53,66,'옛 선착장'],[143,69,'광업소']]){ring(g,x,y,3.5,3.5,'#764f3c',2);words(g,label,x+4,y+20,'#544c3e',13);}
+    box(g,21,105,277,27,'#e2c89a');words(g,'우편길 표지는 방해석',153,125,'#493e33',17);
+    g.restore();path(g,edge.slice(1,19),'#f9eac7',2);
   }
   window.NorthLab={mount(parent,view,select){
     const render={'magnet-well':well,splice, survey:chart}[view.kind];if(!render)return false;

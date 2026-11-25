@@ -12,7 +12,7 @@
       const draft={...Voyage.initial(),...data.game};
       if(!Array.isArray(draft.log)||!draft.visited||typeof draft.visited!=='object')return null;
       if(!data.game.pack && !draft.repaired && draft.coupA && draft.coupB) draft.pack={chain:1,zinc:1};
-      Supplies.restore(draft);
+      Supplies.restore(draft);WestStory.restore(draft,data.game);
       if(!['rain','brine'].includes(draft.water)||draft.gate)draft.water=null;
       return draft;
     }catch{return null;}
@@ -37,7 +37,7 @@
       document.body.classList.add('west-entry');
       document.querySelector('.chapter').textContent='셋째 장 · 서쪽 갱구의 우편함';
       document.querySelector('.intro').textContent='간판이 바랜 갱구가 둘. 석 어르신은 마지막 우편차가 어느 쪽으로 들어갔는지 찾고 있다.';
-      $('west-route').href='?v=west1';$('west-route').textContent='첫 장 항해로';
+      $('west-route').href='?v=west2';$('west-route').textContent='첫 장 항해로';
     }
     $('start').textContent=stored?'항해 이어하기':westEntry?'광업소 마당으로':northEntry?'북암에 상륙':'첫 항해 시작';
     $('resume-info').textContent=stored?(stored.westStamp?'서쪽 갱구의 우편함 · 배달 완료':stored.northDelivered?'셋째 장 · 서쪽 갱구의 우편함':stored.finished?'둘째 장 · 북암의 답장':World.scenes[stored.scene].name+' · 귀항 '+stored.returns+'회'):westEntry?'셋째 장부터 시작하는 별도 저장 항해':northEntry?'북암부터 시작하는 별도 저장 항해':'';
@@ -52,6 +52,7 @@
     cord:{name:'삼줄 타래',detail:'창고 앞에서 주운 마른 줄.'},magnet:{name:'고리 달린 자석',detail:'고리에 줄을 단단히 묶을 수 있다.'},
     retriever:{name:'자석줄',detail:'점검홈 아래까지 닿는 손수 만든 도구.'},crankPin:{name:'강철 고정핀',detail:'도개교 손잡이 축에 맞는다.'},
     copper:{name:'피복 구리선',detail:'양 끝을 벗기면 구리 심선이 드러난다.'},reply:{name:'북암의 답장',detail:'석 어르신이 오 국장 앞으로 보낸 봉투.'},
+    missingMail:{name:'하은이 옮겨 적은 미배달 기록',detail:'북암 우체소 옛 장부의 마지막 줄. “마지막 운행일 · 서안 우편함 한 개 미인도.”'},
     survey:{name:'옛 광업소 측량도',detail:'석 어르신이 그린 북암 서쪽 해안의 길.'},
     woodFrame:{name:'나무틀',detail:'유리판을 비스듬히 받칠 수 있다.'},
     glassPane:{name:'유리판',detail:'작업마당에서 찾은 투명한 창유리.'},
@@ -66,7 +67,7 @@
     for(const id of Object.keys(WestStory.contents))if(state[id])ids.push(id);
     if(state.water)ids.push(state.water);
     for(const id of ['cord','magnet','retriever','crankPin','copper','reply'])if(state[id])ids.push(id);
-    if(state.reply||state.northDelivered)ids.push('survey');
+    if(state.reply||state.northDelivered)ids.push('survey','missingMail');
     for(const part of ['woodFrame','glassPane','flask'])if(state[part])ids.push(part);
     if(state.mineClue)ids.push('ink');
     if(state.saltClue)ids.push('ledger');
@@ -98,6 +99,7 @@
     if(panel.open)close();
     const notice=$('pickup');clearTimeout(pickupTimer);notice.textContent=view.text;
     notice.classList.add('shown');pickupTimer=setTimeout(()=>notice.classList.remove('shown'),2500);
+    if(view.pickup==='chipLeft'||view.pickup==='chipRight')World.gather();
     World.refresh();
   }
   function clearNotice(){clearTimeout(pickupTimer);$('pickup').classList.remove('shown');$('pickup').textContent='';}
@@ -175,7 +177,6 @@
     save();hud();
     if(view?.fieldNotice){
       if(view.round)PierYard.startRound();
-      if(view.shunt)WestField.shunt();
       pickup({text:view.fieldNotice});$('world').focus({preventScroll:true});return;
     }
     if(old===state.scene){if(view?.pickup)pickup(view);else drawDialog(view,choose);return;}
@@ -201,10 +202,11 @@
     const view=Voyage.interact(state,key,PierYard.keeper.mode);save();hud();
     if(view?.pickup)pickup(view);else drawDialog(view,choose);
   }
+  function fieldStopped(){WestStory.finishMotion(state);save();hud();World.refresh();}
   function start(asTrial=false){
     trial=asTrial;$('exit-trial').hidden=!trial;
     clearNotice();state=trial?Voyage.initial():(read()||newVoyage());$('cover').hidden=true;$('play').hidden=false;
-    World.start(state,inspect);save();hud();$('world').focus({preventScroll:true});
+    World.start(state,inspect,fieldStopped);save();hud();$('world').focus({preventScroll:true});
   }
   function resume(){close();start();}
   $('start').onclick=()=>start();
@@ -221,7 +223,7 @@
     drawDialog({title:'조작과 저장',text:'화면 속 길을 누르면 걷습니다. 우체국 문이나 작업대, 배를 누르면 그 앞으로 걸어가 살펴봅니다. 부두에 놓인 사슬이나 정비 상자를 누르면 재료를 챙깁니다. 가방에서 주운 물건을 살펴보고, 작업대에서 사용하세요. 세로 화면에서는 ‘전경 보기’로 시야를 넓힐 수 있습니다.\n\n키보드로는 방향키 또는 WASD로 걷고, E로 가까운 곳을 조사합니다. 대화는 Tab과 Enter로 선택하고 Esc로 닫습니다.\n\n조사와 항해는 이 브라우저에 자동 저장됩니다. 표지로 돌아가도 이어서 플레이할 수 있어요.',choices:[{label:'표지로 돌아가기',id:'title'},{label:'처음부터 다시 시작',id:'reset'},{label:'닫기',id:'close'}]},action=>{
       if(action==='title'){close();returnToCover();return;}
       if(action==='reset')drawDialog({title:'새 항해를 시작할까요?',text:westEntry?'셋째 장부터 시작한 별도 항해를 처음으로 되돌립니다.':northEntry?'북암부터 시작한 별도 항해를 처음으로 되돌립니다.':'이 기기에 저장한 v2의 현재 항해 기록을 새 기록으로 교체합니다.',choices:[{label:'새 항해 시작',id:'confirmed'},{label:'취소',id:'close'}]},action=>{
-        if(action==='confirmed'){state=newVoyage();clearNotice();close();World.start(state,inspect);save();hud();}
+        if(action==='confirmed'){state=newVoyage();clearNotice();close();World.start(state,inspect,fieldStopped);save();hud();}
       },'항해일지');
     },'선실 · 안내');
   }

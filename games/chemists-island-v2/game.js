@@ -161,7 +161,7 @@
       haeun:function(s){
         if(!s.bridgeDown)return null;
         if(s.reply||s.northDelivered)return D('기관사 하은','하은이 파란 배의 밧줄을 살핀다. “견인선이 오면 물새호도 집에 가겠네요.”');
-        if(s.radioFixed)return D('기관사 하은','“구조선이 온대요. 석 어르신은 이 답장을 먼저 보내고 싶으시대요.” 하은이 봉투 한 장과 납작하게 접은 측량도를 건넨다.',[{label:'답장과 측량도 받아 들기',id:'take_reply'}]);
+        if(s.radioFixed)return D('기관사 하은','“발이 묶인 열이틀 동안 북암 우체소에서 옛 장부를 봤어요. 마지막 줄에 ‘서안 우편함 한 개 미인도’라고 적혀 있더라고요.” 하은이 장부에서 베낀 쪽지를 석 어르신의 답장, 측량도와 함께 내민다.',[{label:'답장과 기록 받아 들기',id:'take_reply'}]);
         s.metHaeun=true;L(s,'물새호는 북암에 남은 석 어르신에게 약 꾸러미를 전하러 왔다.');
         return D('물새호 기관사 하은','“다리가 올라간 뒤로 열이틀이에요. 그래도 석 어르신 약은 제때 전했어요.”\n하은이 앞바다를 가리킨다. 폭풍에 물새호가 암초에 걸리고 작은 배는 떠내려갔다.\n“무전기 전원선도 끊겼어요. 건너편 창고엔 분명 여분이 있을 텐데.”');
       },
@@ -314,12 +314,12 @@
     },
     take_reply:function(s){
       if(s.scene!=='north'||!s.radioFixed||s.reply||s.northDelivered)return null;
-      s.reply=true;return {pickup:'reply',text:'북암의 답장과 옛 광업소 측량도를 받았다.'};
+      s.reply=true;L(s,'북암 우체소 옛 장부 · 마지막 운행일, 서안 우편함 한 개 미인도.');return {pickup:'reply',text:'답장과 측량도, 하은이 옮겨 적은 미배달 기록을 받았다.'};
     },
     deliver_north:function(s){
       if(s.scene!=='harbor'||!s.reply||s.northDelivered)return null;
       s.reply=false;s.northDelivered=true;L(s,'석 어르신의 답장을 배달했다. 북암행 우편 자루가 다시 걸렸다.');
-      return D('둘째 장 끝 · 다시 걸린 우편 자루','“답장이군. 북암에도 아직 받는 사람이 있었어.” 오 국장이 빈 고리에 북암행 자루를 건다.\n석 어르신이 동봉한 측량도에는 폐쇄된 갱도에서 서쪽 해안으로 난 길이 그려져 있다. 북암 우체소 옆 오르막으로 가면 광업소가 나온다.',[{id:'go_north',label:'측량도를 들고 북암으로 출항'}],'survey');
+      return D('둘째 장 끝 · 다시 걸린 우편 자루','“답장이군. 북암에도 아직 받는 사람이 있었어.” 오 국장이 빈 고리에 북암행 자루를 건다.\n오 국장이 하은의 쪽지를 펼친다. “그럼 광업소에 우편함 하나가 남았겠군. 이 측량도를 석 선생님께 보여 드리게.” 북암 우체소 옆 오르막으로 가면 광업소가 나온다.',[{id:'go_north',label:'측량도를 들고 북암으로 출항'}],'survey');
     },
     go_mine: function (s) { return go(s, 'mine'); },
     go_salt: function (s) { return go(s, 'salt'); },
@@ -365,7 +365,7 @@
 
   function westStart(){
     const s=northStart();Object.assign(s,{scene:'quarry',trip:'north',northDelivered:true,bridgeDown:true,metHaeun:true,radioFixed:true,retriever:true,returns:3});
-    L(s,'북암의 답장을 배달하고 석 어르신의 측량도를 받았다.');return s;
+    L(s,'하은이 북암 우체소 옛 장부에서 옮겨 적은 마지막 줄 · 서안 우편함 한 개 미인도. 석 어르신의 측량도를 들고 광업소에 왔다.');return s;
   }
   function northStart(){
     var s=initial();

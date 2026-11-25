@@ -59,7 +59,7 @@
     image.onerror=()=>{image.onerror=null;image.src='art/'+key+'.png';};
     image.src='art/'+key+'-hd.webp';
   }
-  let density=1;
+  let density=1,gatherSince=-1,onFieldStop=()=>{};
   function snap(v){return Math.round(v*density)/density;}
   const held=new Set(); const reduced=matchMedia('(prefers-reduced-motion: reduce)');
   let s, scene, id, px=0,py=0,face='down',route=[],request=null,walkPhase=0,wasWalking=false,lastFrame=0,raf=0,active=false,paused=false,onSpot=()=>{},width=W,camera=0;
@@ -99,7 +99,7 @@
   function walkway(){return id==='north'&&NorthDock.crossable()?Walkways.northOpen:Walkways[id];}
   function present(key){
     if(id==='north'&&key==='westTrail')return s.northDelivered;
-    if(id==='mailcave'&&key==='delivery')return s.cartSent&&WestField.arrived();
+    if(id==='mailcave'&&key==='delivery')return s.cartPhase==='docked';
     if(id==='north'&&(key==='cord'||key==='magnet'))return !s[key]&&!s.retriever&&!s.bridgeDown;
     if(id==='yard'&&key==='frame')return !s.still&&!s.woodFrame;
     if(id==='yard'&&key==='pane')return !s.still&&!s.glassPane;
@@ -186,7 +186,13 @@
   function actor(moving){
     const x=snap(px)-camera,y=snap(py);
     ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.ellipse(x,y-.7,5.8,1.7,0,0,Math.PI*2);ctx.fill();
-    IslandChemist.draw(ctx,x,y,face,moving?Math.floor(walkPhase*8/28):-1);
+    const age=performance.now()-gatherSince;
+    if(gatherSince>=0&&!moving&&age<850){
+      const dip=reduced.matches?0:Math.sin(Math.PI*Math.min(1,age/630));
+      ctx.save();ctx.translate(x,y);ctx.scale(1,1-.25*dip);IslandChemist.draw(ctx,0,0,face,-1);ctx.restore();
+      const side=face==='left'?-1:1,ex=x+side*5,ey=y-4-Math.round(reduced.matches?7:16*Math.min(1,age/700));
+      ctx.fillStyle='#856748';ctx.fillRect(ex-2,ey,5,4);ctx.fillStyle='#f1dcab';ctx.fillRect(ex-2,ey,5,2);ctx.fillStyle='#b48a60';ctx.fillRect(ex,ey+1,1,1);
+    }else{if(moving)gatherSince=-1;IslandChemist.draw(ctx,x,y,face,moving?Math.floor(walkPhase*8/28):-1);}
   }
   function prop(column,x,y){
     if(!loaded(props))return false;
@@ -230,8 +236,8 @@
     rect(123,134,5,2,'#efe7c6');rect(137,132,4,1,'#dedfc7');
   }
   function weather(t,image){
-    if(WestStory.isField(id)){WestField.paint(ctx,camera,id,s,t);return;}
-    if(id==='north'){NorthDock.paint(ctx,camera,s,t);if(s.northDelivered)WestField.paint(ctx,camera,id,s,t);return;}
+    if(WestStory.isField(id)){WestField.paint(ctx,camera,id,s,t,image);return;}
+    if(id==='north'){NorthDock.paint(ctx,camera,s,t);if(s.northDelivered)WestField.paint(ctx,camera,id,s,t,image);return;}
     if(id==='harbor'){
       board();
       if(s.northDelivered){
@@ -261,7 +267,7 @@
     if(!active)return;
     const elapsed=Math.max(0,(ts-lastFrame)/1000),dt=Math.min(.08,elapsed);lastFrame=ts;
     if(id==='north')NorthDock.tick(Math.min(.5,elapsed),s.bridgeDown,reduced.matches);
-    if(id==='mailcave'&&WestField.tick(Math.min(.4,elapsed),s,reduced.matches))positionObjects();
+    if(id==='mailcave'&&!paused&&WestField.tick(Math.min(.4,elapsed),s,reduced.matches)){onFieldStop();positionObjects();}
     const keeperMoved=id==='harbor'&&PierYard.tickKeeper(Math.min(1,elapsed),s.lampReady,document.hidden||paused||request==='keeper',reduced.matches);
     const oldX=px,oldY=py;
     movement(dt);
@@ -286,9 +292,9 @@
     const time=reduced.matches?0:ts/1000;
     for(const person of residents)if(person.y<=py)PierYard.person(ctx,camera,person,time);
     if(id==='north'&&107<=py)NorthDock.person(ctx,camera,s,time);
-    if(id==='quarry'&&120<=py)WestField.elder(ctx,camera,time);
+    if(id==='quarry'&&120<=py)WestField.elder(ctx,camera,time,px,py);
     actor(moving);
-    if(id==='quarry'&&120>py)WestField.elder(ctx,camera,time);
+    if(id==='quarry'&&120>py)WestField.elder(ctx,camera,time,px,py);
     if(id==='north'&&107>py)NorthDock.person(ctx,camera,s,time);
     for(const person of residents)if(person.y>py)PierYard.person(ctx,camera,person,time);
     raf=requestAnimationFrame(frame);
@@ -343,9 +349,9 @@
   addEventListener('keyup',e=>held.delete(keys[e.code]));addEventListener('blur',()=>{stopPad();held.clear();});
   addEventListener('resize',size);
   document.addEventListener('visibilitychange',()=>{lastFrame=performance.now();});
-  window.World={scenes,start(state,cb){s=state;onSpot=cb;active=true;paused=false;this.enter(state.scene);cancelAnimationFrame(raf);lastFrame=performance.now();raf=requestAnimationFrame(frame);},
+  window.World={scenes,gather(){gatherSince=performance.now();},start(state,cb,stopped){s=state;onSpot=cb;onFieldStop=stopped;active=true;paused=false;this.enter(state.scene);cancelAnimationFrame(raf);lastFrame=performance.now();raf=requestAnimationFrame(frame);},
     enter(key,arriving=false){
-      s.scene=key;id=key;scene=scenes[key];loadScene(key);overview=false;
+      gatherSince=-1;s.scene=key;id=key;scene=scenes[key];loadScene(key);overview=false;
       if(key==='north')NorthDock.enter(s);
       if(key==='mailcave')WestField.enter(s);
       if(key==='harbor')PierYard.enterHarbor(s.lampReady);
