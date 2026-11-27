@@ -25,7 +25,17 @@
   .toolbar button:hover { filter: brightness(0.95); }
   .toolbar .count { font-size: 13px; color: #555; margin-left: 4px; }
 
-  .viewport { overflow: auto; padding: 20px 0 40px; }
+  /* 두 손가락 동작은 보고서 확대·축소에 쓰고, 한 손가락은 스크롤 그대로 */
+  /* 화면 = 도구 막대 + 보고서 영역. 보고서가 커져도 페이지 전체가 아니라 보고서 영역 안에서만 스크롤 */
+  body { touch-action: pan-x pan-y; display: flex; flex-direction: column; height: 100vh; height: 100dvh; overflow: hidden; }
+  .toolbar { flex: none; }
+  .viewport { flex: 1; min-height: 0; overflow: auto; padding: 20px 8px 40px; }
+  /* 확대·축소: 바깥 상자 크기를 배율만큼 잡고, 용지는 그 안에서 transform으로 키움 */
+  .zoomwrap { --z: 1; width: calc(210mm * var(--z)); height: calc(297mm * var(--z)); margin: 0 auto; }
+  .zoomwrap .page { margin: 0; transform: scale(var(--z)); transform-origin: 0 0; }
+  .toolbar .zoom { display: inline-flex; align-items: center; gap: 4px; }
+  .toolbar .zoom button { min-width: 38px; padding: 8px 10px; }
+  .toolbar #zPct { min-width: 44px; text-align: center; font-size: 13px; color: #333; }
   /* A4 용지 */
   .page {
     position: relative; width: 210mm; height: 297mm; margin: 0 auto;
@@ -61,11 +71,10 @@
   .cell { position: relative; cursor: pointer; }
   /* 사진이 들어가는 안쪽 영역: 확대해도 이 안에서만 보임 */
   .cell .frame { position: absolute; inset: 1mm; overflow: hidden; }
-  /* 위치·크기는 스크립트가 mm 단위로 지정 (기본: 칸을 꽉 채우고 넘치는 부분은 잘림) */
-  .cell img { position: absolute; max-width: none; max-height: none; user-select: none; -webkit-user-drag: none; pointer-events: none; }
-  /* 편집 중인 칸: 손가락 끌기·두 손가락 확대를 이 칸이 받음 (나머지 칸은 화면 스크롤 그대로) */
-  .cell.selected .frame { touch-action: none; cursor: grab; }
-  .cell.selected .frame:active { cursor: grabbing; }
+  .cell img {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: contain; transform-origin: center center;
+  }
   /* 표 선: 사진 위에 겹쳐 그려서 사진·화면 배율과 관계없이 항상 보이게 함 */
   .lines {
     position: absolute; left: 22.9mm; top: 22.9mm; width: 164.7mm; height: 242.1mm;
@@ -74,14 +83,12 @@
   /* 크기 조절 막대 (칸을 눌렀을 때 표시, 인쇄 시 숨김) */
   .cell .ctrl {
     position: absolute; left: 2mm; right: 2mm; bottom: 2mm; z-index: 3;
-    display: none; flex-wrap: wrap; align-items: center; gap: 1.5mm 2mm;
+    display: none; align-items: center; gap: 2mm;
     padding: 1.5mm 2.5mm; border-radius: 2mm; background: rgba(255,255,255,.95);
     box-shadow: 0 1px 4px rgba(0,0,0,.3); font-size: 9pt; cursor: default;
   }
   .cell.selected .ctrl { display: flex; }
   .cell.selected { outline: 0.6mm solid #2f6fdd; outline-offset: -0.6mm; z-index: 1; }
-  .ctrl .row { display: flex; align-items: center; gap: 2mm; width: 100%; }
-  .ctrl .tip { flex: 1; color: #666; font-size: 8pt; }
   .ctrl input[type=range] { flex: 1; min-width: 0; }
   .ctrl .pct { width: 10mm; text-align: right; font-variant-numeric: tabular-nums; }
   .ctrl button {
@@ -102,10 +109,12 @@
   .cell.filled:hover .del, .cell.selected .del { display: block; }
 
   @media print {
-    body { background: #fff; }
+    body { background: #fff; display: block; height: auto; overflow: visible; }
     .toolbar, .hint, .del, .ctrl { display: none !important; }
     .cell.selected { outline: none; }
     .viewport { padding: 0; overflow: visible; }
+    .zoomwrap { width: auto; height: auto; margin: 0; }
+    .zoomwrap .page { transform: none !important; }
     .page { box-shadow: none; margin: 0; }
     .cell:hover { background: none; }
     .head input:focus { background: transparent; }
@@ -121,10 +130,16 @@
   <button id="btnPrint">인쇄</button>
   <button id="btnPdf">PDF로 내보내기</button>
   <span class="count" id="count">0 / 10장</span>
+  <span class="zoom" aria-label="보고서 확대·축소">
+    <button id="zOut" title="축소">－</button>
+    <span id="zPct">100%</span>
+    <button id="zIn" title="확대">＋</button>
+    <button id="zFit">화면 맞춤</button>
+  </span>
 </div>
 
 <div class="viewport">
-  <div class="page" id="page">
+  <div class="zoomwrap" id="zoomwrap"><div class="page" id="page">
     <div class="title">「학교장허가 교외체험학습」 결과보고서(별지)</div>
     <div class="head">
       <div class="label">성명</div>
@@ -149,7 +164,7 @@
       </g>
       <rect x="0.25" y="0.25" width="164.2" height="241.6" stroke="#222" stroke-width="0.5" fill="none"/>
     </svg>
-  </div>
+  </div></div>
 </div>
 
 <input type="file" id="fileMulti" accept="image/*" multiple hidden>
@@ -158,44 +173,11 @@
 <script>
 const MAX = 10;
 const photos = new Array(MAX).fill(null);   // 각 칸의 이미지 dataURL
-// 칸 안쪽(사진 영역) 크기, mm
-const FW = 164.7 / 2 - 2, FH = 231.6 / 5 - 2;
-// 각 칸의 보기 상태: z = 칸 채우기 기준 배율(1 = 꽉 채움), ox·oy = 가운데에서 옮긴 거리(mm), w·h = 원본 픽셀 크기
-const views = Array.from({ length: MAX }, () => ({ z: 1, ox: 0, oy: 0, w: 0, h: 0 }));
-const ZMAX = 4;
+const scales = new Array(MAX).fill(100);    // 각 칸의 사진 크기(%)
 const grid = document.getElementById('grid');
 const fileMulti = document.getElementById('fileMulti');
 const fileOne = document.getElementById('fileOne');
 let targetSlot = null;
-
-const coverOf = v => Math.max(FW / v.w, FH / v.h);            // 칸을 꽉 채우는 배율(mm/px)
-const zMinOf  = v => Math.min(FW / v.w, FH / v.h) / coverOf(v); // 사진 전체가 보이는 배율
-
-// 확대·이동 범위를 제한: 사진이 칸보다 크면 빈 곳이 생기지 않게, 작으면 가운데로
-function clampView(v) {
-  v.z = Math.min(ZMAX, Math.max(zMinOf(v), v.z));
-  const k = coverOf(v) * v.z, dw = v.w * k, dh = v.h * k;
-  const mx = Math.max(0, (dw - FW) / 2), my = Math.max(0, (dh - FH) / 2);
-  v.ox = Math.min(mx, Math.max(-mx, v.ox));
-  v.oy = Math.min(my, Math.max(-my, v.oy));
-  return { dw, dh };
-}
-// 사진이 그려질 위치(칸 안쪽 왼쪽 위 기준, mm) — 화면과 PDF가 같이 씀
-function layoutOf(v) {
-  const { dw, dh } = clampView(v);
-  return { x: (FW - dw) / 2 + v.ox, y: (FH - dh) / 2 + v.oy, dw, dh };
-}
-
-function render(i) {
-  const v = views[i], c = grid.children[i], img = c.querySelector('img');
-  if (!photos[i] || !v.w) return;
-  const L = layoutOf(v);
-  Object.assign(img.style, { left: L.x + 'mm', top: L.y + 'mm', width: L.dw + 'mm', height: L.dh + 'mm' });
-  const range = c.querySelector('input[type=range]');
-  range.min = Math.floor(zMinOf(v) * 100); range.max = ZMAX * 100;
-  range.value = Math.round(v.z * 100);
-  c.querySelector('.pct').textContent = Math.round(v.z * 100) + '%';
-}
 
 // 칸 만들기
 for (let i = 0; i < MAX; i++) {
@@ -203,38 +185,30 @@ for (let i = 0; i < MAX; i++) {
   c.className = 'cell';
   c.dataset.i = i;
   c.innerHTML = `<div class="hint">+ 사진 ${i + 1}</div>
-    <div class="frame"><img alt="" hidden draggable="false"></div>
+    <div class="frame"><img alt="" hidden></div>
     <button class="del" title="이 사진 지우기">×</button>
     <div class="ctrl">
-      <div class="row">
-        <span>크기</span>
-        <input type="range" min="30" max="400" step="1" value="100" aria-label="사진 크기">
-        <span class="pct">100%</span>
-      </div>
-      <div class="row">
-        <span class="tip">끌어서 위치 · 두 손가락으로 확대</span>
-        <button type="button" class="fit">칸에 맞추기</button>
-        <button type="button" class="swap">사진 바꾸기</button>
-        <button type="button" class="done">완료</button>
-      </div>
+      <span>크기</span>
+      <input type="range" min="30" max="200" step="5" value="100" aria-label="사진 크기">
+      <span class="pct">100%</span>
+      <button type="button" class="reset">원래대로</button>
+      <button type="button" class="swap">사진 바꾸기</button>
     </div>`;
   const range = c.querySelector('input[type=range]');
-  range.addEventListener('input', () => { views[i].z = range.value / 100; render(i); });
-  c.querySelector('.fit').addEventListener('click', () => { Object.assign(views[i], { z: 1, ox: 0, oy: 0 }); render(i); });
+  range.addEventListener('input', () => setScale(i, +range.value));
+  c.querySelector('.reset').addEventListener('click', () => setScale(i, 100));
   c.querySelector('.swap').addEventListener('click', () => { targetSlot = i; fileOne.value = ''; fileOne.click(); });
-  c.querySelector('.done').addEventListener('click', () => select(null));
   c.querySelector('.ctrl').addEventListener('click', e => e.stopPropagation());
   c.addEventListener('click', e => {
+    if (e.target.classList.contains('del')) { e.stopPropagation(); setPhoto(i, null); return; }
     e.stopPropagation();
-    if (e.target.classList.contains('del')) { setPhoto(i, null); return; }
-    if (photos[i]) { if (!c.classList.contains('selected')) select(i); return; }  // 사진 있는 칸: 편집 열기
+    if (photos[i]) { select(c.classList.contains('selected') ? null : i); return; }  // 사진 있는 칸: 크기 조절 열기/닫기
     select(null);
-    targetSlot = i; fileOne.value = ''; fileOne.click();                          // 빈 칸: 사진 고르기
+    targetSlot = i; fileOne.value = ''; fileOne.click();                             // 빈 칸: 사진 고르기
   });
-  attachGestures(c.querySelector('.frame'), i);
   grid.appendChild(c);
 }
-// 칸 밖을 누르면 편집 닫기
+// 칸 밖을 누르면 크기 조절 닫기
 document.addEventListener('click', e => { if (!e.target.closest('.cell')) select(null); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') select(null); });
 
@@ -242,74 +216,20 @@ function select(i) {
   [...grid.children].forEach((c, k) => c.classList.toggle('selected', k === i));
 }
 
-// 끌기(마우스·한 손가락)와 두 손가락 확대·축소
-function attachGestures(frame, i) {
-  const pts = new Map();
-  let start = null;
-  const isOn = () => frame.parentElement.classList.contains('selected') && photos[i];
-  const mmPerPx = () => FW / frame.getBoundingClientRect().width;
-  // 화면 좌표 → 칸 안쪽 가운데 기준 mm
-  const toMM = (x, y) => {
-    const r = frame.getBoundingClientRect(), k = FW / r.width;
-    return { x: (x - r.left - r.width / 2) * k, y: (y - r.top - r.height / 2) * k };
-  };
-  const snapshot = () => {
-    const v = views[i], arr = [...pts.values()];
-    if (arr.length >= 2) {
-      const [a, b] = arr;
-      start = { mode: 2, z: v.z, ox: v.ox, oy: v.oy,
-        dist: Math.hypot(a.x - b.x, a.y - b.y) || 1, mid: toMM((a.x + b.x) / 2, (a.y + b.y) / 2) };
-    } else if (arr.length === 1) {
-      start = { mode: 1, ox: v.ox, oy: v.oy, x: arr[0].x, y: arr[0].y };
-    } else start = null;
-  };
-  frame.addEventListener('pointerdown', e => {
-    if (!isOn()) return;
-    e.preventDefault();
-    frame.setPointerCapture(e.pointerId);
-    pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    snapshot();
-  });
-  frame.addEventListener('pointermove', e => {
-    if (!pts.has(e.pointerId) || !start) return;
-    pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    const v = views[i], arr = [...pts.values()];
-    if (start.mode === 2 && arr.length >= 2) {
-      const [a, b] = arr;
-      const z = Math.min(ZMAX, Math.max(zMinOf(v), start.z * Math.hypot(a.x - b.x, a.y - b.y) / start.dist));
-      const mid = toMM((a.x + b.x) / 2, (a.y + b.y) / 2);
-      // 손가락 사이 지점이 사진의 같은 곳을 계속 가리키도록
-      v.z = z;
-      v.ox = mid.x - (start.mid.x - start.ox) * z / start.z;
-      v.oy = mid.y - (start.mid.y - start.oy) * z / start.z;
-    } else if (start.mode === 1) {
-      const k = mmPerPx();
-      v.ox = start.ox + (e.clientX - start.x) * k;
-      v.oy = start.oy + (e.clientY - start.y) * k;
-    }
-    render(i);
-  });
-  const end = e => {
-    if (!pts.has(e.pointerId)) return;
-    pts.delete(e.pointerId);
-    clampView(views[i]);
-    snapshot();          // 손가락 하나를 떼면 남은 손가락으로 이어서 끌기
-  };
-  frame.addEventListener('pointerup', end);
-  frame.addEventListener('pointercancel', end);
+function setScale(i, v) {
+  scales[i] = v;
+  const c = grid.children[i];
+  c.querySelector('img').style.transform = `scale(${v / 100})`;
+  c.querySelector('input[type=range]').value = v;
+  c.querySelector('.pct').textContent = v + '%';
 }
 
 function setPhoto(i, url) {
   photos[i] = url;
   const c = grid.children[i], img = c.querySelector('img');
-  Object.assign(views[i], { z: 1, ox: 0, oy: 0, w: 0, h: 0 });
-  if (url) {
-    img.onload = () => { views[i].w = img.naturalWidth; views[i].h = img.naturalHeight; render(i); };
-    img.src = url; img.hidden = false; c.classList.add('filled');
-  } else {
-    img.onload = null; img.removeAttribute('src'); img.removeAttribute('style'); img.hidden = true;
-    c.classList.remove('filled', 'selected');
-  }
+  setScale(i, 100);
+  if (url) { img.src = url; img.hidden = false; c.classList.add('filled'); }
+  else { img.removeAttribute('src'); img.hidden = true; c.classList.remove('filled', 'selected'); }
   document.getElementById('count').textContent = photos.filter(Boolean).length + ' / 10장';
 }
 
@@ -346,6 +266,52 @@ document.getElementById('btnClear').onclick = () => {
   }
 };
 document.getElementById('btnPrint').onclick = () => window.print();
+
+/* ---------- 보고서 확대·축소 (버튼, 두 손가락) ---------- */
+const zoomwrap = document.getElementById('zoomwrap');
+const viewport = document.querySelector('.viewport');
+const PAGE_PX = 210 * 96 / 25.4;           // 100%일 때 용지 너비(px)
+const ZOOM_MIN = 0.3, ZOOM_MAX = 3;
+let zoom = 1;
+// anchor(화면 좌표)를 주면 그 지점의 내용이 손가락·화면 아래에 그대로 머물게 스크롤을 맞춤
+function setZoom(z, anchor) {
+  z = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, z));
+  let px, py;
+  if (anchor) {
+    const r = zoomwrap.getBoundingClientRect();
+    px = (anchor.x - r.left) / zoom; py = (anchor.y - r.top) / zoom;
+  }
+  zoom = z;
+  zoomwrap.style.setProperty('--z', z);
+  document.getElementById('zPct').textContent = Math.round(z * 100) + '%';
+  if (anchor) {
+    const r = zoomwrap.getBoundingClientRect();
+    viewport.scrollBy(r.left + px * z - anchor.x, r.top + py * z - anchor.y);
+  }
+}
+const fitZoom = () => (viewport.clientWidth - 16) / PAGE_PX;
+const center = () => { const r = viewport.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; };
+document.getElementById('zIn').onclick = () => setZoom(Math.round(zoom * 100 + 10) / 100, center());
+document.getElementById('zOut').onclick = () => setZoom(Math.round(zoom * 100 - 10) / 100, center());
+document.getElementById('zFit').onclick = () => { setZoom(fitZoom()); viewport.scrollTo({ left: 0 }); };
+// 화면이 용지보다 좁으면(휴대폰 등) 처음에 화면 너비에 맞춤
+if (fitZoom() < 1) setZoom(fitZoom());
+
+let pinch = null;
+const dist = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+const mid = t => ({ x: (t[0].clientX + t[1].clientX) / 2, y: (t[0].clientY + t[1].clientY) / 2 });
+document.addEventListener('touchstart', e => {
+  if (e.touches.length === 2) pinch = { d: dist(e.touches), z: zoom };
+}, { passive: true });
+document.addEventListener('touchmove', e => {
+  if (!pinch || e.touches.length !== 2) return;
+  e.preventDefault();
+  setZoom(pinch.z * dist(e.touches) / pinch.d, mid(e.touches));
+}, { passive: false });
+document.addEventListener('touchend', e => { if (e.touches.length < 2) pinch = null; });
+document.addEventListener('touchcancel', () => { pinch = null; });
+// iPhone·iPad 사파리의 기본 화면 확대 막기 (보고서 확대로 대신함)
+document.addEventListener('gesturestart', e => e.preventDefault());
 
 /* ---------- PDF 내보내기 (외부 라이브러리 없이) ---------- */
 const MM = 200 / 25.4;               // 200dpi 기준 1mm 당 픽셀
@@ -409,11 +375,12 @@ async function renderCanvas() {
     if (!photos[i]) continue;
     const im = await loadImg(photos[i]);
     const r = Math.floor(i / 2), c = i % 2;
-    const fx = L + c * CW + 1, fy = GT + r * RH + 1;
-    const P = layoutOf(views[i]);
+    const bx = m(L + c * CW + 1), by = m(GT + r * RH + 1), bw = m(CW - 2), bh = m(RH - 2);
+    const s = Math.min(bw / im.naturalWidth, bh / im.naturalHeight) * scales[i] / 100;
+    const dw = im.naturalWidth * s, dh = im.naturalHeight * s;
     ctx.save();
-    ctx.beginPath(); ctx.rect(m(fx), m(fy), m(FW), m(FH)); ctx.clip();   // 칸 안쪽만 보이게 자름
-    ctx.drawImage(im, m(fx + P.x), m(fy + P.y), m(P.dw), m(P.dh));
+    ctx.beginPath(); ctx.rect(bx, by, bw, bh); ctx.clip();   // 확대한 사진은 칸 안쪽만 보이게
+    ctx.drawImage(im, bx + (bw - dw) / 2, by + (bh - dh) / 2, dw, dh);
     ctx.restore();
   }
 
