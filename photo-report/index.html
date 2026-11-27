@@ -36,6 +36,16 @@
   .toolbar .zoom { display: inline-flex; align-items: center; gap: 4px; }
   .toolbar .zoom button { min-width: 38px; padding: 8px 10px; }
   .toolbar #zPct { min-width: 44px; text-align: center; font-size: 13px; color: #333; }
+  .toolbar .viewgrp { display: inline-flex; align-items: center; gap: 8px; }
+  /* 휴대폰: 도구 막대를 두 줄(작업 버튼 / 장수·확대축소)로 작게 */
+  @media (max-width: 640px) {
+    .toolbar { gap: 6px; padding: 6px 6px; }
+    .toolbar button { font-size: 13px; padding: 6px 9px; }
+    .toolbar .more { display: none; }
+    .toolbar .viewgrp { flex-basis: 100%; justify-content: center; }
+    .toolbar .zoom button { min-width: 32px; padding: 5px 8px; }
+    .toolbar #zPct { min-width: 38px; }
+  }
   /* A4 용지 */
   .page {
     position: relative; width: 210mm; height: 297mm; margin: 0 auto;
@@ -125,16 +135,18 @@
 <body>
 
 <div class="toolbar">
-  <button class="primary" id="btnAdd">사진 선택 (여러 장 가능)</button>
-  <button id="btnClear">사진 모두 지우기</button>
+  <button class="primary" id="btnAdd">사진 선택<span class="more"> (여러 장 가능)</span></button>
+  <button id="btnClear"><span class="more">사진 </span>모두 지우기</button>
   <button id="btnPrint">인쇄</button>
   <button id="btnPdf">PDF로 내보내기</button>
+  <span class="viewgrp">
   <span class="count" id="count">0 / 10장</span>
   <span class="zoom" aria-label="보고서 확대·축소">
     <button id="zOut" title="축소">－</button>
     <span id="zPct">100%</span>
     <button id="zIn" title="확대">＋</button>
     <button id="zFit">화면 맞춤</button>
+  </span>
   </span>
 </div>
 
