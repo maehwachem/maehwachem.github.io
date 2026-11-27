@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>「학교장허가 교외체험학습」 결과보고서(별지)</title>
 <style>
   @page { size: A4 portrait; margin: 0; }
@@ -431,11 +431,14 @@ function setZoom(z, anchor) {
 }
 const fitZoom = () => (viewport.clientWidth - 16) / PAGE_PX;
 const center = () => { const r = viewport.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; };
-document.getElementById('zIn').onclick = () => setZoom(Math.round(zoom * 100 + 10) / 100, center());
-document.getElementById('zOut').onclick = () => setZoom(Math.round(zoom * 100 - 10) / 100, center());
-document.getElementById('zFit').onclick = () => { setZoom(fitZoom()); viewport.scrollTo({ left: 0 }); };
+document.getElementById('zIn').onclick = () => (autoFit = false, setZoom(Math.round(zoom * 100 + 10) / 100, center()));
+document.getElementById('zOut').onclick = () => (autoFit = false, setZoom(Math.round(zoom * 100 - 10) / 100, center()));
+let autoFit = false;   // '화면 맞춤' 상태면 화면 크기가 바뀔 때(회전 등) 다시 맞춤
+const doFit = () => { setZoom(fitZoom()); viewport.scrollTo({ left: 0 }); autoFit = true; };
+document.getElementById('zFit').onclick = doFit;
+window.addEventListener('resize', () => { if (autoFit) doFit(); });
 // 화면이 용지보다 좁으면(휴대폰 등) 처음에 화면 너비에 맞춤
-if (fitZoom() < 1) setZoom(fitZoom());
+if (fitZoom() < 1) doFit();
 
 let pinch = null;
 const dist = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
@@ -446,6 +449,7 @@ document.addEventListener('touchstart', e => {
 document.addEventListener('touchmove', e => {
   if (!pinch || e.touches.length !== 2 || ed) return;
   e.preventDefault();
+  autoFit = false;
   setZoom(pinch.z * dist(e.touches) / pinch.d, mid(e.touches));
 }, { passive: false });
 document.addEventListener('touchend', e => { if (e.touches.length < 2) pinch = null; });
