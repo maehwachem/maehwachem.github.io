@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>「학교장허가 교외체험학습」 결과보고서(별지)</title>
+<style>
+  @page { size: A4 portrait; margin: 0; }
+  * { box-sizing: border-box; }
+  :root { --font: "Malgun Gothic", "맑은 고딕", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+  html, body { margin: 0; padding: 0; }
+  body { background: #e9ecef; font-family: var(--font); color: #111; }
+
+  /* 상단 도구 막대 (인쇄 시 숨김) */
+  .toolbar {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center;
+    padding: 10px 12px; background: #fff; border-bottom: 1px solid #d0d5db;
+  }
+  .toolbar button {
+    font-family: var(--font); font-size: 14px; padding: 8px 14px;
+    border: 1px solid #9aa4ae; border-radius: 6px; background: #f8f9fa; cursor: pointer;
+  }
+  .toolbar button.primary { background: #2f6fdd; border-color: #2f6fdd; color: #fff; }
+  .toolbar button:hover { filter: brightness(0.95); }
+  .toolbar .count { font-size: 13px; color: #555; margin-left: 4px; }
+
+  .viewport { overflow: auto; padding: 20px 0 40px; }
+  /* A4 용지 */
+  .page {
+    position: relative; width: 210mm; height: 297mm; margin: 0 auto;
+    background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,.15);
+  }
+  .title {
+    position: absolute; left: 0; right: 0; top: 7.5mm;
+    text-align: center; font-size: 18pt; font-weight: 700; letter-spacing: 1.2mm;
+  }
+  /* 머리 칸 */
+  .head {
+    position: absolute; left: 22.9mm; top: 22.9mm; width: 164.7mm; height: 10.5mm;
+    display: grid; grid-template-columns: 20.7mm 43.2mm 30.1mm 1fr;
+    border: 0.5mm solid #222; border-bottom: none;
+    font-size: 10pt;
+  }
+  .head > div { display: flex; align-items: center; justify-content: center; border-right: 0.25mm solid #444; }
+  .head > div:last-child { border-right: none; }
+  .head .label { background: #eef1f6; letter-spacing: 1.5mm; }
+  .head input {
+    font-family: var(--font); font-size: 10pt; border: none; outline: none; background: transparent;
+    text-align: center; padding: 0; color: #111;
+  }
+  .head input:focus { background: #fff8d6; }
+  .head .name input { width: 100%; height: 100%; }
+  .head .cls { gap: 0; }
+  .head .cls input { width: 10mm; }
+  .head .cls span { white-space: nowrap; }
+
+  /* 사진 칸 5×2 */
+  .grid {
+    position: absolute; left: 22.9mm; top: 33.4mm; width: 164.7mm; height: 231.6mm;
+    display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(5, 1fr);
+    border: 0.5mm solid #222;
+  }
+  .cell {
+    position: relative; overflow: hidden; cursor: pointer;
+    border-bottom: 0.25mm solid #444;
+  }
+  .cell:nth-child(odd) { border-right: 0.3mm dotted #444; }
+  .cell:nth-last-child(-n+2) { border-bottom: none; }
+  .cell img {
+    position: absolute; inset: 1mm; width: calc(100% - 2mm); height: calc(100% - 2mm);
+    object-fit: contain;
+  }
+  .cell .hint {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    color: #9aa4ae; font-size: 11pt;
+  }
+  .cell:hover { background: #f4f8ff; }
+  .cell.filled .hint { display: none; }
+  .cell .del {
+    position: absolute; top: 1.5mm; right: 1.5mm; width: 7mm; height: 7mm; border-radius: 50%;
+    border: none; background: rgba(0,0,0,.6); color: #fff; font-size: 12pt; line-height: 7mm;
+    cursor: pointer; display: none; padding: 0;
+  }
+  .cell.filled:hover .del { display: block; }
+
+  @media print {
+    body { background: #fff; }
+    .toolbar, .hint, .del { display: none !important; }
+    .viewport { padding: 0; overflow: visible; }
+    .page { box-shadow: none; margin: 0; }
+    .cell:hover { background: none; }
+    .head input:focus { background: transparent; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <button class="primary" id="btnAdd">사진 선택 (여러 장 가능)</button>
+  <button id="btnClear">사진 모두 지우기</button>
+  <button id="btnPrint">인쇄</button>
+  <button id="btnPdf">PDF로 내보내기</button>
+  <span class="count" id="count">0 / 10장</span>
+</div>
+
+<div class="viewport">
+  <div class="page" id="page">
+    <div class="title">「학교장허가 교외체험학습」 결과보고서(별지)</div>
+    <div class="head">
+      <div class="label">성명</div>
+      <div class="name"><input id="inName" type="text" autocomplete="off"></div>
+      <div class="label" style="letter-spacing:1mm">학년 반</div>
+      <div class="cls">
+        <span>3 학년&nbsp;</span><input id="inBan" type="text" inputmode="numeric" autocomplete="off"><span>반&nbsp;</span><input id="inBeon" type="text" inputmode="numeric" autocomplete="off"><span>번</span>
+      </div>
+    </div>
+    <div class="grid" id="grid"></div>
+  </div>
+</div>
+
+<input type="file" id="fileMulti" accept="image/*" multiple hidden>
+<input type="file" id="fileOne" accept="image/*" hidden>
+
+<script>
+const MAX = 10;
+const photos = new Array(MAX).fill(null);   // 각 칸의 이미지 dataURL
+const grid = document.getElementById('grid');
+const fileMulti = document.getElementById('fileMulti');
+const fileOne = document.getElementById('fileOne');
+let targetSlot = null;
+
+// 칸 만들기
+for (let i = 0; i < MAX; i++) {
+  const c = document.createElement('div');
+  c.className = 'cell';
+  c.dataset.i = i;
+  c.innerHTML = `<div class="hint">+ 사진 ${i + 1}</div><img alt="" hidden><button class="del" title="이 사진 지우기">×</button>`;
+  c.addEventListener('click', e => {
+    if (e.target.classList.contains('del')) { e.stopPropagation(); setPhoto(i, null); return; }
+    targetSlot = i; fileOne.value = ''; fileOne.click();
+  });
+  grid.appendChild(c);
+}
+
+function setPhoto(i, url) {
+  photos[i] = url;
+  const c = grid.children[i], img = c.querySelector('img');
+  if (url) { img.src = url; img.hidden = false; c.classList.add('filled'); }
+  else { img.removeAttribute('src'); img.hidden = true; c.classList.remove('filled'); }
+  document.getElementById('count').textContent = photos.filter(Boolean).length + ' / 10장';
+}
+
+function readFile(f) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result);
+    r.onerror = rej;
+    r.readAsDataURL(f);
+  });
+}
+
+// 여러 장 선택: 빈 칸을 앞에서부터 1장씩 채움
+document.getElementById('btnAdd').onclick = () => { fileMulti.value = ''; fileMulti.click(); };
+fileMulti.onchange = async () => {
+  const files = [...fileMulti.files].filter(f => f.type.startsWith('image/'));
+  const empty = photos.map((p, i) => p ? -1 : i).filter(i => i >= 0);
+  if (files.length > empty.length) {
+    alert(`빈 칸이 ${empty.length}개라서 앞의 ${empty.length}장만 넣습니다.`);
+  }
+  for (let k = 0; k < Math.min(files.length, empty.length); k++) {
+    setPhoto(empty[k], await readFile(files[k]));
+  }
+};
+// 칸을 눌러 1장 선택(교체)
+fileOne.onchange = async () => {
+  const f = fileOne.files[0];
+  if (f && targetSlot !== null) setPhoto(targetSlot, await readFile(f));
+};
+
+document.getElementById('btnClear').onclick = () => {
+  if (photos.some(Boolean) && confirm('넣은 사진을 모두 지울까요?')) {
+    for (let i = 0; i < MAX; i++) setPhoto(i, null);
+  }
+};
+document.getElementById('btnPrint').onclick = () => window.print();
+
+/* ---------- PDF 내보내기 (외부 라이브러리 없이) ---------- */
+const MM = 200 / 25.4;               // 200dpi 기준 1mm 당 픽셀
+const W = Math.round(210 * MM), H = Math.round(297 * MM);
+const FONT = '"Malgun Gothic","맑은 고딕","Apple SD Gothic Neo","Noto Sans KR",sans-serif';
+
+function loadImg(src) {
+  return new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = src; });
+}
+
+function spacedText(ctx, text, cx, cy, spacing) {
+  // 글자 사이 간격을 두고 가운데 정렬
+  const chars = [...text];
+  const widths = chars.map(ch => ctx.measureText(ch).width);
+  const total = widths.reduce((a, b) => a + b, 0) + spacing * (chars.length - 1);
+  let x = cx - total / 2;
+  ctx.textAlign = 'left';
+  chars.forEach((ch, k) => { ctx.fillText(ch, x, cy); x += widths[k] + spacing; });
+}
+
+async function renderCanvas() {
+  const cv = document.createElement('canvas');
+  cv.width = W; cv.height = H;
+  const ctx = cv.getContext('2d');
+  const m = v => v * MM;
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = '#111'; ctx.textBaseline = 'middle';
+
+  // 제목
+  ctx.font = `700 ${m(6.35)}px ${FONT}`;
+  spacedText(ctx, '「학교장허가 교외체험학습」 결과보고서(별지)', W / 2, m(13.8), m(1.2));
+
+  const L = 22.9, T = 22.9, TW = 164.7, HH = 10.5;
+  const cols = [20.7, 43.2, 30.1, TW - 20.7 - 43.2 - 30.1];
+  // 머리 칸 배경
+  ctx.fillStyle = '#eef1f6';
+  ctx.fillRect(m(L), m(T), m(cols[0]), m(HH));
+  ctx.fillRect(m(L + cols[0] + cols[1]), m(T), m(cols[2]), m(HH));
+  // 머리 칸 글자
+  ctx.fillStyle = '#111';
+  ctx.font = `${m(3.53)}px ${FONT}`;
+  const cy = m(T + HH / 2);
+  spacedText(ctx, '성명', m(L + cols[0] / 2), cy, m(1.5));
+  spacedText(ctx, document.getElementById('inName').value, m(L + cols[0] + cols[1] / 2), cy, 0);
+  spacedText(ctx, '학년 반', m(L + cols[0] + cols[1] + cols[2] / 2), cy, m(1));
+  const ban = document.getElementById('inBan').value, beon = document.getElementById('inBeon').value;
+  // "3 학년 [반] 반 [번] 번" — 화면과 같은 배치
+  const x4 = L + cols[0] + cols[1] + cols[2], c4 = x4 + cols[3] / 2;
+  const parts = [['3 학년 ', null], [ban, 10], ['반 ', null], [beon, 10], ['번', null]];
+  const pw = parts.map(([t, fix]) => fix ? m(fix) : ctx.measureText(t).width);
+  let px = m(c4) - pw.reduce((a, b) => a + b, 0) / 2;
+  parts.forEach(([t, fix], k) => {
+    ctx.textAlign = fix ? 'center' : 'left';
+    ctx.fillText(t, fix ? px + pw[k] / 2 : px, cy);
+    px += pw[k];
+  });
+
+  // 사진
+  const GT = T + HH, GH = 231.6, RH = GH / 5, CW = TW / 2;
+  for (let i = 0; i < MAX; i++) {
+    if (!photos[i]) continue;
+    const im = await loadImg(photos[i]);
+    const r = Math.floor(i / 2), c = i % 2;
+    const bx = m(L + c * CW + 1), by = m(GT + r * RH + 1), bw = m(CW - 2), bh = m(RH - 2);
+    const s = Math.min(bw / im.naturalWidth, bh / im.naturalHeight);
+    const dw = im.naturalWidth * s, dh = im.naturalHeight * s;
+    ctx.drawImage(im, bx + (bw - dw) / 2, by + (bh - dh) / 2, dw, dh);
+  }
+
+  // 선
+  ctx.strokeStyle = '#444'; ctx.lineWidth = m(0.25);
+  const line = (x1, y1, x2, y2) => { ctx.beginPath(); ctx.moveTo(m(x1), m(y1)); ctx.lineTo(m(x2), m(y2)); ctx.stroke(); };
+  let xx = L;
+  for (let k = 0; k < 3; k++) { xx += cols[k]; line(xx, T, xx, T + HH); }   // 머리 칸 세로선
+  line(L, GT, L + TW, GT);                                                    // 머리 칸 아래선
+  for (let r = 1; r < 5; r++) line(L, GT + r * RH, L + TW, GT + r * RH);     // 사진 칸 가로선
+  ctx.setLineDash([m(0.5), m(0.5)]); ctx.lineWidth = m(0.3);
+  line(L + CW, GT, L + CW, GT + GH);                                          // 가운데 점선
+  ctx.setLineDash([]);
+  ctx.strokeStyle = '#222'; ctx.lineWidth = m(0.5);
+  ctx.strokeRect(m(L), m(T), m(TW), m(HH + GH));                              // 바깥 테두리
+  return cv;
+}
+
+// JPEG 한 장을 A4 한 쪽에 넣은 PDF를 직접 만듦
+function buildPdf(jpegBytes, imgW, imgH) {
+  const enc = new TextEncoder();
+  const chunks = []; let len = 0; const offs = [];
+  const push = d => { const b = typeof d === 'string' ? enc.encode(d) : d; chunks.push(b); len += b.length; };
+  const PW = 595.28, PH = 841.89;
+  const content = `q ${PW} 0 0 ${PH} 0 0 cm /Im0 Do Q`;
+  push('%PDF-1.4\n%\xE2\xE3\xCF\xD3\n');
+  const obj = (n, body) => { offs[n] = len; push(`${n} 0 obj\n`); body(); push('\nendobj\n'); };
+  obj(1, () => push('<< /Type /Catalog /Pages 2 0 R >>'));
+  obj(2, () => push('<< /Type /Pages /Kids [3 0 R] /Count 1 >>'));
+  obj(3, () => push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${PW} ${PH}] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>`));
+  obj(4, () => {
+    push(`<< /Type /XObject /Subtype /Image /Width ${imgW} /Height ${imgH} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpegBytes.length} >>\nstream\n`);
+    push(jpegBytes); push('\nendstream');
+  });
+  obj(5, () => push(`<< /Length ${content.length} >>\nstream\n${content}\nendstream`));
+  const xref = len;
+  let x = 'xref\n0 6\n0000000000 65535 f \n';
+  for (let n = 1; n <= 5; n++) x += String(offs[n]).padStart(10, '0') + ' 00000 n \n';
+  push(x + `trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`);
+  const out = new Uint8Array(len); let p = 0;
+  chunks.forEach(c => { out.set(c, p); p += c.length; });
+  return out;
+}
+
+document.getElementById('btnPdf').onclick = async () => {
+  const btn = document.getElementById('btnPdf');
+  btn.disabled = true; btn.textContent = 'PDF 만드는 중…';
+  try {
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    const cv = await renderCanvas();
+    const blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.92));
+    const bytes = new Uint8Array(await blob.arrayBuffer());
+    const pdf = buildPdf(bytes, cv.width, cv.height);
+    const name = document.getElementById('inName').value.trim();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([pdf], { type: 'application/pdf' }));
+    a.download = `교외체험학습_결과보고서_별지${name ? '_' + name : ''}.pdf`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  } catch (e) {
+    alert('PDF를 만들지 못했습니다. [인쇄] → "PDF로 저장"을 이용해 주세요.\n' + e);
+  } finally {
+    btn.disabled = false; btn.textContent = 'PDF로 내보내기';
+  }
+};
+</script>
+</body>
+</html>
