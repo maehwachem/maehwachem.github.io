@@ -273,9 +273,10 @@ for (let i = 0; i < MAX; i++) {
 function setPhoto(i, url) {
   photos[i] = url;
   const c = grid.children[i], img = c.querySelector('img');
-  Object.assign(views[i], { z: 1, ox: 0, oy: 0, w: 0, h: 0 });   // 새 사진은 칸을 채우게 가운데 기준으로 자름
+  Object.assign(views[i], { z: 1, ox: 0, oy: 0, w: 0, h: 0 });
   if (url) {
-    img.onload = () => { views[i].w = img.naturalWidth; views[i].h = img.naturalHeight; render(i); };
+    // 새 사진은 처음에 원본 그대로(자르지 않고 사진 전체가 보이게) 넣음 — 누르면 자르기 창에서 편집
+    img.onload = () => { const v = views[i]; v.w = img.naturalWidth; v.h = img.naturalHeight; v.z = wholeOf(v); render(i); };
     img.src = url; img.hidden = false; c.classList.add('filled');
   } else {
     img.onload = null; img.removeAttribute('src'); img.removeAttribute('style'); img.hidden = true;
