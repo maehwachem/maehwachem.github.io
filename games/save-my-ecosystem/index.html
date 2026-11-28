@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>생태계를 지켜라</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* 한 테마: 종이 위 게임판. 위에는 공동판(덱·찾아온 생물·결산 트랙), 가운데 내 피라미드, 아래 손패 */
+:root{
+  --paper:#F4F1E8; --card:#FFFDF7; --ink:#1F2A24; --muted:#5B6359; --line:#DDD6C3;
+  --green:#3E7D4A; --amber:#9A6B12; --blue:#2F5F8A; --red:#9B3B2E; --brown:#6B4F35; --orange:#C8662E;
+  --l1:#E3EDE0; --l2:#F3E9D2; --l3:#DDE7F0; --l4:#F2DEDA; --dec:#EFE4D6;
+  --display:'Gowun Batang', Georgia, serif; --body:'Noto Sans KR', system-ui, sans-serif;
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:14px;line-height:1.45}
+button{font-family:inherit;font-size:14px;cursor:pointer;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 14px}
+button:hover:not(:disabled){border-color:var(--green)}
+button:focus-visible,.card:focus-visible,.slot:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+button.primary{background:var(--green);color:#FBFBF8;border-color:var(--green);font-weight:700}
+button:disabled{opacity:.45;cursor:not-allowed}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance}
+.wrap{max-width:1180px;margin:0 auto;padding:12px 16px 24px;display:flex;flex-direction:column;gap:12px}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}
+header h1{font-size:24px}
+header .en{font-size:12px;color:var(--muted);letter-spacing:.04em}
+.track{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-left:auto}
+.track .lbl{font-size:12px;color:var(--muted);margin-right:4px}
+.dot{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-weight:700;font-size:10px;color:var(--muted);font-variant-numeric:tabular-nums}
+.dot.s{border:2px solid var(--orange);color:var(--orange)}
+.dot.e{background:#2B2B2B;color:#F2B266;border-color:#2B2B2B}
+.dot.s.e{border-color:var(--orange)}
+.dot.last{border-style:double;border-width:4px}
+.dot.done{opacity:.4}
+.dot.now{outline:2px solid var(--green);outline-offset:1px}
+.track .key{font-size:11px;color:var(--muted);margin-left:4px;white-space:nowrap}
+.topbtns{display:flex;gap:6px}
+.topbtns button{padding:6px 10px;font-size:13px}
+
+.table{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:12px;align-items:start}
+@media (max-width:900px){.table{grid-template-columns:minmax(0,1fr)}}
+.panel{min-width:0;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}
+.panel h2{font-size:16px;margin-bottom:8px}
+
+.common{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.pile{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:var(--muted)}
+.pile .back{width:76px;aspect-ratio:34/53;border-radius:8px;display:grid;place-items:center;text-align:center;font-family:var(--display);font-weight:700;font-size:13px;line-height:1.3;border:2px solid transparent}
+.pile .back.bio{background:#2F5A3A;color:#CFE6C4}
+.pile .back.ev{background:#2B2B2B;color:#F2B266}
+.pile .back.past{background:var(--paper);color:var(--muted);border:2px dashed var(--line);font-family:var(--body);font-weight:400;font-size:11px;padding:4px}
+.pile button.back{padding:0}
+.market{display:flex;gap:8px}
+.market .card{width:76px}
+.prompt{flex:1 1 220px;min-height:52px;background:var(--paper);border-radius:10px;padding:8px 12px;font-size:14px}
+.prompt b{color:var(--green)}
+
+.me{display:flex;flex-direction:column;gap:10px;min-width:0}
+.mehead{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+.mehead .score{font-variant-numeric:tabular-nums}
+.chip{display:inline-flex;gap:4px;align-items:center;background:var(--paper);border-radius:999px;padding:3px 10px;font-size:12px}
+.boardwrap{display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:10px;align-items:start}
+@media (max-width:560px){.boardwrap{grid-template-columns:minmax(0,1fr)}}
+.board{position:relative;width:100%;max-width:440px;aspect-ratio:1/1.0103;container-type:inline-size}
+.board svg.lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.slot{position:absolute;width:15%;height:23.14%;border:1.5px dashed;border-radius:7px;display:grid;place-items:center;text-align:center;font-size:2.1cqw;font-weight:700;padding:2px}
+.slot.r0{border-color:var(--green);background:var(--l1);color:var(--green)}
+.slot.r1{border-color:var(--amber);background:var(--l2);color:var(--amber)}
+.slot.r2{border-color:var(--blue);background:var(--l3);color:var(--blue)}
+.slot.r3{border-color:var(--red);background:var(--l4);color:var(--red)}
+.slot.legal{border-style:solid;border-width:3px;border-color:var(--orange);background:#FFF1E2;cursor:pointer;animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 4px rgba(200,102,46,.25)}}
+@media (prefers-reduced-motion:reduce){.slot.legal{animation:none}}
+.slot .card{position:absolute;inset:0;width:100%;height:100%}
+.decs{display:flex;flex-direction:column;gap:6px}
+.decs .h{font-size:12px;color:var(--muted)}
+.decrow{display:flex;gap:6px;flex-wrap:wrap}
+.decslot{width:64px;aspect-ratio:34/53;border:1.5px dashed var(--brown);border-radius:7px;background:var(--dec);display:grid;place-items:center;font-size:11px;color:var(--brown);text-align:center}
+.decslot .card{width:100%}
+
+.hand{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 8px;min-height:130px}
+.hand .card{width:84px;flex:0 0 auto}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+
+/* 카드 */
+.card{container-type:inline-size;aspect-ratio:34/53;border-radius:7px;border:2px solid;background:var(--card);display:flex;flex-direction:column;overflow:hidden;position:relative;user-select:none}
+button.card{padding:0;font:inherit;text-align:left}
+.card .band{color:#fff;font-size:9cqw;font-weight:700;padding:2cqw 4cqw;white-space:nowrap;overflow:hidden}
+.card .art{margin:2cqw 4cqw 0;border-radius:4px;aspect-ratio:120/70;display:flex;justify-content:center}
+.card .art svg{width:100%;height:100%}
+.card .nm{font-family:var(--display);font-weight:700;font-size:14cqw;padding:2cqw 4cqw 0;line-height:1.15;word-break:keep-all}
+.card .fd{margin-top:auto;font-size:8.5cqw;line-height:1.25;padding:2cqw 4cqw 3cqw;border-top:1px dashed;word-break:keep-all}
+.card .star{position:absolute;top:13cqw;right:3cqw;background:var(--red);color:#fff;font-size:8cqw;font-weight:700;border-radius:3px;padding:0 2cqw}
+.card.sel{outline:3px solid var(--orange);outline-offset:2px;transform:translateY(-4px)}
+.card.can::after{content:"놓을 수 있음";position:absolute;left:0;right:0;bottom:0;background:var(--orange);color:#fff;font-size:8cqw;text-align:center;font-weight:700}
+.card.bad{outline:3px solid #C0392B;outline-offset:-1px}
+.card.bad::after{content:"먹이 없음";position:absolute;left:0;right:0;bottom:0;background:#C0392B;color:#fff;font-size:8cqw;text-align:center;font-weight:700}
+.slot.pick .card{outline:3px solid var(--orange);outline-offset:2px}
+.card.canmove::after{content:"다시 배치하면 놓을 수 있음";position:absolute;left:0;right:0;bottom:0;background:#F2C9A8;color:var(--ink);font-size:8cqw;text-align:center;font-weight:700}
+.card.dec{background:var(--brown);border-color:var(--brown);color:#fff}
+.card.dec .art{background:var(--dec)}
+.card.ev{border-color:#2B2B2B}
+
+.side{display:flex;flex-direction:column;gap:12px}
+.opp{width:100%;text-align:left;font:inherit;display:flex;gap:10px;align-items:center;padding:8px;border-radius:10px;background:var(--paper);border:2px solid transparent}
+.opp.turn{border-color:var(--orange)}
+.opp .info{flex:1;font-size:12px}
+.opp .info b{font-size:14px}
+.mini{display:grid;grid-template-columns:repeat(24,3px);grid-auto-rows:13px;gap:1px}
+.mini i{border-radius:2px;background:#E8E2D2}
+.mini i.f1{background:var(--green)} .mini i.f2{background:var(--amber)} .mini i.f3{background:var(--blue)} .mini i.f4{background:var(--red)}
+.log{max-height:280px;overflow:auto;font-size:12.5px;display:flex;flex-direction:column;gap:4px}
+.log div{padding:3px 6px;border-radius:6px}
+.log .ev{background:#F7EADF}
+.log .st{background:var(--l1)}
+.memo{font-size:12.5px;display:flex;flex-direction:column;gap:6px}
+.memo div{background:var(--paper);border-radius:8px;padding:6px 8px}
+.detail{font-size:12.5px;color:var(--muted);min-height:38px}
+.detail b{color:var(--ink)}
+
+/* 대화 상자 */
+.modal{position:fixed;inset:0;background:rgba(31,42,36,.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:20}
+.modal.on{display:flex}
+.dialog{background:var(--card);border-radius:16px;max-width:640px;width:100%;max-height:90vh;overflow:auto;padding:18px 20px;display:flex;flex-direction:column;gap:12px}
+.dialog h2{font-size:20px}
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.mode{display:flex;flex-direction:column;gap:6px;align-items:flex-start;text-align:left;padding:16px;border-radius:12px;border:2px solid var(--line);background:var(--paper);font:inherit;color:inherit;cursor:pointer}
+.mode b{font-size:19px}
+.mode span{font-size:13.5px;color:var(--muted);line-height:1.45}
+.mode:hover,.mode:focus-visible{border-color:var(--green)}
+.dialog .row{display:flex;flex-wrap:wrap;gap:8px}
+.dialog .cards{display:flex;flex-wrap:wrap;gap:8px}
+.dialog .cards .card{width:84px}
+table.sc{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+table.sc th,table.sc td{border-bottom:1px solid var(--line);padding:5px 6px;text-align:center}
+table.sc th:first-child,table.sc td:first-child{text-align:left}
+table.sc tr.tot td{font-weight:700;border-top:2px solid var(--ink)}
+.evcard{border-radius:12px;padding:14px;display:flex;gap:14px;align-items:center}
+.evcard svg{width:150px;flex:0 0 auto}
+.setup label{display:flex;flex-direction:column;gap:4px;font-size:13px}
+.setup select,.setup input{font:inherit;padding:6px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:inherit}
+.rules{font-size:13.5px}
+.rules li{margin-bottom:4px}
+.bigboard{position:relative;width:100%;max-width:440px;aspect-ratio:1/1.0103;container-type:inline-size;margin:0 auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div><h1>생태계를 지켜라</h1><div class="en">SAVE MY ECOSYSTEM · 먹고 먹히는 생태 피라미드 카드게임</div></div>
+    <div class="track" id="track" aria-label="결산 트랙"></div>
+    <span id="netInfo"></span><div class="topbtns"><button id="btnRules">규칙 보기</button><button id="btnSound" aria-pressed="true">소리 켬</button><button id="btnMulti">함께하기</button><button id="btnNew">새 게임</button></div>
+  </header>
+
+  <div class="table">
+    <main class="me">
+      <section class="panel">
+        <h2>공동 게임판</h2>
+        <div class="common">
+          <div class="pile"><button class="back bio" id="deckBtn" aria-label="생물 덱에서 1장 가져오기">생물<br>덱</button><span id="deckCount"></span></div>
+          <div class="pile"><div class="market" id="market"></div><span>찾아온 생물</span></div>
+          <div class="pile"><div class="back ev">사건<br>덱</div><span id="evCount"></span></div>
+          <div class="pile"><div class="back past" id="pastEv">지나간 사건</div><span>지나간 사건</span></div>
+          <div class="prompt" id="prompt" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="mehead">
+          <h2 style="margin:0">나의 생태 피라미드</h2>
+          <span class="chip score" id="myScore"></span>
+          <span class="chip" id="myHandInfo"></span>
+          <span class="chip" id="roundInfo"></span>
+        </div>
+        <div class="boardwrap" style="margin-top:10px">
+          <div class="board" id="myBoard"></div>
+          <div class="decs">
+            <div class="h">분해자 칸 (3장까지)</div>
+            <div class="decrow" id="myDec"></div>
+            <div class="h" style="margin-top:8px">연결선</div>
+            <div style="font-size:12px;line-height:1.6"><span style="display:inline-block;width:18px;height:3px;background:#A89F88;vertical-align:middle"></span> 먹이로 이어지는 칸 (가운데 2차 칸은 아래 3칸)<br><span style="display:inline-block;width:18px;height:3px;background:#C8662E;vertical-align:middle"></span> 먹이사슬 줄 (꼭대기에서 바깥 선, 4장, +3)<br><span style="display:inline-block;width:18px;height:3px;background:#3E7D4A;vertical-align:middle"></span> 가로 빙고 줄 (+2)</div>
+            <div class="h" style="margin-top:8px">지금 판 점수 (결산하면 이렇게)</div>
+            <div id="preview" style="font-size:12px"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="mehead"><h2 style="margin:0">손패</h2><span class="detail" id="detail">카드를 누르면 놓을 수 있는 칸이 주황색으로 보여요.</span></div>
+        <div class="hand" id="hand"></div>
+        <div class="actions">
+          <button id="btnRedraw">다시 찾아보기 (놓을 생물이 없을 때)</button>
+          <button id="btnMove">판 다시 배치하기</button>
+          <button id="btnRevert" hidden>처음 배치로 되돌리기</button>
+          <button class="primary" id="btnEnd">차례 끝</button>
+        </div>
+      </section>
+    </main>
+
+    <aside class="side">
+      <section class="panel"><h2 id="oppsTitle">컴퓨터 참가자</h2><div id="opps" style="display:flex;flex-direction:column;gap:8px"></div></section>
+      <section class="panel"><h2>기록지 메모</h2><div class="memo" id="memo"><div id="memoList"><div>사건이 끝날 때마다 내 판에서 사라진 생물, 무너진 먹이사슬, 그 이유가 여기에 쌓여요. 피해가 없을 때는 운이 좋았는지, 다른 먹이 덕분에 버텼는지도 적혀요. 활동지 3번을 쓸 때 보세요.</div></div>
+<div class="row" id="memoBtns" hidden style="display:flex;gap:6px;flex-wrap:wrap"><button id="btnSaveMemo">기록지 PDF 저장</button><button id="btnCompare">모두의 기록지 비교</button><button id="btnCopyMemo">메모 복사</button></div><div id="memoMsg" class="detail"></div></div></section>
+      <section class="panel"><h2>진행 기록</h2><div class="log" id="log"></div></section>
+    </aside>
+  </div>
+</div>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true"><div class="dialog" id="dialog"></div></div>
+
+<script src="vendor/jspdf.js"></script>
+<script src="vendor/autotable.js"></script>
+<script src="vendor/nanum-pdf.js"></script>
+<script src="vendor/peerjs.min.js"></script>
+<script src="room.js"></script>
+<script>
+const DATA = {"bio": [{"lv": 1, "name": "부착조류", "hab": "하천·습지", "bottom": "종류: 조류", "star": 0, "count": 5, "note": "물속 돌과 수초 표면에 붙어 자라요"}, {"lv": 1, "name": "수초", "hab": "하천·습지", "bottom": "종류: 수초", "star": 0, "count": 4, "note": "물속에 잠겨 자라는 식물"}, {"lv": 1, "name": "식물플랑크톤", "hab": "갯벌·연안", "bottom": "종류: 조류", "star": 0, "count": 5, "note": "바닷물에 떠다니는 아주 작은 생산자"}, {"lv": 1, "name": "갯벌 미세조류", "hab": "갯벌·연안", "bottom": "종류: 조류", "star": 0, "count": 4, "note": "갯벌 표면을 덮고 자라는 작은 조류"}, {"lv": 1, "name": "상수리나무", "hab": "숲", "bottom": "종류: 나무(활엽수)", "star": 0, "count": 5, "note": "도토리가 열리는 참나무"}, {"lv": 1, "name": "소나무", "hab": "숲", "bottom": "종류: 나무(침엽수)", "star": 0, "count": 4, "note": "송진이 많은 늘푸른나무"}, {"lv": 2, "name": "붕어", "hab": "하천·습지", "bottom": "먹이: 수초, 부착조류", "star": 0, "count": 3, "note": "식물과 조류를 먹는 민물고기"}, {"lv": 2, "name": "새뱅이", "hab": "하천·습지", "bottom": "먹이: 부착조류", "star": 0, "count": 3, "note": "민물에 사는 작은 새우"}, {"lv": 2, "name": "조개류", "hab": "갯벌·연안", "bottom": "먹이: 식물플랑크톤", "star": 0, "count": 3, "note": "물속의 작은 먹이를 걸러 먹는 조개 무리"}, {"lv": 2, "name": "칠게", "hab": "갯벌·연안", "bottom": "먹이: 갯벌 미세조류", "star": 0, "count": 3, "note": "갯벌 진흙 속 먹이를 걸러 먹는 게"}, {"lv": 2, "name": "나방 애벌레", "hab": "숲", "bottom": "먹이: 상수리나무, 소나무", "star": 0, "count": 3, "note": "잎을 먹는 나방 애벌레의 총칭"}, {"lv": 2, "name": "매미", "hab": "숲", "bottom": "먹이: 상수리나무, 소나무", "star": 0, "count": 3, "note": "굼벵이는 땅속에서 뿌리 수액을 빨아 먹어요"}, {"lv": 3, "name": "메기", "hab": "하천·습지", "bottom": "먹이: 붕어, 새뱅이", "star": 0, "count": 2, "note": "밤에 수염으로 먹이를 찾는 물고기"}, {"lv": 3, "name": "가물치", "hab": "하천·습지", "bottom": "먹이: 붕어, 새뱅이", "star": 0, "count": 2, "note": "물고기와 새우를 잡아먹는 물고기"}, {"lv": 3, "name": "도요새", "hab": "갯벌·연안", "bottom": "먹이: 칠게", "star": 0, "count": 2, "note": "칠게를 먹는 도요류의 총칭"}, {"lv": 3, "name": "검은머리물떼새", "hab": "갯벌·연안", "bottom": "먹이: 조개류", "star": 1, "count": 1, "note": "단단한 부리로 조개를 열어요"}, {"lv": 3, "name": "괭이갈매기", "hab": "갯벌·연안", "bottom": "먹이: 칠게, 조개류", "star": 0, "count": 1, "note": "가리지 않고 먹는 바닷가 새"}, {"lv": 3, "name": "박새", "hab": "숲", "bottom": "먹이: 나방 애벌레, 매미", "star": 0, "count": 2, "note": "애벌레를 잡아먹는 작은 새"}, {"lv": 3, "name": "두꺼비", "hab": "숲", "bottom": "먹이: 나방 애벌레, 매미", "star": 0, "count": 2, "note": "곤충을 잡아먹는 양서류"}, {"lv": 4, "name": "수달", "hab": "하천·습지", "bottom": "먹이: 메기, 가물치", "star": 1, "count": 1, "note": "하천의 최상위 포식자"}, {"lv": 4, "name": "황새", "hab": "하천·습지", "bottom": "먹이: 메기, 가물치", "star": 1, "count": 1, "note": "복원 중인 습지의 상징 새"}, {"lv": 4, "name": "매", "hab": "갯벌·연안", "bottom": "먹이: 도요새, 검은머리물떼새", "star": 1, "count": 1, "note": "하늘을 날며 새를 사냥해요"}, {"lv": 4, "name": "흰꼬리수리", "hab": "하천·습지 · 갯벌·연안 · 숲(둥지)", "bottom": "먹이: 메기, 가물치, 도요새, 검은머리물떼새, 괭이갈매기", "star": 1, "count": 1, "note": "물가 전체를 누비는 큰 맹금류"}, {"lv": 4, "name": "담비", "hab": "숲", "bottom": "먹이: 박새", "star": 1, "count": 1, "note": "열매도 먹고 사냥도 하는 숲의 포식자"}, {"lv": 4, "name": "수리부엉이", "hab": "숲 · 하천·습지", "bottom": "먹이: 박새, 두꺼비", "star": 1, "count": 1, "note": "숲과 강가 절벽에 사는 큰 부엉이"}], "ev": [{"name": "녹조 (약)", "tag": "나쁜 · 지역", "habitat": "하천·습지", "effect": "수초를 모두 판에서 빼요.", "foot": "녹조가 물을 덮어 빛이 막혀요", "bg": "#24352C", "fg": "#A9D8A0", "art": "녹조", "remove": ["수초"]}, {"name": "녹조 (강)", "tag": "나쁜 · 지역", "habitat": "하천·습지", "effect": "하천·습지 생산자를 모두 판에서 빼요.", "foot": "녹조가 물을 덮어 빛이 막혀요", "bg": "#24352C", "fg": "#A9D8A0", "art": "녹조"}, {"name": "해양 열파 (약)", "tag": "나쁜 · 지역", "habitat": "갯벌·연안", "effect": "식물플랑크톤을 모두 판에서 빼요.", "foot": "높은 수온이 이어져 먹이그물이 달라져요", "bg": "#1F3446", "fg": "#9CC8EC", "art": "해양 열파", "remove": ["식물플랑크톤"]}, {"name": "해양 열파 (강)", "tag": "나쁜 · 지역", "habitat": "갯벌·연안", "effect": "갯벌·연안 생산자를 모두 판에서 빼요.", "foot": "높은 수온이 이어져 먹이그물이 달라져요", "bg": "#1F3446", "fg": "#9CC8EC", "art": "해양 열파"}, {"name": "산불 (약)", "tag": "나쁜 · 지역", "habitat": "숲", "effect": "소나무를 모두 판에서 빼요.", "foot": "소나무가 있는 구역에 불이 났어요", "bg": "#3E2620", "fg": "#F2B266", "art": "산불", "remove": ["소나무"]}, {"name": "산불 (강)", "tag": "나쁜 · 지역", "habitat": "숲", "effect": "숲 생산자를 모두 판에서 빼요.", "foot": "불이 숲의 여러 구역으로 번졌어요", "bg": "#3E2620", "fg": "#F2B266", "art": "산불"}, {"name": "대가뭄", "tag": "나쁜 · 광역", "habitat": "모든 서식지", "effect": "모두 생산자 1장씩 골라 판에서 빼요.", "foot": "가뭄이 여러 서식지에 영향을 줘요", "bg": "#2B2B2B", "fg": "#E8D27A", "art": "대가뭄"}, {"name": "대가뭄", "tag": "나쁜 · 광역", "habitat": "모든 서식지", "effect": "모두 생산자 1장씩 골라 판에서 빼요.", "foot": "가뭄이 여러 서식지에 영향을 줘요", "bg": "#2B2B2B", "fg": "#E8D27A", "art": "대가뭄"}, {"name": "단비", "tag": "좋은 · 광역", "habitat": "모든 서식지", "effect": "모두 생물 덱에서 1장씩 더 가져와요.", "foot": "메마른 땅에 비가 내려요", "bg": "#DCEBD6", "fg": "#2F6B3B", "art": "단비"}, {"name": "하천 정화", "tag": "좋은 · 지역", "habitat": "하천·습지", "effect": "하천·습지 생물이 판에 있으면 생물 덱에서 1장 더 가져와요.", "foot": "사람이 지키면 생물이 돌아와요", "bg": "#DCEBD6", "fg": "#2F6B3B", "art": "하천 정화"}, {"name": "갯벌 보전", "tag": "좋은 · 지역", "habitat": "갯벌·연안", "effect": "갯벌·연안 생물이 판에 있으면 생물 덱에서 1장 더 가져와요.", "foot": "사람이 지키면 생물이 돌아와요", "bg": "#DCEBD6", "fg": "#2F6B3B", "art": "갯벌 보전"}, {"name": "숲 가꾸기", "tag": "좋은 · 지역", "habitat": "숲", "effect": "숲 생물이 판에 있으면 생물 덱에서 1장 더 가져와요.", "foot": "사람이 지키면 생물이 돌아와요", "bg": "#DCEBD6", "fg": "#2F6B3B", "art": "숲 가꾸기"}]};
+const ART = {"부착조류": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><g stroke=\"#9CC8EC\" stroke-width=\"1.6\" fill=\"none\" stroke-linecap=\"round\"><path d=\"M8 12 q8 -4 16 0 t16 0\"/><path d=\"M84 8 q8 -4 16 0 t16 0\"/></g><path d=\"M14 64 Q16 36 50 34 Q90 32 106 52 Q108 64 100 66 Z\" fill=\"#9A9A8E\"/><path d=\"M18 46 Q28 36 50 35 Q86 33 104 50 Q94 45 84 47 Q74 41 62 45 Q50 39 40 44 Q30 42 18 46 Z\" fill=\"#5E9E4A\"/><g stroke=\"#5E9E4A\" stroke-width=\"2\" fill=\"none\" stroke-linecap=\"round\"><path d=\"M36 42 q-3 -8 2 -16\"/><path d=\"M52 38 q4 -9 -1 -18\"/><path d=\"M68 40 q-3 -8 2 -14\"/><path d=\"M84 44 q4 -7 0 -14\"/></g><g fill=\"#7DB35E\"><circle cx=\"30\" cy=\"44\" r=\"2\"/><circle cx=\"58\" cy=\"40\" r=\"2\"/><circle cx=\"92\" cy=\"47\" r=\"2\"/></g></svg>", "수초": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><g stroke=\"#9CC8EC\" stroke-width=\"1.6\" fill=\"none\" stroke-linecap=\"round\"><path d=\"M8 12 q8 -4 16 0 t16 0\"/><path d=\"M84 8 q8 -4 16 0 t16 0\"/></g><g fill=\"none\" stroke-linecap=\"round\"><path d=\"M38 68 C30 50 46 38 38 18\" stroke=\"#4E8A3E\" stroke-width=\"4.5\"/><path d=\"M60 68 C68 46 52 32 60 8\" stroke=\"#5E9E4A\" stroke-width=\"4.5\"/><path d=\"M82 68 C74 52 90 40 84 22\" stroke=\"#4E8A3E\" stroke-width=\"4.5\"/></g><g fill=\"#6FAE58\"><ellipse cx=\"32\" cy=\"34\" rx=\"7\" ry=\"3\" transform=\"rotate(-30 32 34)\"/><ellipse cx=\"46\" cy=\"48\" rx=\"7\" ry=\"3\" transform=\"rotate(30 46 48)\"/><ellipse cx=\"68\" cy=\"28\" rx=\"7\" ry=\"3\" transform=\"rotate(30 68 28)\"/><ellipse cx=\"52\" cy=\"22\" rx=\"7\" ry=\"3\" transform=\"rotate(-30 52 22)\"/><ellipse cx=\"92\" cy=\"38\" rx=\"7\" ry=\"3\" transform=\"rotate(30 92 38)\"/><ellipse cx=\"76\" cy=\"50\" rx=\"7\" ry=\"3\" transform=\"rotate(-30 76 50)\"/></g><path d=\"M20 68 H100\" stroke=\"#9A8466\" stroke-width=\"3\"/></svg>", "식물플랑크톤": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"60\" cy=\"35\" r=\"31\" fill=\"#E6F2F7\" stroke=\"#7FB0D6\" stroke-width=\"2.5\"/><circle cx=\"46\" cy=\"26\" r=\"9\" fill=\"#9CCB6E\" stroke=\"#5E9E4A\" stroke-width=\"1.5\"/><circle cx=\"46\" cy=\"26\" r=\"4\" fill=\"none\" stroke=\"#5E9E4A\" stroke-width=\"1\"/><g fill=\"#7DB35E\" stroke=\"#4E8A3E\" stroke-width=\"1\"><ellipse cx=\"64\" cy=\"20\" rx=\"5\" ry=\"3.5\"/><ellipse cx=\"72\" cy=\"26\" rx=\"5\" ry=\"3.5\"/><ellipse cx=\"80\" cy=\"32\" rx=\"5\" ry=\"3.5\"/></g><ellipse cx=\"62\" cy=\"46\" rx=\"17\" ry=\"4\" fill=\"#C7D97A\" stroke=\"#8A9A3E\" stroke-width=\"1\" transform=\"rotate(-20 62 46)\"/><path d=\"M38 46 l4 -8 l4 8 l-8 -4 h8 z\" fill=\"#9CCB6E\" stroke=\"#5E9E4A\" stroke-width=\"0.8\"/><path d=\"M82 52 l14 14\" stroke=\"#7FB0D6\" stroke-width=\"5\" stroke-linecap=\"round\"/></svg>", "갯벌 미세조류": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M0 40 Q30 34 60 40 T120 38 V70 H0 Z\" fill=\"#9A8466\"/><g fill=\"#7E8C46\" opacity=\"0.85\"><ellipse cx=\"22\" cy=\"44\" rx=\"14\" ry=\"3\"/><ellipse cx=\"56\" cy=\"46\" rx=\"18\" ry=\"3\"/><ellipse cx=\"94\" cy=\"43\" rx=\"14\" ry=\"3\"/></g><circle cx=\"84\" cy=\"22\" r=\"17\" fill=\"#F1ECDD\" stroke=\"#7A6A4A\" stroke-width=\"2\"/><path d=\"M72 34 L62 44\" stroke=\"#7A6A4A\" stroke-width=\"4\" stroke-linecap=\"round\"/><g fill=\"#A6B45A\" stroke=\"#6E7A36\" stroke-width=\"0.8\"><ellipse cx=\"80\" cy=\"16\" rx=\"8\" ry=\"2.5\" transform=\"rotate(-15 80 16)\"/><ellipse cx=\"88\" cy=\"24\" rx=\"8\" ry=\"2.5\" transform=\"rotate(20 88 24)\"/><ellipse cx=\"80\" cy=\"28\" rx=\"6\" ry=\"2\" transform=\"rotate(-5 80 28)\"/></g><g fill=\"#7A6548\"><circle cx=\"30\" cy=\"56\" r=\"1.5\"/><circle cx=\"48\" cy=\"62\" r=\"1.5\"/><circle cx=\"96\" cy=\"58\" r=\"1.5\"/></g></svg>", "상수리나무": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M46 70 Q47 66 48 62\" stroke=\"#7A5230\" stroke-width=\"2\" fill=\"none\"/><path d=\"M48.0 64.0 Q47.5 39.0 23.4 32.5 Q23.9 57.5 48.0 64.0 Z\" fill=\"#6FAE58\"/><path d=\"M48.0 64.0 L23.4 32.5 M44.3 59.3 L46.1 54.8 M44.3 59.3 L39.6 59.9 M42.6 57.1 L45.1 52.1 M42.6 57.1 L37.2 58.3 M40.9 54.9 L43.8 49.5 M40.9 54.9 L34.9 56.4 M39.1 52.7 L42.4 47.0 M39.1 52.7 L32.9 54.5 M37.4 50.4 L40.8 44.7 M37.4 50.4 L31.0 52.4 M35.7 48.2 L39.0 42.6 M35.7 48.2 L29.4 50.1 M34.0 46.0 L37.0 40.6 M34.0 46.0 L27.9 47.7 M32.2 43.8 L34.9 38.7 M32.2 43.8 L26.7 45.1 M30.5 41.6 L32.5 37.0 M30.5 41.6 L25.6 42.4 M28.8 39.4 L29.9 35.5 M28.8 39.4 L24.7 39.6 M27.1 37.2 L27.2 34.1 M27.1 37.2 L24.0 36.6\" stroke=\"#3E7A36\" stroke-width=\"0.7\" fill=\"none\"/><path d=\"M46.1 54.8 L46.9 53.2 M39.6 59.9 L37.8 60.3 M45.1 52.1 L45.9 50.4 M37.2 58.3 L35.3 58.7 M43.8 49.5 L44.8 47.7 M34.9 56.4 L33.0 56.9 M42.4 47.0 L43.4 45.3 M32.9 54.5 L30.9 55.0 M40.8 44.7 L41.8 42.9 M31.0 52.4 L29.1 52.9 M39.0 42.6 L40.0 40.8 M29.4 50.1 L27.4 50.6 M37.0 40.6 L38.0 38.8 M27.9 47.7 L26.0 48.2 M34.9 38.7 L35.8 37.0 M26.7 45.1 L24.8 45.6 M32.5 37.0 L33.3 35.4 M25.6 42.4 L23.7 42.8 M29.9 35.5 L30.7 33.9 M24.7 39.6 L23.0 39.9 M27.2 34.1 L27.8 32.6 M24.0 36.6 L22.4 36.8\" stroke=\"#3E7A36\" stroke-width=\"0.8\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M48.0 64.0 Q69.1 33.7 50.2 2.0 Q29.1 32.3 48.0 64.0 Z\" fill=\"#5E9E4A\"/><path d=\"M48.0 64.0 L50.2 2.0 M48.3 55.8 L53.6 52.3 M48.3 55.8 L43.3 51.9 M48.4 52.5 L54.7 49.0 M48.4 52.5 L42.4 48.6 M48.5 49.3 L55.6 45.8 M48.5 49.3 L41.7 45.3 M48.6 46.0 L56.3 42.6 M48.6 46.0 L41.2 42.1 M48.7 42.8 L56.8 39.3 M48.7 42.8 L40.9 38.8 M48.9 39.5 L57.2 36.1 M48.9 39.5 L40.8 35.5 M49.0 36.3 L57.4 32.8 M49.0 36.3 L40.8 32.3 M49.1 33.0 L57.4 29.6 M49.1 33.0 L41.1 29.0 M49.2 29.8 L57.2 26.3 M49.2 29.8 L41.5 25.8 M49.3 26.5 L56.8 23.1 M49.3 26.5 L42.1 22.5 M49.4 23.3 L56.3 19.8 M49.4 23.3 L42.8 19.3 M49.5 20.0 L55.5 16.5 M49.5 20.0 L43.8 16.1 M49.6 16.8 L54.6 13.2 M49.6 16.8 L44.9 12.9 M49.8 13.5 L53.5 9.9 M49.8 13.5 L46.3 9.7 M49.9 10.2 L52.2 6.6 M49.9 10.2 L47.8 6.5\" stroke=\"#3E7A36\" stroke-width=\"0.7\" fill=\"none\"/><path d=\"M53.6 52.3 L55.4 51.1 M43.3 51.9 L41.5 50.6 M54.7 49.0 L56.6 47.9 M42.4 48.6 L40.6 47.3 M55.6 45.8 L57.6 44.6 M41.7 45.3 L39.8 44.0 M56.3 42.6 L58.4 41.4 M41.2 42.1 L39.2 40.7 M56.8 39.3 L59.0 38.2 M40.9 38.8 L38.9 37.5 M57.2 36.1 L59.3 34.9 M40.8 35.5 L38.7 34.2 M57.4 32.8 L59.5 31.7 M40.8 32.3 L38.7 31.0 M57.4 29.6 L59.5 28.4 M41.1 29.0 L39.0 27.7 M57.2 26.3 L59.3 25.2 M41.5 25.8 L39.4 24.5 M56.8 23.1 L58.9 21.9 M42.1 22.5 L40.1 21.2 M56.3 19.8 L58.2 18.6 M42.8 19.3 L40.9 18.0 M55.5 16.5 L57.4 15.3 M43.8 16.1 L42.0 14.8 M54.6 13.2 L56.4 12.0 M44.9 12.9 L43.3 11.6 M53.5 9.9 L55.2 8.7 M46.3 9.7 L44.7 8.4 M52.2 6.6 L53.7 5.4 M47.8 6.5 L46.4 5.2\" stroke=\"#3E7A36\" stroke-width=\"0.8\" fill=\"none\" stroke-linecap=\"round\"/><ellipse cx=\"86\" cy=\"49.25\" rx=\"7.3500000000000005\" ry=\"7.875\" fill=\"#B9813E\"/><ellipse cx=\"83.27\" cy=\"49.25\" rx=\"1.6800000000000002\" ry=\"3.3600000000000003\" fill=\"#D9A766\"/><path d=\"M76.025 46.1 Q76.55 35.6 86 35.075 Q95.45 35.6 95.975 46.1 Z\" fill=\"#7E6038\"/><path d=\"M80.8 37.7 q-2.6 1.6 -1.1 3.4 M86.0 37.7 q2.6 1.6 1.1 3.4 M91.2 37.7 q2.6 1.6 1.1 3.4 M77.6 41.9 q-2.6 1.6 -1.1 3.4 M82.8 41.9 q-2.6 1.6 -1.1 3.4 M88.1 41.9 q2.6 1.6 1.1 3.4 M93.3 41.9 q2.6 1.6 1.1 3.4 M76.0 45.6 q-2.6 1.6 -1.1 3.4 M80.8 45.6 q-2.6 1.6 -1.1 3.4 M86.0 45.6 q2.6 1.6 1.1 3.4 M91.2 45.6 q2.6 1.6 1.1 3.4 M96.0 45.6 q2.6 1.6 1.1 3.4\" stroke=\"#4E3A1E\" stroke-width=\"1.1550000000000002\" fill=\"none\" stroke-linecap=\"round\"/><ellipse cx=\"103\" cy=\"56.5\" rx=\"6.3\" ry=\"6.75\" fill=\"#B9813E\"/><ellipse cx=\"100.66\" cy=\"56.5\" rx=\"1.4400000000000002\" ry=\"2.8800000000000003\" fill=\"#D9A766\"/><path d=\"M94.45 53.8 Q94.9 44.8 103 44.35 Q111.1 44.8 111.55 53.8 Z\" fill=\"#7E6038\"/><path d=\"M98.5 46.6 q-2.2 1.4 -0.9 2.9 M103.0 46.6 q2.2 1.4 0.9 2.9 M107.5 46.6 q2.2 1.4 0.9 2.9 M95.8 50.2 q-2.2 1.4 -0.9 2.9 M100.3 50.2 q-2.2 1.4 -0.9 2.9 M104.8 50.2 q2.2 1.4 0.9 2.9 M109.3 50.2 q2.2 1.4 0.9 2.9 M94.5 53.4 q-2.2 1.4 -0.9 2.9 M98.5 53.4 q-2.2 1.4 -0.9 2.9 M103.0 53.4 q2.2 1.4 0.9 2.9 M107.5 53.4 q2.2 1.4 0.9 2.9 M111.5 53.4 q2.2 1.4 0.9 2.9\" stroke=\"#4E3A1E\" stroke-width=\"0.9900000000000001\" fill=\"none\" stroke-linecap=\"round\"/></svg>", "소나무": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M34 70 Q33.0 45.0 28 20\" stroke=\"#8A5A36\" stroke-width=\"2.2\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32.5 57.5 q-7.4 -6.3 -15.9 -11.4\" stroke=\"#2F6B3B\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32.5 57.5 q-5.7 -7.9 -12.6 -14.9\" stroke=\"#3E7A36\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32.5 57.5 q-3.8 -9.0 -9.0 -17.3\" stroke=\"#5E9E4A\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32.5 57.5 q1.6 -9.6 4.6 -18.9\" stroke=\"#4E8A3E\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32.5 57.5 q3.6 -9.1 8.7 -17.5\" stroke=\"#2F6B3B\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32.5 57.5 q5.7 -7.9 12.7 -14.8\" stroke=\"#3E7A36\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M31.6 50.0 q-7.1 -6.0 -15.1 -10.8\" stroke=\"#3E7A36\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M31.6 50.0 q-5.4 -7.6 -12.0 -14.2\" stroke=\"#5E9E4A\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M31.6 50.0 q-3.6 -8.6 -8.6 -16.5\" stroke=\"#4E8A3E\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M31.6 50.0 q1.5 -9.2 4.4 -18.1\" stroke=\"#2F6B3B\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M31.6 50.0 q3.5 -8.6 8.3 -16.7\" stroke=\"#3E7A36\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M31.6 50.0 q5.5 -7.5 12.1 -14.1\" stroke=\"#5E9E4A\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M30.7 42.5 q-6.8 -5.7 -14.4 -10.3\" stroke=\"#5E9E4A\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M30.7 42.5 q-5.1 -7.2 -11.4 -13.5\" stroke=\"#4E8A3E\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M30.7 42.5 q-3.4 -8.2 -8.2 -15.7\" stroke=\"#2F6B3B\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M30.7 42.5 q1.4 -8.7 4.2 -17.2\" stroke=\"#3E7A36\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M30.7 42.5 q3.3 -8.2 7.9 -15.9\" stroke=\"#5E9E4A\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M30.7 42.5 q5.2 -7.1 11.5 -13.4\" stroke=\"#4E8A3E\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M29.8 35.0 q-6.4 -5.4 -13.7 -9.8\" stroke=\"#4E8A3E\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M29.8 35.0 q-4.9 -6.8 -10.8 -12.9\" stroke=\"#2F6B3B\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M29.8 35.0 q-3.3 -7.7 -7.7 -14.9\" stroke=\"#3E7A36\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M29.8 35.0 q1.3 -8.3 4.0 -16.3\" stroke=\"#5E9E4A\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M29.8 35.0 q3.1 -7.8 7.5 -15.0\" stroke=\"#4E8A3E\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M29.8 35.0 q5.0 -6.8 11.0 -12.7\" stroke=\"#2F6B3B\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M28.9 27.5 q-6.1 -5.1 -12.9 -9.3\" stroke=\"#2F6B3B\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M28.9 27.5 q-4.6 -6.5 -10.2 -12.2\" stroke=\"#3E7A36\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M28.9 27.5 q-3.1 -7.3 -7.3 -14.1\" stroke=\"#5E9E4A\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M28.9 27.5 q1.3 -7.8 3.8 -15.4\" stroke=\"#4E8A3E\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M28.9 27.5 q3.0 -7.4 7.1 -14.2\" stroke=\"#2F6B3B\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M28.9 27.5 q4.7 -6.4 10.4 -12.1\" stroke=\"#3E7A36\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M28.0 20.0 q-5.7 -4.8 -12.2 -8.7\" stroke=\"#3E7A36\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M28.0 20.0 q-4.4 -6.1 -9.7 -11.5\" stroke=\"#5E9E4A\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M28.0 20.0 q-2.9 -6.9 -6.9 -13.3\" stroke=\"#4E8A3E\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M28.0 20.0 q1.2 -7.4 3.6 -14.6\" stroke=\"#2F6B3B\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M28.0 20.0 q2.8 -7.0 6.7 -13.4\" stroke=\"#3E7A36\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M28.0 20.0 q4.4 -6.1 9.8 -11.4\" stroke=\"#5E9E4A\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M28 20 l-4.9 -11.0\" stroke=\"#5E9E4A\" stroke-width=\"0.85\" stroke-linecap=\"round\"/><path d=\"M28 20 l-2.6 -11.7\" stroke=\"#5E9E4A\" stroke-width=\"0.85\" stroke-linecap=\"round\"/><path d=\"M28 20 l-0.2 -12.0\" stroke=\"#5E9E4A\" stroke-width=\"0.85\" stroke-linecap=\"round\"/><path d=\"M28 20 l2.2 -11.8\" stroke=\"#5E9E4A\" stroke-width=\"0.85\" stroke-linecap=\"round\"/><path d=\"M68 70 Q73.0 43.0 74 16\" stroke=\"#8A5A36\" stroke-width=\"2.2\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M69.5 56.5 q-5.8 -7.8 -12.8 -14.7\" stroke=\"#2F6B3B\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M69.5 56.5 q-3.7 -9.0 -8.8 -17.4\" stroke=\"#3E7A36\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M69.5 56.5 q-1.6 -9.6 -4.8 -18.9\" stroke=\"#5E9E4A\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M69.5 56.5 q3.7 -9.0 8.8 -17.4\" stroke=\"#4E8A3E\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M69.5 56.5 q5.6 -8.0 12.4 -15.0\" stroke=\"#2F6B3B\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M69.5 56.5 q7.4 -6.4 15.8 -11.5\" stroke=\"#3E7A36\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M70.2 49.8 q-5.6 -7.5 -12.4 -14.1\" stroke=\"#3E7A36\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M70.2 49.8 q-3.6 -8.7 -8.5 -16.7\" stroke=\"#5E9E4A\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M70.2 49.8 q-1.6 -9.2 -4.6 -18.2\" stroke=\"#4E8A3E\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M70.2 49.8 q3.6 -8.7 8.5 -16.7\" stroke=\"#2F6B3B\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M70.2 49.8 q5.4 -7.7 11.9 -14.5\" stroke=\"#3E7A36\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M70.2 49.8 q7.1 -6.1 15.1 -11.0\" stroke=\"#5E9E4A\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M71.0 43.0 q-5.4 -7.2 -11.9 -13.5\" stroke=\"#5E9E4A\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M71.0 43.0 q-3.4 -8.3 -8.1 -16.1\" stroke=\"#4E8A3E\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M71.0 43.0 q-1.5 -8.9 -4.4 -17.4\" stroke=\"#2F6B3B\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M71.0 43.0 q3.4 -8.3 8.2 -16.0\" stroke=\"#3E7A36\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M71.0 43.0 q5.2 -7.4 11.5 -13.9\" stroke=\"#5E9E4A\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M71.0 43.0 q6.8 -5.9 14.5 -10.6\" stroke=\"#4E8A3E\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M71.8 36.2 q-5.1 -6.9 -11.4 -13.0\" stroke=\"#4E8A3E\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M71.8 36.2 q-3.3 -8.0 -7.8 -15.4\" stroke=\"#2F6B3B\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M71.8 36.2 q-1.5 -8.5 -4.3 -16.7\" stroke=\"#3E7A36\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M71.8 36.2 q3.3 -8.0 7.8 -15.4\" stroke=\"#5E9E4A\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M71.8 36.2 q4.9 -7.1 11.0 -13.3\" stroke=\"#4E8A3E\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M71.8 36.2 q6.5 -5.6 13.9 -10.2\" stroke=\"#2F6B3B\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M72.5 29.5 q-4.9 -6.6 -10.9 -12.4\" stroke=\"#2F6B3B\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M72.5 29.5 q-3.1 -7.6 -7.5 -14.7\" stroke=\"#3E7A36\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M72.5 29.5 q-1.4 -8.1 -4.1 -16.0\" stroke=\"#5E9E4A\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M72.5 29.5 q3.1 -7.6 7.5 -14.7\" stroke=\"#4E8A3E\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M72.5 29.5 q4.7 -6.8 10.5 -12.7\" stroke=\"#2F6B3B\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M72.5 29.5 q6.3 -5.4 13.3 -9.7\" stroke=\"#3E7A36\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M73.2 22.8 q-4.7 -6.3 -10.4 -11.8\" stroke=\"#3E7A36\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M73.2 22.8 q-3.0 -7.3 -7.1 -14.0\" stroke=\"#5E9E4A\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M73.2 22.8 q-1.3 -7.8 -3.9 -15.3\" stroke=\"#4E8A3E\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M73.2 22.8 q3.0 -7.3 7.1 -14.0\" stroke=\"#2F6B3B\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M73.2 22.8 q4.5 -6.5 10.0 -12.1\" stroke=\"#3E7A36\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M73.2 22.8 q6.0 -5.1 12.7 -9.3\" stroke=\"#5E9E4A\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M74.0 16.0 q-4.5 -6.0 -9.9 -11.3\" stroke=\"#5E9E4A\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M74.0 16.0 q-2.8 -6.9 -6.8 -13.4\" stroke=\"#4E8A3E\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M74.0 16.0 q-1.3 -7.4 -3.7 -14.5\" stroke=\"#2F6B3B\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M74.0 16.0 q2.9 -6.9 6.8 -13.4\" stroke=\"#3E7A36\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M74.0 16.0 q4.3 -6.1 9.6 -11.6\" stroke=\"#5E9E4A\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M74.0 16.0 q5.7 -4.9 12.1 -8.8\" stroke=\"#4E8A3E\" stroke-width=\"0.85\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M74 16 l-2.3 -11.8\" stroke=\"#5E9E4A\" stroke-width=\"0.85\" stroke-linecap=\"round\"/><path d=\"M74 16 l0.1 -12.0\" stroke=\"#5E9E4A\" stroke-width=\"0.85\" stroke-linecap=\"round\"/><path d=\"M74 16 l2.5 -11.7\" stroke=\"#5E9E4A\" stroke-width=\"0.85\" stroke-linecap=\"round\"/><path d=\"M74 16 l4.8 -11.0\" stroke=\"#5E9E4A\" stroke-width=\"0.85\" stroke-linecap=\"round\"/><path d=\"M102 35 L102 40\" stroke=\"#6B4A2B\" stroke-width=\"1.6\"/><ellipse cx=\"102\" cy=\"50\" rx=\"8.5\" ry=\"12\" fill=\"#8C5E30\"/><path d=\"M96.7 42.0 Q99.3 46.0 101.9 42.0\" fill=\"#A8743E\" stroke=\"#6B4A2B\" stroke-width=\"0.8\"/><path d=\"M99.4 42.0 Q102.0 46.0 104.6 42.0\" fill=\"#A8743E\" stroke=\"#6B4A2B\" stroke-width=\"0.8\"/><path d=\"M102.1 42.0 Q104.7 46.0 107.3 42.0\" fill=\"#A8743E\" stroke=\"#6B4A2B\" stroke-width=\"0.8\"/><path d=\"M94.5 46.0 Q97.1 50.0 99.7 46.0\" fill=\"#A8743E\" stroke=\"#6B4A2B\" stroke-width=\"0.8\"/><path d=\"M97.8 46.0 Q100.4 50.0 103.0 46.0\" fill=\"#A8743E\" stroke=\"#6B4A2B\" stroke-width=\"0.8\"/><path d=\"M101.0 46.0 Q103.6 50.0 106.2 46.0\" fill=\"#A8743E\" stroke=\"#6B4A2B\" stroke-width=\"0.8\"/><path d=\"M104.3 46.0 Q106.9 50.0 109.5 46.0\" fill=\"#A8743E\" stroke=\"#6B4A2B\" stroke-width=\"0.8\"/><path d=\"M93.8 50.5 Q96.4 54.5 99.0 50.5\" fill=\"#A8743E\" stroke=\"#6B4A2B\" stroke-width=\"0.8\"/><path d=\"M97.5 50.5 Q100.1 54.5 102.7 50.5\" fill=\"#A8743E\" stroke=\"#6B4A2B\" stroke-width=\"0.8\"/><path d=\"M101.3 50.5 Q103.9 54.5 106.5 50.5\" fill=\"#A8743E\" stroke=\"#6B4A2B\" stroke-width=\"0.8\"/><path d=\"M105.0 50.5 Q107.6 54.5 110.2 50.5\" fill=\"#A8743E\" stroke=\"#6B4A2B\" stroke-width=\"0.8\"/><path d=\"M94.2 55.0 Q96.8 59.0 99.3 55.0\" fill=\"#A8743E\" stroke=\"#6B4A2B\" stroke-width=\"0.8\"/><path d=\"M97.7 55.0 Q100.2 59.0 102.8 55.0\" fill=\"#A8743E\" stroke=\"#6B4A2B\" stroke-width=\"0.8\"/><path d=\"M101.2 55.0 Q103.8 59.0 106.3 55.0\" fill=\"#A8743E\" stroke=\"#6B4A2B\" stroke-width=\"0.8\"/><path d=\"M104.7 55.0 Q107.2 59.0 109.8 55.0\" fill=\"#A8743E\" stroke=\"#6B4A2B\" stroke-width=\"0.8\"/><path d=\"M96.1 59.0 Q98.7 63.0 101.3 59.0\" fill=\"#A8743E\" stroke=\"#6B4A2B\" stroke-width=\"0.8\"/><path d=\"M99.4 59.0 Q102.0 63.0 104.6 59.0\" fill=\"#A8743E\" stroke=\"#6B4A2B\" stroke-width=\"0.8\"/><path d=\"M102.7 59.0 Q105.3 63.0 107.9 59.0\" fill=\"#A8743E\" stroke=\"#6B4A2B\" stroke-width=\"0.8\"/></svg>", "붕어": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><g stroke=\"#9CC8EC\" stroke-width=\"1.6\" fill=\"none\" stroke-linecap=\"round\"><path d=\"M8 12 q8 -4 16 0 t16 0\"/><path d=\"M84 8 q8 -4 16 0 t16 0\"/></g><path d=\"M80 36 L104 22 L98 36 L104 50 Z\" fill=\"#9C8440\"/><path d=\"M18 36 Q48 12 82 36 Q48 60 18 36 Z\" fill=\"#B59A4E\"/><path d=\"M42 22 Q56 10 68 24 Z\" fill=\"#9C8440\"/><path d=\"M48 48 Q56 56 62 48 Z\" fill=\"#9C8440\"/><path d=\"M36 26 Q41 36 36 46\" stroke=\"#8A7236\" stroke-width=\"1.5\" fill=\"none\"/><g stroke=\"#9C8440\" stroke-width=\"0.8\" fill=\"none\"><path d=\"M48 30 q4 3 0 6\"/><path d=\"M56 30 q4 3 0 6\"/><path d=\"M64 31 q4 3 0 6\"/><path d=\"M52 38 q4 3 0 6\"/><path d=\"M60 38 q4 3 0 6\"/></g><circle cx=\"28\" cy=\"33\" r=\"3\" fill=\"#FFFFFF\"/><circle cx=\"28\" cy=\"33\" r=\"1.5\" fill=\"#1E1E1E\"/></svg>", "새뱅이": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><g stroke=\"#9CC8EC\" stroke-width=\"1.6\" fill=\"none\" stroke-linecap=\"round\"><path d=\"M8 12 q8 -4 16 0 t16 0\"/><path d=\"M84 8 q8 -4 16 0 t16 0\"/></g><g stroke=\"#6E8C7A\" stroke-width=\"1\" fill=\"none\" stroke-linecap=\"round\"><path d=\"M32 30 Q14 18 4 26\"/><path d=\"M33 28 Q18 10 8 12\"/></g><path d=\"M30 32 Q40 16 62 18 Q84 22 88 40 Q90 50 82 54 Q80 46 72 44 Q60 40 48 42 Q36 44 30 32 Z\" fill=\"#A8C2B0\" stroke=\"#6E8C7A\" stroke-width=\"1\"/><path d=\"M82 54 L74 64 L84 62 L90 67 L90 56 Z\" fill=\"#A8C2B0\" stroke=\"#6E8C7A\" stroke-width=\"1\"/><g stroke=\"#6E8C7A\" stroke-width=\"1\" fill=\"none\"><path d=\"M54 19 Q52 30 54 41\"/><path d=\"M64 19 Q62 30 64 41\"/><path d=\"M74 24 Q72 34 74 44\"/></g><g stroke=\"#6E8C7A\" stroke-width=\"1.2\"><line x1=\"44\" y1=\"42\" x2=\"42\" y2=\"52\"/><line x1=\"52\" y1=\"42\" x2=\"50\" y2=\"52\"/><line x1=\"60\" y1=\"42\" x2=\"58\" y2=\"51\"/><line x1=\"68\" y1=\"44\" x2=\"66\" y2=\"52\"/></g><circle cx=\"35\" cy=\"28\" r=\"2.5\" fill=\"#1E1E1E\"/></svg>", "조개류": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M22 56 Q20 22 48 18 Q76 22 74 56 Z\" fill=\"#E2C597\" stroke=\"#A9864F\" stroke-width=\"1.5\"/><g stroke=\"#A9864F\" stroke-width=\"1.2\" fill=\"none\"><path d=\"M48 56 L48 20\"/><path d=\"M48 56 L34 24\"/><path d=\"M48 56 L62 24\"/><path d=\"M48 56 L26 36\"/><path d=\"M48 56 L70 36\"/></g><path d=\"M42 58 L54 58 L52 62 L44 62 Z\" fill=\"#C9A66E\"/><ellipse cx=\"92\" cy=\"42\" rx=\"11\" ry=\"22\" transform=\"rotate(25 92 42)\" fill=\"#2E3550\"/><ellipse cx=\"90\" cy=\"40\" rx=\"5\" ry=\"15\" transform=\"rotate(25 90 40)\" fill=\"#4A5578\"/></svg>", "칠게": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M0 58 Q30 52 60 58 T120 56 V70 H0 Z\" fill=\"#9A8466\"/><g stroke=\"#6B5A3A\" stroke-width=\"2.4\" stroke-linecap=\"round\" fill=\"none\"><path d=\"M42 46 L28 54 L24 62\"/><path d=\"M44 50 L34 60 L32 66\"/><path d=\"M78 46 L92 54 L96 62\"/><path d=\"M76 50 L86 60 L88 66\"/></g><rect x=\"38\" y=\"30\" width=\"44\" height=\"22\" rx=\"8\" fill=\"#8C7A55\"/><g stroke=\"#6B5A3A\" stroke-width=\"2\"><line x1=\"50\" y1=\"30\" x2=\"46\" y2=\"14\"/><line x1=\"70\" y1=\"30\" x2=\"74\" y2=\"14\"/></g><circle cx=\"46\" cy=\"13\" r=\"2.8\" fill=\"#1E1E1E\"/><circle cx=\"74\" cy=\"13\" r=\"2.8\" fill=\"#1E1E1E\"/><path d=\"M38 38 Q24 34 22 26 Q30 22 36 30\" fill=\"#B39468\"/><path d=\"M82 38 Q96 34 98 26 Q90 22 84 30\" fill=\"#B39468\"/></svg>", "나방 애벌레": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M8 58 Q48 6 114 28 Q72 70 8 58 Z\" fill=\"#7DB35E\"/><path d=\"M10 58 Q60 36 112 28\" stroke=\"#5E9E4A\" stroke-width=\"1.5\" fill=\"none\"/><path d=\"M96 32 q4 6 10 4 q-2 6 4 8\" fill=\"#F4F1E8\"/><g fill=\"#8C6A3A\"><circle cx=\"34\" cy=\"42\" r=\"5\"/><circle cx=\"42\" cy=\"39\" r=\"5.5\"/><circle cx=\"51\" cy=\"37\" r=\"5.5\"/><circle cx=\"60\" cy=\"36\" r=\"5.5\"/><circle cx=\"69\" cy=\"36\" r=\"5.5\"/></g><g fill=\"#C9A15E\"><circle cx=\"42\" cy=\"38\" r=\"1.5\"/><circle cx=\"51\" cy=\"36\" r=\"1.5\"/><circle cx=\"60\" cy=\"35\" r=\"1.5\"/></g><circle cx=\"78\" cy=\"35\" r=\"6.5\" fill=\"#5A3D22\"/><circle cx=\"80\" cy=\"33\" r=\"1.4\" fill=\"#FFFFFF\"/></svg>", "매미": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><ellipse cx=\"38\" cy=\"40\" rx=\"30\" ry=\"9\" transform=\"rotate(-12 38 40)\" fill=\"#DDEFF0\" stroke=\"#7FA3A6\" stroke-width=\"1\"/><ellipse cx=\"82\" cy=\"40\" rx=\"30\" ry=\"9\" transform=\"rotate(12 82 40)\" fill=\"#DDEFF0\" stroke=\"#7FA3A6\" stroke-width=\"1\"/><g stroke=\"#7FA3A6\" stroke-width=\"0.8\" fill=\"none\"><path d=\"M60 36 L14 42\"/><path d=\"M60 36 L106 42\"/><path d=\"M30 38 L24 46\"/><path d=\"M90 38 L96 46\"/></g><ellipse cx=\"60\" cy=\"40\" rx=\"9\" ry=\"20\" fill=\"#5B4A2E\"/><ellipse cx=\"60\" cy=\"30\" rx=\"9\" ry=\"7\" fill=\"#3F5A3A\"/><circle cx=\"52\" cy=\"22\" r=\"4\" fill=\"#3A2A1A\"/><circle cx=\"68\" cy=\"22\" r=\"4\" fill=\"#3A2A1A\"/><rect x=\"54\" y=\"18\" width=\"12\" height=\"7\" rx=\"3\" fill=\"#3F5A3A\"/><g stroke=\"#4A3A22\" stroke-width=\"1\"><line x1=\"56\" y1=\"44\" x2=\"60\" y2=\"58\"/><line x1=\"64\" y1=\"44\" x2=\"60\" y2=\"58\"/><line x1=\"56\" y1=\"50\" x2=\"60\" y2=\"62\"/><line x1=\"64\" y1=\"50\" x2=\"60\" y2=\"62\"/></g></svg>", "메기": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><g stroke=\"#9CC8EC\" stroke-width=\"1.6\" fill=\"none\" stroke-linecap=\"round\"><path d=\"M8 12 q8 -4 16 0 t16 0\"/><path d=\"M84 8 q8 -4 16 0 t16 0\"/></g><path d=\"M14 38 Q20 26 44 26 Q80 26 96 34 L112 24 L108 40 L112 54 L96 44 Q70 52 40 50 Q18 50 14 38 Z\" fill=\"#5E5A4E\"/><path d=\"M40 50 Q66 56 92 46\" stroke=\"#4A473D\" stroke-width=\"3\" fill=\"none\"/><path d=\"M22 44 Q50 50 90 42\" stroke=\"#8A8676\" stroke-width=\"1.5\" fill=\"none\"/><circle cx=\"27\" cy=\"33\" r=\"2.2\" fill=\"#EEEEEE\"/><g stroke=\"#3A372F\" stroke-width=\"1.4\" fill=\"none\" stroke-linecap=\"round\"><path d=\"M15 36 Q4 28 2 18\"/><path d=\"M15 40 Q4 46 2 56\"/><path d=\"M19 43 Q14 52 16 62\"/></g></svg>", "가물치": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><g stroke=\"#9CC8EC\" stroke-width=\"1.6\" fill=\"none\" stroke-linecap=\"round\"><path d=\"M8 12 q8 -4 16 0 t16 0\"/><path d=\"M84 8 q8 -4 16 0 t16 0\"/></g><path d=\"M104 36 L118 24 L116 36 L118 48 Z\" fill=\"#4A5236\"/><path d=\"M34 25 Q66 16 98 28 L98 31 L34 27 Z\" fill=\"#4A5236\"/><path d=\"M50 46 L98 41 L98 44 Q72 52 50 49 Z\" fill=\"#4A5236\"/><path d=\"M8 36 Q12 26 30 26 L96 30 Q106 32 108 36 Q106 40 96 42 L30 46 Q12 46 8 36 Z\" fill=\"#6E7A56\"/><g fill=\"#3E4630\"><ellipse cx=\"38\" cy=\"36\" rx=\"5\" ry=\"4\"/><ellipse cx=\"54\" cy=\"37\" rx=\"5.5\" ry=\"4.5\"/><ellipse cx=\"70\" cy=\"36\" rx=\"5\" ry=\"4\"/><ellipse cx=\"85\" cy=\"36\" rx=\"4.5\" ry=\"3.5\"/></g><path d=\"M9 38 L18 38\" stroke=\"#3E4630\" stroke-width=\"1.2\"/><circle cx=\"18\" cy=\"32\" r=\"2.2\" fill=\"#E8D27A\"/><circle cx=\"18\" cy=\"32\" r=\"1\" fill=\"#1E1E1E\"/></svg>", "도요새": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M0 58 Q30 52 60 58 T120 56 V70 H0 Z\" fill=\"#9A8466\"/><g stroke=\"#6E7A56\" stroke-width=\"2\" stroke-linecap=\"round\"><line x1=\"62\" y1=\"44\" x2=\"58\" y2=\"60\"/><line x1=\"70\" y1=\"44\" x2=\"74\" y2=\"60\"/></g><path d=\"M84 34 L104 30 L96 40 Z\" fill=\"#7A6040\"/><ellipse cx=\"66\" cy=\"36\" rx=\"22\" ry=\"11\" fill=\"#A08660\"/><ellipse cx=\"62\" cy=\"40\" rx=\"15\" ry=\"6\" fill=\"#F1ECDD\"/><g fill=\"#6B5236\"><circle cx=\"64\" cy=\"30\" r=\"1.3\"/><circle cx=\"72\" cy=\"31\" r=\"1.3\"/><circle cx=\"80\" cy=\"33\" r=\"1.3\"/><circle cx=\"68\" cy=\"34\" r=\"1.3\"/><circle cx=\"76\" cy=\"36\" r=\"1.3\"/></g><circle cx=\"44\" cy=\"26\" r=\"8\" fill=\"#A08660\"/><path d=\"M38 28 Q22 34 8 42\" stroke=\"#3A2A1A\" stroke-width=\"2.4\" fill=\"none\" stroke-linecap=\"round\"/><circle cx=\"43\" cy=\"24\" r=\"1.6\" fill=\"#1E1E1E\"/><path d=\"M38 21 Q44 18 50 22\" stroke=\"#F1ECDD\" stroke-width=\"1.2\" fill=\"none\"/><path d=\"M6 54 l4 -2 m0 0 l3 3 m-3 -3 l-1 -4\" stroke=\"#6B5A3A\" stroke-width=\"1.2\" fill=\"none\"/></svg>", "검은머리물떼새": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><g stroke=\"#E7A2A0\" stroke-width=\"2.4\" stroke-linecap=\"round\"><line x1=\"60\" y1=\"46\" x2=\"57\" y2=\"64\"/><line x1=\"70\" y1=\"46\" x2=\"73\" y2=\"64\"/></g><path d=\"M96 30 L114 24 L106 38 Z\" fill=\"#1E1E1E\"/><ellipse cx=\"68\" cy=\"36\" rx=\"30\" ry=\"14\" fill=\"#FFFFFF\" stroke=\"#CFCFCF\" stroke-width=\"1\"/><path d=\"M38 34 Q50 18 82 22 Q100 26 100 34 Q80 30 60 34 Z\" fill=\"#1E1E1E\"/><path d=\"M50 32 Q68 28 92 32\" stroke=\"#FFFFFF\" stroke-width=\"2.5\" fill=\"none\"/><circle cx=\"38\" cy=\"26\" r=\"11\" fill=\"#1E1E1E\"/><path d=\"M28 26 L2 31 L28 30 Z\" fill=\"#E2542B\"/><circle cx=\"36\" cy=\"23\" r=\"2.8\" fill=\"#E2542B\"/><circle cx=\"36\" cy=\"23\" r=\"1.2\" fill=\"#1E1E1E\"/></svg>", "괭이갈매기": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M0 56 Q15 50 30 56 T60 56 T90 56 T120 56 V70 H0 Z\" fill=\"#7FB0D6\"/><g stroke=\"#E8C53A\" stroke-width=\"2.2\" stroke-linecap=\"round\"><line x1=\"60\" y1=\"46\" x2=\"58\" y2=\"58\"/><line x1=\"68\" y1=\"46\" x2=\"70\" y2=\"58\"/></g><path d=\"M90 30 L108 28 L104 38 Z\" fill=\"#1E1E1E\"/><ellipse cx=\"64\" cy=\"36\" rx=\"26\" ry=\"12\" fill=\"#FFFFFF\" stroke=\"#CFCFCF\" stroke-width=\"1\"/><path d=\"M46 30 Q70 22 96 30 Q90 38 64 38 Z\" fill=\"#8A97A3\"/><path d=\"M88 32 L100 31 L96 36 Z\" fill=\"#1E1E1E\"/><circle cx=\"40\" cy=\"26\" r=\"9\" fill=\"#FFFFFF\" stroke=\"#CFCFCF\" stroke-width=\"1\"/><path d=\"M32 26 L16 29 L32 30 Z\" fill=\"#E8C53A\"/><rect x=\"18\" y=\"27.6\" width=\"3\" height=\"2.4\" fill=\"#1E1E1E\"/><circle cx=\"20\" cy=\"30.2\" r=\"1.3\" fill=\"#D9452B\"/><circle cx=\"38\" cy=\"24\" r=\"1.6\" fill=\"#1E1E1E\"/></svg>", "박새": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M4 62 Q60 54 116 60\" stroke=\"#7A5230\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M74 40 L98 54 L92 44 Z\" fill=\"#6E7E86\"/><ellipse cx=\"62\" cy=\"40\" rx=\"18\" ry=\"13\" fill=\"#FFFFFF\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><path d=\"M56 30 Q74 26 82 40 Q72 46 60 40 Z\" fill=\"#8A9AA0\"/><path d=\"M48 36 Q52 44 54 52\" stroke=\"#1E1E1E\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/><circle cx=\"46\" cy=\"28\" r=\"10\" fill=\"#1E1E1E\"/><ellipse cx=\"47\" cy=\"31\" rx=\"5\" ry=\"4\" fill=\"#FFFFFF\"/><path d=\"M36 28 L31 30 L36 31 Z\" fill=\"#3A3A3A\"/><circle cx=\"42\" cy=\"26\" r=\"1.5\" fill=\"#FFFFFF\"/><g stroke=\"#5A4A3A\" stroke-width=\"1.5\"><line x1=\"58\" y1=\"52\" x2=\"56\" y2=\"58\"/><line x1=\"64\" y1=\"52\" x2=\"64\" y2=\"58\"/></g></svg>", "두꺼비": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M10 66 H110\" stroke=\"#9A8466\" stroke-width=\"3\"/><path d=\"M26 64 Q20 32 58 26 Q96 26 96 64 Z\" fill=\"#8C6E46\"/><g fill=\"#6E5434\"><circle cx=\"40\" cy=\"44\" r=\"3\"/><circle cx=\"52\" cy=\"36\" r=\"2.5\"/><circle cx=\"66\" cy=\"34\" r=\"2.5\"/><circle cx=\"78\" cy=\"42\" r=\"3\"/><circle cx=\"60\" cy=\"50\" r=\"2.5\"/><circle cx=\"84\" cy=\"54\" r=\"2.5\"/><circle cx=\"36\" cy=\"56\" r=\"2.5\"/></g><path d=\"M30 64 Q26 56 34 54 Q42 58 40 64 Z\" fill=\"#7A5E3A\"/><path d=\"M90 64 Q94 56 86 54 Q78 58 80 64 Z\" fill=\"#7A5E3A\"/><circle cx=\"44\" cy=\"28\" r=\"6\" fill=\"#C9A24A\"/><circle cx=\"72\" cy=\"28\" r=\"6\" fill=\"#C9A24A\"/><ellipse cx=\"44\" cy=\"28\" rx=\"3.5\" ry=\"2\" fill=\"#1E1E1E\"/><ellipse cx=\"72\" cy=\"28\" rx=\"3.5\" ry=\"2\" fill=\"#1E1E1E\"/><path d=\"M40 40 Q58 46 78 40\" stroke=\"#5A4228\" stroke-width=\"1.5\" fill=\"none\"/></svg>", "수달": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M78 52 Q100 50 108 36\" stroke=\"#6B4628\" stroke-width=\"7\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M34 62 Q36 32 58 24 Q76 22 80 36 Q82 50 76 62 Z\" fill=\"#7A5232\"/><path d=\"M48 44 Q58 56 70 44 Q66 60 52 60 Z\" fill=\"#B48A5E\"/><circle cx=\"58\" cy=\"22\" r=\"13\" fill=\"#7A5232\"/><circle cx=\"48\" cy=\"12\" r=\"3.5\" fill=\"#6B4628\"/><circle cx=\"68\" cy=\"12\" r=\"3.5\" fill=\"#6B4628\"/><ellipse cx=\"58\" cy=\"28\" rx=\"8\" ry=\"5.5\" fill=\"#D8C2A0\"/><ellipse cx=\"58\" cy=\"25\" rx=\"2.8\" ry=\"2\" fill=\"#1E1E1E\"/><circle cx=\"52\" cy=\"19\" r=\"1.8\" fill=\"#1E1E1E\"/><circle cx=\"64\" cy=\"19\" r=\"1.8\" fill=\"#1E1E1E\"/><g stroke=\"#3A2A1A\" stroke-width=\"0.8\"><line x1=\"52\" y1=\"28\" x2=\"40\" y2=\"26\"/><line x1=\"52\" y1=\"30\" x2=\"40\" y2=\"32\"/><line x1=\"64\" y1=\"28\" x2=\"76\" y2=\"26\"/><line x1=\"64\" y1=\"30\" x2=\"76\" y2=\"32\"/></g><path d=\"M0 58 Q15 50 30 58 T60 58 T90 58 T120 58 V70 H0 Z\" fill=\"#7FB0D6\"/></svg>", "황새": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><g stroke=\"#D9452B\" stroke-width=\"2.2\" stroke-linecap=\"round\"><line x1=\"62\" y1=\"44\" x2=\"60\" y2=\"68\"/><line x1=\"70\" y1=\"44\" x2=\"72\" y2=\"68\"/></g><ellipse cx=\"66\" cy=\"36\" rx=\"22\" ry=\"11\" fill=\"#FFFFFF\" stroke=\"#CFCFCF\" stroke-width=\"1\"/><path d=\"M60 40 Q80 44 98 34 Q92 46 72 46 Z\" fill=\"#1E1E1E\"/><path d=\"M50 32 Q42 24 42 14\" stroke=\"#BDBDBD\" stroke-width=\"8.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M50 32 Q42 24 42 14\" stroke=\"#FFFFFF\" stroke-width=\"6.5\" fill=\"none\" stroke-linecap=\"round\"/><circle cx=\"42\" cy=\"12\" r=\"6.5\" fill=\"#FFFFFF\" stroke=\"#CFCFCF\" stroke-width=\"1\"/><path d=\"M37 12 L14 20 L37 15 Z\" fill=\"#2A2A2A\"/><circle cx=\"41\" cy=\"11\" r=\"2\" fill=\"#D9452B\"/><circle cx=\"41\" cy=\"11\" r=\"0.9\" fill=\"#1E1E1E\"/></svg>", "매": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M4 62 Q60 54 116 60\" stroke=\"#7A5230\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/><g stroke=\"#E8C53A\" stroke-width=\"2.5\" stroke-linecap=\"round\"><line x1=\"54\" y1=\"56\" x2=\"54\" y2=\"60\"/><line x1=\"66\" y1=\"56\" x2=\"66\" y2=\"60\"/></g><path d=\"M48 22 Q38 40 46 58 L74 58 Q82 40 72 22 Z\" fill=\"#5C6B7A\"/><path d=\"M52 58 L60 68 L68 58 Z\" fill=\"#4A5866\"/><path d=\"M52 34 Q49 48 54 58 L66 58 Q71 48 68 34 Z\" fill=\"#EDE6D6\"/><g stroke=\"#5C6B7A\" stroke-width=\"1\"><line x1=\"54\" y1=\"42\" x2=\"66\" y2=\"42\"/><line x1=\"53\" y1=\"47\" x2=\"67\" y2=\"47\"/><line x1=\"54\" y1=\"52\" x2=\"66\" y2=\"52\"/></g><circle cx=\"60\" cy=\"18\" r=\"10\" fill=\"#2E3640\"/><ellipse cx=\"62\" cy=\"22\" rx=\"4.5\" ry=\"5\" fill=\"#EDE6D6\"/><path d=\"M57 18 Q56 24 58 28\" stroke=\"#1E1E1E\" stroke-width=\"2.5\" fill=\"none\"/><path d=\"M52 17 L47 20 L52 21 Z\" fill=\"#E8C53A\"/><circle cx=\"56\" cy=\"15\" r=\"2.4\" fill=\"#E8C53A\"/><circle cx=\"56\" cy=\"15\" r=\"1.2\" fill=\"#1E1E1E\"/></svg>", "흰꼬리수리": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M58 32 C44 14 24 12 4 20 C14 22 16 26 12 30 C22 28 26 32 22 36 C34 32 44 36 56 40 Z\" fill=\"#6B4A2B\"/><path d=\"M62 32 C76 14 96 12 116 20 C106 22 104 26 108 30 C98 28 94 32 98 36 C86 32 76 36 64 40 Z\" fill=\"#6B4A2B\"/><g fill=\"#4A3220\"><path d=\"M4 20 L10 26 L12 30 Z\"/><path d=\"M116 20 L110 26 L108 30 Z\"/></g><path d=\"M53 52 L60 68 L67 52 Z\" fill=\"#FFFFFF\" stroke=\"#BDBDBD\" stroke-width=\"1\"/><ellipse cx=\"60\" cy=\"40\" rx=\"10\" ry=\"15\" fill=\"#5A3D22\"/><circle cx=\"60\" cy=\"21\" r=\"8\" fill=\"#D8C9A3\"/><path d=\"M57 24 L60 32 L63 24 Z\" fill=\"#E8B630\"/><circle cx=\"56.5\" cy=\"19.5\" r=\"1.3\" fill=\"#1E1E1E\"/><circle cx=\"63.5\" cy=\"19.5\" r=\"1.3\" fill=\"#1E1E1E\"/></svg>", "담비": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M4 62 Q60 54 116 60\" stroke=\"#7A5230\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M86 46 Q104 48 112 30\" stroke=\"#2A2420\" stroke-width=\"7\" fill=\"none\" stroke-linecap=\"round\"/><g fill=\"#2A2420\"><rect x=\"40\" y=\"46\" width=\"5\" height=\"12\" rx=\"2\"/><rect x=\"50\" y=\"46\" width=\"5\" height=\"12\" rx=\"2\"/><rect x=\"74\" y=\"46\" width=\"5\" height=\"12\" rx=\"2\"/><rect x=\"82\" y=\"44\" width=\"5\" height=\"12\" rx=\"2\"/></g><path d=\"M30 40 Q50 30 80 34 Q94 38 88 48 Q70 52 44 50 Q32 50 30 40 Z\" fill=\"#C98B2E\"/><ellipse cx=\"36\" cy=\"42\" rx=\"9\" ry=\"7\" fill=\"#F2C14E\"/><circle cx=\"26\" cy=\"32\" r=\"8.5\" fill=\"#2A2420\"/><path d=\"M20 26 L22 18 L27 24 Z\" fill=\"#2A2420\"/><path d=\"M28 24 L33 18 L34 26 Z\" fill=\"#2A2420\"/><path d=\"M18 34 L12 36 L19 37 Z\" fill=\"#2A2420\"/><circle cx=\"22\" cy=\"31\" r=\"1.4\" fill=\"#FFFFFF\"/></svg>", "수리부엉이": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M4 62 Q60 54 116 60\" stroke=\"#7A5230\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/><ellipse cx=\"60\" cy=\"40\" rx=\"20\" ry=\"22\" fill=\"#8C6A44\"/><ellipse cx=\"60\" cy=\"46\" rx=\"13\" ry=\"14\" fill=\"#C9A878\"/><g stroke=\"#8C6A44\" stroke-width=\"1.2\"><line x1=\"56\" y1=\"38\" x2=\"56\" y2=\"44\"/><line x1=\"64\" y1=\"40\" x2=\"64\" y2=\"46\"/><line x1=\"58\" y1=\"48\" x2=\"58\" y2=\"54\"/><line x1=\"62\" y1=\"52\" x2=\"62\" y2=\"58\"/></g><path d=\"M44 12 L48 2 L52 12 Z\" fill=\"#6B4E30\"/><path d=\"M68 12 L72 2 L76 12 Z\" fill=\"#6B4E30\"/><ellipse cx=\"60\" cy=\"20\" rx=\"17\" ry=\"13\" fill=\"#8C6A44\"/><ellipse cx=\"52\" cy=\"20\" rx=\"7\" ry=\"7\" fill=\"#C9A878\"/><ellipse cx=\"68\" cy=\"20\" rx=\"7\" ry=\"7\" fill=\"#C9A878\"/><circle cx=\"52\" cy=\"20\" r=\"5\" fill=\"#E8862A\"/><circle cx=\"68\" cy=\"20\" r=\"5\" fill=\"#E8862A\"/><circle cx=\"52\" cy=\"20\" r=\"2.4\" fill=\"#1E1E1E\"/><circle cx=\"68\" cy=\"20\" r=\"2.4\" fill=\"#1E1E1E\"/><path d=\"M58 26 L60 31 L62 26 Z\" fill=\"#3A2A1A\"/><g stroke=\"#5A4228\" stroke-width=\"2\" stroke-linecap=\"round\"><line x1=\"54\" y1=\"60\" x2=\"54\" y2=\"64\"/><line x1=\"66\" y1=\"60\" x2=\"66\" y2=\"64\"/></g></svg>", "버섯": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M4 50 H100 Q108 50 108 59 Q108 68 100 68 H4 Z\" fill=\"#7A5230\"/><ellipse cx=\"102\" cy=\"59\" rx=\"6\" ry=\"9\" fill=\"#B08A5E\"/><ellipse cx=\"102\" cy=\"59\" rx=\"3.5\" ry=\"5.5\" fill=\"none\" stroke=\"#7A5230\" stroke-width=\"1\"/><g stroke=\"#5E3E22\" stroke-width=\"1\" fill=\"none\"><path d=\"M10 56 H40\"/><path d=\"M50 62 H86\"/><path d=\"M20 64 H34\"/></g><path d=\"M30 50 Q29 40 27 36 H41 Q39 40 38 50 Z\" fill=\"#F1E3C6\" stroke=\"#C9B38A\" stroke-width=\"0.8\"/><path d=\"M16 38 Q18 16 34 16 Q50 16 52 38 Z\" fill=\"#B5502E\"/><g fill=\"#FFF3E0\"><circle cx=\"27\" cy=\"26\" r=\"2.6\"/><circle cx=\"38\" cy=\"22\" r=\"2.2\"/><circle cx=\"44\" cy=\"31\" r=\"2.6\"/><circle cx=\"31\" cy=\"33\" r=\"1.6\"/></g><path d=\"M66 50 Q65 44 64 41 H72 Q71 44 70 50 Z\" fill=\"#F1E3C6\" stroke=\"#C9B38A\" stroke-width=\"0.8\"/><path d=\"M57 42 Q58 30 68 30 Q78 30 79 42 Z\" fill=\"#C2683E\"/><g fill=\"#FFF3E0\"><circle cx=\"64\" cy=\"35\" r=\"1.6\"/><circle cx=\"72\" cy=\"36\" r=\"1.8\"/></g><path d=\"M82 50 Q86 46 92 50\" fill=\"#E3CFA2\" stroke=\"#B89A6A\" stroke-width=\"0.8\"/></svg>", "녹조": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M0 28 Q30 22 60 28 T120 26 V70 H0 Z\" fill=\"#3E6E5E\"/><path d=\"M0 30 Q20 24 40 30 Q56 26 70 31 Q90 24 120 29 V40 Q96 36 80 40 Q60 34 40 40 Q20 35 0 40 Z\" fill=\"#7DBE3A\"/><g fill=\"#A9D86A\"><circle cx=\"18\" cy=\"34\" r=\"3\"/><circle cx=\"46\" cy=\"33\" r=\"2.5\"/><circle cx=\"78\" cy=\"35\" r=\"3.5\"/><circle cx=\"102\" cy=\"33\" r=\"2.5\"/></g><path d=\"M44 56 Q56 50 68 56 Q56 62 44 56 Z\" fill=\"#9AA6A0\"/><path d=\"M68 56 L74 52 L74 60 Z\" fill=\"#9AA6A0\"/><path d=\"M48 54 l3 3 m0 -3 l-3 3\" stroke=\"#3A3A3A\" stroke-width=\"1\"/><circle cx=\"96\" cy=\"12\" r=\"8\" fill=\"#F2C14E\" opacity=\"0.6\"/></svg>", "해양 열파": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"30\" cy=\"22\" r=\"11\" fill=\"#F2A33A\"/><g stroke=\"#F2A33A\" stroke-width=\"2.5\" stroke-linecap=\"round\"><line x1=\"30\" y1=\"4\" x2=\"30\" y2=\"8\"/><line x1=\"12\" y1=\"22\" x2=\"16\" y2=\"22\"/><line x1=\"44\" y1=\"22\" x2=\"48\" y2=\"22\"/><line x1=\"17\" y1=\"9\" x2=\"20\" y2=\"12\"/><line x1=\"43\" y1=\"9\" x2=\"40\" y2=\"12\"/></g><rect x=\"88\" y=\"8\" width=\"10\" height=\"34\" rx=\"5\" fill=\"#FFFFFF\" stroke=\"#9CC8EC\" stroke-width=\"1.5\"/><rect x=\"91\" y=\"18\" width=\"4\" height=\"22\" fill=\"#E2542B\"/><circle cx=\"93\" cy=\"44\" r=\"7\" fill=\"#E2542B\"/><path d=\"M0 50 Q15 42 30 50 T60 50 T90 50 T120 50 V70 H0 Z\" fill=\"#3E7FB8\"/><path d=\"M0 58 Q15 50 30 58 T60 58 T90 58 T120 58 V70 H0 Z\" fill=\"#2C5F8C\"/></svg>", "산불": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M0 62 H120 V70 H0 Z\" fill=\"#4A2A20\"/><g fill=\"#2A1A14\"><path d=\"M20 62 L30 30 L40 62 Z\"/><path d=\"M82 62 L94 26 L106 62 Z\"/></g><path d=\"M44 62 Q38 44 50 34 Q50 44 56 42 Q54 28 64 18 Q64 32 72 36 Q76 28 74 22 Q86 34 80 50 Q78 58 74 62 Z\" fill=\"#E2542B\"/><path d=\"M52 62 Q48 50 58 44 Q58 52 64 50 Q64 42 70 38 Q76 48 72 56 L70 62 Z\" fill=\"#F2A33A\"/><path d=\"M58 62 Q58 54 64 52 Q68 56 66 62 Z\" fill=\"#F7D774\"/><g fill=\"#8A7A70\" opacity=\"0.6\"><circle cx=\"40\" cy=\"14\" r=\"6\"/><circle cx=\"50\" cy=\"8\" r=\"5\"/><circle cx=\"32\" cy=\"8\" r=\"4\"/></g></svg>", "대가뭄": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"94\" cy=\"16\" r=\"10\" fill=\"#F2A33A\"/><g stroke=\"#F2A33A\" stroke-width=\"2.5\" stroke-linecap=\"round\"><line x1=\"94\" y1=\"0\" x2=\"94\" y2=\"3\"/><line x1=\"78\" y1=\"16\" x2=\"81\" y2=\"16\"/><line x1=\"107\" y1=\"16\" x2=\"110\" y2=\"16\"/><line x1=\"83\" y1=\"5\" x2=\"85\" y2=\"7\"/><line x1=\"105\" y1=\"5\" x2=\"103\" y2=\"7\"/></g><path d=\"M0 36 Q60 30 120 36 V70 H0 Z\" fill=\"#C9A26A\"/><g stroke=\"#7A5A3A\" stroke-width=\"1.6\" fill=\"none\" stroke-linecap=\"round\"><path d=\"M10 44 L24 50 L20 60 L34 66\"/><path d=\"M24 50 L40 46 L52 54\"/><path d=\"M52 54 L48 66\"/><path d=\"M52 54 L70 50 L80 58 L96 54 L110 62\"/><path d=\"M70 50 L72 40\"/><path d=\"M80 58 L78 68\"/><path d=\"M96 54 L102 42\"/></g><path d=\"M30 36 Q28 28 32 22\" stroke=\"#9A8466\" stroke-width=\"1.8\" fill=\"none\"/><path d=\"M32 24 Q26 22 24 26\" stroke=\"#9A8466\" stroke-width=\"1.5\" fill=\"none\"/></svg>", "단비": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M0 56 Q60 50 120 56 V70 H0 Z\" fill=\"#8A6A45\"/><path d=\"M60 56 Q58 46 60 40\" stroke=\"#4E8A3E\" stroke-width=\"2.5\" fill=\"none\"/><ellipse cx=\"54\" cy=\"42\" rx=\"6\" ry=\"3\" transform=\"rotate(-25 54 42)\" fill=\"#5E9E4A\"/><ellipse cx=\"66\" cy=\"40\" rx=\"6\" ry=\"3\" transform=\"rotate(25 66 40)\" fill=\"#5E9E4A\"/><g fill=\"#9AA6B2\"><circle cx=\"40\" cy=\"18\" r=\"10\"/><circle cx=\"56\" cy=\"12\" r=\"12\"/><circle cx=\"74\" cy=\"16\" r=\"10\"/><rect x=\"34\" y=\"16\" width=\"48\" height=\"10\" rx=\"5\"/></g><g fill=\"#5B9BD5\"><path d=\"M38 34 q2 -4 4 0 a2 2 0 0 1 -4 0 Z\"/><path d=\"M50 40 q2 -4 4 0 a2 2 0 0 1 -4 0 Z\"/><path d=\"M72 36 q2 -4 4 0 a2 2 0 0 1 -4 0 Z\"/><path d=\"M82 44 q2 -4 4 0 a2 2 0 0 1 -4 0 Z\"/><path d=\"M28 46 q2 -4 4 0 a2 2 0 0 1 -4 0 Z\"/></g></svg>", "하천 정화": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M0 26 Q30 20 60 26 T120 24 V70 H0 Z\" fill=\"#7FB8E0\"/><path d=\"M0 40 Q30 34 60 40 T120 38\" stroke=\"#FFFFFF\" stroke-width=\"2\" fill=\"none\" opacity=\"0.7\"/><path d=\"M30 52 Q42 44 54 52 Q42 60 30 52 Z\" fill=\"#B59A4E\"/><path d=\"M54 52 L62 46 L60 52 L62 58 Z\" fill=\"#9C8440\"/><circle cx=\"36\" cy=\"51\" r=\"1.3\" fill=\"#1E1E1E\"/><path d=\"M74 44 Q84 38 94 44 Q84 50 74 44 Z\" fill=\"#5E5A4E\"/><path d=\"M94 44 L100 40 L99 44 L100 48 Z\" fill=\"#5E5A4E\"/><g fill=\"#F2C14E\"><path d=\"M20 12 l2 5 l5 2 l-5 2 l-2 5 l-2 -5 l-5 -2 l5 -2 Z\"/><path d=\"M98 10 l1.5 3.5 l3.5 1.5 l-3.5 1.5 l-1.5 3.5 l-1.5 -3.5 l-3.5 -1.5 l3.5 -1.5 Z\"/></g><g fill=\"#4E8A3E\"><path d=\"M8 26 Q10 12 12 26 Z\"/><path d=\"M12 26 Q16 14 16 26 Z\"/><path d=\"M108 24 Q110 10 112 24 Z\"/></g></svg>", "갯벌 보전": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M0 34 Q30 28 60 34 T120 32 V70 H0 Z\" fill=\"#9A8466\"/><g fill=\"#7A6548\"><circle cx=\"20\" cy=\"46\" r=\"2\"/><circle cx=\"34\" cy=\"60\" r=\"2\"/><circle cx=\"88\" cy=\"62\" r=\"2\"/><circle cx=\"104\" cy=\"48\" r=\"2\"/></g><g stroke=\"#6B5A3A\" stroke-width=\"1.8\" stroke-linecap=\"round\"><path d=\"M50 52 l-6 4\"/><path d=\"M50 55 l-5 6\"/><path d=\"M70 52 l6 4\"/><path d=\"M70 55 l5 6\"/></g><rect x=\"48\" y=\"46\" width=\"24\" height=\"12\" rx=\"5\" fill=\"#8C7A55\"/><g stroke=\"#6B5A3A\" stroke-width=\"1.5\"><line x1=\"54\" y1=\"46\" x2=\"52\" y2=\"38\"/><line x1=\"66\" y1=\"46\" x2=\"68\" y2=\"38\"/></g><circle cx=\"52\" cy=\"37\" r=\"1.8\" fill=\"#1E1E1E\"/><circle cx=\"68\" cy=\"37\" r=\"1.8\" fill=\"#1E1E1E\"/><path d=\"M60 26 C52 16 40 22 48 30 L60 40 L72 30 C80 22 68 16 60 26 Z\" fill=\"#E2542B\" opacity=\"0.85\"/><path d=\"M90 20 q6 -6 12 0 q-6 6 -12 0 Z\" fill=\"#3A3A3A\"/><path d=\"M14 18 q6 -6 12 0\" stroke=\"#3A3A3A\" stroke-width=\"1.6\" fill=\"none\"/></svg>", "숲 가꾸기": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M0 54 Q60 48 120 54 V70 H0 Z\" fill=\"#8A6A45\"/><path d=\"M40 54 Q38 40 40 30\" stroke=\"#6B4A2B\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"40\" cy=\"26\" r=\"10\" fill=\"#5E9E4A\"/><circle cx=\"32\" cy=\"32\" r=\"7\" fill=\"#4E8A3E\"/><circle cx=\"48\" cy=\"32\" r=\"7\" fill=\"#4E8A3E\"/><path d=\"M66 30 L94 30 L90 46 L70 46 Z\" fill=\"#5B9BD5\"/><path d=\"M94 32 L106 22\" stroke=\"#5B9BD5\" stroke-width=\"3.5\" stroke-linecap=\"round\"/><path d=\"M70 30 Q80 18 90 30\" stroke=\"#3E7FB8\" stroke-width=\"2.5\" fill=\"none\"/><g fill=\"#5B9BD5\"><circle cx=\"104\" cy=\"30\" r=\"1.6\"/><circle cx=\"100\" cy=\"36\" r=\"1.6\"/><circle cx=\"106\" cy=\"38\" r=\"1.6\"/></g><path d=\"M84 54 Q84 48 86 44\" stroke=\"#4E8A3E\" stroke-width=\"2\" fill=\"none\"/><ellipse cx=\"82\" cy=\"46\" rx=\"4\" ry=\"2\" transform=\"rotate(-25 82 46)\" fill=\"#5E9E4A\"/></svg>", "세균": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M6 60 Q30 48 58 56 Q40 66 6 60 Z\" fill=\"#8A6A3E\"/><path d=\"M8 60 Q32 54 56 56\" stroke=\"#6B4E2C\" stroke-width=\"1\" fill=\"none\"/><g fill=\"#5E4426\"><circle cx=\"22\" cy=\"58\" r=\"1.6\"/><circle cx=\"40\" cy=\"57\" r=\"2\"/><circle cx=\"30\" cy=\"61\" r=\"1.3\"/></g><path d=\"M46 54 L58 44\" stroke=\"#7A6A4A\" stroke-width=\"4.5\" stroke-linecap=\"round\"/><circle cx=\"78\" cy=\"30\" r=\"25\" fill=\"#F7F3EA\" stroke=\"#7A6A4A\" stroke-width=\"2.5\"/><g fill=\"#C77DA8\" stroke=\"#8E4F78\" stroke-width=\"0.8\"><rect x=\"62\" y=\"16\" width=\"14\" height=\"5\" rx=\"2.5\" transform=\"rotate(-25 69 18)\"/><rect x=\"80\" y=\"30\" width=\"15\" height=\"5\" rx=\"2.5\" transform=\"rotate(20 87 32)\"/><rect x=\"66\" y=\"36\" width=\"13\" height=\"5\" rx=\"2.5\" transform=\"rotate(-60 72 38)\"/><rect x=\"86\" y=\"14\" width=\"12\" height=\"4.6\" rx=\"2.3\" transform=\"rotate(10 92 16)\"/></g><g fill=\"#8FB6D9\" stroke=\"#5B83A8\" stroke-width=\"0.7\"><circle cx=\"76\" cy=\"26\" r=\"2.6\"/><circle cx=\"80.5\" cy=\"27\" r=\"2.6\"/><circle cx=\"85\" cy=\"25.5\" r=\"2.6\"/><circle cx=\"70\" cy=\"46\" r=\"2.4\"/><circle cx=\"74\" cy=\"48.5\" r=\"2.4\"/><circle cx=\"94\" cy=\"42\" r=\"2.4\"/></g></svg>", "곰팡이": "<svg viewBox=\"0 0 120 70\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M10 62 Q34 30 66 30 Q98 32 112 54 Q84 66 10 62 Z\" fill=\"#9A6B3A\"/><path d=\"M12 61 Q60 46 110 54\" stroke=\"#7A5230\" stroke-width=\"1.6\" fill=\"none\"/><g stroke=\"#7A5230\" stroke-width=\"0.9\" fill=\"none\"><path d=\"M36 56 L30 44\"/><path d=\"M56 52 L52 38\"/><path d=\"M78 51 L78 37\"/><path d=\"M96 53 L100 43\"/></g><g fill=\"#EDEDE6\" opacity=\"0.95\"><ellipse cx=\"44\" cy=\"44\" rx=\"13\" ry=\"7\"/><ellipse cx=\"80\" cy=\"42\" rx=\"15\" ry=\"7.5\"/></g><g fill=\"#B8C9A0\" opacity=\"0.9\"><ellipse cx=\"46\" cy=\"44\" rx=\"6\" ry=\"3.5\"/><ellipse cx=\"82\" cy=\"42\" rx=\"7\" ry=\"3.5\"/></g><g stroke=\"#9AA0A0\" stroke-width=\"0.8\" fill=\"none\"><path d=\"M34 44 q-4 -4 -2 -9\"/><path d=\"M38 40 q0 -6 4 -9\"/><path d=\"M50 39 q2 -5 6 -6\"/><path d=\"M70 39 q-3 -5 -1 -10\"/><path d=\"M78 36 q1 -6 5 -9\"/><path d=\"M90 38 q3 -5 7 -6\"/></g><g fill=\"#5E6E5A\"><circle cx=\"32\" cy=\"34\" r=\"2\"/><circle cx=\"42\" cy=\"30\" r=\"2\"/><circle cx=\"56\" cy=\"32\" r=\"2\"/><circle cx=\"69\" cy=\"28\" r=\"2\"/><circle cx=\"83\" cy=\"26\" r=\"2\"/><circle cx=\"97\" cy=\"31\" r=\"2\"/></g></svg>"};
+
+/* ---------- 데이터 ---------- */
+const LV = {1:['1단계 · 생산자','#3E7D4A','#E3EDE0'],2:['2단계 · 1차 소비자','#9A6B12','#F3E9D2'],3:['3단계 · 2차 소비자','#2F5F8A','#DDE7F0'],4:['4단계 · 최상위','#9B3B2E','#F2DEDA']};
+const ROWLEN=[6,5,3,2], OFF=[0,6,11,14], NSLOT=16;
+/* 먹이선: 소비자 (r,i)가 먹을 수 있는 바로 아랫줄 칸 번호. 2차 줄만 가운데 칸이 1차 2·3·4번(0부터 1·2·3)과 이어져요. */
+const BELOW_2=[[0,1],[1,2,3],[3,4]];
+function below(r,i){ if(r<1||r>3||i<0||i>=ROWLEN[r]) return []; return r===2?BELOW_2[i]:[i,i+1]; }
+function above(r,i){ const out=[]; if(r<0||r>2) return out; for(let k=0;k<ROWLEN[r+1];k++) if(below(r+1,k).includes(i)) out.push(k); return out; }
+/* 먹이사슬 줄(+3): 꼭대기 두 칸에서 각각 왼쪽 바깥 선(가장 왼쪽 먹이 칸)·오른쪽 바깥 선(가장 오른쪽 먹이 칸)을 따라 내려간 네 경로. 아래→위 순서 */
+function tracePath(i,side){ const p=[[3,i]]; let r=3; while(r>0){ const b=below(r,i); i=side<0?b[0]:b[b.length-1]; r--; p.unshift([r,i]); } return p; }
+const DIAGS=[tracePath(0,-1),tracePath(0,1),tracePath(1,-1),tracePath(1,1)];
+/* 판에 그릴 칸 가운데 위치(가로 %): 생산자는 고르게, 윗줄은 이어진 아래 칸들의 가운데 */
+const SW=15, SH=23.38, VG=2.5, BH=4*SH+3*VG; // 칸 너비·높이(판 너비 기준 %), 줄 간격, 판 높이
+function slotCX(r,i){ if(r===0) return SW/2+i*(SW+2); const b=below(r,i); return b.reduce((s,j)=>s+slotCX(r-1,j),0)/b.length; }
+const idx=(r,i)=>OFF[r]+i;
+const rc=k=>{for(let r=3;r>=0;r--) if(k>=OFF[r]) return [r,k-OFF[r]];};
+/* 일정: 한 바퀴 = 모두 한 번씩. 3·6·9·12·15바퀴 끝은 결산(누적 반영) → 사건 1장을 한 묶음으로, 18바퀴 끝은 6번째 최종 결산만(사건 없음). 참가자는 2~3명 */
+const LASTROUND=18, MAXP=3, NSETTLE=LASTROUND/3, NEVENT=NSETTLE-1;
+const SCHED=r=>({settle:r%3===0, event:r%3===0&&r<LASTROUND, final:r>=LASTROUND});
+const hWhen=h=>(h.rd?h.rd+'바퀴 끝':'')+(h.rd?' · ':'')+h.settle+'번째';
+const SCHEDULE_TEXT='3·6·9·12·15바퀴 끝마다 그 판으로 결산해 누적에 더한 뒤 바로 사건 카드 1장을 처리하고, 18바퀴 끝에는 6번째 최종 결산만 하고 끝나요(결산 6번·사건 5번, 그 밖의 바퀴에는 결산 없음)';
+const evWhen=m=>m.rd?m.rd+'바퀴 끝':m.settle+'번째 결산 뒤';
+let UID=0;
+function makeBio(b){
+  const bi=DATA.bio.indexOf(b);
+  const habs=b.hab.split(' · ').map(h=>h.replace('(둥지)','').trim());
+  const foods=b.bottom.startsWith('먹이:')?b.bottom.slice(3).split(',').map(s=>s.trim()):null;
+  return {uid:++UID,bi,kind:'bio',name:b.name,lv:b.lv,hab:habs,habText:b.hab,foods,star:!!b.star,note:b.note,bottom:b.bottom};
+}
+function makeDec(n){return {uid:++UID,kind:'dec',name:n};}
+function J(w,a,b){w=String(w);const c=w.charCodeAt(w.length-1);const jong=(c>=0xAC00&&c<=0xD7A3)?((c-0xAC00)%28>0):/[0-9]$/.test(w)?!/[2459]$/.test(w):false;return w+(jong?a:b);}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+/* ---------- 상태 ---------- */
+let S=null;
+/* 게임 수명: 새 게임을 만들 때마다 EPOCH가 바뀌어요. 이전 게임의 대기(wait)·선택창·원격 응답은 즉시 풀리고,
+   풀린 비동기 작업은 alive() 검사에서 멈춰 새 게임 상태(S)를 건드리지 않아요. */
+let EPOCH=0; const WAITS=new Set(), CHOICES=new Set();
+function alive(ep,p){return ep===EPOCH && !!S && !S.over && (!p||S.players.includes(p));}
+function cancelPending(){
+  EPOCH++;
+  WAITS.forEach(w=>{clearTimeout(w.id); w.res(false);}); WAITS.clear();
+  CHOICES.forEach(r=>r(null)); CHOICES.clear();
+  PENDING.forEach(pd=>pd.res(null)); PENDING.clear();
+  AWAY.forEach(t=>clearTimeout(t)); AWAY.clear();
+}
+function newGame(nPlayers, diff, speed, seats){
+  nPlayers=Math.max(2,Math.min(MAXP,+nPlayers||2)); if(seats) seats=seats.slice(0,MAXP); if(seats&&seats.length<2) seats=null; // 2~3명만
+  cancelPending();
+  UID=0;
+  const deck=[];
+  DATA.bio.forEach(b=>{for(let k=0;k<b.count;k++) deck.push(makeBio(b));});
+  const decN={2:3,3:4,4:6}[nPlayers];
+  const decNames=['세균','세균','곰팡이','곰팡이','버섯','버섯'].slice(0,decN);
+  decNames.forEach(n=>deck.push(makeDec(n)));
+  shuffle(deck);
+  const allEv=DATA.ev.map((e,i)=>({...e,uid:'e'+i}));
+  let evs;
+  const good=allEv.filter(e=>e.tag.startsWith('좋은')), bad=allEv.filter(e=>e.tag.startsWith('나쁜'));
+  if(diff==='easy') evs=[...good, ...bad.filter(e=>e.name.includes('(약)')), ...bad.filter(e=>e.name==='대가뭄')];
+  else if(diff==='hard') evs=[...bad, ...good.filter(e=>e.name==='단비')];
+  else evs=allEv;
+  const names=['나','다람','솔이','바다'];
+  if(!seats) seats=names.slice(0,nPlayers).map((n,k)=>({name:n,ctrl:k===0?'local':'ai',peer:null}));
+  const players=seats.map(st=>({name:st.name,ctrl:st.ctrl,human:st.ctrl!=='ai',peer:st.peer||null,wasHuman:st.ctrl!=='ai',board:Array(NSLOT).fill(null),dec:[],hand:[],total:0,last:0,hist:[]}));
+  S={gid:Math.random().toString(36).slice(2,8),seq:0,owner:0,ready:{},notice:null,players,deck,market:[null,null,null],ev:shuffle(evs),past:[],round:1,turn:0,settle:0,phase:'setup',redrawUsed:false,sel:null,moveFrom:null,speed,over:false,endFlag:false,log:[],memoAll:{},busy:false,diff};
+  players.forEach(p=>{S.memoAll[p.name]=[]; for(let k=0;k<5;k++){const d=drawFor(p,true); if(d.c) giveCard(p,d.c,true);}});
+  refillMarket();
+  players.forEach(p=>{if(!p.human) aiPlaceAll(p);});
+  players.forEach((p,k)=>{if(!p.human) S.ready[k]=true;});
+  log('게임 시작! 모두 5장을 받았어요. 놓을 수 있는 카드를 판에 놓고 시작해요.');
+  S.phase='setup';
+  render();
+}
+function giveCard(p,c,silent){ // 돌려주는 값: 'hand' 손패에 넣음 / 'dec' 분해자 칸에 둠 / 'decFull' 칸이 가득 차 덱에 되돌림
+  if(!c) return 'none';
+  if(c.kind==='dec'){
+    if(p.dec.length<3){p.dec.push(c); if(!silent) log(`${p.name}: 분해자 ${J(c.name,'을','를')} 분해자 칸에 두었어요.`); return 'dec';}
+    S.deck.push(c); shuffle(S.deck); if(!silent) log(`${p.name}: 분해자 칸이 가득 차서 ${J(c.name,'을','를')} 덱에 섞었어요.`);
+    return 'decFull';
+  }
+  p.hand.push(c);
+  return 'hand';
+}
+/* 같은 생물은 손패에 2장까지: 처음 받기·일반 뽑기·다시 찾아보기·좋은 사건이 모두 drawFor()를 거쳐요. */
+function canHold(p,c){return c.kind!=='bio' || sameCount(p,c.name)<2;}
+function drawFor(p,silent){ // 생물 덱에서 받을 수 있는 카드 1장을 꺼냄. 3장째는 덱에 섞고 다시 뽑음
+  if(!S.deck.length) return {c:null,why:'empty'};
+  if(!S.deck.some(c=>canHold(p,c))) return {c:null,why:'noneHoldable'}; // 무한 반복 방지
+  for(let guard=0;guard<30;guard++){
+    const c=S.deck.pop();
+    if(canHold(p,c)) return {c,why:'ok'};
+    if(!silent) log(`${p.name}: ${c.name} 3장째라 모두에게 보여 주고 덱에 섞었어요. 다시 1장 가져와요.`);
+    S.deck.push(c); shuffle(S.deck);
+  }
+  const k=S.deck.findIndex(c=>canHold(p,c)); // 운이 나빠 30번 모두 겹치면 받을 수 있는 카드를 바로 꺼냄
+  return {c:S.deck.splice(k,1)[0],why:'ok'};
+}
+function refillMarket(){for(let i=0;i<3;i++) if(!S.market[i] && S.deck.length) S.market[i]=S.deck.pop();}
+function log(t,cls){S.logN=(S.logN||0)+1; S.log.unshift({t,cls,n:S.logN});}
+
+/* ---------- 규칙 ---------- */
+function at(p,r,i){if(r<0||r>3||i<0||i>=ROWLEN[r]) return null; return p.board[idx(r,i)];}
+function eats(top,low){return top&&low&&top.foods&&top.foods.includes(low.name);}
+function hasFood(p,r,i,card){return below(r,i).some(j=>eats(card,at(p,r-1,j)));}
+function canPlace(p,c,r,i){
+  if(c.kind!=='bio') return false;
+  if(at(p,r,i)) return false;
+  if(r!==c.lv-1) return false;
+  if(r===0){
+    const anyProd=p.board.slice(0,ROWLEN[0]).some(x=>x);
+    if(!anyProd) return true;
+    if(at(p,0,i-1)||at(p,0,i+1)) return true;
+    return above(0,i).some(k=>eats(at(p,1,k),c));
+  }
+  return hasFood(p,r,i,c);
+}
+function legalSlots(p,c){const out=[];for(let r=0;r<4;r++)for(let i=0;i<ROWLEN[r];i++) if(canPlace(p,c,r,i)) out.push([r,i]);return out;}
+function anyPlaceable(p){return p.hand.some(c=>legalSlots(p,c).length);}
+function boardValid(p){
+  for(let r=1;r<4;r++)for(let i=0;i<ROWLEN[r];i++){const c=at(p,r,i); if(c && !hasFood(p,r,i,c)) return false;}
+  return true;
+}
+function moveTargets(p,from){
+  const [fr,fi]=from, c=at(p,fr,fi), out=[];
+  for(let i=0;i<ROWLEN[fr];i++){
+    if(i===fi||at(p,fr,i)) continue;
+    p.board[idx(fr,fi)]=null; p.board[idx(fr,i)]=c;
+    const ok=(fr===0||hasFood(p,fr,i,c)) && boardValid(p);
+    p.board[idx(fr,i)]=null; p.board[idx(fr,fi)]=c;
+    if(ok) out.push([fr,i]);
+  }
+  return out;
+}
+function arrangeFor(p,extra){ // 판(과 extra 카드)을 줄 안에서 다시 배치해 모두 먹이가 맞는 배치가 있는지
+  const rows=[[],[],[],[]];
+  p.board.forEach((c,k)=>{if(c) rows[rc(k)[0]].push(c);});
+  if(extra) rows[extra.lv-1].push(extra);
+  if(rows.some((r,ri)=>r.length>ROWLEN[ri])) return null;
+  const B=Array(NSLOT).fill(null); let steps=0;
+  function row(r){
+    if(r===4) return true;
+    const n=ROWLEN[r], items=rows[r], used=Array(n).fill(false);
+    function rec(j){
+      if(++steps>200000) return false;
+      if(j===items.length) return row(r+1);
+      const c=items[j];
+      for(let i=0;i<n;i++){
+        if(used[i]) continue;
+        if(r>0 && !below(r,i).some(j=>eats(c,B[idx(r-1,j)]))) continue;
+        used[i]=true; B[idx(r,i)]=c;
+        if(rec(j+1)) return true;
+        used[i]=false; B[idx(r,i)]=null;
+      }
+      return false;
+    }
+    return rec(0);
+  }
+  return row(0)?B:null;
+}
+function moveHint(p,c){ // 판의 카드 1장을 옮기면 c를 놓을 수 있는지
+  for(let k=0;k<NSLOT;k++){ const m=p.board[k]; if(!m) continue; const [r,i]=rc(k);
+    for(const [tr,ti] of moveTargets(p,[r,i])){
+      p.board[k]=null; p.board[idx(tr,ti)]=m;
+      const ok=legalSlots(p,c).length>0;
+      p.board[idx(tr,ti)]=null; p.board[k]=m;
+      if(ok) return {card:m, from:[r,i], to:[tr,ti]};
+    }
+  }
+  return null;
+}
+function scoreOf(p,final){
+  const b=p.board, cnt=b.filter(x=>x).length, stars=b.filter(x=>x&&x.star).length;
+  let rows=0; for(let r=0;r<4;r++){let full=true;for(let i=0;i<ROWLEN[r];i++) if(!at(p,r,i)) full=false; if(full) rows++;}
+  let diag=0, same=0;
+  DIAGS.forEach(d=>{
+    const cs=d.map(([r,i])=>at(p,r,i));
+    if(cs.some(x=>!x)) return;
+    for(let k=1;k<4;k++) if(!eats(cs[k],cs[k-1])) return;
+    diag++;
+    const common=cs.reduce((acc,c)=>acc.filter(h=>c.hab.includes(h)),cs[0].hab.slice());
+    if(common.length) same++;
+  });
+  const full=(final&&cnt===NSLOT)?5:0;
+  return {cnt,stars,rows,diag,same,full,total:cnt+stars*3+rows*2+diag*3+same*2+full};
+}
+function collapse(p,withPos){
+  const gone=[];
+  for(let r=1;r<4;r++)for(let i=0;i<ROWLEN[r];i++){const c=at(p,r,i); if(c && !hasFood(p,r,i,c)){gone.push({c,r,i}); p.board[idx(r,i)]=null;}}
+  return withPos?gone:gone.map(x=>x.c);
+}
+/* 먹이사슬(먹이 경로): 생산자 칸에서 시작해, 먹이선으로 이어진 바로 윗칸 중 그 생물을 먹는 카드로 이어 올라가
+   더 이어질 카드가 없는 마지막 소비자에서 끝나는 길.
+   - 위에서 합류해도 아래 갈래가 다르면 다른 길(합치지 않음). 갈라지면 갈래마다 셈.
+   - 중간에서 멈춘 앞부분(접두 경로)은 따로 세지 않음. 생산자 혼자는 먹이사슬이 아님.
+   - 판의 실제 인접 칸과 eats 관계만 사용(사선 빙고 4줄로 제한하지 않음). 칸이 다르면 같은 이름이어도 다른 카드.
+   사건 처리 단계와의 관계: 무너진 소비자를 지나는 길은 반드시 사라진 생산자도 지나므로,
+   '생산자 제거 직후 끊긴 길'과 '소비자 연쇄 뒤 끊긴 길'의 수는 같다. 기록은 분해자 쓰기 전 기준으로 세고,
+   분해자로 생산자를 되돌려 다시 이어진 길은 따로 기록한다. */
+function foodPaths(board){
+  const B=(r,i)=>(r<0||r>3||i<0||i>=ROWLEN[r])?null:board[idx(r,i)];
+  const out=[];
+  function go(r,i,path){
+    const c=B(r,i), up=[];
+    if(r<3) above(r,i).forEach(k=>{const u=B(r+1,k); if(u&&eats(u,c)) up.push(k);});
+    if(!up.length){ if(path.length>1) out.push(path); return; }
+    up.forEach(k=>go(r+1,k,path.concat({r:r+1,i:k,c:B(r+1,k)})));
+  }
+  for(let i=0;i<ROWLEN[0];i++){const c=B(0,i); if(c) go(0,i,[{r:0,i,c}]);}
+  return out;
+}
+const pathStr=path=>path.map(n=>n.c.name).join('→');
+function pathAlive(path,board){return path.every(n=>board[idx(n.r,n.i)]===n.c);}
+/* 사건 전 판(before)과 지금 판을 비교: 먹이 일부가 사라졌지만 다른 먹이가 남아 버틴 소비자(모든 영양단계) */
+function webSurvivors(p,before){
+  const out=[];
+  for(let r=1;r<4;r++)for(let i=0;i<ROWLEN[r];i++){
+    const c=at(p,r,i); if(!c) continue;
+    const was=below(r,i).map(j=>before[idx(r-1,j)]).filter(q=>eats(c,q));
+    const now=below(r,i).map(j=>at(p,r-1,j)).filter(q=>eats(c,q));
+    if(now.length && now.length<was.length) out.push({name:c.name,lv:c.lv,food:now.map(q=>q.name).join('·'),lostFood:was.filter(q=>!now.includes(q)).map(q=>q.name)});
+  }
+  return out;
+}
+function survText(v){return `${J(v.name,'은','는')} ${J(v.lostFood.join('·'),'이','가')} 사라졌지만 ${J(v.food,'이','가')} 남아 있어 버텼어요.`;}
+function distinct(p){return new Set(p.board.filter(x=>x).map(c=>c.name)).size;}
+
+/* ---------- 차례 진행 ---------- */
+const cur=()=>S.players[S.turn];
+function sameCount(p,name){return p.hand.filter(c=>c.name===name).length;}
+function takeCard(p,src){ // src: 'deck' 또는 0~2
+  let c;
+  if(src==='deck'){
+    if(!S.deck.length){log('생물 덱이 비었어요.'); return 'empty';}
+    c=drawFor(p).c;
+    if(!c){log(`${p.name}: 생물 덱에 손패와 겹치지 않는 카드가 없어 가져오지 못했어요.`); return 'empty';}
+  }
+  else {c=S.market[src]; S.market[src]=null; if(!c) return 'empty';}
+  const from=src==='deck'?'생물 덱':'찾아온 생물';
+  if(c.kind==='bio' && sameCount(p,c.name)>=2){
+    log(`${p.name}: ${c.name} 3장째라 모두에게 보여 주고 덱에 섞었어요. 다시 1장 가져와요.`);
+    S.deck.push(c); shuffle(S.deck); refillMarket();
+    return 'again';
+  }
+  log(`${p.name}: ${from}에서 ${J((p.human&&MODE==='solo')?c.name:(src==='deck'?'1장':c.name),'을','를')} 가져왔어요.`);
+  giveCard(p,c);
+  refillMarket();
+  if(c.kind==='dec'){ if(p.human&&S.phase==='draw'){S.drewDec=true; S.placedThisTurn=true;} return 'dec'; }
+  return 'ok';
+}
+function placeCard(p,c,r,i){
+  p.hand=p.hand.filter(x=>x.uid!==c.uid);
+  p.board[idx(r,i)]=c;
+  if(p.human&&S.phase==='place') S.placedThisTurn=true;
+  log(`${p.name}: ${J(c.name,'을','를')} ${['생산자','1차 소비자','2차 소비자','최상위'][r]} 줄에 놓았어요.`);
+}
+function redraw(p,c){
+  p.hand=p.hand.filter(x=>x.uid!==c.uid); S.deck.push(c); shuffle(S.deck);
+  log(`${p.name}: 다시 찾아보기 — 손패 1장을 덱에 섞고 1장을 다시 뽑았어요.`);
+  let res; let guard=0;
+  do{res=takeCard(p,'deck'); guard++;}while(res==='again'&&guard<20);
+  S.redrawUsed=true;
+}
+
+/* 사람 차례 */
+function resetTurn(){
+  S.phase='draw'; S.redrawUsed=false; S.placedThisTurn=false; S.drewDec=false; S.sel=null; S.moveFrom=null; S.moveMode=false; S.pickRedraw=false; S.arr=null;
+  if(!S.deck.length && S.market.every(x=>!x)){ S.phase='place'; log('더 가져올 생물 카드가 없어요. 내려놓기만 하고 차례를 마쳐요.'); }
+}
+function humanStartTurn(){
+  S.phase='draw'; S.redrawUsed=false; S.placedThisTurn=false; S.drewDec=false; S.sel=null; S.moveFrom=null; S.moveMode=false; S.pickRedraw=false; S.arr=null;
+  if(!S.deck.length && S.market.every(x=>!x)){ S.phase='place'; log('더 가져올 생물 카드가 없어요. 내려놓기만 하고 차례를 마쳐요.'); }
+  render();
+}
+function humanDraw(src){
+  if(S.phase!=='draw'||S.busy||!myTurnNow()) return;
+  const res=takeCard(cur(),src);
+  if(res==='again'){render(); return;}
+  if(res==='empty'&&src!=='deck'){render(); return;}
+  S.phase='place'; render();
+}
+function humanEnd(){
+  const p=mine();
+  if(S.arr){document.getElementById('detail').innerHTML='<b>다시 배치 중</b>이에요. 먼저 <b>배치 완료</b>나 <b>처음 배치로 되돌리기</b>를 누르세요.'; return;}
+  if(S.phase==='setup'){
+    if(MODE==='solo'){S.phase='draw'; S.redrawUsed=false; log('준비 끝. 내 차례부터 시작해요.'); render(); return;}
+    setupReady(); return;
+  }
+  if(S.phase!=='place'||!myTurnNow()) return;
+  const fin=()=>{ if(MODE==='guest') passBack(); else nextTurn(); };
+  if(p.hand.length>5){askDiscard(p,fin); return;}
+  fin();
+}
+function askDiscard(p,done){
+  openModal(`<h2>손패가 ${p.hand.length}장이에요</h2><p>내려놓은 뒤 손패는 5장 이하여야 해요. 생물 덱에 섞을 카드 1장을 고르세요.</p><div class="cards">${p.hand.map(c=>cardHTML(c,'button','data-d="'+c.uid+'"')).join('')}</div>`);
+  document.querySelectorAll('[data-d]').forEach(el=>el.onclick=()=>{
+    const c=p.hand.find(x=>x.uid==el.dataset.d);
+    p.hand=p.hand.filter(x=>x!==c); S.deck.push(c); shuffle(S.deck);
+    log(`${p.name}: 손패가 6장이라 ${J(c.name,'을','를')} 덱에 섞었어요.`);
+    closeModal(); if(p.hand.length>5) askDiscard(p,done); else done();
+  });
+}
+
+/* 컴퓨터 */
+const wait=ms=>new Promise(r=>{const w={res:r}; w.id=setTimeout(()=>{WAITS.delete(w); r(true);},ms*(S&&S.speed==='fast'?0.35:1)); WAITS.add(w);});
+function cardValue(p,c){
+  if(c.kind==='dec') return p.dec.length<3?7:0;
+  if(sameCount(p,c.name)>=2) return -1;
+  const ls=legalSlots(p,c).length;
+  let v=0;
+  if(ls) v=10+c.lv*2+(c.star?8:0);
+  else if(c.lv>1){const onBoard=p.board.some(x=>x&&c.foods.includes(x.name)); v=onBoard?4:1;}
+  else v=2;
+  return v;
+}
+function aiPlaceAll(p){
+  let placed=true;
+  while(placed){
+    placed=false; let best=null;
+    p.hand.forEach(c=>legalSlots(p,c).forEach(([r,i])=>{
+      let s=c.lv*3+(c.star?5:0);
+      if(r>0){ if(below(r,i).filter(j=>eats(c,at(p,r-1,j))).length>=2) s+=2; }
+      else { s+= above(0,i).some(k=>eats(at(p,1,k),c))?2:0; s+= (i>=1&&i<=4)?1:0; }
+      s+=Math.random()*0.5;
+      if(!best||s>best.s) best={c,r,i,s};
+    }));
+    if(best){placeCard(p,best.c,best.r,best.i); placed=true;}
+  }
+}
+function aiWorst(p){
+  let w=null;
+  p.hand.forEach(c=>{const v=cardValue(p,c)+(c.star?3:0); if(!w||v<w.v) w={c,v};});
+  return w&&w.c;
+}
+async function aiTurn(p){
+  const ep=EPOCH;
+  S.busy=true; render(); await wait(700); if(!alive(ep,p)) return;
+  let best=S.deck.length?{src:'deck',v:5}:{src:null,v:-99};
+  S.market.forEach((c,k)=>{if(c){const v=cardValue(p,c); if(v>best.v) best={src:k,v};}});
+  if(best.src===null){log(`${p.name}: 가져올 카드가 없어요.`); aiPlaceAll(p); S.busy=false; nextTurn(); return;}
+  let res=takeCard(p,best.src), guard=0;
+  while(res==='again'&&guard<20){res=takeCard(p,'deck');guard++;}
+  render(); await wait(600); if(!alive(ep,p)) return;
+  if(res!=='dec'&&!anyPlaceable(p)&&p.hand.length){const w=aiWorst(p); if(w){redraw(p,w); render(); await wait(500); if(!alive(ep,p)) return;}}
+  aiPlaceAll(p);
+  while(p.hand.length>5){const w=aiWorst(p); p.hand=p.hand.filter(x=>x!==w); S.deck.push(w); shuffle(S.deck); log(`${p.name}: 손패가 6장이라 1장을 덱에 섞었어요.`);}
+  render(); await wait(600); if(!alive(ep,p)) return;
+  S.busy=false;
+  nextTurn();
+}
+
+/* 바퀴·결산·사건 */
+function nextTurn(){
+  S.sel=null; S.moveFrom=null;
+  if(S.players.some(p=>p.board.every(x=>x))) S.endFlag=true;
+  if(!S.deck.length && S.market.every(x=>!x)) S.endFlag=true;
+  S.turn++;
+  if(S.turn>=S.players.length){S.turn=0; endRound(); return;}
+  startTurn();
+}
+function startTurn(){
+  if(S.over) return;
+  const p=cur();
+  if(!p.human) aiTurn(p);
+  else if(S.turn===ME) humanStartTurn();
+  else handOff(S.turn);
+}
+function endRound(){
+  const r=S.round; S.round++;
+  const sc=SCHED(r);
+  if(S.endFlag){ log(`${r}바퀴가 끝났어요. 끝나는 조건이 생겨 마지막 결산을 해요(사건 없음).`); doSettle(true); return; }
+  if(sc.settle){ doSettle(sc.final, sc.event?r:0); return; }
+  if(sc.event){ log(`${r}바퀴가 끝났어요. 사건 카드를 1장 뒤집어요.`); S.evRound=r; doEvent(); return; }
+  log(`${r}바퀴가 끝났어요.`); startTurn();
+}
+function doSettle(final,evRound){
+  S.settle++;
+  const rows=S.players.map(p=>{const s=scoreOf(p,final); p.last=s.total; p.total+=s.total; p.hist.push({...s,settle:S.settle,rd:S.round-1,cum:p.total}); return {p,s};});
+  log(`${S.settle}번째 결산${final?' (마지막)':''}: `+rows.map(x=>`${x.p.name} +${x.s.total}`).join(', '),'st');
+  const tbl=settleTable();
+  setNotice({kind:final?'end':'settle',n:S.settle,next:evRound?'event':'turn',rd:S.round-1});
+  render();
+  if(final){ endGame(tbl); return; }
+  const ep=EPOCH;
+  if(evRound){
+    openModal(`<h2>${S.settle}번째 결산 (${evRound}바퀴 끝)</h2>${tbl}<p>${evRound}바퀴 끝에는 결산 다음에 사건 카드를 1장 뒤집어요.</p><div class="row"><button class="primary" id="mOk">사건 뒤집기</button></div>`);
+    document.getElementById('mOk').onclick=()=>{closeModal(); if(alive(ep)){ S.evRound=evRound; doEvent(); }};
+  } else {
+    openModal(`<h2>${S.settle}번째 결산 (${S.round-1}바퀴 끝)</h2>${tbl}<p>이번 결산 뒤에는 사건이 없어요. ${nextStepText(S.round)}</p><div class="row"><button class="primary" id="mOk">다음 바퀴 시작</button></div>`);
+    document.getElementById('mOk').onclick=()=>{closeModal(); if(alive(ep)) startTurn();};
+  }
+}
+function habOf(e){return e.habitat;}
+/* r바퀴부터 다음에 오는 결산·사건 안내 */
+function nextStepText(from){ for(let r=from;r<=LASTROUND;r++){ const s=SCHED(r); if(s.final) return `다음은 ${r}바퀴 끝 마지막 결산이에요.`; if(s.settle&&s.event) return `다음은 ${r}바퀴 끝 결산과 사건이에요.`; if(s.settle) return `다음은 ${r}바퀴 끝 결산이에요.`; if(s.event) return `다음은 ${r}바퀴 끝 사건이에요(결산 없음).`; } return ''; }
+async function doEvent(){
+  const ep=EPOCH;
+  const e=S.ev.pop();
+  if(!e){log('사건 덱이 비어 사건 없이 진행해요.'); startTurn(); return;}
+  S.past.push(e);
+  log(`사건: ${e.name} — ${e.effect}`,'ev');
+  render();
+  await revealEvent(e);
+  if(!alive(ep)) return;
+  const reports=[];
+  if(e.tag.startsWith('좋은')){
+    S.players.forEach(p=>{
+      const ok = e.name==='단비' || p.board.some(c=>c&&c.hab.includes(e.habitat));
+      let res='notEligible', card=null;
+      if(ok){
+        const d=drawFor(p);
+        if(!d.c) res = d.why==='empty' ? 'deckEmpty' : 'noneHoldable';
+        else { card=d.c; const g=giveCard(p,d.c); res = g==='decFull' ? 'decFull' : (g==='dec' ? 'gotDec' : 'got'); }
+      }
+      const R={
+        notEligible:[`${p.name}: 해당 없음`, `좋은 사건이지만 판에 ${e.habitat} 생물이 없어서 받지 못했어요.`],
+        deckEmpty:[`${p.name}: 생물 덱이 비어 받지 못함`, '받을 자격은 있었지만 생물 덱이 비어서 받지 못했어요.'],
+        noneHoldable:[`${p.name}: 받을 수 있는 카드 없음`, '받을 자격은 있었지만 생물 덱에 남은 카드가 모두 손패에 이미 2장 있는 생물이라 받지 못했어요.'],
+        got:[`${p.name}: 1장 더 받음`, '좋은 사건이라 생물 덱에서 1장을 더 받았어요.'],
+        gotDec:[`${p.name}: 분해자 1장 받음`, card?`좋은 사건이라 생물 덱에서 1장을 더 받았어요. 분해자 ${J(card.name,'이라서','라서')} 분해자 칸에 두었어요.`:''],
+        decFull:[`${p.name}: 분해자 칸이 가득 차 덱에 되돌림`, card?`좋은 사건이라 1장을 뽑았지만 분해자 ${J(card.name,'이었고','였고')} 분해자 칸(3장)이 가득 차서 덱에 되돌렸어요. 이번에 더 받은 카드는 없어요.`:'']
+      }[res];
+      reports.push(R[0]);
+      const ent={kind:'good',ev:e.name,settle:S.settle,rd:S.evRound||0,lost:[],chains:0,restored:[],type:'좋은 사건',goodResult:res,why:R[1],others:'',survivedByWeb:0,webSurvivors:[],restoredCount:0,fallenCount:0,removedCount:0,brokenPaths:[],reconnectedCount:0,reconnectedPaths:[]};
+      S.memoAll[p.name].unshift(ent);
+    });
+    showEvent(e, reports, ()=>{ if(alive(ep)) afterEvent(); });
+    return;
+  }
+  // 나쁜 사건 — 참가자마다 동시에 정리(사람 참가자는 각자 화면에서 고름)
+  const lostBy=new Map();
+  async function badFor(p){
+    const before=p.board.slice(); // 사건 전 연결(자리)을 기억해 사건 뒤 판과 비교
+    const pathsBefore=foodPaths(before); // 사건 전 먹이사슬 목록
+    let removed=[];
+    if(e.name==='대가뭄'){
+      const prods=[];for(let i=0;i<ROWLEN[0];i++) if(at(p,0,i)) prods.push(i);
+      if(prods.length){
+        let bestI=prods[0],bestLoss=99; prods.forEach(i=>{const keep=p.board.slice(); p.board[idx(0,i)]=null; const l=collapse(p).length; p.board=keep; if(l<bestLoss){bestLoss=l;bestI=i;}});
+        const pick=await chooseFor(p,'대가뭄','내 판의 생산자 1장을 골라 빼요.', prods.map(i=>({label:at(p,0,i).name,val:i})), bestI);
+        if(!alive(ep,p)) return;
+        removed.push({c:at(p,0,pick),i:pick}); p.board[idx(0,pick)]=null;
+      }
+    } else {
+      for(let i=0;i<ROWLEN[0];i++){const c=at(p,0,i); if(!c) continue;
+        const hit = e.remove ? e.remove.includes(c.name) : c.hab.includes(e.habitat);
+        if(hit){removed.push({c,i}); p.board[idx(0,i)]=null;}
+      }
+    }
+    const fellP=collapse(p,true), fell=fellP.map(x=>x.c);
+    const survivors=webSurvivors(p,before);
+    const broken=pathsBefore.filter(path=>!pathAlive(path,p.board)); // 생산자 제거·소비자 연쇄 뒤(분해자 쓰기 전) 끊긴 길
+    if(p.human && (removed.length||fell.length)){ render();
+      await chooseFor(p, e.name+' · 내 판 정리', `${removed.length?J(removed.map(x=>x.c.name).join(', '),'이','가')+' 판에서 빠졌어요.':''}${fell.length?' 먹이가 없어진 '+J(fell.map(c=>c.name).join(', '),'이','가')+' 무너졌어요.':''}${survivors.length?' '+survivors.map(survText).join(' '):''}${removed.length&&!fell.length&&!survivors.length?' 빠진 생산자 바로 위에 그것을 먹는 생물이 없어서 무너진 생물은 없었어요.':''} 판에서 바뀐 모습을 확인하세요.`, [{label:'확인',val:1}], 1);
+      if(!alive(ep,p)) return; }
+    // 분해자
+    let restored=[];
+    if(removed.length && p.dec.length){
+      let left=removed.slice();
+      while(left.length && p.dec.length){
+        const v=await chooseFor(p,'분해자 쓰기',`분해자 ${p.dec.length}장이 있어요. 분해자 1장으로 이번 사건에 빠진 생산자 1장을 제자리에 돌려놓을 수 있고, 여러 장을 쓸 수 있어요. (생산자만 돌아와요. 이미 무너진 소비자는 돌아오지 않아요)`, [...left.map((x,k)=>({label:x.c.name+' 되돌리기',val:k})),{label:'그만 쓰기',val:-1}], 0);
+        if(!alive(ep,p)) return;
+        if(v===-1||v==null||!left[v]) break;
+        const x=left.splice(v,1)[0]; p.board[idx(0,x.i)]=x.c; const d=p.dec.pop(); S.deck.push(d); restored.push(x.c);
+        render();
+      }
+    }
+    const reconnected=broken.filter(path=>pathAlive(path,p.board)); // 분해자 복구로 다시 온전해진 길
+    removed.filter(x=>!restored.includes(x.c)).forEach(x=>S.deck.push(x.c));
+    fell.forEach(c=>S.deck.push(c));
+    const lost=removed.filter(x=>!restored.includes(x.c)).map(x=>x.c.name).concat(fell.map(c=>c.name));
+    lostBy.set(p,{lost,fell:fell.map(c=>c.name),restored:restored.map(c=>c.name),removed:removed.map(x=>x.c.name),chains:broken.length,brokenPaths:broken.map(pathStr),reconnected:reconnected.map(pathStr),chainsBefore:pathsBefore.length,chainsAfter:foodPaths(p.board).length,survivors});
+  }
+  S.busy=true;
+  await Promise.all(S.players.map(badFor));
+  if(!alive(ep)) return; // 새 게임이 시작됐으면 이전 사건 결과를 쓰지 않음
+  S.busy=false;
+  shuffle(S.deck);
+  S.players.forEach(p=>{const o=lostBy.get(p); reports.push(`${p.name}: ${o.lost.length?('사라짐 '+o.lost.join(', ')):'사라진 생물 없음'}${o.restored.length?(' · 분해자로 되돌림 '+o.restored.join(', ')):''}`);});
+  const target = e.name==='대가뭄' ? '생산자' : (e.remove ? e.remove.join(', ') : e.habitat+' 생산자');
+  S.players.forEach((p,pi)=>{
+    const me=lostBy.get(p); let why='', type='';
+    if(!me.removed.length){
+      type='운이 좋아서';
+      why = e.name==='대가뭄' ? '판에 뺄 생산자가 없어서 피해가 없었어요.' : `판에 ${J(target,'이','가')} 없어서 피해가 없었어요. 사건이 다른 곳에서 일어난 셈이에요.`;
+    } else {
+      why=`${J(me.removed.join(', '),'이','가')} 판에서 빠졌어요.`;
+      // 대표 분류 우선순위: 운 → 무너짐 → 먹이그물 → 분해자로 되돌림 → 생산자만 (효과는 아래 필드로 따로 셈)
+      if(me.fell.length){ type='무너짐'; why+=` 그 결과 먹이가 없어진 ${J(me.fell.join(', '),'이','가')} 무너졌어요.`; }
+      else if(me.survivors.length) type='먹이그물 덕분에';
+      else if(me.restored.length===me.removed.length) type='분해자로 되돌림';
+      else type='생산자만 빠짐';
+      if(me.survivors.length) why+=' '+me.survivors.map(survText).join(' ');
+      else if(!me.fell.length) why+=' 위에 그 생산자를 먹는 생물이 없어서 무너진 생물은 없었어요.';
+      if(me.chains) why+=` 사건 전 먹이사슬 ${me.chainsBefore}개 중 ${me.chains}개가 끊겼어요.`+(me.survivors.length?' 버틴 소비자가 있어도 사라진 생물을 지나던 먹이사슬은 끊긴 것으로 세요.':'');
+      if(me.restored.length) why+=` 무너짐 정리가 끝난 뒤 분해자로 ${J(me.restored.join(', '),'을','를')} 제자리에 되돌렸어요.`+(me.fell.length?' 이미 무너진 소비자는 돌아오지 않아요.':' 분해자는 소비자를 살린 것이 아니라 빠진 생산자를 되돌린 거예요.');
+      if(me.reconnected.length) why+=` 되돌린 생산자 덕분에 끊겼던 먹이사슬 ${me.reconnected.length}개가 다시 이어졌어요.`;
+    }
+    const others = S.players.filter(q=>q!==p).map(q=>{const o=lostBy.get(q); return `${q.name} ${o.lost.length?o.lost.join('·')+' 사라짐':'피해 없음'}`;}).join(' / ');
+    const ent={kind:'bad',ev:e.name,settle:S.settle,rd:S.evRound||0,lost:me.lost,chains:me.chains,why,type,restored:me.restored,others,
+      survivedByWeb:me.survivors.length, webSurvivors:me.survivors.map(v=>v.name), restoredCount:me.restored.length, fallenCount:me.fell.length, removedCount:me.removed.length,
+      brokenPaths:me.brokenPaths, chainsBefore:me.chainsBefore, chainsAfter:me.chainsAfter, reconnectedCount:me.reconnected.length, reconnectedPaths:me.reconnected};
+    S.memoAll[p.name].unshift(ent);
+  });
+  showEvent(e, reports, ()=>{ if(alive(ep)) afterEvent(); });
+}
+function afterEvent(){
+  render();
+  if(S.players.every(p=>!p.board.slice(0,ROWLEN[0]).some(x=>x))){ log('모두의 판에서 생산자가 사라졌어요. 생태계 붕괴로 게임이 끝나요.','ev'); endGame(''); return; }
+  startTurn();
+}
+function revealEvent(e){
+  const bad=e.tag.startsWith('나쁜');
+  setNotice({kind:'reveal',ev:S.past.length-1,rd:S.evRound||0}); render();
+  return new Promise(res=>{
+    CHOICES.add(res);
+    openModal(`<h2>${S.evRound?S.evRound+'바퀴 끝 사건':'사건'}</h2><div class="evcard" style="background:${e.bg};color:${e.fg}">${ART[e.art]||''}<div><div style="font-size:12px;opacity:.85">${e.tag} · ${e.habitat}</div><h3 style="font-size:22px">${e.name}</h3><div>${e.effect}</div><div style="font-size:12px;opacity:.85;margin-top:4px">${e.foot}</div></div></div><p style="font-size:13.5px">${bad?'사건 카드를 읽었으면 이제 모두의 판을 정리해요. 생산자를 빼고, 아랫단부터 먹이가 하나도 남지 않은 생물을 빼요. 그 직후 분해자를 쓸 수 있어요.':'좋은 사건이에요. 해당하는 사람은 생물 덱에서 1장을 더 받아요.'}</p><div class="row"><button class="primary" id="mOk">${bad?'판 정리하기':'카드 받기'}</button></div>`);
+    document.getElementById('mOk').onclick=()=>{CHOICES.delete(res); closeModal(); res(true);};
+  });
+}
+function showEvent(e,reports,done){
+  const bad=e.tag.startsWith('나쁜');
+  setNotice({kind:'summary',ev:S.past.length-1,report:reports}); render();
+  const report=reports.map(esc).join('<br>');
+  openModal(`<h2>사건 정리 결과</h2><div class="evcard" style="background:${e.bg};color:${e.fg}">${ART[e.art]||''}<div><div style="font-size:12px;opacity:.85">${e.tag} · ${e.habitat}</div><h3 style="font-size:22px">${e.name}</h3><div>${e.effect}</div><div style="font-size:12px;opacity:.85;margin-top:4px">${e.foot}</div></div></div><p style="font-size:13.5px">${report}</p>${bad?'<p style="font-size:12.5px;color:var(--muted)">빠진 카드와 쓴 분해자는 생물 덱에 섞었어요. 내 판의 변화는 기록지 메모에 적혀 있어요.</p>':''}<p style="font-size:12.5px;color:var(--muted)">${nextStepText(S.round)}</p><div class="row"><button class="primary" id="mOk">다음 바퀴 시작</button></div>`);
+  document.getElementById('mOk').onclick=()=>{closeModal(); done();};
+}
+function endGame(tbl){
+  S.over=true; setNotice({kind:'end',n:S.settle}); render();
+  const rank=S.players.slice().sort((a,b)=>b.total-a.total||b.last-a.last||distinct(b)-distinct(a));
+  openModal(`<h2>게임 끝</h2>${tbl}${rankTable()}<p>동점이면 마지막 결산 점수 → 판 위 서로 다른 생물 수로 정해요.</p><p style="font-size:13px;color:var(--muted)">기록지 메모를 보고 활동지 3번을 채워 보세요: 사건마다 사라진 생물, 무너진 먹이사슬, 그 이유.</p><div class="row"><button class="primary" id="mNew">새 게임</button><button id="mCmp">모두의 기록지 비교</button><button id="mClose">판 보기</button></div>`);
+  document.getElementById('mNew').onclick=()=>{closeModal(); if(MODE==='host') hostLobby(); else startDialog();};
+  document.getElementById('mClose').onclick=closeModal;
+  document.getElementById('mCmp').onclick=openCompare;
+}
+function rankTable(){
+  const rank=S.players.slice().sort((a,b)=>b.total-a.total||b.last-a.last||distinct(b)-distinct(a));
+  return `<table class="sc"><tr><th>순위</th><th>참가자</th><th>누적 점수</th><th>마지막 결산</th><th>서로 다른 생물</th></tr>${rank.map((p,k)=>`<tr><td>${k+1}</td><td>${p.name}</td><td><b>${p.total}</b></td><td>${p.last}</td><td>${distinct(p)}</td></tr>`).join('')}</table>`;
+}
+
+/* ---------- 모달 ---------- */
+function openModal(h){document.getElementById('dialog').innerHTML=h; document.getElementById('modal').classList.add('on'); const f=document.querySelector('#dialog button'); if(f) f.focus();}
+function closeModal(){document.getElementById('modal').classList.remove('on');}
+function choose(h,opts){return new Promise(res=>{CHOICES.add(res); openModal(h+`<div class="row">${opts.map((o,k)=>`<button data-o="${k}" ${k===0?'class="primary"':''}>${o.label}</button>`).join('')}</div>`); document.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>{CHOICES.delete(res); closeModal(); res(opts[+b.dataset.o].val);});});}
+
+/* ---------- 그리기 ---------- */
+function cardHTML(c,tag='div',attrs='',extraCls=''){
+  if(!c) return '';
+  if(c.kind==='dec') return `<${tag} class="card dec ${extraCls}" ${attrs} title="분해자 ${c.name}"><div class="band" style="background:#5A4130">분해자</div><div class="art">${ART[c.name]||''}</div><div class="nm">${c.name}</div><div class="fd" style="border-color:#F0DCC0">나쁜 사건 뒤 생산자 1장 되돌리기</div></${tag}>`;
+  const [t,col,bg]=LV[c.lv];
+  return `<${tag} class="card ${extraCls}" ${attrs} style="border-color:${col}" title="${c.name} · ${c.habText} · ${c.bottom}"><div class="band" style="background:${col}">${t}</div><div class="art" style="background:${bg}">${ART[c.name]||''}</div><div class="nm">${c.name}</div>${c.star?'<span class="star">★+3</span>':''}<div class="fd" style="color:${col};border-color:${col}">${c.lv===1?c.habText:c.bottom.replace('먹이: ','먹이 ')}</div></${tag}>`;
+}
+function slotPos(r,i){const left=slotCX(r,i)-SW/2; const top=(3-r)*(SH+VG)/BH*100; return {left,top};}
+function boardHTML(p,interactive,legal,moveSel,arr){
+  const lines=[];
+  const ctr=(r,i)=>[slotCX(r,i), (3-r)*(SH+VG)+SH/2];
+  for(let r=1;r<4;r++) for(let i=0;i<ROWLEN[r];i++) for(const j of below(r,i)){const a=ctr(r-1,j),b=ctr(r,i); lines.push(`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="#A89F88" stroke-width="0.9" stroke-linecap="round"/>`);}
+  DIAGS.forEach(d=>{for(let k=1;k<4;k++){const a=ctr(...d[k-1]),b=ctr(...d[k]); lines.push(`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="#C8662E" stroke-width="1.1" stroke-linecap="round"/>`);}});
+  const rc=['#3E7D4A','#9A6B12','#2F5F8A','#9B3B2E'];
+  for(let r=0;r<4;r++) for(let i=0;i<ROWLEN[r]-1;i++){const a=ctr(r,i),b=ctr(r,i+1); lines.push(`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="${rc[r]}" stroke-width="1.1" opacity=".8"/>`);}
+  let h=`<svg class="lines" viewBox="0 0 100 ${BH}" preserveAspectRatio="none">${lines.join('')}</svg>`;
+  const labels=['생산자','1차 소비자','2차 소비자','최상위'];
+  for(let r=0;r<4;r++) for(let i=0;i<ROWLEN[r];i++){
+    const s=slotPos(r,i), c=at(p,r,i);
+    const isLegal=legal&&legal.some(([a,b])=>a===r&&b===i);
+    const attrs = interactive&&(isLegal||c||arr) ? `role="button" tabindex="0" data-r="${r}" data-i="${i}"` : '';
+    const bad = arr&&c&&r>0&&!hasFood(p,r,i,c);
+    const pick = arr&&arr.pick&&arr.pick[0]===r&&arr.pick[1]===i;
+    h+=`<div class="slot r${r} ${isLegal?'legal':''} ${pick?'pick':''}" style="left:${s.left}%;top:${s.top}%" ${attrs}>${c?cardHTML(c,'div','',bad?'bad':''):labels[r]}</div>`;
+  }
+  return h;
+}
+function render(){
+  if(!S) return;
+  const me=mine(), p=cur();
+  // 트랙
+  let tr='<span class="lbl">바퀴</span>'; for(let k=1;k<=LASTROUND;k++){ const s=SCHED(k); const t=s.final?'마지막 결산':s.settle&&s.event?'결산 → 사건':s.settle?'결산':s.event?'사건(결산 없음)':'결산·사건 없음'; tr+=`<span class="dot ${s.settle?'s':''} ${s.event?'e':''} ${s.final?'last':''} ${k<S.round?'done':''} ${k===S.round&&!S.over?'now':''}" title="${k}바퀴 끝: ${t}">${k}</span>`; } tr+='<span class="key">주황 테두리 결산 · 검정 사건</span>';
+  document.getElementById('track').innerHTML=tr;
+  document.getElementById('deckCount').textContent=`${S.deck.length}장`;
+  document.getElementById('evCount').textContent=`${S.ev.length}장`;
+  const pe=S.past[S.past.length-1];
+  document.getElementById('pastEv').innerHTML=pe?`<b style="color:${pe.fg};background:${pe.bg};display:block;border-radius:6px;padding:4px">${pe.name}</b>`:'아직 없음';
+  const canDraw = S.phase==='draw' && myTurnNow() && !S.busy && !S.over;
+  document.getElementById('deckBtn').disabled=!canDraw || !S.deck.length;
+  document.getElementById('market').innerHTML=S.market.map((c,k)=>c?cardHTML(c,'button',`data-m="${k}" ${canDraw?'':'disabled'} aria-label="찾아온 생물 ${c.name} 가져오기"`):`<div class="card" style="border-style:dashed;border-color:var(--line);display:grid;place-items:center;font-size:11px;color:var(--muted)">빈칸</div>`).join('');
+  // 안내
+  let pr='';
+  if(S.over) pr='게임이 끝났어요. <b>새 게임</b>을 눌러 다시 할 수 있어요.';
+  else if(S.phase==='setup' && !inSetup()) pr = ME<0 ? '구경하는 중이에요.' : '<b>준비 끝</b> · 다른 참가자가 준비를 마치기를 기다려요. ('+S.players.filter((q,k)=>!S.ready[k]).map(q=>q.name).join(', ')+')';
+  else if(S.phase==='setup') pr=anyPlaceable(me)?'<b>준비</b> · 손패에서 카드를 골라 놓을 수 있는 만큼 판에 놓으세요. 첫 생산자는 맨 아랫줄 원하는 칸에 놓을 수 있어요. 다 놓으면 <b>준비 끝</b>.':'<b>준비</b> · 지금 놓을 수 있는 카드가 없어요. <b>준비 끝</b>을 누르면 첫 차례가 시작돼요. 1장을 가져온 뒤에도 놓을 게 없으면 <b>다시 찾아보기</b>를 쓸 수 있어요.';
+  else if(!myTurnNow()) pr=`<b>${p.name}</b>의 차례예요…`+(p.human&&ME>=0?' 내 차례를 기다리는 동안 다른 사람의 판을 눌러 볼 수 있어요.':'');
+  else if(S.phase==='draw') pr='<b>내 차례</b> · 찾아온 생물 3장 중 1장 또는 생물 덱을 눌러 1장 가져오세요.';
+  else if(S.arr) pr = S.arr.pick ? '<b>다시 배치</b> · 같은 줄의 다른 칸(주황색)을 누르면 두 카드의 자리가 바뀌어요. 빈칸이면 그리로 옮겨져요.' : '<b>다시 배치</b> · 자리를 바꿀 카드를 누르세요. 같은 줄 안에서만 바꿀 수 있어요. 빨간 표시는 먹이가 없는 카드예요. 다 되면 <b>배치 완료</b>.';
+  else pr=anyPlaceable(me)?'<b>내려놓기</b> · 손패 카드를 골라 주황색 칸에 놓으세요. 다 하면 <b>차례 끝</b>.':((S.redrawUsed||S.placedThisTurn)?'<b>내려놓기</b> · 더 놓을 수 있는 카드가 없어요. <b>차례 끝</b>을 누르세요.':'<b>놓을 생물이 없어요</b> · <b>다시 찾아보기</b>로 손패 1장을 덱에 섞고 새로 뽑을 수 있어요(1번). 쓰지 않으려면 <b>차례 끝</b>.');
+  document.getElementById('prompt').innerHTML=pr;
+  // 내 판
+  const myTurn = canAct();
+  let legal=null;
+  if(myTurn && S.sel){const c=me.hand.find(x=>x.uid===S.sel); if(c) legal=legalSlots(me,c);}
+  if(myTurn && S.arr){ legal = S.arr.pick ? Array.from({length:ROWLEN[S.arr.pick[0]]},(_,i)=>[S.arr.pick[0],i]).filter(([a,b])=>b!==S.arr.pick[1]) : null; }
+  document.getElementById('myBoard').innerHTML=boardHTML(me,myTurn,legal,null,myTurn?S.arr:null);
+  document.getElementById('myDec').innerHTML=[0,1,2].map(k=>`<div class="decslot">${me.dec[k]?cardHTML(me.dec[k]):'분해자'}</div>`).join('');
+  const sc=scoreOf(me,false);
+  document.getElementById('preview').innerHTML=`생물 ${sc.cnt}×1 · ★ ${sc.stars}×3<br>가로 ${sc.rows}×2 · 사선 ${sc.diag}×3 · 같은 서식지 ${sc.same}×2<br><b>= ${sc.total}점</b>`;
+  document.getElementById('myScore').textContent=`누적 ${me.total}점`;
+  document.getElementById('myHandInfo').textContent=`손패 ${me.hand.length}/5`;
+  document.getElementById('roundInfo').textContent=`${Math.min(S.round,LASTROUND)}바퀴째 · 결산 ${S.settle}/${NSETTLE} · 사건 ${S.past.length}/${NEVENT}`+(S.over?'':` · ${(()=>{const s=SCHED(Math.min(S.round,LASTROUND)); return s.final?'이 바퀴 끝 마지막 결산':s.settle&&s.event?'이 바퀴 끝 결산 → 사건':s.settle?'이 바퀴 끝 결산':s.event?'이 바퀴 끝 사건':'이 바퀴 끝 없음';})()}`);
+  // 손패
+  document.getElementById('hand').innerHTML=me.hand.length?me.hand.map(c=>{
+    const can = myTurn && legalSlots(me,c).length>0;
+    return cardHTML(c,'button',`data-h="${c.uid}" ${myTurn?'':'tabindex="-1"'}`, (S.sel===c.uid?'sel ':'')+(can?'can':(myTurn&&!S.arr&&arrangeFor(me,c)?'canmove':'')));
+  }).join(''):'<div class="detail">손패가 없어요.</div>';
+  const rdOk=myTurnNow()&&S.phase==='place'&&!S.redrawUsed&&!S.placedThisTurn&&!anyPlaceable(me)&&me.hand.length&&S.deck.length&&!S.busy;
+  const rb=document.getElementById('btnRedraw'); rb.disabled=S.over; rb.classList.toggle('primary',!!rdOk); rb.textContent=S.redrawUsed&&myTurnNow()?'다시 찾아보기 (이번 차례에 사용함)':'다시 찾아보기 (놓을 생물이 없을 때)';
+  document.getElementById('btnMove').disabled=!(myTurn && me.board.some(x=>x));
+  document.getElementById('btnMove').textContent=S.arr?'배치 완료':'판 다시 배치하기';
+  document.getElementById('btnMove').classList.toggle('primary',!!S.arr);
+  document.getElementById('btnRevert').hidden=!S.arr;
+  document.getElementById('btnEnd').disabled=!canAct();
+  document.getElementById('btnEnd').textContent=S.phase==='setup'?'준비 끝':'차례 끝';
+  // 상대
+  document.getElementById('oppsTitle').textContent=MODE==='solo'?'컴퓨터 참가자':'다른 참가자';
+  document.getElementById('opps').innerHTML=S.players.map((q,k)=>[q,k]).filter(([q,k])=>k!==VIEW()).map(([q,k])=>{
+    let mini=''; for(let r=3;r>=0;r--) for(let i=0;i<ROWLEN[r];i++){const c=at(q,r,i); const col=Math.round((slotCX(r,i)-SW/2)/(SW+2)*4)+1; mini+=`<i class="${c?'f'+c.lv:''}" style="grid-row:${4-r};grid-column:${col} / span 4"></i>`;}
+    return `<button class="opp ${cur()===q&&!S.over&&S.phase!=='setup'?'turn':''}" data-opp="${k}" aria-label="${q.name}의 판 크게 보기"><div class="mini">${mini}</div><div class="info"><b>${q.name}</b> <span style="font-size:11px;color:var(--muted)">${MODE==='solo'?'':(q.human?(q.ctrl==='away'?'연결 끊김':'사람'):(q.wasHuman?'컴퓨터가 대신':'컴퓨터'))}${S.phase==='setup'&&MODE!=='solo'?(S.ready[k]?' · 준비 끝':' · 준비 중'):''}</span><br>누적 ${q.total}점 · 손패 ${q.hand.length} · 분해자 ${q.dec.length}<br><span style="color:var(--muted)">판 ${q.board.filter(x=>x).length}/${NSLOT}칸 · 눌러서 보기</span></div></button>`;
+  }).join('');
+  // 메모, 기록
+  const MM=myMemo();
+  if(MM.length) document.getElementById('memoList').innerHTML=MM.map(m=>`<div><b>${evWhen(m)} · ${m.ev}</b>${m.type?` <span class="chip" style="padding:1px 8px;color:${TYPECOL[typeOf(m)]||'inherit'}" title="${esc(TYPEHELP[typeOf(m)]||'')}">${typeOf(m)}</span>`:''}<br>사라진 생물: ${m.lost.length?m.lost.join(', '):'없음'} · <span title="${esc(CHAIN_HELP)}">무너진 먹이사슬 ${m.chains}개</span>${effectLine(m).map(x=>'<br>'+x).join('')}<br>이유: ${m.why}${m.others?`<br><span style="color:var(--muted)">다른 참가자: ${m.others}</span>`:''}</div>`).join('')+`<div style="color:var(--muted);font-size:11.5px">※ ${CHAIN_HELP}</div>`;
+  document.getElementById('memoBtns').hidden=!MM.length;
+  document.getElementById('log').innerHTML=S.log.slice(0,80).map(l=>`<div class="${l.cls||''}">${l.t}</div>`).join('');
+  document.getElementById('netInfo').innerHTML=MODE==='solo'?'':`<span class="chip">방 ${esc(NETCODE)} · ${MODE==='host'?'방장':'참가'}${ME>=0&&S.players[ME]?' · '+esc(S.players[ME].name):' · 구경'}</span>`;
+  bind();
+  afterRender();
+  soundTick();
+}
+function bind(){
+  const me=mine();
+  document.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>humanDraw(+b.dataset.m));
+  document.querySelectorAll('[data-h]').forEach(b=>b.onclick=()=>{
+    const c=me.hand.find(x=>x.uid==b.dataset.h); if(!c) return;
+    document.getElementById('detail').innerHTML=`<b>${c.name}</b> · ${LV[c.lv][0]} · ${c.habText} · ${c.bottom}${c.star?' · ★ 멸종위기종':''}<br>${c.note}`;
+    const myTurn=canAct();
+    if(!myTurn) return;
+    if(S.arr){document.getElementById('detail').innerHTML='<b>다시 배치 중</b>이에요. <b>배치 완료</b>를 누른 뒤에 손패를 놓을 수 있어요.'; return;}
+    S.moveFrom=null; S.sel = S.sel===c.uid?null:c.uid; render();
+    document.getElementById('detail').innerHTML=`<b>${c.name}</b> · ${LV[c.lv][0]} · ${c.habText} · ${c.bottom}${c.star?' · ★ 멸종위기종':''}<br>${legalSlots(me,c).length?'주황색 칸에 놓을 수 있어요.':(()=>{const h=moveHint(me,c); if(h) return `<b style="color:var(--orange)">${J(h.card.name,'을','를')} ${h.to[1]<h.from[1]?'왼쪽':'오른쪽'}으로 옮기면 놓을 수 있어요.</b> 판 다시 배치하기를 눌러 보세요.`; if(arrangeFor(me,c)) return '<b style="color:var(--orange)">판의 카드를 다시 배치하면 놓을 수 있어요.</b> 판 다시 배치하기를 눌러 같은 줄의 카드끼리 자리를 바꿔 보세요.'; return '지금은 놓을 칸이 없어요. 아래에 먹이가 있어야 해요.';})()}`;
+  });
+  document.querySelectorAll('.slot[data-r]').forEach(el=>{
+    const act=()=>{
+      const r=+el.dataset.r,i=+el.dataset.i;
+      if(S.arr){
+        const pk=S.arr.pick;
+        if(pk && pk[0]===r){
+          if(pk[1]!==i){const a=at(me,r,pk[1]), b=at(me,r,i); me.board[idx(r,pk[1])]=b; me.board[idx(r,i)]=a;}
+          S.arr.pick=null; render(); return;
+        }
+        S.arr.pick = at(me,r,i) ? [r,i] : null; render(); return;
+      }
+      if(S.moveFrom){
+        const ok=moveTargets(me,S.moveFrom).some(([a,b])=>a===r&&b===i);
+        if(ok){const c=at(me,...S.moveFrom); me.board[idx(...S.moveFrom)]=null; me.board[idx(r,i)]=c; log(`${me.name}: ${J(c.name,'을','를')} 옮겼어요.`); S.moveFrom=null; render(); return;}
+        if(S.moveFrom[0]===r&&S.moveFrom[1]===i){S.moveFrom=null; render(); return;}
+        if(at(me,r,i)){S.moveFrom=[r,i]; render();} return;
+      }
+      if(S.sel){
+        const c=me.hand.find(x=>x.uid===S.sel);
+        if(c&&canPlace(me,c,r,i)){placeCard(me,c,r,i); S.sel=null; render(); return;}
+      }
+      if(S.moveMode&&at(me,r,i)){S.moveFrom=[r,i]; S.moveMode=false; render();}
+    };
+    el.onclick=act; el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();act();}};
+  });
+  document.querySelectorAll('[data-opp]').forEach(b=>b.onclick=()=>{
+    const q=S.players[+b.dataset.opp]; const s=scoreOf(q,false);
+    openModal(`<h2>${q.name}의 생태 피라미드</h2><div class="bigboard">${boardHTML(q,false,null,null)}</div><p>누적 ${q.total}점 · 지금 판 ${s.total}점 · 손패 ${q.hand.length}장 · 분해자 ${q.dec.length}장</p><div class="row"><button class="primary" id="mOk">닫기</button></div>`);
+    document.getElementById('mOk').onclick=closeModal;
+  });
+}
+
+/* ---------- 버튼 ---------- */
+document.getElementById('deckBtn').onclick=()=>humanDraw('deck');
+document.getElementById('btnEnd').onclick=humanEnd;
+document.getElementById('btnRedraw').onclick=()=>{
+  const me=mine(), p=cur();
+  let why='';
+  if(S.over||S.busy||(!myTurnNow()&&S.phase!=='setup')) why='지금은 내 차례가 아니에요.';
+  else if(S.phase==='setup') why='지금은 준비 단계예요. 놓을 카드가 없으면 <b>준비 끝</b>을 누르세요. 첫 차례에 1장을 가져온 뒤에 다시 찾아보기를 쓸 수 있어요.';
+  else if(S.phase==='draw') why='먼저 찾아온 생물이나 생물 덱에서 1장을 가져오세요. 가져온 뒤에도 놓을 생물이 없으면 그때 쓸 수 있어요.';
+  else if(S.redrawUsed) why='다시 찾아보기는 차례마다 1번만 쓸 수 있어요.';
+  else if(S.drewDec) why='이번 차례에 분해자를 가져왔어요. 분해자를 분해자 칸에 둔 것이 이번 차례에 가져온 카드라서 다시 찾아보기는 쓸 수 없어요.';
+  else if(S.placedThisTurn) why='이번 차례에 이미 카드를 놓았어요. 다시 찾아보기는 1장을 가져온 직후, 손패 중 놓을 수 있는 카드가 하나도 없을 때만 쓸 수 있어요.';
+  else if(!me.hand.length) why='손패가 없어요.';
+  else if(!S.deck.length) why='생물 덱이 비어서 다시 뽑을 수 없어요.';
+  else if(anyPlaceable(me)) why='놓을 수 있는 카드가 있어요("놓을 수 있음" 표시). 놓을 생물이 하나도 없을 때만 쓸 수 있어요.';
+  if(why){document.getElementById('detail').innerHTML='<b>다시 찾아보기</b> · '+why; return;}
+  openModal(`<h2>다시 찾아보기</h2><p>생물 덱에 섞을 손패 1장을 고르세요. 섞은 뒤 생물 덱에서 1장을 새로 뽑아요.</p><div class="cards">${me.hand.map(c=>cardHTML(c,'button','data-rd="'+c.uid+'"')).join('')}</div><div class="row"><button id="rdCancel">그만두기</button></div>`);
+  document.querySelectorAll('[data-rd]').forEach(el=>el.onclick=()=>{const c=me.hand.find(x=>x.uid==el.dataset.rd); closeModal(); redraw(me,c); render();
+    const got=me.hand[me.hand.length-1]; document.getElementById('detail').innerHTML='<b>다시 찾아보기</b> · 1장을 섞고 새로 뽑았어요.'+(anyPlaceable(me)?' 이제 놓을 수 있는 카드가 있어요.':' 그래도 놓을 카드가 없으면 차례 끝을 누르세요.');});
+  document.getElementById('rdCancel').onclick=closeModal;
+};
+document.getElementById('btnMove').onclick=()=>{
+  const me=mine();
+  if(!S.arr){ S.sel=null; S.arr={snap:me.board.slice(),pick:null}; render(); return; }
+  if(!boardValid(me)){
+    const bad=[]; for(let r=1;r<4;r++)for(let i=0;i<ROWLEN[r];i++){const c=at(me,r,i); if(c&&!hasFood(me,r,i,c)) bad.push(c.name);}
+    document.getElementById('detail').innerHTML=`<b>아직 끝낼 수 없어요</b> · ${J(bad.join(', '),'은','는')} 아래에 먹이가 없어요(빨간 표시). 자리를 더 바꾸거나 <b>처음 배치로 되돌리기</b>를 누르세요.`;
+    return;
+  }
+  const changed=S.arr.snap.some((c,k)=>c!==me.board[k]);
+  S.arr=null; if(changed) log(me.name+': 판의 카드를 다시 배치했어요.');
+  render();
+  document.getElementById('detail').innerHTML=changed?'다시 배치를 마쳤어요. 이제 손패를 놓을 수 있는지 확인해 보세요.':'배치를 바꾸지 않았어요.';
+};
+document.getElementById('btnRevert').onclick=()=>{ const me=mine(); if(S.arr){ me.board=S.arr.snap.slice(); S.arr=null; render(); document.getElementById('detail').innerHTML='처음 배치로 되돌렸어요.'; } };
+document.getElementById('btnNew').onclick=()=>{ if(MODE!=='solo'||LOBBY) multiDialog(); else startDialog(); };
+function memoRows(){return myMemo().slice().reverse();}
+const TYPECOL={'운이 좋아서':'#C8662E','먹이그물 덕분에':'#3E7D4A','분해자로 되돌림':'#6B4F35','분해자 덕분에':'#6B4F35','생산자만 빠짐':'#5B6359','무너짐':'#9B3B2E','좋은 사건':'#2F5F8A'};
+const BADTYPES=['운이 좋아서','무너짐','먹이그물 덕분에','분해자로 되돌림','생산자만 빠짐']; // 대표 분류 우선순위 순서
+const TYPEHELP={'운이 좋아서':'사건이 빼는 생산자가 내 판에 없었어요.','무너짐':'먹이가 모두 사라진 소비자가 판에서 빠졌어요.','먹이그물 덕분에':'먹이 하나가 사라졌지만 다른 먹이가 남아 버틴 소비자가 있었고, 무너진 생물은 없었어요.','분해자로 되돌림':'위험해진 소비자 없이, 빠진 생산자를 무너짐 정리 뒤에 분해자로 모두 되돌렸어요. 소비자를 살린 것은 아니에요.','생산자만 빠짐':'생산자만 빠지고 그것을 먹는 소비자가 위에 없었어요.'};
+const CHAIN_HELP='먹이사슬은 생산자에서 시작해 먹이선으로 연결된 바로 윗단의 소비자를 따라 올라가 마지막 소비자까지 가는 길이에요. 위에서 합쳐져도 아래 갈래가 다르면 따로 세고, 중간에서 멈춘 짧은 길과 생산자 혼자는 세지 않아요. 무너진 먹이사슬 수는 사건 전 먹이사슬 중 사라진 생물을 지나던 길의 수예요(분해자 쓰기 전 기준). 무너진 소비자 장 수와는 다른 값이고, 소비자가 다른 먹이로 버텨도 사라진 먹이를 지나던 길은 끊긴 것으로 세요. 분해자로 다시 이어진 길은 따로 적어요.';
+const typeOf=m=>m.type==='분해자 덕분에'?'분해자로 되돌림':m.type; // 이전 기록 호환
+function typeLegendHTML(){return BADTYPES.map(t=>`<b style="color:${TYPECOL[t]}">[${t}]</b> ${TYPEHELP[t]}`).join(' · ');}
+function effectLine(m){ const a=[]; if(m.fallenCount) a.push('무너진 소비자 '+m.fallenCount+'장'); if(m.brokenPaths&&m.brokenPaths.length) a.push('끊긴 먹이사슬: '+m.brokenPaths.join(' / ')); if(m.webSurvivors&&m.webSurvivors.length) a.push('먹이그물로 버팀: '+m.webSurvivors.join(', ')); if(m.restored&&m.restored.length) a.push('분해자로 되돌린 생산자: '+m.restored.join(', ')); if(m.reconnectedCount) a.push('분해자로 다시 이어진 먹이사슬 '+m.reconnectedCount+'개'); return a; }
+function compareHTML(forFile){
+  const ps=S.players, esc=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const lists=ps.map(p=>S.memoAll[p.name].slice().reverse());
+  const n=Math.max(0,...lists.map(l=>l.length));
+  let rows='';
+  for(let k=0;k<n;k++){
+    const m0=lists.find(l=>l[k])[k];
+    rows+=`<tr><td style="text-align:left;white-space:nowrap">${evWhen(m0)}<br><b>${esc(m0.ev)}</b></td>`+lists.map(l=>{const m=l[k]; if(!m) return '<td></td>';
+      return `<td style="text-align:left"><b style="color:${TYPECOL[typeOf(m)]||'inherit'}">${esc(typeOf(m))}</b><br>${m.kind==='bad'?(m.lost.length?'사라짐: '+esc(m.lost.join(', ')):'사라진 생물 없음')+(m.chains?` · 무너진 먹이사슬 ${m.chains}개`:''):esc(m.why)}${effectLine(m).map(x=>'<br>'+esc(x)).join('')}</td>`;}).join('')+'</tr>';
+  }
+  const sum=ps.map((p,i)=>compareSum(lists[i]));
+  const head=`<tr><th>사건</th>${ps.map(p=>`<th>${esc(p.name)}</th>`).join('')}</tr>`;
+  const foot=`<tr class="tot"><td style="text-align:left">나쁜 사건 정리<br><small>대표 분류(합 = 나쁜 사건 수)</small></td>${sum.map(x=>`<td style="text-align:left">나쁜 사건 ${x.n}번: ${BADTYPES.map((t,k)=>`${t} ${x.by[k]}`).join(' · ')}</td>`).join('')}</tr>`+
+    `<tr class="tot"><td style="text-align:left">실제 효과(장)<br><small>한 사건에 여러 효과가 겹치면 모두 셈</small></td>${sum.map(x=>`<td style="text-align:left">먹이그물로 버틴 소비자 ${x.web}장 · 분해자로 되돌린 생산자 ${x.rest}장<br>무너진 소비자 ${x.fall}장 · 사라진 생물 ${x.lost}장<br>무너진 먹이사슬 ${x.chains}개 · 분해자로 다시 이어진 먹이사슬 ${x.recon}개</td>`).join('')}</tr>`;
+  const score=`<tr class="tot"><td style="text-align:left">누적 점수</td>${ps.map(p=>`<td>${p.total}점</td>`).join('')}</tr>`;
+  return `<table class="sc" ${forFile?'':'style="font-size:12.5px"'}>${head}${rows||`<tr><td colspan="${ps.length+1}">아직 사건이 없어요.</td></tr>`}${foot}${score}</table>`;
+}
+function compareSum(list){ // 나쁜 사건 대표 분류 5종 횟수 + 효과별 장 수
+  const l=list.filter(m=>m.kind==='bad');
+  return {n:l.length, by:BADTYPES.map(t=>l.filter(m=>typeOf(m)===t).length),
+    web:l.reduce((a,m)=>a+(m.survivedByWeb||0),0), rest:l.reduce((a,m)=>a+(m.restoredCount!=null?m.restoredCount:(m.restored||[]).length),0),
+    fall:l.reduce((a,m)=>a+(m.fallenCount||0),0), recon:l.reduce((a,m)=>a+(m.reconnectedCount||0),0), lost:l.reduce((a,m)=>a+m.lost.length,0), chains:l.reduce((a,m)=>a+m.chains,0)};
+}
+function openCompare(){
+  openModal(`<h2>모두의 기록지 비교</h2><p style="font-size:13.5px">같은 사건에도 판마다 결과가 달라요. 누가 운이 좋았고, 누가 먹이그물 덕분에 버텼는지 비교해 보세요.</p><div style="overflow-x:auto">${compareHTML(false)}</div><p style="font-size:12px">${typeLegendHTML()}</p><p style="font-size:12px;color:var(--muted)">※ ${CHAIN_HELP}</p><p style="font-size:12.5px;color:var(--muted)">생각해 보기: 피해가 적었던 사람의 판은 생산자가 여러 서식지에 나뉘어 있었나요? 먹이가 둘인 소비자가 많았나요?</p><div class="row"><button class="primary" id="mOk">닫기</button></div>`);
+  document.getElementById('mOk').onclick=closeModal;
+}
+function memoText(){
+  const me=mine();
+  let t='생태계를 지켜라 · 기록지 메모\n\n';
+  memoRows().forEach(m=>{t+=`[${evWhen(m)}] ${m.ev}${m.type?' ('+typeOf(m)+')':''}\n사라진 생물: ${m.lost.length?m.lost.join(', '):'없음'} / 무너진 먹이사슬: ${m.chains}개\n${effectLine(m).map(x=>x+'\n').join('')}이유: ${m.why}\n${m.others?'다른 참가자: '+m.others+'\n':''}\n`;});
+  const cs=compareSum(myMemo());
+  t+=`나쁜 사건 ${cs.n}번: ${BADTYPES.map((x,k)=>x+' '+cs.by[k]).join(' · ')}\n실제 효과: 먹이그물로 버틴 소비자 ${cs.web}장 · 분해자로 되돌린 생산자 ${cs.rest}장 · 무너진 소비자 ${cs.fall}장 · 사라진 생물 ${cs.lost}장 · 무너진 먹이사슬 ${cs.chains}개 · 분해자로 다시 이어진 먹이사슬 ${cs.recon}개\n※ ${CHAIN_HELP}\n\n`;
+  t+='결산 점수\n'; me.hist.forEach(h=>{t+=`${hWhen(h)} 결산: 생물 ${h.cnt}, ★ ${h.stars}, 가로 ${h.rows}, 사선 ${h.diag}, 같은 서식지 ${h.same}${h.full?', 완성 +5':''} → 이번 ${h.total}점, 누적 ${h.cum}점\n`;});
+  return t;
+}
+function memoHTML(){
+  const me=mine(), esc=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const rows=memoRows().map(m=>`<tr><td>${evWhen(m)}</td><td>${esc(m.ev)}</td><td>${m.lost.length?esc(m.lost.join(', ')):'없음'}</td><td>${m.chains}</td><td>${m.type?'<b>['+esc(typeOf(m))+']</b> ':''}${esc(m.why)}${effectLine(m).map(x=>'<br><small>'+esc(x)+'</small>').join('')}${m.others?'<br><small>다른 참가자: '+esc(m.others)+'</small>':''}</td></tr>`).join('');
+  const sc=me.hist.map(h=>`<tr><td>${hWhen(h)}</td><td>${h.cnt}</td><td>${h.stars}</td><td>${h.rows}</td><td>${h.diag}</td><td>${h.same}</td><td>${h.full?'+5':''}</td><td><b>${h.total}</b></td><td><b>${h.cum}</b></td></tr>`).join('');
+  return `<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><title>기록지 메모</title><style>@page{size:A4;margin:14mm}tr.tot td{font-weight:700;border-top:2px solid #1F2A24}body{font-family:'Noto Sans KR','Malgun Gothic',sans-serif;color:#1F2A24;font-size:11pt}h1{font-size:16pt;margin:0 0 2mm}p{margin:1mm 0}table{border-collapse:collapse;width:100%;margin:3mm 0 6mm}th,td{border:1px solid #999;padding:4px 6px;vertical-align:top;font-size:10pt}th{background:#E3EDE0}small{color:#555}</style></head><body><h1>생태계를 지켜라 · 기록지 메모</h1><p>이름: ________________ · 게임한 날: ${new Date().toLocaleDateString('ko-KR')}</p><h2 style="font-size:12pt">사건마다 내 생태계에 일어난 일 (활동지 3번용)</h2><table><tr><th style="width:10%">결산</th><th style="width:14%">나온 사건</th><th style="width:18%">사라진 생물</th><th style="width:9%">무너진 먹이사슬의 수*</th><th>무너진 이유 / 버틴 이유</th></tr>${rows||'<tr><td colspan="5">사건 기록이 없어요.</td></tr>'}</table><p><small>* ${esc(CHAIN_HELP)}</small></p><h2 style="font-size:12pt">모두의 기록지 비교</h2>${compareHTML(true)}<h2 style="font-size:12pt">결산 점수</h2><table><tr><th>결산</th><th>판 위 생물 수<br><small>1장에 1점</small></th><th>★ 생물 수<br><small>1장에 3점</small></th><th>가로 빙고 수<br><small>1줄에 2점</small></th><th>사선 빙고 수<br><small>1줄에 3점</small></th><th>같은 서식지 사선 수<br><small>1줄에 2점 더</small></th><th>16칸 완성</th><th>이번 점수</th><th>누적 점수</th></tr>${sc||'<tr><td colspan="9">아직 결산 전이에요.</td></tr>'}</table><p><small>대표 분류(우선순위 순): ${typeLegendHTML()}<br>대표 분류는 사건마다 하나만 붙어요. 한 사건에서 먹이그물로 버티기와 분해자로 되돌리기가 함께 일어나면 '실제 효과' 줄에 둘 다 세요.</small></p></body></html>`;
+}
+let DL=null;
+/* ---------- 기록지 PDF (A4 세로, 표는 용지 가운데) ---------- */
+const PDF_C={ink:[31,42,36],muted:[96,104,98],line:[172,182,174],head:[232,240,229],foot:[245,247,242]};
+const hex2rgb=h=>[1,3,5].map(k=>parseInt(String(h).slice(k,k+2),16));
+function buildMemoPdf(){
+  const JsPDF=window.jspdf&&window.jspdf.jsPDF;
+  if(!JsPDF||!window.ECO_PDF_FONT) throw new Error('PDF 도구를 불러오지 못했어요.');
+  const doc=new JsPDF({unit:'mm',format:'a4',orientation:'portrait',compress:true});
+  doc.addFileToVFS('NanumGothic.ttf',window.ECO_PDF_FONT);
+  doc.addFont('NanumGothic.ttf','NanumGothic','normal');
+  doc.addFont('NanumGothic.ttf','NanumGothic','bold'); // 굵은 글꼴 요청이 와도 같은 글꼴로
+  doc.setFont('NanumGothic','normal'); doc.setLineHeightFactor(1.32);
+  doc.setProperties({title:'생태계를 지켜라 · 기록지',subject:'기록지 메모',creator:'생태계를 지켜라'});
+  const W=210,H=297,M=15,CW=W-2*M,TOP=16,BOT=18, me=mine();
+  let y=TOP+2;
+  const text=(t,size,yy,color,align)=>{doc.setFontSize(size); doc.setTextColor(...(color||PDF_C.ink)); doc.text(t,align==='left'?M:W/2,yy,{align:align||'center'});};
+  const room=h=>{ if(y+h>H-BOT){ doc.addPage(); y=TOP+2; } };
+  const section=t=>{ room(28); text(t,11.5,y+4); y+=8; };
+  const note=(t,size)=>{ size=size||7.8; doc.setFontSize(size); const lines=doc.splitTextToSize(t,CW); const lh=size*0.3528*1.32; room(lines.length*lh+2); doc.setTextColor(...PDF_C.muted); doc.text(lines,M,y+lh*0.8); y+=lines.length*lh+3.5; };
+  // widths: 열 너비(mm), al: 열 정렬, 표는 용지 가운데에 둠
+  const table=(widths,al,o)=>{
+    const tw=widths.reduce((a,b)=>a+b,0), left=(W-tw)/2;
+    doc.autoTable({theme:'grid',startY:y,tableWidth:tw,margin:{top:TOP,bottom:BOT,left,right:W-left-tw},
+      showHead:'everyPage',showFoot:'lastPage',rowPageBreak:'avoid',
+      styles:{font:'NanumGothic',fontStyle:'normal',fontSize:o.fontSize||8.4,textColor:PDF_C.ink,lineColor:PDF_C.line,lineWidth:0.2,cellPadding:{top:1.7,bottom:1.7,left:2,right:2},valign:'middle',overflow:'linebreak',minCellHeight:6.5},
+      headStyles:{fillColor:PDF_C.head,textColor:PDF_C.ink,fontStyle:'normal',halign:'center',valign:'middle',fontSize:(o.fontSize||8.4)+0.3},
+      footStyles:{fillColor:PDF_C.foot,textColor:PDF_C.ink,fontStyle:'normal',valign:'middle'},
+      columnStyles:Object.fromEntries(widths.map((w,k)=>[k,{cellWidth:w,halign:al[k]||'center'}])),
+      head:o.head, body:o.body, foot:o.foot,
+      didParseCell:o.cell});
+    y=doc.lastAutoTable.finalY+5;
+  };
+  const empty=(t,n)=>[[{content:t,colSpan:n,styles:{halign:'center',textColor:PDF_C.muted}}]];
+
+  text('생태계를 지켜라 · 기록지',16,y+3); y+=10;
+  text(`이름: ________________      게임한 날: ${new Date().toLocaleDateString('ko-KR')}      참가자: ${S.players.map(p=>p.name).join(' · ')}`,9,y,PDF_C.muted); y+=8;
+
+  // 1. 사건 기록
+  section(`1. 사건마다 내 생태계에 일어난 일 (${me.name})`);
+  const rows=memoRows();
+  table([14,24,22,30,16,74],['center','center','center','left','center','left'],{
+    head:[['언제','나온 사건','분류','사라진 생물','무너진\n먹이사슬','무너진 이유 · 버틴 이유 · 효과']],
+    body:rows.length?rows.map(m=>[evWhen(m),m.ev,m.type?typeOf(m):'',m.lost.length?m.lost.join(', '):'없음',m.kind==='bad'?`${m.chains}개`:'-',
+      [m.why,...effectLine(m),m.others?'다른 참가자: '+m.others:''].filter(Boolean).join('\n')]):empty('사건 기록이 없어요.',6),
+    cell:d=>{ if(d.section==='body'&&d.column.index===2&&TYPECOL[d.cell.raw]) d.cell.styles.textColor=hex2rgb(TYPECOL[d.cell.raw]); }});
+  note('먹이사슬 수 · '+CHAIN_HELP);
+
+  // 2. 모두의 기록지 비교
+  section('2. 모두의 기록지 비교');
+  const ps=S.players, lists=ps.map(p=>(S.memoAll[p.name]||[]).slice().reverse()), n=Math.max(0,...lists.map(l=>l.length));
+  const cmpCell=m=>!m?'':[typeOf(m), ...(m.kind==='bad'?[(m.lost.length?'사라짐: '+m.lost.join(', '):'사라진 생물 없음'),...(m.chains?[`무너진 먹이사슬 ${m.chains}개`]:[])]:[m.why]), ...effectLine(m)].join('\n');
+  const body2=[]; for(let k=0;k<n;k++){ const m0=lists.find(l=>l[k])[k]; body2.push([`${evWhen(m0)}\n${m0.ev}`,...lists.map(l=>cmpCell(l[k]))]); }
+  const sums=lists.map(compareSum), pw=Math.min(54,(CW-26)/ps.length);
+  table([26,...ps.map(()=>pw)],['center',...ps.map(()=>'left')],{fontSize:ps.length>=4?7.8:8.2,
+    head:[['사건',...ps.map(p=>p.name)]],
+    body:body2.length?body2:empty('아직 사건이 없어요.',ps.length+1),
+    foot:[['대표 분류 합계\n(합 = 나쁜 사건 수)',...sums.map(x=>`나쁜 사건 ${x.n}번\n`+BADTYPES.map((t,k)=>`${t} ${x.by[k]}`).join('\n'))],
+          ['실제 효과(장)\n겹치면 모두 셈',...sums.map(x=>`먹이그물로 버틴 소비자 ${x.web}장\n분해자로 되돌린 생산자 ${x.rest}장\n무너진 소비자 ${x.fall}장\n사라진 생물 ${x.lost}장\n무너진 먹이사슬 ${x.chains}개\n분해자로 다시 이어진 먹이사슬 ${x.recon}개`)],
+          ['누적 점수',...ps.map(p=>`${p.total}점`)]],
+    cell:d=>{ if(d.section==='foot'&&(d.column.index===0||d.row.index===2)) d.cell.styles.halign='center'; }});
+
+  // 3. 결산 점수
+  section(`3. 결산 점수 (${me.name})`);
+  table([22,17,15,17,17,19,15,17,17],[],{
+    head:[['바퀴 · 결산','판 위 생물\n1장 1점','★ 생물\n1장 3점','가로 빙고\n1줄 2점','사선 빙고\n1줄 3점','같은 서식지\n1줄 2점 더','16칸 완성\n+5','이번 점수','누적 점수']],
+    body:me.hist.length?me.hist.map(h=>[hWhen(h),h.cnt,h.stars,h.rows,h.diag,h.same,h.full?'+5':'-',h.total,h.cum].map(String)):empty('아직 결산 전이에요.',9)});
+
+  note('대표 분류(우선순위 순) · '+BADTYPES.map(t=>`[${t}] ${TYPEHELP[t]}`).join('  ')+'  대표 분류는 사건마다 하나만 붙어요. 한 사건에서 먹이그물로 버티기와 분해자로 되돌리기가 함께 일어나면 실제 효과 줄에 둘 다 세요.');
+
+  const N=doc.getNumberOfPages();
+  for(let k=1;k<=N;k++){ doc.setPage(k); text(`생태계를 지켜라 · 기록지   ${k} / ${N}`,7.5,H-9,PDF_C.muted); }
+  return doc;
+}
+/* Claude 화면에서는 downloads 기능으로, 독립 HTML(일반 브라우저)에서는 브라우저 내려받기로 실제 PDF 파일을 저장해요. */
+const DLP=(window.claude&&window.claude.use)?window.claude.use('downloads').then(d=>(DL=d)).catch(()=>null):null;
+function memoPdfName(ascii){const d=new Date(); const p=n=>String(n).padStart(2,'0'); const day=`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`; return ascii?`ecosystem_record_${day}.pdf`:`생태계를지켜라_기록지_${day}.pdf`;} // 브라우저 내려받기는 한글 파일 이름을 버리는 경우가 있어 영문 이름 사용
+document.getElementById('btnSaveMemo').onclick=async()=>{
+  const msg=document.getElementById('memoMsg');
+  msg.textContent='PDF를 만드는 중이에요…';
+  let blob; try{ blob=buildMemoPdf().output('blob'); }catch(e){ msg.textContent='PDF를 만들지 못했어요. '+(e&&e.message?e.message:''); return; }
+  const filename=memoPdfName();
+  const dl = DL || (DLP ? await DLP : null);
+  if(dl){
+    try{ await dl.save({filename,data:blob}); msg.textContent='기록지 PDF를 저장했어요. 저장한 PDF를 열어 인쇄하세요.'; }
+    catch(e){ const c=e&&e.code; msg.textContent = c==='declined' ? 'PDF 저장을 취소했어요.' : c==='rate_limited' ? '저장 확인 창이 이미 열려 있어요. 잠시 뒤 다시 눌러 주세요.' : '이 화면에서는 PDF 파일을 저장할 수 없어요. 메모 복사를 써 주세요.'; }
+    return;
+  }
+  if(window.claude&&window.claude.use){ msg.textContent='이 화면에서는 PDF 파일을 저장할 수 없어요(저장 기능이 허용되지 않음). 메모 복사를 써 주세요.'; return; }
+  try{
+    const url=URL.createObjectURL(blob), a=document.createElement('a');
+    a.href=url; a.download=memoPdfName(true); a.style.display='none'; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),60000);
+    msg.textContent='기록지 PDF 내려받기를 시작했어요. 내려받은 PDF를 열어 인쇄하세요.';
+  }catch(e){ msg.textContent='이 브라우저에서는 PDF를 내려받을 수 없어요. 메모 복사를 써 주세요.'; }
+};
+document.getElementById('btnCompare').onclick=openCompare;
+document.getElementById('btnCopyMemo').onclick=async()=>{
+  const msg=document.getElementById('memoMsg');
+  try{ await navigator.clipboard.writeText(memoText()); msg.textContent='메모를 복사했어요. 문서에 붙여 넣어 인쇄할 수 있어요.'; }
+  catch(e){ msg.textContent='복사하지 못했어요. 이 화면에서는 복사가 막혀 있을 수 있어요.'; }
+};
+document.getElementById('btnRules').onclick=()=>{
+  openModal(`<h2>규칙 한눈에</h2><ol class="rules">
+  <li><b>목표</b> · 생산자부터 먹이로 이어지는 나만의 생태 피라미드(아래부터 생산자 6·1차 5·2차 3·최상위 2칸, 모두 16칸)를 쌓아요. 한 바퀴는 모두가 한 번씩 둔 것이고, 3·6·9·12·15·18바퀴 끝에 여섯 번 결산해 점수를 모아요. 참가자는 2~3명이에요.</li>
+  <li><b>놓기</b> · 생산자는 맨 아랫줄(첫 장은 아무 칸, 다음부터 놓인 생산자 옆). 소비자는 먹이선으로 이어진 바로 아래 칸(보통 2칸) 중 하나 이상이 카드에 적힌 먹이일 때만. <b>가운데 2차 칸은 바로 아래 세 칸에 닿아 있어서, 그중 한 칸에만 먹이가 있어도 살 수 있어요.</b> 양 끝 2차 칸은 1차 1·2번, 4·5번과 이어져요. '생산자 옆' 조건은 새로 놓을 때만 적용해요(다시 배치나 사건 뒤에 생산자 사이가 떨어져도 괜찮아요). 결산 전까지는 <b>판 다시 배치하기</b>로 같은 줄 카드끼리 자리를 바꿀 수 있어요(다 바꾼 뒤 모든 소비자 아래에 먹이가 있어야 해요).</li>
+  <li><b>내 차례</b> · 찾아온 생물이나 생물 덱에서 1장 → (놓을 생물이 없으면) 다시 찾아보기 1번 → 내려놓기 → 차례 끝. 시간 제한은 없어요. <b>함께하기</b>로 방 코드를 나누면 여러 사람이 각자 화면에서 함께할 수 있어요(빈자리는 컴퓨터).</li>
+  <li><b>손패</b> · 내려놓은 뒤 5장 이하. 같은 카드는 2장까지(3장째는 덱에 섞고 다시 1장). 처음 받을 때, 다시 찾아보기, 좋은 사건으로 받을 때도 똑같아요. 받을 수 있는 카드가 덱에 없으면 받지 않아요. 분해자는 분해자 칸에 3장까지.</li>
+  <li><b>결산 점수</b> · 판 위 생물 1장에 1점, ★ 1장에 3점, 가로 빙고 1줄에 2점, 먹이사슬 줄(꼭대기 두 칸에서 각각 왼쪽·오른쪽 바깥 먹이선을 따라 내려간 주황 연결선 4줄, 4장이 실제 먹이로 이어짐) 1줄에 3점, 4장이 같은 서식지면 1줄에 2점 더, 16칸 완성은 마지막 결산에 +5점.</li>
+  <li><b>일정</b> · ${SCHEDULE_TEXT}.</li>
+  <li><b>사건</b> · 3·6·9·12·15바퀴 끝 결산 바로 다음에 사건 1장. 나쁜 사건은 생산자를 빼고, 아랫단부터 먹이가 하나도 안 남은 생물이 빠져요. 무너짐 정리가 끝난 뒤 분해자 1장으로 빠진 생산자 1장을 되돌릴 수 있고, 가진 분해자를 여러 장(1장당 1장씩) 쓸 수 있어요. 생산자만 돌아오고 이미 무너진 소비자는 돌아오지 않아요.</li>
+  <li><b>기록지</b> · 사건마다 대표 분류 하나가 붙어요(우선순위: 운이 좋아서 → 무너짐 → 먹이그물 덕분에 → 분해자로 되돌림 → 생산자만 빠짐). 먹이그물로 버틴 소비자와 분해자로 되돌린 생산자는 따로 세요. ${CHAIN_HELP}</li>
+  <li><b>끝</b> · 18바퀴 끝 마지막(6번째) 결산. 누군가 16칸 완성 또는 더 가져올 생물 카드가 없음 → 그 바퀴 끝에 바로 마지막 결산(이후 사건은 없음). 모두의 생산자가 사라지면 그때 끝나요.</li>
+  </ol><div class="row"><button class="primary" id="mOk">닫기</button></div>`);
+  document.getElementById('mOk').onclick=closeModal;
+};
+/* ================= 함께하기(여러 사람) =================
+   구조: 방장 화면이 게임을 진행하고(결산·사건·컴퓨터 차례), 사람 참가자는 자기 차례 동안만
+   상태를 넘겨받아 직접 진행한 뒤 방장에게 돌려줘요. 사건 때 고를 것은 방장이 각자에게 물어봐요.
+   방 연결은 room.js의 makeNet()이 담당해요.
+   makeNet이 돌려주는 것: send(obj), on(fn(obj,from)), peers(), onPeers(fn), self(), leave() */
+let MODE='solo', ME=0, NET=null, NETCODE='', LOBBY=null, HOSTPEER=null, MYNAME='', LOCALREADY=null;
+let lastKey=null, lastPayload=null, lastEmit=0, pendingAck=0, syncTimer=null, mineTimer=null, lastMine=0;
+let shownNotice=null, askOpen=null, deferredNotice=null;
+const PENDING=new Map(), ANSWERED=new Map(), AWAY=new Map();
+function esc(x){return String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+const VIEW=()=>(S&&ME>=0&&S.players[ME])?ME:0;
+const mine=()=>S.players[VIEW()];
+const myMemo=()=>(S.memoAll[mine().name]||[]);
+function myTurnNow(){return !!S && ME>=0 && S.turn===ME && (MODE==='solo'||S.owner===ME) && S.phase!=='setup';}
+function inSetup(){return !!S && S.phase==='setup' && ME>=0 && !S.ready[ME];}
+function canAct(){return ((myTurnNow()&&S.phase==='place')||inSetup()) && !S.busy && !S.over;}
+function setNotice(n){S.notice={...n,id:(S.notice?S.notice.id:0)+1};}
+function settleTable(){
+  return `<table class="sc"><tr><th>참가자</th><th>생물<br><small>1장 1점</small></th><th>★<br><small>1장 3점</small></th><th>가로<br><small>1줄 2점</small></th><th>사선<br><small>1줄 3점</small></th><th>같은 서식지<br><small>1줄 2점 더</small></th><th>완성<br><small>+5</small></th><th>이번</th><th>누적</th></tr>${S.players.map(p=>{const s=p.hist[p.hist.length-1]||{cnt:0,stars:0,rows:0,diag:0,same:0,full:0,total:0}; return `<tr><td>${esc(p.name)}</td><td>${s.cnt}</td><td>${s.stars}</td><td>${s.rows}</td><td>${s.diag}</td><td>${s.same}</td><td>${s.full?'+5':'-'}</td><td><b>${s.total}</b></td><td><b>${p.total}</b></td></tr>`;}).join('')}</table>`;
+}
+function evCardHTML(e){return `<div class="evcard" style="background:${e.bg};color:${e.fg}">${ART[e.art]||''}<div><div style="font-size:12px;opacity:.85">${e.tag} · ${e.habitat}</div><h3 style="font-size:22px">${e.name}</h3><div>${e.effect}</div><div style="font-size:12px;opacity:.85;margin-top:4px">${e.foot}</div></div></div>`;}
+
+/* ---- 상태를 짧게 줄여 보내기 ---- */
+const DECN=['세균','곰팡이','버섯'];
+const encC=c=>c?(c.kind==='dec'?100+DECN.indexOf(c.name):c.bi):null;
+const decC=x=>(typeof x!=='number'||x<0)?null:(x>=100?(DECN[x-100]?makeDec(DECN[x-100]):null):(DATA.bio[x]?makeBio(DATA.bio[x]):null));
+const evI=e=>+String(e.uid).slice(1);
+const evById=i=>DATA.ev[i]?{...DATA.ev[i],uid:'e'+i}:null;
+function ser(){
+  return {v:1,gid:S.gid,seq:S.seq,owner:S.owner,ready:S.ready,notice:S.notice,turn:S.turn,round:S.round,settle:S.settle,phase:S.phase,
+    redrawUsed:!!S.redrawUsed,placedThisTurn:!!S.placedThisTurn,drewDec:!!S.drewDec,over:!!S.over,endFlag:!!S.endFlag,busy:!!S.busy,diff:S.diff,speed:S.speed,hostPeer:S.hostPeer||null,
+    deck:S.deck.map(encC),market:S.market.map(encC),ev:S.ev.map(evI),past:S.past.map(evI),
+    players:S.players.map(p=>({name:p.name,ctrl:p.ctrl,peer:p.peer,wasHuman:!!p.wasHuman,board:p.board.map(encC),dec:p.dec.map(encC),hand:p.hand.map(encC),total:p.total,last:p.last,hist:p.hist})),
+    memoAll:S.memoAll,log:S.log.slice(0,30),logN:S.logN||0};
+}
+function clean(o){ // 받은 글자에서 꺾쇠 제거(받은 내용은 HTML로 쓰지 않음)
+  if(typeof o==='string') return o.replace(/[<>]/g,'');
+  if(Array.isArray(o)) return o.map(clean);
+  if(o&&typeof o==='object'){const r={}; for(const k of Object.keys(o)){ if(k==='__proto__'||k==='constructor'||k==='prototype') continue; r[k]=clean(o[k]);} return r;}
+  return o;
+}
+function deser(o){
+  const arr=a=>Array.isArray(a)?a:[];
+  return {...o, sel:null,arr:null,moveFrom:null,moveMode:false,
+    ready:o.ready||{}, deck:arr(o.deck).map(decC).filter(Boolean), market:[0,1,2].map(k=>decC(arr(o.market)[k])),
+    ev:arr(o.ev).map(evById).filter(Boolean), past:arr(o.past).map(evById).filter(Boolean),
+    players:arr(o.players).map(p=>({...p,human:p.ctrl!=='ai',board:Array.from({length:NSLOT},(_,k)=>decC(arr(p.board)[k])),dec:arr(p.dec).map(decC).filter(Boolean),hand:arr(p.hand).map(decC).filter(Boolean),hist:arr(p.hist)})),
+    memoAll:o.memoAll||{}, log:arr(o.log)};
+}
+
+/* ---- 보내기 ---- */
+function emitState(extra,force){
+  if(!NET||!S) return;
+  const body=ser(); delete body.seq; const key=JSON.stringify(body);
+  if(!force && key===lastKey) return;
+  lastKey=key; S.seq++; body.seq=S.seq; lastPayload={k:'st',s:body,...(extra||{})}; lastEmit=Date.now();
+  NET.send(lastPayload);
+}
+function afterRender(){
+  if(MODE==='solo'||!S||!NET) return;
+  if(S.owner===ME && ME>=0){ clearTimeout(syncTimer); syncTimer=setTimeout(()=>{ if(S.owner===ME) emitState(); },140); }
+  if(MODE==='guest' && S.phase==='setup' && ME>=0){ clearTimeout(mineTimer); mineTimer=setTimeout(()=>sendMine(),200); }
+}
+function sendMine(){
+  if(MODE!=='guest'||!S||ME<0||S.phase!=='setup') return;
+  const me=S.players[ME]; lastMine=Date.now();
+  NET.send({k:'mine',gid:S.gid,board:me.board.map(encC),hand:me.hand.map(encC),ready:LOCALREADY===S.gid});
+}
+setInterval(()=>{ // 놓친 신호 다시 보내기
+  if(MODE==='solo'||!NET||!S) return;
+  const now=Date.now();
+  if(pendingAck && lastPayload && now-lastEmit>1500){ lastEmit=now; NET.send(lastPayload); }
+  else if(S.owner===ME && lastPayload && now-lastEmit>4000){ lastEmit=now; NET.send(lastPayload); }
+  if(MODE==='guest' && S.phase==='setup' && ME>=0 && now-lastMine>2500) sendMine();
+  if(MODE==='host') for(const [id,pd] of PENDING){ const q=S.players[pd.seat];
+    if(!q||!q.human||q.ctrl==='ai'){PENDING.delete(id); pd.res(pd.aiVal); continue;}
+    if(now-pd.t>2000){pd.t=now; NET.send(pd.msg);} }
+},500);
+
+/* ---- 방장: 차례 넘기기, 묻기 ---- */
+function handOff(seat){ resetTurn(); S.owner=seat; render(); emitState(null,true); pendingAck=S.seq; }
+function passBack(){ S.sel=null; S.arr=null; S.owner=0; emitState({done:1},true); pendingAck=S.seq; render(); }
+function setupReady(){
+  if(MODE==='guest'){ LOCALREADY=S.gid; S.ready[ME]=true; S.sel=null; S.arr=null; render(); sendMine(); return; }
+  S.ready[ME]=true; S.sel=null; S.arr=null; log(mine().name+': 준비 끝.'); render(); checkAllReady();
+}
+function checkAllReady(){
+  if(MODE!=='host'||S.phase!=='setup') return;
+  if(!S.players.every((p,k)=>S.ready[k])) return;
+  log('모두 준비 끝! 첫 바퀴를 시작해요.'); S.turn=0; S.phase='draw'; startTurn();
+}
+function chooseFor(p,title,body,opts,aiVal){
+  if(!p.human) return Promise.resolve(aiVal);
+  const seat=S.players.indexOf(p);
+  if(seat===ME) return choose(`<h2>${esc(title)}</h2><p>${esc(body)}</p>`,opts);
+  if(MODE!=='host') return Promise.resolve(aiVal);
+  return new Promise(res=>{ const id=Math.random().toString(36).slice(2,10);
+    const pd={seat,res,opts,aiVal,t:0,msg:{k:'ask',id,to:seat,gid:S.gid,title,body,opts:opts.map(o=>o.label)}}; PENDING.set(id,pd); });
+}
+function toAI(k){
+  const p=S.players[k]; if(!p||!p.human) return;
+  p.ctrl='ai'; p.human=false; log(`${p.name}: 연결이 끊겨 컴퓨터가 대신 둬요. 같은 이름으로 다시 들어오면 돌아갈 수 있어요.`,'ev');
+  if(S.phase==='setup' && !S.ready[k]){ aiPlaceAll(p); S.ready[k]=true; render(); checkAllReady(); return; }
+  if(S.owner===k){ S.owner=ME; pendingAck=0;
+    if(S.phase==='draw'){ aiTurn(p); }
+    else { S.arr=null; aiPlaceAll(p); while(p.hand.length>5){const w=aiWorst(p); p.hand=p.hand.filter(x=>x!==w); S.deck.push(w); shuffle(S.deck);} render(); nextTurn(); }
+    return; }
+  render();
+}
+
+/* ---- 받기 ---- */
+function onNet(m,from){
+  if(!m||typeof m!=='object') return;
+  if(m.k==='st') onState(m,from);
+  else if(m.k==='mine' && MODE==='host') onMine(m,from);
+  else if(m.k==='ask' && MODE==='guest') onAsk(m,from);
+  else if(m.k==='ans' && MODE==='host') onAns(m,from);
+  else if(m.k==='bye' && MODE==='guest' && from.peer===HOSTPEER){ log('방장이 방을 나갔어요. 혼자 하기로 새 게임을 시작할 수 있어요.','ev'); render(); openModal('<h2>방장이 나갔어요</h2><p>이 방의 게임은 더 진행되지 않아요.</p><div class="row"><button class="primary" id="mOk">혼자 하기</button><button id="mStay">판 보기</button></div>'); document.getElementById('mOk').onclick=()=>{leaveNet(); closeModal(); startDialog();}; document.getElementById('mStay').onclick=closeModal; }
+}
+function onState(m,from){
+  const st=m.s; if(!st||typeof st!=='object'||!Array.isArray(st.players)||typeof st.seq!=='number') return;
+  if(MODE==='host'){
+    if(!S||st.gid!==S.gid) return;
+    const sp=S.players[S.owner]; if(!sp||sp.peer!==from.peer||S.owner===ME) return;
+  } else {
+    if(LOBBY!=='guest' && MODE!=='guest') return;
+    const ownerPeer = S&&S.players[S.owner] ? S.players[S.owner].peer : null;
+    const okFrom = (st.hostPeer===from.peer && (!HOSTPEER||HOSTPEER===from.peer)) || (S && st.gid===S.gid && from.peer===ownerPeer);
+    if(!okFrom) return;
+  }
+  if(S && st.gid===S.gid && st.seq<=S.seq) return;
+  const o=clean(st);
+  if(pendingAck && (o.gid!==(S&&S.gid) || o.seq>pendingAck)) pendingAck=0;
+  const wasOwner = !!S && S.owner===ME && MODE!=='solo';
+  if(MODE==='guest' || LOBBY==='guest'){
+    const sameGame = S && MODE==='guest' && S.gid===o.gid;
+    const myPeer=NET.self();
+    const meIdx=o.players.findIndex(p=>p.peer===myPeer);
+    const keepSetup = sameGame && o.phase==='setup' && meIdx>=0 && !(o.ready&&o.ready[meIdx]) && S.phase==='setup';
+    const keep = keepSetup ? {board:S.players[meIdx].board, hand:S.players[meIdx].hand, sel:S.sel, arr:S.arr} : null;
+    if(!sameGame){ shownNotice=null; LOCALREADY=null; lastKey=null; }
+    S=deser(o); MODE='guest'; LOBBY=null; HOSTPEER=o.hostPeer; ME=meIdx;
+    if(keep){ const me=S.players[ME]; me.board=keep.board; me.hand=keep.hand; S.sel=keep.sel; S.arr=keep.arr; S.ready[ME]=(LOCALREADY===S.gid); }
+    if(document.getElementById('lobbyBox')) closeModal();
+    render();
+    if(!wasOwner && S.owner===ME && ME>=0) emitState(null,true);
+    if(S.notice && S.notice.id!==shownNotice && !(S.owner===ME)){ shownNotice=S.notice.id; if(askOpen) deferredNotice=S.notice; else showNotice(S.notice); }
+    return;
+  }
+  // 방장: 차례를 가진 사람이 보낸 상태를 받아들임
+  const keepPeers=S.players.map(p=>({peer:p.peer,ctrl:p.ctrl,name:p.name}));
+  const notice=S.notice, hostPeer=S.hostPeer;
+  S=deser(o); S.hostPeer=hostPeer; S.notice=notice;
+  S.players.forEach((p,k)=>{ p.peer=keepPeers[k].peer; p.ctrl=keepPeers[k].ctrl; p.name=keepPeers[k].name; p.human=p.ctrl!=='ai'; }); // 자리 정보는 방장 것이 기준
+  render();
+  if(m.done && S.owner===ME){ lastKey=null; nextTurn(); }
+}
+function onMine(m,from){
+  if(!S||m.gid!==S.gid||S.phase!=='setup') return;
+  const k=S.players.findIndex(p=>p.peer===from.peer&&p.human); if(k<0||k===ME||S.ready[k]) return;
+  const p=S.players[k];
+  if(!Array.isArray(m.board)||m.board.length!==NSLOT||!Array.isArray(m.hand)) return;
+  const before=[...p.board.filter(Boolean),...p.hand].map(encC).sort().join(',');
+  const board=m.board.map(decC), hand=m.hand.map(decC).filter(Boolean);
+  const after=[...board.filter(Boolean),...hand].map(encC).sort().join(',');
+  if(before!==after) return; // 카드가 달라지면 받지 않음
+  const tmp={...p,board}; if(!boardValid(tmp)) return;
+  p.board=board; p.hand=hand;
+  if(m.ready){S.ready[k]=true; log(p.name+': 준비 끝.');}
+  render(); checkAllReady();
+}
+function onAsk(m,from){
+  if(from.peer!==HOSTPEER||!S||m.gid!==S.gid||m.to!==ME) return;
+  if(ANSWERED.has(m.id)){ NET.send({k:'ans',id:m.id,val:ANSWERED.get(m.id)}); return; }
+  if(askOpen===m.id) return;
+  askOpen=m.id;
+  const opts=Array.isArray(m.opts)?m.opts.slice(0,8):[];
+  openModal(`<h2>${esc(m.title)}</h2><p>${esc(m.body)}</p><div class="row">${opts.map((o,k)=>`<button data-ao="${k}" ${k===0?'class="primary"':''}>${esc(o)}</button>`).join('')}</div>`);
+  document.querySelectorAll('[data-ao]').forEach(b=>b.onclick=()=>{ const v=+b.dataset.ao; ANSWERED.set(m.id,v); NET.send({k:'ans',id:m.id,val:v}); askOpen=null; closeModal();
+    if(deferredNotice){const n=deferredNotice; deferredNotice=null; showNotice(n);} });
+}
+function onAns(m,from){
+  const pd=PENDING.get(m.id); if(!pd) return;
+  const q=S.players[pd.seat]; if(!q||q.peer!==from.peer) return;
+  const o=pd.opts[m.val]; if(!o) return;
+  PENDING.delete(m.id); pd.res(o.val);
+}
+function showNotice(n){
+  const e = n.ev!=null ? S.past[n.ev] : null;
+  const ok='<div class="row"><button class="primary" id="mOk">닫기</button></div>';
+  if(n.kind==='settle') openModal(`<h2>${n.n}번째 결산${n.rd?' ('+n.rd+'바퀴 끝)':''}</h2>${settleTable()}<p>${n.next==='event'?'결산 다음에 사건이 있어요. 방장이 사건 카드를 뒤집으면 이어서 보여요.':'이번 결산 뒤에는 사건이 없어요. '+nextStepText((n.rd||0)+1)}</p>${ok}`);
+  else if(n.kind==='reveal'&&e) openModal(`<h2>${n.rd?n.rd+'바퀴 끝 사건':'사건'}</h2>${evCardHTML(e)}<p style="font-size:13.5px">${e.tag.startsWith('나쁜')?'모두의 판을 정리하는 중이에요. 내 판에서 고를 것이 있으면 바로 물어봐요.':'좋은 사건이에요. 해당하는 사람은 생물 덱에서 1장을 더 받아요.'}</p>${ok}`);
+  else if(n.kind==='summary'&&e) openModal(`<h2>사건 정리 결과</h2>${evCardHTML(e)}<p style="font-size:13.5px">${(Array.isArray(n.report)?n.report:[]).map(esc).join('<br>')}</p><p style="font-size:12.5px;color:var(--muted)">내 판의 변화는 기록지 메모에 적혀 있어요. 방장이 다음 바퀴를 시작해요. ${nextStepText(S.round)}</p>${ok}`);
+  else if(n.kind==='end'){ openModal(`<h2>게임 끝</h2>${settleTable()}${rankTable()}<p style="font-size:13px;color:var(--muted)">기록지 메모를 보고 활동지 3번을 채워 보세요.</p><div class="row"><button class="primary" id="mOk">판 보기</button><button id="mCmp">모두의 기록지 비교</button></div>`); document.getElementById('mCmp').onclick=openCompare; }
+  else return;
+  document.getElementById('mOk').onclick=closeModal;
+}
+
+/* ---- 방 만들기 / 들어가기 ---- */
+function loadName(){try{return localStorage.getItem('eco_name')||'';}catch(e){return '';}}
+function saveName(n){try{localStorage.setItem('eco_name',n);}catch(e){}}
+const cleanName=n=>String(n||'').replace(/[^\p{L}\p{N} _-]/gu,'').trim().slice(0,8);
+function genCode(){const a='abcdefghjkmnpqrstuvwxyz23456789'; let s=''; for(const b of crypto.getRandomValues(new Uint8Array(6))) s+=a[b%a.length]; return s;}
+function multiDialog(){
+  if(MODE!=='solo'||LOBBY){
+    openModal(`<h2>함께하기</h2><p>지금 방 코드: <b style="font-size:20px;letter-spacing:.1em">${esc(NETCODE)}</b></p><p>${MODE==='host'?'방장이에요. 방을 나가면 다른 사람들의 게임도 멈춰요.':'방을 나가면 내 자리는 컴퓨터가 대신 둬요.'}</p><div class="row"><button class="primary" id="mOk">닫기</button>${MODE==='host'?'<button id="mRe">이 방에서 새 게임</button>':''}<button id="mLeave">방 나가기(혼자 하기)</button></div>`);
+    document.getElementById('mOk').onclick=closeModal;
+    if(MODE==='host') document.getElementById('mRe').onclick=()=>{closeModal(); hostLobby();};
+    document.getElementById('mLeave').onclick=()=>{leaveNet(); closeModal(); startDialog();};
+    return;
+  }
+  openModal(`<h2>함께하기</h2><p>같은 게임 화면을 연 사람끼리 방 코드로 모여요. 빈자리는 컴퓨터가 채워요(2~3명).</p>
+  <div class="row setup"><label for="nName">게임 닉네임(8자까지)<input id="nName" maxlength="8" value="${esc(loadName())}" placeholder="예: 다람"></label></div>
+  <div class="row"><button class="primary" id="nHost">방 만들기</button></div>
+  <div class="row setup"><label for="nCode">받은 방 코드<input id="nCode" maxlength="6" placeholder="예: k7mq2d" autocapitalize="off"></label><button id="nJoin" style="align-self:flex-end">방 들어가기</button></div>
+  <p id="nMsg" class="detail"></p>
+  <p style="font-size:12px;color:var(--muted)">모두 이 페이지를 열고 방장이 알려 준 6글자 코드를 입력하세요. 방장은 게임이 끝날 때까지 창을 열어 두세요.</p>
+  <div class="row"><button id="mOk">뒤로</button></div>`);
+  document.getElementById('mOk').onclick=startDialog;
+  const getName=()=>{const n=cleanName(document.getElementById('nName').value); if(!n){document.getElementById('nMsg').textContent='닉네임을 적어 주세요.'; return null;} saveName(n); MYNAME=n; return n;};
+  document.getElementById('nHost').onclick=async()=>{ if(!getName()) return; await openRoom(genCode(),'host'); };
+  document.getElementById('nJoin').onclick=async()=>{ if(!getName()) return; const c=String(document.getElementById('nCode').value).toLowerCase().replace(/[^a-z0-9]/g,''); if(c.length!==6){document.getElementById('nMsg').textContent='방 코드 6글자를 적어 주세요.'; return;} await openRoom(c,'guest'); };
+}
+async function openRoom(code,role){
+  const msg=document.getElementById('nMsg'); if(msg) msg.textContent='연결하는 중…';
+  const buttons = [...document.querySelectorAll('#nJoin,#nHost')];
+  buttons.forEach(b => b.disabled = true);
+  let net;
+  try { net = await makeNet(code,role,MYNAME); }
+  catch(error) {
+    if(msg) msg.textContent = error.message;
+    buttons.forEach(b => b.disabled = false);
+    return;
+  }
+  if(!msg || !msg.isConnected) { net.leave(); return; }
+  NET=net; NETCODE=code; LOBBY=role; HOSTPEER=null;
+  NET.on(onNet);
+  NET.onPeers(onPeersChange);
+  if(role==='host') hostLobby(); else guestLobby();
+}
+function lobbyPeers(){ return NET?NET.peers().filter(p=>p.kind==='viewer'&&p.presence&&typeof p.presence.name==='string'):[]; }
+function hostLobby(){
+  if(!NET) return;
+  if(MODE==='host'){ MODE='solo'; LOBBY='host'; } // 새 게임 준비
+  const guests=lobbyPeers().filter(p=>!p.sameTab&&p.presence.role==='guest');
+  openModal(`<div id="lobbyBox"><h2>방 만들기</h2><p>방 코드 <b style="font-size:26px;letter-spacing:.12em">${esc(NETCODE)}</b> · 같이 할 사람에게 알려 주세요.</p><p style="font-size:13px;color:var(--muted)">판 16칸(6·5·3·2) · ${SCHEDULE_TEXT}.</p>
+  <p><b>들어온 사람</b> (${guests.length+1}명)<br>${esc(MYNAME)} (방장)${guests.slice(0,MAXP-1).map(p=>'<br>'+esc(cleanName(p.presence.name)||'이름 없음')).join('')}${guests.length>MAXP-1?'<br><span style="color:var(--muted)">3명이 넘으면 방장과 먼저 들어온 2명까지 참가하고 나머지는 구경해요.</span>':''}</p>
+  <div class="row setup">
+    <label for="hN">참가자 수<select id="hN">${[2,3].map(n=>`<option value="${n}" ${n===Math.max(2,Math.min(MAXP,guests.length+1))?'selected':''} ${n<Math.min(MAXP,guests.length+1)?'disabled':''}>${n}명 (컴퓨터 ${Math.max(0,n-1-Math.min(MAXP-1,guests.length))})</option>`).join('')}</select></label>
+    <label for="hD">사건 난이도<select id="hD"><option value="easy">쉬움</option><option value="normal" selected>보통</option><option value="hard">어려움</option></select></label>
+    <label for="hS">컴퓨터 속도<select id="hS"><option value="normal">보통</option><option value="fast">빠르게</option></select></label>
+  </div><div class="row"><button class="primary" id="hGo">시작하기</button><button id="hLeave">방 닫기</button></div></div>`);
+  document.getElementById('hGo').onclick=()=>{
+    const gs=lobbyPeers().filter(p=>!p.sameTab&&p.presence.role==='guest').slice(0,MAXP-1);
+    const n=Math.min(MAXP,Math.max(+document.getElementById('hN').value, gs.length+1));
+    const used=new Set([MYNAME]); const uniq=nm=>{let x=nm||'참가자',k=2; while(used.has(x)) x=(nm||'참가자').slice(0,6)+k++; used.add(x); return x;};
+    const seats=[{name:MYNAME,ctrl:'local',peer:NET.self()}];
+    gs.forEach(p=>seats.push({name:uniq(cleanName(p.presence.name)),ctrl:'remote',peer:p.peer}));
+    const ainames=['다람','솔이','바다','하늘'].filter(x=>!used.has(x));
+    while(seats.length<n) seats.push({name:uniq(ainames.shift()),ctrl:'ai',peer:null});
+    closeModal(); MODE='host'; LOBBY=null; ME=0; lastKey=null; pendingAck=0;
+    newGame(n,document.getElementById('hD').value,document.getElementById('hS').value,seats);
+    S.hostPeer=NET.self(); render(); emitState(null,true);
+  };
+  document.getElementById('hLeave').onclick=()=>{leaveNet(); closeModal(); startDialog();};
+}
+function guestLobby(){
+  const host=lobbyPeers().find(p=>p.presence.role==='host');
+  const others=lobbyPeers().filter(p=>p.presence.role==='guest');
+  openModal(`<div id="lobbyBox"><h2>방 ${esc(NETCODE)}</h2><p>${host?`방장 <b>${esc(cleanName(host.presence.name))}</b>이(가) 시작하기를 누르면 게임이 열려요.`:'방장을 찾는 중이에요. 방 코드가 맞는지 확인해 주세요.'}</p><p style="font-size:13px;color:var(--muted)">판 16칸(6·5·3·2) · ${SCHEDULE_TEXT}.</p><p><b>들어온 사람</b><br>${others.map(p=>esc(cleanName(p.presence.name))+(p.sameTab?' (나)':'')).join('<br>')}</p><div class="row"><button id="gLeave">나가기</button></div></div>`);
+  document.getElementById('gLeave').onclick=()=>{leaveNet(); closeModal(); startDialog();};
+}
+function onPeersChange(ch){
+  if(LOBBY==='host' && MODE==='solo' && document.getElementById('lobbyBox')) hostLobby();
+  if(LOBBY==='guest' && document.getElementById('lobbyBox')) guestLobby();
+  if(MODE==='guest' && HOSTPEER && ch.left.some(p=>p.peer===HOSTPEER)){ log('방장의 연결이 끊겼어요. 새 게임을 하려면 방장이 새 방을 만들어 주세요.','ev'); render(); }
+  if(!S||MODE==='solo') return;
+  if(S.owner===ME && lastPayload && ch.joined.some(p=>!p.sameTab)){ lastEmit=Date.now(); NET.send(lastPayload); }
+  if(MODE!=='host') return;
+  let changed=false;
+  ch.left.forEach(pe=>{ const k=S.players.findIndex(p=>p.peer===pe.peer&&p.human); if(k<0||k===ME) return;
+    S.players[k].ctrl='away'; changed=true; log(`${S.players[k].name}: 연결이 끊겼어요. 잠시 기다려요.`);
+    clearTimeout(AWAY.get(k)); const ep=EPOCH; AWAY.set(k,setTimeout(()=>{ if(ep===EPOCH && S.players[k]&&S.players[k].ctrl==='away') toAI(k); },10000)); });
+  [...ch.joined,...ch.updated].forEach(pe=>{ if(pe.sameTab||!pe.presence||pe.presence.role!=='guest') return;
+    const nm=cleanName(pe.presence.name);
+    let k=S.players.findIndex(p=>p.peer===pe.peer&&p.ctrl==='away');
+    if(k<0) k=S.players.findIndex(p=>p.name===nm&&p.wasHuman&&(p.ctrl==='away'||p.ctrl==='ai')&&!S.players.some(q=>q.peer===pe.peer&&q.human));
+    if(k<0||k===ME||S.over) return;
+    const p=S.players[k]; clearTimeout(AWAY.get(k)); p.peer=pe.peer; p.ctrl='remote'; p.human=true; changed=true; log(`${p.name}: 다시 들어왔어요.`);
+    if(S.phase==='setup' && S.ready[k]===true && !p.board.some(Boolean)) S.ready[k]=false; });
+  if(changed){ render(); if(S.owner===ME) emitState(null,true); }
+}
+function leaveNet(){
+  if(NET){ if(MODE==='host') NET.send({k:'bye'}); NET.leave(); }
+  NET=null; MODE='solo'; LOBBY=null; ME=0; NETCODE=''; HOSTPEER=null; pendingAck=0; lastPayload=null; lastKey=null; PENDING.forEach(pd=>pd.res(pd.aiVal)); PENDING.clear();
+  if(S) render();
+}
+document.getElementById('btnMulti').onclick=multiDialog;
+
+/* ================= 소리 =================
+   파일 없이 브라우저에서 짧게 만들어 내는 효과음. 진행 기록(log)에 새 줄이 생기면 그 내용에 맞는 소리를 내서,
+   혼자 하기·방장·참가자 화면 어디서든 같은 순간에 소리가 나요. */
+let SND_ON=true; try{ SND_ON=localStorage.getItem('eco_sound')!=='off'; }catch(e){}
+let AC=null, SND_HEARD=0, SND_GID=null, SND_MYTURN=false, SND_MYCOUNT=-1, SND_OVER=false;
+function ac(){ if(!AC){ const C=window.AudioContext||window.webkitAudioContext; if(!C) return null; AC=new C(); } if(AC.state==='suspended') AC.resume().catch(()=>{}); return AC; }
+['pointerdown','keydown'].forEach(ev=>window.addEventListener(ev,()=>{ if(SND_ON) ac(); },{passive:true}));
+function tone(f,dur,{type='sine',gain=0.18,at=0,slide=null,attack=0.005}={}){
+  const a=ac(); if(!a) return; const t=a.currentTime+at;
+  const o=a.createOscillator(), g=a.createGain(); o.type=type; o.frequency.setValueAtTime(f,t);
+  if(slide) o.frequency.exponentialRampToValueAtTime(slide,t+dur);
+  g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(gain,t+attack); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.connect(g).connect(a.destination); o.start(t); o.stop(t+dur+0.02);
+}
+function noise(dur,{gain=0.12,at=0,freq=2000,q=0.8,type='bandpass',sweep=null}={}){
+  const a=ac(); if(!a) return; const t=a.currentTime+at;
+  const n=Math.max(1,Math.floor(a.sampleRate*dur)), buf=a.createBuffer(1,n,a.sampleRate), d=buf.getChannelData(0);
+  for(let i=0;i<n;i++) d[i]=Math.random()*2-1;
+  const s=a.createBufferSource(); s.buffer=buf; const f=a.createBiquadFilter(); f.type=type; f.frequency.setValueAtTime(freq,t); f.Q.value=q;
+  if(sweep) f.frequency.exponentialRampToValueAtTime(sweep,t+dur);
+  const g=a.createGain(); g.gain.setValueAtTime(gain,t); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  s.connect(f).connect(g).connect(a.destination); s.start(t); s.stop(t+dur+0.02);
+}
+const SFX={
+  draw(){ noise(0.16,{freq:1200,sweep:4000,q:1.2,gain:0.10}); },
+  place(){ tone(240,0.09,{slide:130,gain:0.22}); noise(0.03,{freq:3000,gain:0.06}); },
+  move(){ tone(300,0.07,{slide:200,gain:0.12}); },
+  shuffle(){ [0,0.07,0.14].forEach(t=>noise(0.06,{freq:2500,gain:0.08,at:t})); },
+  dec(){ tone(660,0.18,{type:'triangle',gain:0.12}); tone(990,0.22,{type:'triangle',gain:0.10,at:0.07}); },
+  myturn(){ tone(784,0.18,{type:'triangle',gain:0.14}); tone(1047,0.28,{type:'triangle',gain:0.12,at:0.12}); },
+  settle(){ [523,659,784].forEach((f,k)=>tone(f,0.22,{type:'triangle',gain:0.13,at:k*0.1})); },
+  good(){ [523,659,784,1047].forEach((f,k)=>tone(f,0.25,{type:'sine',gain:0.14,at:k*0.09})); },
+  bad(){ tone(196,0.7,{type:'sawtooth',gain:0.07,slide:92}); noise(0.7,{type:'lowpass',freq:400,gain:0.10}); },
+  crumble(){ [0,0.08,0.18,0.3].forEach((t,k)=>noise(0.12,{type:'lowpass',freq:900-k*150,gain:0.12,at:t})); tone(180,0.4,{slide:70,gain:0.08}); },
+  end(){ [523,659,784].forEach((f,k)=>tone(f,0.2,{type:'triangle',gain:0.13,at:k*0.12})); [523,659,784,1047].forEach(f=>tone(f,0.7,{type:'triangle',gain:0.07,at:0.42})); },
+  click(){ tone(880,0.06,{type:'triangle',gain:0.08}); }
+};
+const SND_RANK=['end','bad','good','settle','crumble','myturn','dec','shuffle','place','move','draw'];
+function soundFor(l){
+  const t=l.t||'';
+  if(l.cls==='st' && /결산/.test(t)) return 'settle';
+  if(t.startsWith('사건:')){ const e=S.past[S.past.length-1]; return e&&e.tag.startsWith('좋은')?'good':'bad'; }
+  if(/생태계 붕괴/.test(t)) return 'crumble';
+  if(/분해자 칸에|분해자로/.test(t)) return 'dec';
+  if(/다시 찾아보기|3장째|덱에 섞었어요/.test(t)) return 'shuffle';
+  if(/놓았어요/.test(t)) return 'place';
+  if(/옮겼어요|다시 배치했어요/.test(t)) return 'move';
+  if(/가져왔어요/.test(t)) return 'draw';
+  return null;
+}
+function soundTick(){ // render 끝에 불림
+  if(!S) return;
+  const maxN=S.log.reduce((m,l)=>Math.max(m,l.n||0),0);
+  const myT=myTurnNow()&&S.phase==='draw'?S.round+':'+S.turn:null, myC=mine().board.filter(Boolean).length;
+  if(S.gid!==SND_GID){ SND_GID=S.gid; SND_HEARD=maxN; SND_MYTURN=myT; SND_MYCOUNT=myC; SND_OVER=S.over; return; }
+  const want=new Set();
+  S.log.forEach(l=>{ if((l.n||0)>SND_HEARD){ const s=soundFor(l); if(s) want.add(s);} });
+  if(myT && myT!==SND_MYTURN) want.add('myturn');
+  if(SND_MYCOUNT>=0 && myC<SND_MYCOUNT && S.phase!=='setup') want.add('crumble'); // 내 판의 카드가 줄어드는 건 사건 때뿐
+  if(S.over && !SND_OVER) want.add('end');
+  SND_HEARD=Math.max(SND_HEARD,maxN); SND_MYTURN=myT; SND_MYCOUNT=myC; SND_OVER=S.over;
+  if(!SND_ON||!want.size) return;
+  const pick=SND_RANK.filter(k=>want.has(k)&&k!=='myturn').slice(0,2); // 한 번에 많아야 2개 + 내 차례 알림은 늘 따로
+  if(want.has('myturn')) pick.push('myturn');
+  pick.forEach((k,i)=>setTimeout(()=>{try{SFX[k]();}catch(e){}},i*180));
+}
+function soundBtn(){ const b=document.getElementById('btnSound'); if(!b) return; b.textContent=SND_ON?'소리 켬':'소리 끔'; b.setAttribute('aria-pressed',SND_ON?'true':'false'); b.title=SND_ON?'눌러서 소리 끄기':'눌러서 소리 켜기'; }
+document.getElementById('btnSound').onclick=()=>{ SND_ON=!SND_ON; try{localStorage.setItem('eco_sound',SND_ON?'on':'off');}catch(e){} soundBtn(); if(SND_ON){ ac(); SFX.click(); } };
+soundBtn();
+
+function startDialog(){
+  openModal(`<h2>생태계를 지켜라</h2><p>어떻게 할까요?</p>
+  <div class="modes">
+    <button class="mode" id="goSolo"><b>혼자 하기</b><span>나 1명과 컴퓨터 1~2명이 함께해요.</span></button>
+    <button class="mode" id="goMulti"><b>함께하기</b><span>방 코드로 다른 사람과 각자 화면에서 해요. 빈자리는 컴퓨터가 채워요.</span></button>
+  </div>`);
+  document.getElementById('goSolo').onclick=setupDialog;
+  document.getElementById('goMulti').onclick=multiDialog;
+}
+function setupDialog(){
+  openModal(`<h2>혼자 하기</h2><p>나 1명과 컴퓨터가 함께해요. 컴퓨터는 놓을 수 있는 카드를 먼저 고르는 단순한 방식으로 둬요.</p>
+  <div class="row setup">
+    <label for="sN">참가자 수<select id="sN"><option value="2">2명 (컴퓨터 1)</option><option value="3" selected>3명 (컴퓨터 2)</option></select></label>
+    <label for="sD">사건 난이도<select id="sD"><option value="easy">쉬움 (좋은 사건 많음)</option><option value="normal" selected>보통 (12장 전부)</option><option value="hard">어려움 (나쁜 사건 8 + 단비)</option></select></label>
+    <label for="sS">컴퓨터 속도<select id="sS"><option value="normal">보통</option><option value="fast">빠르게</option></select></label>
+  </div><div class="row"><button class="primary" id="sGo">시작하기</button><button id="sBack">뒤로</button></div>`);
+  document.getElementById('sBack').onclick=startDialog;
+  document.getElementById('sGo').onclick=()=>{const n=+document.getElementById('sN').value,d=document.getElementById('sD').value,s=document.getElementById('sS').value; closeModal(); newGame(n,d,s);};
+}
+newGame(3,'normal','normal');
+startDialog();
+</script>
+</body>
+</html>

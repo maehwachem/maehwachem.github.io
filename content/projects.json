@@ -277,6 +277,24 @@
     ],
     "game": [
       {
+        "title": "생태계를 지켜라",
+        "subject": "biology",
+        "date": "2026-11-28",
+        "desc": "생산자부터 최상위 소비자까지 먹이로 연결해 나만의 생태 피라미드를 만듭니다. 3바퀴마다 사건을 겪으며 먹이그물이 어떻게 변했는지 기록지로 돌아봅니다.",
+        "tag": "먹이그물 · 생태 카드게임",
+        "level": "중학교 과학, 고등학교 통합과학",
+        "cover": "/games/save-my-ecosystem/cover.webp",
+        "poster": "island",
+        "words": "생태계를\n지켜라",
+        "links": [
+          {
+            "label": "게임 열기",
+            "url": "/games/save-my-ecosystem/"
+          }
+        ],
+        "kind": "game"
+      },
+      {
         "title": "화학자의 섬",
         "subject": "chemistry",
         "desc": "무인도에서 재료를 모으고 장치를 만들며 다섯 장을 풀어 가는 화학 이야기 게임. 증류와 전기분해, 금속 제련, 산성비와 중화, 연소열, 화학 평형을 다룹니다.",
