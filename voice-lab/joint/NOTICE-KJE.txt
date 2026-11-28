@@ -1,0 +1,10 @@
+목소리 실험실 · 협업 개발판
+구성: KJE, 2026-11-28
+
+Based on CHIMERA by Jameson Hodge (see the original LICENSE).
+https://github.com/jamesondh/chimera-vocal-synth
+
+Korean navigation, optional sound-elements comparison, measurement display and
+experiment-session controls were adapted with GPT and Claude.
+The upstream MIT license and copyright notice remain included in LICENSE.
+This adaptation does not imply endorsement by the original author.
