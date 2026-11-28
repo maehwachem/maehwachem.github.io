@@ -145,6 +145,37 @@ table.sc tr.tot td{font-weight:700;border-top:2px solid var(--ink)}
 .rules{font-size:13.5px}
 .rules li{margin-bottom:4px}
 .bigboard{position:relative;width:100%;max-width:440px;aspect-ratio:1/1.0103;container-type:inline-size;margin:0 auto}
+
+.dialog:has(.compare-view){display:block;width:min(100%,800px);max-width:none;max-height:calc(100dvh - 24px);padding:0;overscroll-behavior:contain}
+.compare-view{display:grid;gap:10px;min-width:0;padding:0 18px 18px}
+.compare-view h2,.compare-view h3,.compare-view p{margin:0}
+.compare-header{position:sticky;top:0;z-index:1;display:grid;gap:8px;background:var(--card);padding:14px 0 10px;border-bottom:1px solid var(--line)}
+.compare-view .tools{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.compare-view .tools button{padding:7px 10px;font-size:14px;min-height:40px}
+.compare-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:14px;line-height:1.3;font-variant-numeric:tabular-nums}
+.compare-table th,.compare-table td{text-align:center;padding:7px 4px;border-bottom:1px solid var(--line);word-break:keep-all;overflow-wrap:anywhere}
+.compare-table thead,.compare-table tfoot{background:var(--paper)}
+.compare-table tbody th{text-align:left;font-weight:500}
+.compare-table button{display:block;background:none;border:0;border-radius:3px;font:inherit;text-align:left;padding:3px;width:100%;min-height:44px;color:var(--green);text-decoration:underline;text-underline-offset:2px}
+.compare-table button small{display:block;font-size:12px;color:var(--muted);text-decoration:none}
+.compare-view .note{color:var(--muted);font-size:14px}
+.compare-view .note:empty{display:none}
+.compare-entry{padding:9px 0;border-top:1px solid var(--line);font-size:15px}
+.compare-entry p{margin-top:6px}
+.compare-view details{font-size:14px}
+.compare-view details summary{cursor:pointer;color:var(--green);padding:5px 0}
+@media(max-width:560px){
+  .modal:has(.compare-view){padding:0}
+  .dialog:has(.compare-view){height:100dvh;max-height:100dvh;border-radius:0}
+  .compare-view{padding:0 12px 12px;gap:8px}
+  .compare-table th,.compare-table td{padding:5px 3px}
+}
+@media(max-height:600px){
+  .compare-view{gap:5px}
+  .compare-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:6px 0;gap:4px}
+  .compare-header h2{font-size:18px}
+  .compare-table th,.compare-table td{padding:2px}
+}
 </style>
 </head>
 <body>
@@ -969,9 +1000,69 @@ function compareSum(list){ // 나쁜 사건 대표 분류 5종 횟수 + 효과�
     web:l.reduce((a,m)=>a+(m.survivedByWeb||0),0), rest:l.reduce((a,m)=>a+(m.restoredCount!=null?m.restoredCount:(m.restored||[]).length),0),
     fall:l.reduce((a,m)=>a+(m.fallenCount||0),0), recon:l.reduce((a,m)=>a+(m.reconnectedCount||0),0), lost:l.reduce((a,m)=>a+m.lost.length,0), chains:l.reduce((a,m)=>a+m.chains,0)};
 }
+function settlementRounds(){
+  return [...new Set(S.players.flatMap(p=>p.hist.map(h=>h.rd||h.settle*3)))].sort((a,b)=>a-b);
+}
+function comparisonEvents(){
+  const events=new Map();
+  S.players.forEach((p,seat)=>{
+    for(const m of S.memoAll[p.name]||[]){
+      const key=(m.rd||m.settle)+'|'+m.ev;
+      if(!events.has(key)) events.set(key,{first:m,cells:Array(S.players.length).fill(null)});
+      events.get(key).cells[seat]=m;
+    }
+  });
+  return [...events.values()].sort((a,b)=>a.first.settle-b.first.settle);
+}
+function comparisonResult(m){
+  if(!m) return '기록 없음';
+  if(m.kind==='bad') return typeOf(m)||'나쁜 사건';
+  const good={got:'1장 받음',gotDec:'분해자 받음',notEligible:'해당 없음',deckEmpty:'덱 소진',noneHoldable:'받을 카드 없음',decFull:'분해자 칸 가득'};
+  return good[m.goodResult]||'좋은 사건';
+}
+function resultDetails(m){
+  if(!m) return ['기록 없음'];
+  const lines=[m.why];
+  if(m.kind==='bad'){
+    lines.push('사라진 생물 '+(m.lost.length?m.lost.join(', '):'없음'),'무너진 먹이사슬 '+m.chains+'개');
+    lines.push(...effectLine(m));
+  }
+  return lines.filter(Boolean);
+}
+function compareScreen(title,content,back){
+  openModal(`<section class="compare-view"><div class="compare-header"><h2>${esc(title)}</h2><div class="tools"><button class="primary" id="comparePdf">모두의 기록지 PDF</button><button id="mOk">${back?'전체 비교':'닫기'}</button></div><p class="note" id="compareMsg" role="status"></p></div>${content}</section>`);
+  document.getElementById('dialog').scrollTop=0;
+  document.getElementById('mOk').onclick=back?openCompare:closeModal;
+  document.getElementById('comparePdf').onclick=()=>downloadRecord(true,document.getElementById('compareMsg'));
+}
 function openCompare(){
-  openModal(`<h2>모두의 기록지 비교</h2><p style="font-size:13.5px">같은 사건에도 판마다 결과가 달라요. 누가 운이 좋았고, 누가 먹이그물 덕분에 버텼는지 비교해 보세요.</p><div style="overflow-x:auto">${compareHTML(false)}</div><p style="font-size:12px">${typeLegendHTML()}</p><p style="font-size:12px;color:var(--muted)">※ ${CHAIN_HELP}</p><p style="font-size:12.5px;color:var(--muted)">생각해 보기: 피해가 적었던 사람의 판은 생산자가 여러 서식지에 나뉘어 있었나요? 먹이가 둘인 소비자가 많았나요?</p><div class="row"><button class="primary" id="mOk">닫기</button></div>`);
-  document.getElementById('mOk').onclick=closeModal;
+  const events=comparisonEvents(), ps=S.players;
+  const heads=ps.map(p=>`<th scope="col">${esc(p.name)}</th>`).join('');
+  const rows=events.map(({first,cells},i)=>`<tr><th scope="row"><button data-event-row="${i}"><small>${esc(evWhen(first))}</small>${esc(first.ev)}</button></th>${cells.map(m=>`<td style="color:${m?TYPECOL[typeOf(m)]||'inherit':'inherit'}">${esc(comparisonResult(m))}</td>`).join('')}</tr>`).join('');
+  const table=`<table class="compare-table" aria-label="사건별 참가자 결과"><thead><tr><th scope="col">사건</th>${heads}</tr></thead><tbody>${rows||`<tr><td colspan="${ps.length+1}">아직 사건이 없어요.</td></tr>`}</tbody><tfoot><tr><th scope="row">누적 점수</th>${ps.map(p=>`<td>${p.total}점</td>`).join('')}</tr></tfoot></table>`;
+  compareScreen('모두의 기록지 비교',table+`<div class="tools"><button id="compareTotals">효과별 합계</button><button id="compareScores">결산별 점수</button>${events.length?'<span class="note">사건 이름을 누르면 자세히 볼 수 있어요.</span>':''}</div>`,false);
+  document.querySelectorAll('[data-event-row]').forEach(b=>b.onclick=()=>{
+    const {first,cells}=events[+b.dataset.eventRow];
+    const content=cells.map((m,i)=>`<article class="compare-entry"><h3>${esc(ps[i].name)} · ${esc(comparisonResult(m))}</h3>${resultDetails(m).map(t=>`<p>${esc(t)}</p>`).join('')}</article>`).join('');
+    compareScreen(evWhen(first)+' · '+first.ev,content,true);
+  });
+  document.getElementById('compareScores').onclick=()=>{
+    const rounds=settlementRounds();
+    const rows=rounds.map(rd=>`<tr><th scope="row">${rd}바퀴</th>${ps.map(p=>{
+      const h=p.hist.find(h=>(h.rd||h.settle*3)===rd);
+      return `<td>${h?h.total+'점<br><small>누적 '+h.cum+'점</small>':'기록 없음'}</td>`;
+    }).join('')}</tr>`).join('');
+    compareScreen('모두의 결산 점수',`<table class="compare-table"><thead><tr><th scope="col">결산</th>${heads}</tr></thead><tbody>${rows||`<tr><td colspan="${ps.length+1}">아직 결산 전이에요.</td></tr>`}</tbody></table>`,true);
+  };
+  document.getElementById('compareTotals').onclick=()=>{
+    const sums=ps.map(p=>compareSum(S.memoAll[p.name]||[]));
+    const metric=(label,vals)=>`<tr><th scope="row">${label}</th>${vals.map(n=>`<td>${n}</td>`).join('')}</tr>`;
+    const effects=[['버틴 소비자 (장)','web'],['되돌린 생산자 (장)','rest'],['무너진 소비자 (장)','fall'],['사라진 생물 (장)','lost'],['끊긴 사슬 (개)','chains'],['다시 이어진 사슬 (개)','recon']];
+    const body=effects.map(([label,k])=>metric(label,sums.map(s=>s[k]))).join('');
+    const types=BADTYPES.map((t,i)=>metric(esc(t),sums.map(s=>s.by[i]))).join('');
+    const header=`<thead><tr><th scope="col">항목</th>${heads}</tr></thead>`;
+    compareScreen('효과별 합계',`<table class="compare-table">${header}<tbody>${body}</tbody></table><details><summary>대표 분류별 횟수와 해설</summary><table class="compare-table">${header}<tbody>${types}</tbody></table><p>${typeLegendHTML()}</p><p>${esc(CHAIN_HELP)}</p><p>피해가 적었던 참가자의 판은 생산자가 여러 서식지에 나뉘어 있었나요? 먹이가 둘인 소비자가 많았나요?</p></details>`,true);
+  };
 }
 function memoText(){
   const me=mine();
@@ -992,7 +1083,7 @@ let DL=null;
 /* ---------- 기록지 PDF (A4 세로, 표는 용지 가운데) ---------- */
 const PDF_C={ink:[31,42,36],muted:[96,104,98],line:[172,182,174],head:[232,240,229],foot:[245,247,242]};
 const hex2rgb=h=>[1,3,5].map(k=>parseInt(String(h).slice(k,k+2),16));
-function buildMemoPdf(){
+function buildMemoPdf(groupOnly=false){
   const JsPDF=window.jspdf&&window.jspdf.jsPDF;
   if(!JsPDF||!window.ECO_PDF_FONT) throw new Error('PDF 도구를 불러오지 못했어요.');
   const doc=new JsPDF({unit:'mm',format:'a4',orientation:'portrait',compress:true});
@@ -1000,7 +1091,8 @@ function buildMemoPdf(){
   doc.addFont('NanumGothic.ttf','NanumGothic','normal');
   doc.addFont('NanumGothic.ttf','NanumGothic','bold'); // 굵은 글꼴 요청이 와도 같은 글꼴로
   doc.setFont('NanumGothic','normal'); doc.setLineHeightFactor(1.32);
-  doc.setProperties({title:'생태계를 지켜라 · 기록지',subject:'기록지 메모',creator:'생태계를 지켜라'});
+  const title=groupOnly?'생태계를 지켜라 · 모두의 기록지':'생태계를 지켜라 · 기록지';
+  doc.setProperties({title,subject:groupOnly?'참가자별 사건 비교':'기록지 메모',creator:'생태계를 지켜라'});
   const W=210,H=297,M=15,CW=W-2*M,TOP=16,BOT=18, me=mine();
   let y=TOP+2;
   const text=(t,size,yy,color,align)=>{doc.setFontSize(size); doc.setTextColor(...(color||PDF_C.ink)); doc.text(t,align==='left'?M:W/2,yy,{align:align||'center'});};
@@ -1022,24 +1114,26 @@ function buildMemoPdf(){
   };
   const empty=(t,n)=>[[{content:t,colSpan:n,styles:{halign:'center',textColor:PDF_C.muted}}]];
 
-  text('생태계를 지켜라 · 기록지',16,y+3); y+=10;
-  text(`이름: ________________      게임한 날: ${new Date().toLocaleDateString('ko-KR')}      참가자: ${S.players.map(p=>p.name).join(' · ')}`,9,y,PDF_C.muted); y+=8;
+  text(title,16,y+3); y+=10;
+  text(`${groupOnly?'':'이름: ________________      '}게임한 날: ${new Date().toLocaleDateString('ko-KR')}      참가자: ${S.players.map(p=>p.name).join(' · ')}`,9,y,PDF_C.muted); y+=8;
 
-  // 1. 사건 기록
-  section(`1. 사건마다 내 생태계에 일어난 일 (${me.name})`);
-  const rows=memoRows();
-  table([14,24,22,30,16,74],['center','center','center','left','center','left'],{
-    head:[['언제','나온 사건','분류','사라진 생물','무너진\n먹이사슬','무너진 이유 · 버틴 이유 · 효과']],
-    body:rows.length?rows.map(m=>[evWhen(m),m.ev,m.type?typeOf(m):'',m.lost.length?m.lost.join(', '):'없음',m.kind==='bad'?`${m.chains}개`:'-',
-      [m.why,...effectLine(m),m.others?'다른 참가자: '+m.others:''].filter(Boolean).join('\n')]):empty('사건 기록이 없어요.',6),
-    cell:d=>{ if(d.section==='body'&&d.column.index===2&&TYPECOL[d.cell.raw]) d.cell.styles.textColor=hex2rgb(TYPECOL[d.cell.raw]); }});
-  note('먹이사슬 수 · '+CHAIN_HELP);
+  if(!groupOnly){
+    // 1. 사건 기록
+    section(`1. 사건마다 내 생태계에 일어난 일 (${me.name})`);
+    const rows=memoRows();
+    table([14,24,22,30,16,74],['center','center','center','left','center','left'],{
+      head:[['언제','나온 사건','분류','사라진 생물','무너진\n먹이사슬','무너진 이유 · 버틴 이유 · 효과']],
+      body:rows.length?rows.map(m=>[evWhen(m),m.ev,m.type?typeOf(m):'',m.lost.length?m.lost.join(', '):'없음',m.kind==='bad'?`${m.chains}개`:'-',
+        [m.why,...effectLine(m),m.others?'다른 참가자: '+m.others:''].filter(Boolean).join('\n')]):empty('사건 기록이 없어요.',6),
+      cell:d=>{ if(d.section==='body'&&d.column.index===2&&TYPECOL[d.cell.raw]) d.cell.styles.textColor=hex2rgb(TYPECOL[d.cell.raw]); }});
+    note('먹이사슬 수 · '+CHAIN_HELP);
+  }
 
   // 2. 모두의 기록지 비교
-  section('2. 모두의 기록지 비교');
-  const ps=S.players, lists=ps.map(p=>(S.memoAll[p.name]||[]).slice().reverse()), n=Math.max(0,...lists.map(l=>l.length));
-  const cmpCell=m=>!m?'':[typeOf(m), ...(m.kind==='bad'?[(m.lost.length?'사라짐: '+m.lost.join(', '):'사라진 생물 없음'),...(m.chains?[`무너진 먹이사슬 ${m.chains}개`]:[])]:[m.why]), ...effectLine(m)].join('\n');
-  const body2=[]; for(let k=0;k<n;k++){ const m0=lists.find(l=>l[k])[k]; body2.push([`${evWhen(m0)}\n${m0.ev}`,...lists.map(l=>cmpCell(l[k]))]); }
+  section(groupOnly?'참가자별 사건 결과':'2. 모두의 기록지 비교');
+  const ps=S.players, lists=ps.map(p=>S.memoAll[p.name]||[]), events=comparisonEvents();
+  const cmpCell=m=>!m?'기록 없음':[comparisonResult(m), ...resultDetails(m)].join('\n');
+  const body2=events.map(({first,cells})=>[evWhen(first)+'\n'+first.ev,...cells.map(m=>groupOnly?comparisonResult(m):cmpCell(m))]);
   const sums=lists.map(compareSum), pw=Math.min(54,(CW-26)/ps.length);
   table([26,...ps.map(()=>pw)],['center',...ps.map(()=>'left')],{fontSize:ps.length>=4?7.8:8.2,
     head:[['사건',...ps.map(p=>p.name)]],
@@ -1049,26 +1143,54 @@ function buildMemoPdf(){
           ['누적 점수',...ps.map(p=>`${p.total}점`)]],
     cell:d=>{ if(d.section==='foot'&&(d.column.index===0||d.row.index===2)) d.cell.styles.halign='center'; }});
 
-  // 3. 결산 점수
-  section(`3. 결산 점수 (${me.name})`);
-  table([22,17,15,17,17,19,15,17,17],[],{
-    head:[['바퀴 · 결산','판 위 생물\n1장 1점','★ 생물\n1장 3점','가로 빙고\n1줄 2점','사선 빙고\n1줄 3점','같은 서식지\n1줄 2점 더','16칸 완성\n+5','이번 점수','누적 점수']],
-    body:me.hist.length?me.hist.map(h=>[hWhen(h),h.cnt,h.stars,h.rows,h.diag,h.same,h.full?'+5':'-',h.total,h.cum].map(String)):empty('아직 결산 전이에요.',9)});
+  if(!groupOnly){
+    // 3. 결산 점수
+    section(`3. 결산 점수 (${me.name})`);
+    table([22,17,15,17,17,19,15,17,17],[],{
+      head:[['바퀴 · 결산','판 위 생물\n1장 1점','★ 생물\n1장 3점','가로 빙고\n1줄 2점','사선 빙고\n1줄 3점','같은 서식지\n1줄 2점 더','16칸 완성\n+5','이번 점수','누적 점수']],
+      body:me.hist.length?me.hist.map(h=>[hWhen(h),h.cnt,h.stars,h.rows,h.diag,h.same,h.full?'+5':'-',h.total,h.cum].map(String)):empty('아직 결산 전이에요.',9)});
+  }
 
+  if(groupOnly && events.length){
+    doc.addPage(); y=TOP+2;
+    for(const {first,cells} of events){
+      section(evWhen(first)+' · '+first.ev);
+      table([32,CW-32],['center','left'],{
+        head:[['참가자','사건 결과와 이유']],
+        body:ps.map((p,i)=>[p.name,cmpCell(cells[i])])});
+    }
+    note('먹이사슬 수 · '+CHAIN_HELP);
+  }
+  if(groupOnly){
+    doc.addPage(); y=TOP+2;
+    section('모두의 결산 점수');
+    const rounds=settlementRounds();
+    table([26,...ps.map(()=>(CW-26)/ps.length)],['center',...ps.map(()=>'center')],{
+      head:[['결산',...ps.map(p=>p.name)]],
+      body:rounds.length?rounds.map(rd=>[rd+'바퀴 끝',...ps.map(p=>{
+        const h=p.hist.find(h=>(h.rd||h.settle*3)===rd);
+        return h?h.total+'점 / 누적 '+h.cum+'점':'기록 없음';
+      })]):empty('아직 결산 전이에요.',ps.length+1)});
+    for(const p of ps){
+      section(p.name+'의 결산 내역');
+      table([22,17,15,17,17,19,15,17,17],[],{
+        head:[['바퀴 · 결산','판 위 생물\n1장 1점','★ 생물\n1장 3점','가로 빙고\n1줄 2점','사선 빙고\n1줄 3점','같은 서식지\n1줄 2점 더','16칸 완성\n+5','이번 점수','누적 점수']],
+        body:p.hist.length?p.hist.map(h=>[hWhen(h),h.cnt,h.stars,h.rows,h.diag,h.same,h.full?'+5':'-',h.total,h.cum].map(String)):empty('아직 결산 전이에요.',9)});
+    }
+  }
   note('대표 분류(우선순위 순) · '+BADTYPES.map(t=>`[${t}] ${TYPEHELP[t]}`).join('  ')+'  대표 분류는 사건마다 하나만 붙어요. 한 사건에서 먹이그물로 버티기와 분해자로 되돌리기가 함께 일어나면 실제 효과 줄에 둘 다 세요.');
 
   const N=doc.getNumberOfPages();
-  for(let k=1;k<=N;k++){ doc.setPage(k); text(`생태계를 지켜라 · 기록지   ${k} / ${N}`,7.5,H-9,PDF_C.muted); }
+  for(let k=1;k<=N;k++){ doc.setPage(k); text(`${title}   ${k} / ${N}`,7.5,H-9,PDF_C.muted); }
   return doc;
 }
 /* Claude 화면에서는 downloads 기능으로, 독립 HTML(일반 브라우저)에서는 브라우저 내려받기로 실제 PDF 파일을 저장해요. */
 const DLP=(window.claude&&window.claude.use)?window.claude.use('downloads').then(d=>(DL=d)).catch(()=>null):null;
-function memoPdfName(ascii){const d=new Date(); const p=n=>String(n).padStart(2,'0'); const day=`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`; return ascii?`ecosystem_record_${day}.pdf`:`생태계를지켜라_기록지_${day}.pdf`;} // 브라우저 내려받기는 한글 파일 이름을 버리는 경우가 있어 영문 이름 사용
-document.getElementById('btnSaveMemo').onclick=async()=>{
-  const msg=document.getElementById('memoMsg');
+function memoPdfName(ascii,groupOnly){const d=new Date(); const p=n=>String(n).padStart(2,'0'); const day=`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`; return ascii?`ecosystem_${groupOnly?'group':'record'}_${day}.pdf`:`생태계를지켜라_${groupOnly?'모두의기록지':'기록지'}_${day}.pdf`;} // 브라우저 내려받기는 한글 파일 이름을 버리는 경우가 있어 영문 이름 사용
+async function downloadRecord(groupOnly,msg){
   msg.textContent='PDF를 만드는 중이에요…';
-  let blob; try{ blob=buildMemoPdf().output('blob'); }catch(e){ msg.textContent='PDF를 만들지 못했어요. '+(e&&e.message?e.message:''); return; }
-  const filename=memoPdfName();
+  let blob; try{ blob=buildMemoPdf(groupOnly).output('blob'); }catch(e){ msg.textContent='PDF를 만들지 못했어요. '+(e&&e.message?e.message:''); return; }
+  const filename=memoPdfName(false,groupOnly);
   const dl = DL || (DLP ? await DLP : null);
   if(dl){
     try{ await dl.save({filename,data:blob}); msg.textContent='기록지 PDF를 저장했어요. 저장한 PDF를 열어 인쇄하세요.'; }
@@ -1078,11 +1200,12 @@ document.getElementById('btnSaveMemo').onclick=async()=>{
   if(window.claude&&window.claude.use){ msg.textContent='이 화면에서는 PDF 파일을 저장할 수 없어요(저장 기능이 허용되지 않음). 메모 복사를 써 주세요.'; return; }
   try{
     const url=URL.createObjectURL(blob), a=document.createElement('a');
-    a.href=url; a.download=memoPdfName(true); a.style.display='none'; document.body.appendChild(a); a.click(); a.remove();
+    a.href=url; a.download=memoPdfName(true,groupOnly); a.style.display='none'; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(()=>URL.revokeObjectURL(url),60000);
     msg.textContent='기록지 PDF 내려받기를 시작했어요. 내려받은 PDF를 열어 인쇄하세요.';
   }catch(e){ msg.textContent='이 브라우저에서는 PDF를 내려받을 수 없어요. 메모 복사를 써 주세요.'; }
-};
+}
+document.getElementById('btnSaveMemo').onclick=()=>downloadRecord(false,document.getElementById('memoMsg'));
 document.getElementById('btnCompare').onclick=openCompare;
 document.getElementById('btnCopyMemo').onclick=async()=>{
   const msg=document.getElementById('memoMsg');
