@@ -325,16 +325,9 @@ function at(p,r,i){if(r<0||r>3||i<0||i>=ROWLEN[r]) return null; return p.board[i
 function eats(top,low){return top&&low&&top.foods&&top.foods.includes(low.name);}
 function hasFood(p,r,i,card){return below(r,i).some(j=>eats(card,at(p,r-1,j)));}
 function canPlace(p,c,r,i){
-  if(c.kind!=='bio') return false;
+  if(c.kind!=='bio' || r!==c.lv-1 || i<0 || i>=ROWLEN[r]) return false;
   if(at(p,r,i)) return false;
-  if(r!==c.lv-1) return false;
-  if(r===0){
-    const anyProd=p.board.slice(0,ROWLEN[0]).some(x=>x);
-    if(!anyProd) return true;
-    if(at(p,0,i-1)||at(p,0,i+1)) return true;
-    return above(0,i).some(k=>eats(at(p,1,k),c));
-  }
-  return hasFood(p,r,i,c);
+  return r===0 || hasFood(p,r,i,c);
 }
 function legalSlots(p,c){const out=[];for(let r=0;r<4;r++)for(let i=0;i<ROWLEN[r];i++) if(canPlace(p,c,r,i)) out.push([r,i]);return out;}
 function anyPlaceable(p){return p.hand.some(c=>legalSlots(p,c).length);}
@@ -808,7 +801,7 @@ function render(){
   let pr='';
   if(S.over) pr='게임이 끝났어요. <b>새 게임</b>을 눌러 다시 할 수 있어요.';
   else if(S.phase==='setup' && !inSetup()) pr = ME<0 ? '구경하는 중이에요.' : '<b>준비 끝</b> · 다른 참가자가 준비를 마치기를 기다려요. ('+S.players.filter((q,k)=>!S.ready[k]).map(q=>q.name).join(', ')+')';
-  else if(S.phase==='setup') pr=anyPlaceable(me)?'<b>준비</b> · 손패에서 카드를 골라 놓을 수 있는 만큼 판에 놓으세요. 첫 생산자는 맨 아랫줄 원하는 칸에 놓을 수 있어요. 다 놓으면 <b>준비 끝</b>.':'<b>준비</b> · 지금 놓을 수 있는 카드가 없어요. <b>준비 끝</b>을 누르면 첫 차례가 시작돼요. 1장을 가져온 뒤에도 놓을 게 없으면 <b>다시 찾아보기</b>를 쓸 수 있어요.';
+  else if(S.phase==='setup') pr=anyPlaceable(me)?'<b>준비</b> · 손패에서 카드를 골라 놓을 수 있는 만큼 판에 놓으세요. 생산자는 맨 아랫줄의 빈칸을 골라 놓으세요. 다 놓으면 <b>준비 끝</b>.':'<b>준비</b> · 지금 놓을 수 있는 카드가 없어요. <b>준비 끝</b>을 누르면 첫 차례가 시작돼요. 1장을 가져온 뒤에도 놓을 게 없으면 <b>다시 찾아보기</b>를 쓸 수 있어요.';
   else if(!myTurnNow()) pr=`<b>${p.name}</b>의 차례예요…`+(p.human&&ME>=0?' 내 차례를 기다리는 동안 다른 사람의 판을 눌러 볼 수 있어요.':'');
   else if(S.phase==='draw') pr='<b>내 차례</b> · 찾아온 생물 3장 중 1장 또는 생물 덱을 눌러 1장 가져오세요.';
   else if(S.arr) pr = S.arr.pick ? '<b>다시 배치</b> · 같은 줄의 다른 칸(주황색)을 누르면 두 카드의 자리가 바뀌어요. 빈칸이면 그리로 옮겨져요.' : '<b>다시 배치</b> · 자리를 바꿀 카드를 누르세요. 같은 줄 안에서만 바꿀 수 있어요. 빨간 표시는 먹이가 없는 카드예요. 다 되면 <b>배치 완료</b>.';
@@ -865,6 +858,12 @@ function bind(){
     if(!myTurn) return;
     if(S.arr){document.getElementById('detail').innerHTML='<b>다시 배치 중</b>이에요. <b>배치 완료</b>를 누른 뒤에 손패를 놓을 수 있어요.'; return;}
     S.moveFrom=null; S.sel = S.sel===c.uid?null:c.uid; render();
+    if(!S.sel) return;
+    if(c.lv===1){
+      const hint=legalSlots(me,c).length?'맨 아랫줄에서 원하는 주황색 빈칸을 누르세요.':'생산자 여섯 칸이 모두 찼어요.';
+      document.getElementById('detail').textContent=c.name+' · '+LV[c.lv][0]+' · '+c.habText+' · '+c.bottom+' · '+hint;
+      return;
+    }
     document.getElementById('detail').innerHTML=`<b>${c.name}</b> · ${LV[c.lv][0]} · ${c.habText} · ${c.bottom}${c.star?' · ★ 멸종위기종':''}<br>${legalSlots(me,c).length?'주황색 칸에 놓을 수 있어요.':(()=>{const h=moveHint(me,c); if(h) return `<b style="color:var(--orange)">${J(h.card.name,'을','를')} ${h.to[1]<h.from[1]?'왼쪽':'오른쪽'}으로 옮기면 놓을 수 있어요.</b> 판 다시 배치하기를 눌러 보세요.`; if(arrangeFor(me,c)) return '<b style="color:var(--orange)">판의 카드를 다시 배치하면 놓을 수 있어요.</b> 판 다시 배치하기를 눌러 같은 줄의 카드끼리 자리를 바꿔 보세요.'; return '지금은 놓을 칸이 없어요. 아래에 먹이가 있어야 해요.';})()}`;
   });
   document.querySelectorAll('.slot[data-r]').forEach(el=>{
@@ -886,7 +885,11 @@ function bind(){
       }
       if(S.sel){
         const c=me.hand.find(x=>x.uid===S.sel);
-        if(c&&canPlace(me,c,r,i)){placeCard(me,c,r,i); S.sel=null; render(); return;}
+        if(c&&canPlace(me,c,r,i)){
+          placeCard(me,c,r,i); S.sel=null; render();
+          document.getElementById('detail').textContent=J(c.name,'을','를')+' '+LV[c.lv][0]+' 줄 '+(i+1)+'번 칸에 놓았어요.';
+          return;
+        }
       }
       if(S.moveMode&&at(me,r,i)){S.moveFrom=[r,i]; S.moveMode=false; render();}
     };
@@ -1089,7 +1092,7 @@ document.getElementById('btnCopyMemo').onclick=async()=>{
 document.getElementById('btnRules').onclick=()=>{
   openModal(`<h2>규칙 한눈에</h2><ol class="rules">
   <li><b>목표</b> · 생산자부터 먹이로 이어지는 나만의 생태 피라미드(아래부터 생산자 6·1차 5·2차 3·최상위 2칸, 모두 16칸)를 쌓아요. 한 바퀴는 모두가 한 번씩 둔 것이고, 3·6·9·12·15·18바퀴 끝에 여섯 번 결산해 점수를 모아요. 참가자는 2~3명이에요.</li>
-  <li><b>놓기</b> · 생산자는 맨 아랫줄(첫 장은 아무 칸, 다음부터 놓인 생산자 옆). 소비자는 먹이선으로 이어진 바로 아래 칸(보통 2칸) 중 하나 이상이 카드에 적힌 먹이일 때만. <b>가운데 2차 칸은 바로 아래 세 칸에 닿아 있어서, 그중 한 칸에만 먹이가 있어도 살 수 있어요.</b> 양 끝 2차 칸은 1차 1·2번, 4·5번과 이어져요. '생산자 옆' 조건은 새로 놓을 때만 적용해요(다시 배치나 사건 뒤에 생산자 사이가 떨어져도 괜찮아요). 결산 전까지는 <b>판 다시 배치하기</b>로 같은 줄 카드끼리 자리를 바꿀 수 있어요(다 바꾼 뒤 모든 소비자 아래에 먹이가 있어야 해요).</li>
+  <li><b>놓기</b> · 생산자 카드를 고르면 맨 아랫줄의 빈칸이 모두 주황색으로 표시돼요. 그중 원하는 칸을 누르면 카드가 놓여요. 소비자는 먹이선으로 이어진 바로 아래 칸(보통 2칸) 중 하나 이상이 카드에 적힌 먹이일 때만. <b>가운데 2차 칸은 바로 아래 세 칸에 닿아 있어서, 그중 한 칸에만 먹이가 있어도 살 수 있어요.</b> 양 끝 2차 칸은 1차 1·2번, 4·5번과 이어져요. 결산 전까지는 <b>판 다시 배치하기</b>로 같은 줄 카드끼리 자리를 바꿀 수 있어요(다 바꾼 뒤 모든 소비자 아래에 먹이가 있어야 해요).</li>
   <li><b>내 차례</b> · 찾아온 생물이나 생물 덱에서 1장 → (놓을 생물이 없으면) 다시 찾아보기 1번 → 내려놓기 → 차례 끝. 시간 제한은 없어요. <b>함께하기</b>로 방 코드를 나누면 여러 사람이 각자 화면에서 함께할 수 있어요(빈자리는 컴퓨터).</li>
   <li><b>손패</b> · 내려놓은 뒤 5장 이하. 같은 카드는 2장까지(3장째는 덱에 섞고 다시 1장). 처음 받을 때, 다시 찾아보기, 좋은 사건으로 받을 때도 똑같아요. 받을 수 있는 카드가 덱에 없으면 받지 않아요. 분해자는 분해자 칸에 3장까지.</li>
   <li><b>결산 점수</b> · 판 위 생물 1장에 1점, ★ 1장에 3점, 가로 빙고 1줄에 2점, 먹이사슬 줄(꼭대기 두 칸에서 각각 왼쪽·오른쪽 바깥 먹이선을 따라 내려간 주황 연결선 4줄, 4장이 실제 먹이로 이어짐) 1줄에 3점, 4장이 같은 서식지면 1줄에 2점 더, 16칸 완성은 마지막 결산에 +5점.</li>
