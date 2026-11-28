@@ -179,6 +179,42 @@
           }
         ],
         "kind": "lab"
+      },
+      {
+        "title": "목소리 실험실 · GPT 독립판",
+        "subject": "physics",
+        "date": "2026-11-28",
+        "desc": "정돈된 한국어 화면과 준비된 A/B 비교로 목소리를 조작하고 소리의 크기·높낮이·음색을 탐색하는 독립 시안입니다.",
+        "tag": "소리의 3요소 · 독립 시안",
+        "level": "중학교 과학 · 자유 탐구",
+        "cover": "/assets/covers/voice-lab-gpt.jpg",
+        "poster": "wave",
+        "words": "목소리 실험실\nGPT 독립판",
+        "links": [
+          {
+            "label": "실험 열기",
+            "url": "/voice-lab/gpt/"
+          }
+        ],
+        "kind": "lab"
+      },
+      {
+        "title": "목소리 실험실 · Claude 독립판",
+        "subject": "physics",
+        "date": "2026-11-28",
+        "desc": "조건을 직접 조절하고 다섯 모음·파형·스펙트럼·진동수·주기를 비교하는 목소리 실험실 독립 시안입니다.",
+        "tag": "소리의 3요소 · 독립 시안",
+        "level": "중학교 과학 · 자유 탐구",
+        "cover": "/assets/covers/voice-lab-claude.jpg",
+        "poster": "wave",
+        "words": "목소리 실험실\nClaude 독립판",
+        "links": [
+          {
+            "label": "실험 열기",
+            "url": "/voice-lab/claude/"
+          }
+        ],
+        "kind": "lab"
       }
     ],
     "real": [
